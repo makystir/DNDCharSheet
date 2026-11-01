@@ -1,0 +1,31 @@
+---
+inclusion: fileMatch
+fileMatchPattern: "**/*.tsx,**/*.css,**/*.module.css"
+---
+
+# UI Layout Rules
+
+## Text Content Must Remain Readable
+
+When adding UI controls (buttons, icons, drag handles, toggles, badges) to existing components:
+
+1. **Never reduce content readability.** Item names, spell names, feature names, skill names, and any user-entered text must remain fully visible or wrap naturally. Do not allow new controls to push text into truncation (`text-overflow: ellipsis`) unless it was already truncated before the change.
+
+2. **Measure the horizontal budget.** Before adding inline controls to a row, check the container's minimum width (look at `minmax()` in grid definitions or `min-width` on flex containers). If the new controls would consume more than 20% of available width, use one of these patterns instead:
+   - Show controls only on hover/focus (hidden by default on desktop)
+   - Place controls in an absolutely-positioned overlay
+   - Use a compact icon that expands on interaction
+   - Move controls to a secondary row that appears on expand/hover
+
+3. **Flex items holding text content must have `min-width: 0` and `flex: 1`.** This prevents flex children from overflowing their container when sibling elements are added.
+
+4. **Compact cards are small (~160px minimum).** Any inline control added to a small card (an inventory item, a prepared-spell chip, a condition badge) must be ≤24px wide at rest. Use hover-reveal or icon-only patterns.
+
+5. **Rich cards use a two-line structure.** Line 1 is the primary name (full width, never truncated) — e.g. a weapon, spell, or feature name. Line 2 is stats + action buttons (attack bonus, damage, save DC, cast/attack buttons). Never put the name on the same flex row as buttons — they will always crowd it out.
+
+## Mobile Touch Targets
+
+On mobile (`@media (max-width: 767px)` or `@media (hover: none)`):
+- Interactive elements must meet 44×44px minimum tap target
+- Use CSS to enlarge controls on touch devices rather than making desktop controls permanently large
+- Controls hidden on desktop via hover-reveal should be always-visible on touch devices
