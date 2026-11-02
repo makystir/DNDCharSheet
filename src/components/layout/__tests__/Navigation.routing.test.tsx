@@ -86,3 +86,46 @@ describe('Navigation routing (shell)', () => {
     });
   });
 });
+
+describe('Character sub-tab routing', () => {
+  beforeEach(() => {
+    // Clean resolve chain so a stored last-used tab does not override deep links.
+    localStorage.removeItem('lastSubTab:character');
+    localStorage.removeItem('tabOrder:character');
+  });
+
+  afterEach(() => {
+    localStorage.removeItem('lastSubTab:character');
+    localStorage.removeItem('tabOrder:character');
+  });
+
+  it('deep-links #character/species land on the Species sub-tab', async () => {
+    history.replaceState(null, '', '#character/species');
+    render(<App />);
+    await screen.findByRole('combobox', { name: 'Species' });
+    expect(window.location.hash).toBe('#character/species');
+  });
+
+  it('#character with no sub-tab lands on overview (Ability Scores)', async () => {
+    history.replaceState(null, '', '#character');
+    render(<App />);
+    expect(await screen.findByText('Ability Scores')).toBeInTheDocument();
+  });
+
+  it('#character/bogus falls back to overview when no last-used is stored', async () => {
+    localStorage.removeItem('lastSubTab:character');
+    history.replaceState(null, '', '#character/bogus');
+    render(<App />);
+    expect(await screen.findByText('Ability Scores')).toBeInTheDocument();
+  });
+
+  it('clicking a sub-tab updates the hash and persists last-used', async () => {
+    history.replaceState(null, '', '#character');
+    render(<App />);
+    await screen.findByText('Ability Scores');
+    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
+    await screen.findByRole('combobox', { name: 'Class' });
+    expect(window.location.hash).toBe('#character/class');
+    expect(localStorage.getItem('lastSubTab:character')).toBe('class');
+  });
+});

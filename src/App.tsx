@@ -31,7 +31,7 @@ function App() {
       return 'dark';
     }
   });
-  const { page, navigate } = useHashRoute();
+  const { page, subTab, navigate } = useHashRoute();
 
   // Load the most recent character, or create a fresh one if none exist.
   useEffect(() => {
@@ -104,7 +104,12 @@ function App() {
         {state.status === 'ready' && (
           <>
             {page === 'character' && (
-              <CharacterPage character={state.character} onChange={handleChange} />
+              <CharacterPage
+                character={state.character}
+                onChange={handleChange}
+                subTab={subTab}
+                onSubTabChange={(tab) => navigate('character', tab)}
+              />
             )}
             {page === 'combat' && (
               <CombatPage character={state.character} onChange={handleChange} />

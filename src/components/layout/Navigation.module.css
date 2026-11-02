@@ -73,13 +73,45 @@
   border-left: 3px solid var(--accent-gold);
 }
 
-/* Label text takes the slack and never pushes the icon out. */
+/*
+ * Label wrapper: a two-line column (label row on top, optional sub-hint below).
+ * It takes the slack and never pushes the icon out. Items without a subTabHint
+ * render a single bare label row inside it.
+ */
 .navItemLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   min-width: 0;
   flex: 1;
+}
+
+/* First line: label text + optional sub-tab caret; the label text clips here. */
+.navItemLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The caret never shrinks, so the label text truncates before it. */
+.subTabCaret {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+/* Second line: the sub-tab hint, ellipsized within the sidebar. */
+.navItemSubHint {
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Collapsed nav item: icon-only, centered */
@@ -153,6 +185,7 @@
 .mobileLabelRow {
   display: inline-flex;
   align-items: center;
+  gap: 2px;
   min-width: 0;
 }
 

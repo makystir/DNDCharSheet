@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, ChevronRight } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { NAV_ITEMS } from './navItems';
 import type { PageSection } from './navItems';
@@ -100,7 +100,12 @@ export function Navigation({ activePage, onPageChange }: NavigationProps) {
             <span className={styles.iconWrapper}>
               <Icon size={18} />
             </span>
-            <span className={styles.mobileLabelRow}>{item.label}</span>
+            <span className={styles.mobileLabelRow}>
+              {item.label}
+              {item.subTabHint && (
+                <ChevronRight size={10} className={styles.subTabCaret} aria-hidden="true" />
+              )}
+            </span>
           </button>
         );
       })}
@@ -126,7 +131,21 @@ export function Navigation({ activePage, onPageChange }: NavigationProps) {
           <span className={styles.iconWrapper}>
             <Icon size={18} />
           </span>
-          {!collapsed && <span className={styles.navItemLabel}>{item.label}</span>}
+          {!collapsed && (
+            <span className={styles.navItemLabel}>
+              <span className={styles.navItemLabelRow}>
+                {item.label}
+                {item.subTabHint && (
+                  <ChevronRight size={12} className={styles.subTabCaret} aria-hidden="true" />
+                )}
+              </span>
+              {item.subTabHint && (
+                <span className={styles.navItemSubHint} aria-hidden="true">
+                  {item.subTabHint}
+                </span>
+              )}
+            </span>
+          )}
         </button>
       );
     });

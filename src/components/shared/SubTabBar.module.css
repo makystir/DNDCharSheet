@@ -79,3 +79,226 @@
     padding: 10px 14px;
   }
 }
+
+/* === Edit Mode Styles (ported from WFRP, re-themed to D&D tokens) === */
+
+/* Wrapper when editMode prop is provided (always shown for toggle button) */
+.editModeContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+/* Active edit mode: highlight the container */
+.editModeContainerActive {
+  composes: editModeContainer;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-gold);
+}
+
+/* When inside the edit mode container, tablist takes remaining space */
+.subTabBarFlex {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+/* Container for toggle + reset buttons */
+.editControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+/* Edit/Done toggle button */
+.editToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.editToggleBtn:hover {
+  background: var(--border);
+}
+
+.editToggleBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+/* Reset button */
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.resetBtn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+}
+
+.resetBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.resetBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Arrow buttons on tabs */
+.arrowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.arrowBtn:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+}
+
+.arrowBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Disabled state for boundary arrow buttons */
+.arrowBtnDisabled {
+  composes: arrowBtn;
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Tab styling in edit mode (with transition for movement) */
+.tabEditMode {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  transition: transform 150ms ease, background 150ms ease;
+  cursor: default;
+}
+
+.tabEditMode[aria-selected='true'] {
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border-bottom: 2px solid var(--accent-gold);
+}
+
+/* Tab label button inside edit mode (no navigation) */
+.tabLabel {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 4px 2px;
+  cursor: default;
+}
+
+/* Animation class applied during tab position change */
+.tabMoving {
+  transition: transform 150ms ease;
+}
+
+/* === Mobile touch targets for edit mode (≤768px) === */
+@media (max-width: 768px) {
+  .editToggleBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .resetBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .arrowBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .arrowBtnDisabled {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tabEditMode {
+    min-height: 44px;
+  }
+
+  /* Compact edit controls on mobile */
+  .editControls {
+    padding: 2px;
+  }
+}
+
+/* Respect reduced-motion preferences for the tab-move transition */
+@media (prefers-reduced-motion: reduce) {
+  .tabEditMode,
+  .tabMoving {
+    transition: none;
+  }
+}
+
+/* Visually hidden but accessible to screen readers (aria-live region) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

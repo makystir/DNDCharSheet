@@ -15,6 +15,12 @@ export interface NavItem {
   icon: LucideIcon;
   /** The number key that switches to this page. */
   shortcut: string;
+  /**
+   * Advertises the combined scope of this page's sub-tabs (e.g. shown as a
+   * secondary hint line beside the label). Purely presentational — it does not
+   * change the routing key (`#<id>`).
+   */
+  subTabHint?: string;
 }
 
 /**
@@ -25,7 +31,13 @@ export interface NavItem {
  * new page module wired into the shell's page switch.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'character', label: 'Character', icon: User, shortcut: '1' },
+  {
+    id: 'character',
+    label: 'Character',
+    icon: User,
+    shortcut: '1',
+    subTabHint: 'Overview · Skills & Saves · Species · Class & Features',
+  },
   { id: 'combat', label: 'Combat', icon: Swords, shortcut: '2' },
   { id: 'settings', label: 'Settings', icon: Settings, shortcut: '3' },
 ];

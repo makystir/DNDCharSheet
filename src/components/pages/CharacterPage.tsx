@@ -37,17 +37,37 @@ import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
 import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
 import type { ClassSelection, SpeciesSelection } from '../../types/character';
+import { useEffect, useState } from 'react';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EditableField } from '../shared/EditableField';
+import { SubTabBar } from '../shared/SubTabBar';
+import { useTabOrder } from '../../hooks/useTabOrder';
+import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
 import { SIZE_LABELS, choiceOptions, srdBadge } from './sheet-helpers';
 import styles from './CharacterPage.module.css';
 
 export interface CharacterPageProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** The sub-tab from the URL hash (or null); the page owns final resolution. */
+  subTab?: string | null;
+  /** Called when the user selects a sub-tab, to sync the hash. */
+  onSubTabChange?: (tab: string) => void;
 }
+
+type CharSubTab = 'overview' | 'skills' | 'species' | 'class';
+
+// Stable identity (module scope) so it stays out of effect dependency arrays.
+const VALID_SUBTABS: CharSubTab[] = ['overview', 'skills', 'species', 'class'];
+
+const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'skills', label: 'Skills & Saves' },
+  { id: 'species', label: 'Species' },
+  { id: 'class', label: 'Class & Features' },
+];
 
 /**
  * The Character tab: identity, the six ability scores + derived modifiers, the
@@ -55,7 +75,54 @@ export interface CharacterPageProps {
  * Throws, and Skills. Section logic and every CalculatedValue call-site are
  * lifted verbatim from the former single-page CharacterSheet.
  */
-export function CharacterPage({ character, onChange }: CharacterPageProps) {
+export function CharacterPage({
+  character,
+  onChange,
+  subTab,
+  onSubTabChange,
+}: CharacterPageProps) {
+  const {
+    orderedTabs,
+    isEditMode,
+    toggleEditMode,
+    moveLeft,
+    moveRight,
+    resetOrder,
+    isDefaultOrder,
+    saveError,
+  } = useTabOrder({ pageKey: 'character', defaultTabs: DEFAULT_SUBTABS });
+
+  const isValidSubTab = (value: string | null | undefined): value is CharSubTab =>
+    value != null && VALID_SUBTABS.includes(value as CharSubTab);
+
+  // Resolve order (WFRP): valid hash sub-tab → last-used → first ordered → 'overview'.
+  const resolveInitialTab = (): CharSubTab => {
+    if (isValidSubTab(subTab)) return subTab;
+    const lastUsed = loadLastSubTab('character');
+    if (isValidSubTab(lastUsed)) return lastUsed;
+    const firstOrdered = orderedTabs[0]?.id;
+    if (isValidSubTab(firstOrdered)) return firstOrdered;
+    return 'overview';
+  };
+
+  const [activeSubTab, setActiveSubTabInternal] = useState<CharSubTab>(resolveInitialTab);
+
+  // Mirror a valid external hash sub-tab into local state (deep link / paste).
+  useEffect(() => {
+    if (subTab && isValidSubTab(subTab)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveSubTabInternal(subTab);
+    }
+    // Only the external hash prop should retrigger this mirror; isValidSubTab
+    // reads only module-scoped VALID_SUBTABS, so subTab is the sole dependency.
+  }, [subTab]);
+
+  const setActiveSubTab = (tab: CharSubTab) => {
+    setActiveSubTabInternal(tab);
+    saveLastSubTab('character', tab);
+    onSubTabChange?.(tab);
+  };
+
   const setName = (name: string) => onChange({ ...character, name });
 
   const setLevel = (raw: string) => {
@@ -183,8 +250,25 @@ export function CharacterPage({ character, onChange }: CharacterPageProps) {
 
   return (
     <div className={styles.page}>
-      <Card>
-        <div className={styles.header}>
+      <SubTabBar
+        tabs={orderedTabs}
+        activeTab={activeSubTab}
+        onTabChange={(t) => setActiveSubTab(t as CharSubTab)}
+        editMode={{
+          isActive: isEditMode,
+          onToggle: toggleEditMode,
+          onMoveLeft: moveLeft,
+          onMoveRight: moveRight,
+          onReset: resetOrder,
+          isDefaultOrder,
+          saveError,
+        }}
+      />
+
+      {activeSubTab === 'overview' && (
+        <>
+          <Card>
+            <div className={styles.header}>
           <EditableField
             label="Character name"
             value={character.name}
@@ -254,7 +338,10 @@ export function CharacterPage({ character, onChange }: CharacterPageProps) {
           })}
         </div>
       </Card>
+        </>
+      )}
 
+      {activeSubTab === 'species' && (
       <Card>
         <CollapsibleSection title="Species" storageKey="dnd-collapse-species">
           <div className={styles.speciesGrid}>
@@ -364,7 +451,9 @@ export function CharacterPage({ character, onChange }: CharacterPageProps) {
           )}
         </CollapsibleSection>
       </Card>
+      )}
 
+      {activeSubTab === 'class' && (
       <Card>
         <CollapsibleSection title="Class" storageKey="dnd-collapse-class">
           <div className={styles.classGrid}>
@@ -541,7 +630,10 @@ export function CharacterPage({ character, onChange }: CharacterPageProps) {
           )}
         </CollapsibleSection>
       </Card>
+      )}
 
+      {activeSubTab === 'skills' && (
+        <>
       <Card>
         <CollapsibleSection title="Saving Throws" storageKey="dnd-collapse-saves">
           <ul className={styles.statList}>
@@ -628,6 +720,8 @@ export function CharacterPage({ character, onChange }: CharacterPageProps) {
           </ul>
         </CollapsibleSection>
       </Card>
+        </>
+      )}
     </div>
   );
 }

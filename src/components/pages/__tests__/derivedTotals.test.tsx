@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { CharacterPage } from '../CharacterPage';
 import { CombatPage } from '../CombatPage';
 import { ABILITY_NAMES, ABILITIES, SKILLS } from '../../../types/character';
@@ -18,36 +18,35 @@ describe('derived totals survive the page split', () => {
     species: { id: 'elf' as const, elvenLineage: 'woodElf' as const },
   };
 
-  it('CharacterPage exposes every expected CalculatedValue trigger', () => {
-    render(<CharacterPage character={character} onChange={vi.fn()} />);
-
-    // Proficiency Bonus
+  it('CharacterPage exposes every expected CalculatedValue trigger across sub-tabs', () => {
+    // Overview: Proficiency Bonus + ability modifiers.
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="overview" />);
     expect(
       screen.getByRole('button', { name: /Proficiency Bonus/ }),
     ).toBeInTheDocument();
-
-    // Each ability modifier
     for (const ability of ABILITIES) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Modifier`) }),
       ).toBeInTheDocument();
     }
+    cleanup();
 
-    // Each saving throw
+    // Skills: every saving throw + every skill check.
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="skills" />);
     for (const ability of ABILITIES) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Save`) }),
       ).toBeInTheDocument();
     }
-
-    // Each skill
     for (const skill of SKILLS) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${skill.name} Check`) }),
       ).toBeInTheDocument();
     }
+    cleanup();
 
-    // Species-derived values
+    // Species: Speed + Darkvision.
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="species" />);
     expect(screen.getByRole('button', { name: /Speed/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Darkvision/ })).toBeInTheDocument();
   });
