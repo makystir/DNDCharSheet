@@ -2,8 +2,21 @@ import { describe, it, expect } from 'vitest';
 import { CLASS_CATALOG, CLASS_LIST, getClass } from '../classes';
 import type { ClassData } from '../classes';
 
-// The classes shipped with full level-1-to-20 feature lists this stage.
-const FULL_FEATURE_CLASSES = ['barbarian', 'cleric', 'rogue', 'wizard'] as const;
+// All twelve classes now ship with full level-1-to-20 feature lists.
+const FULL_FEATURE_CLASSES = [
+  'barbarian',
+  'bard',
+  'cleric',
+  'druid',
+  'fighter',
+  'monk',
+  'paladin',
+  'ranger',
+  'rogue',
+  'sorcerer',
+  'warlock',
+  'wizard',
+] as const;
 
 // All twelve classes, alphabetical (declaration) order.
 const EXPECTED_IDS = [
@@ -46,11 +59,22 @@ const FIXTURES: Record<
   wizard: { hitDie: 6, subclassLevel: 3 },
 };
 
-/** ASI-marker fixtures per full-feature class (ASI rows + level-19 Epic Boon). */
+/**
+ * ASI-marker fixtures per class (ASI rows + the level-19 Epic Boon row),
+ * transcribed from each class's Features table (PHB 2024 Chapter 3).
+ */
 const ASI_MARKER_LEVELS: Record<string, number[]> = {
   barbarian: [4, 8, 12, 16, 19],
+  bard: [4, 8, 12, 16, 19],
   cleric: [4, 8, 12, 16, 19],
-  rogue: [4, 8, 10, 12, 16, 19],
+  druid: [4, 8, 12, 16, 19],
+  fighter: [4, 6, 8, 12, 14, 16, 19], // Fighter gains ASI at 4/6/8/12/14/16.
+  monk: [4, 8, 12, 16, 19],
+  paladin: [4, 8, 12, 16, 19],
+  ranger: [4, 8, 12, 16, 19],
+  rogue: [4, 8, 10, 12, 16, 19], // Rogue gains an extra ASI at level 10.
+  sorcerer: [4, 8, 12, 16, 19],
+  warlock: [4, 8, 12, 16, 19],
   wizard: [4, 8, 12, 16, 19],
 };
 
@@ -146,12 +170,17 @@ describe('CLASS_CATALOG', () => {
     }
   });
 
-  it('ships exactly the four full-feature classes; the rest are names-only', () => {
+  it('ships a full feature list for every class', () => {
     for (const c of CLASS_LIST) {
-      if ((FULL_FEATURE_CLASSES as readonly string[]).includes(c.id)) {
-        expect(c.features.length).toBeGreaterThan(0);
-      } else {
-        expect(c.features).toEqual([]);
+      expect((FULL_FEATURE_CLASSES as readonly string[]).includes(c.id)).toBe(true);
+      expect(c.features.length).toBeGreaterThan(0);
+      // Every class has a level-1 feature. (Paladin's level-20 row is a
+      // subclass feature, so a level-20 class feature is not universal.)
+      expect(c.features.some((f) => f.level === 1)).toBe(true);
+      // Every feature level is within the 1-20 range.
+      for (const f of c.features) {
+        expect(f.level).toBeGreaterThanOrEqual(1);
+        expect(f.level).toBeLessThanOrEqual(20);
       }
     }
   });
@@ -165,11 +194,10 @@ describe('CLASS_CATALOG', () => {
     expect(asiLevels).toEqual(ASI_MARKER_LEVELS[id]);
   });
 
-  it('marks the level-19 Epic Boon as an asi-marker on Barbarian and Fighter-style full classes', () => {
-    // Spot-check Barbarian (full) — Fighter is names-only this stage, so the
-    // Epic Boon assertion is spot-checked on the full-feature classes that
-    // include it.
-    for (const id of ['barbarian', 'wizard'] as const) {
+  it('marks the level-19 Epic Boon as an asi-marker on every class', () => {
+    // Every PHB 2024 class gains an Epic Boon at level 19 (a feat choice,
+    // never an automatic ability-score change).
+    for (const id of EXPECTED_IDS) {
       const c = getClass(id)!;
       const epicBoon = c.features.find((f) => f.level === 19);
       expect(epicBoon?.name).toBe('Epic Boon');
