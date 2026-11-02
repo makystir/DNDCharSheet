@@ -159,6 +159,38 @@ describe('CharacterPage', () => {
     });
   });
 
+  describe('personal details (overview)', () => {
+    it('renders the Personal Details section with the portrait on overview', () => {
+      renderPage();
+      expect(
+        screen.getByRole('heading', { name: 'Personal Details' }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Alignment' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Personality')).toBeInTheDocument();
+      expect(screen.getByText('No portrait set')).toBeInTheDocument();
+    });
+
+    it('Ability Scores still renders alongside Personal Details on overview', () => {
+      renderPage();
+      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
+    });
+
+    it('has exactly one Character name control on overview (consolidated)', () => {
+      renderPage();
+      expect(screen.getAllByRole('button', { name: 'Character name' })).toHaveLength(1);
+    });
+
+    it('editing the consolidated name field updates character.name', () => {
+      const { onChange } = renderStatefulPage({ name: 'Old Name' });
+      fireEvent.click(screen.getByRole('button', { name: 'Character name' }));
+      const input = screen.getByRole('textbox', { name: 'Character name' });
+      fireEvent.change(input, { target: { value: 'Renamed' } });
+      fireEvent.blur(input);
+      expect(onChange.mock.calls.at(-1)?.[0].name).toBe('Renamed');
+    });
+  });
+
   describe('species', () => {
     it('shows sensible placeholders with no species selected', () => {
       renderPage({}, 'species');
@@ -295,8 +327,9 @@ describe('CharacterPage', () => {
       ]);
     });
 
-    it('defaults to overview (header + Ability Scores, no other sections)', () => {
+    it('defaults to overview (Personal Details + header + Ability Scores, no other sections)', () => {
       renderPage();
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
       expect(screen.getByText('Ability Scores')).toBeInTheDocument();
       // Species / Class / Saving Throws / Skills section headings are gated away.
       expect(screen.queryByRole('combobox', { name: 'Species' })).toBeNull();

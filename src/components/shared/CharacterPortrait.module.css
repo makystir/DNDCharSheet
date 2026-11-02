@@ -1,0 +1,155 @@
+/* CharacterPortrait component styles (ported from WFRP, re-themed to D&D tokens). */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.frame {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.enlargeTrigger {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  display: block;
+}
+
+.enlargeTrigger:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.15s ease;
+}
+
+.enlargeTrigger:hover .img {
+  transform: scale(1.04);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--overlay);
+  cursor: zoom-out;
+}
+
+.overlayImg {
+  max-width: min(92vw, 900px);
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: var(--elevation-1);
+  cursor: default;
+}
+
+.overlayClose {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.overlayClose:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  width: 200px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn:focus-visible,
+.removeBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.removeBtn {
+  composes: btn;
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+}
+
+.guidance {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.error {
+  font-size: 11px;
+  color: var(--accent-red);
+  text-align: center;
+  min-height: 16px;
+}
+
+/* Mobile: enforce 44×44 tap targets on the portrait controls. */
+@media (max-width: 767px), (hover: none) {
+  .btn,
+  .removeBtn {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 14px;
+  }
+}

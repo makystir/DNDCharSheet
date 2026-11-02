@@ -41,7 +41,7 @@ import { useEffect, useState } from 'react';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
-import { EditableField } from '../shared/EditableField';
+import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
@@ -55,6 +55,12 @@ export interface CharacterPageProps {
   subTab?: string | null;
   /** Called when the user selects a sub-tab, to sync the hash. */
   onSubTabChange?: (tab: string) => void;
+  /** Portrait object URL (owned by the shell's usePortrait), or '' for none. */
+  portraitURL?: string;
+  /** Upload a portrait file for the active character. */
+  onPortraitUpload?: (file: File) => void;
+  /** Remove the active character's portrait. */
+  onPortraitRemove?: () => void;
 }
 
 type CharSubTab = 'overview' | 'skills' | 'species' | 'class';
@@ -80,6 +86,9 @@ export function CharacterPage({
   onChange,
   subTab,
   onSubTabChange,
+  portraitURL = '',
+  onPortraitUpload,
+  onPortraitRemove,
 }: CharacterPageProps) {
   const {
     orderedTabs,
@@ -122,8 +131,6 @@ export function CharacterPage({
     saveLastSubTab('character', tab);
     onSubTabChange?.(tab);
   };
-
-  const setName = (name: string) => onChange({ ...character, name });
 
   const setLevel = (raw: string) => {
     const level = clampLevel(Number.parseInt(raw, 10));
@@ -267,18 +274,16 @@ export function CharacterPage({
 
       {activeSubTab === 'overview' && (
         <>
-          <Card>
-            <div className={styles.header}>
-          <EditableField
-            label="Character name"
-            value={character.name}
-            type="text"
-            mode="tap-to-edit"
-            required={false}
-            onSave={(v) => setName(String(v))}
-            style={{ flex: '1 1 240px', minWidth: '180px' }}
+          <PersonalDetailsSection
+            character={character}
+            onChange={onChange}
+            portraitURL={portraitURL}
+            onPortraitUpload={onPortraitUpload ?? (() => {})}
+            onPortraitRemove={onPortraitRemove ?? (() => {})}
           />
 
+          <Card>
+            <div className={styles.header}>
           <div className={styles.levelField}>
             <label className={styles.fieldLabel} htmlFor="char-level">
               Level

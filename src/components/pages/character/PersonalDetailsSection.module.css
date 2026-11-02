@@ -1,0 +1,98 @@
+/* PersonalDetailsSection styles (own module; D&D parchment-and-gold tokens). */
+
+.section {
+  display: block;
+}
+
+.identityRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  /* Allow the fixed-size portrait to wrap above the card on narrow screens
+     rather than pushing the card off-screen (ui-layout rule 3). */
+  flex-wrap: wrap;
+}
+
+.gridAutoFill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.selectWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.selectLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.select {
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: inherit;
+  min-height: 28px;
+  width: 100%;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.personalityField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Mobile: stack the portrait above the card, one-column fields, 44px targets. */
+@media (max-width: 767px) {
+  .identityRow {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .gridAutoFill {
+    grid-template-columns: 1fr;
+  }
+
+  .select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .textarea {
+    font-size: 16px;
+  }
+}

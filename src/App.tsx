@@ -6,6 +6,7 @@ import {
   saveCharacter,
 } from './storage/character-store';
 import { useHashRoute } from './hooks/useHashRoute';
+import { usePortrait } from './hooks/usePortrait';
 import { Navigation } from './components/layout/Navigation';
 import { PageContainer } from './components/layout/PageContainer';
 import { NAV_ITEMS } from './components/layout/navItems';
@@ -32,6 +33,14 @@ function App() {
     }
   });
   const { page, subTab, navigate } = useHashRoute();
+
+  // Portrait object-URL lifecycle is owned at the shell, keyed by the active
+  // character id so it survives sub-tab navigation (which mounts/unmounts the
+  // Overview section). Called unconditionally with a stable call site; an empty
+  // id (not yet ready) simply yields no portrait.
+  const activeCharacterId = state.status === 'ready' ? state.character.id : '';
+  const { portraitURL, uploadPortrait, removePortrait } =
+    usePortrait(activeCharacterId);
 
   // Load the most recent character, or create a fresh one if none exist.
   useEffect(() => {
@@ -109,6 +118,9 @@ function App() {
                 onChange={handleChange}
                 subTab={subTab}
                 onSubTabChange={(tab) => navigate('character', tab)}
+                portraitURL={portraitURL}
+                onPortraitUpload={uploadPortrait}
+                onPortraitRemove={removePortrait}
               />
             )}
             {page === 'combat' && (

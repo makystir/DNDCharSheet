@@ -177,6 +177,26 @@ export interface HouseRules {
   rolledHp?: boolean;
 }
 
+/**
+ * Alignment labels — PHB 2024 "Alignment": the nine-alignment grid plus
+ * Unaligned. These are descriptive identity labels only; they carry no
+ * mechanical effect in this app (no rule is invented — rules-compliance rule 1).
+ */
+export const ALIGNMENTS = [
+  'Lawful Good',
+  'Neutral Good',
+  'Chaotic Good',
+  'Lawful Neutral',
+  'True Neutral',
+  'Chaotic Neutral',
+  'Lawful Evil',
+  'Neutral Evil',
+  'Chaotic Evil',
+  'Unaligned',
+] as const;
+
+export type Alignment = (typeof ALIGNMENTS)[number];
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -245,6 +265,44 @@ export interface Character {
   rolledHpTotal?: number;
   /** Opt-in house rules; absent = rules-as-written. */
   houseRules?: HouseRules;
+
+  // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
+  // Additive-optional, free-text identity fields. NONE is a game mechanic or
+  // feeds a derived value, so there is no CURRENT_VERSION bump and no migration
+  // (same convention as the Stage-3 `species` / Stage-4 `class` optional fields
+  // above). A record lacking any of these loads unchanged.
+  //
+  // `name` already exists above and remains the single identity name — there is
+  // deliberately NO second name field here.
+
+  /** Alignment — a PHB 2024 nine-alignment label or "Unaligned" (descriptive, not a mechanic). */
+  alignment?: Alignment;
+  /** Faith / patron deity (free text; PHB 2024 lists deities as flavour, no mechanic here). */
+  faith?: string;
+  /** Biological sex / gender descriptor (free text). */
+  sex?: string;
+  /** Age (free text — species lifespans vary; no validation). */
+  age?: string;
+  /** Height (free text). */
+  height?: string;
+  /** Weight (free text). */
+  weight?: string;
+  /** Eye colour (free text). */
+  eyes?: string;
+  /** Hair (free text). */
+  hair?: string;
+  /** Skin (free text). */
+  skin?: string;
+  /**
+   * Background — FREE TEXT / notes only this stage. The 2024 Background
+   * MECHANICS (ability-score increases, skill & tool proficiencies, origin feat
+   * — PHB 2024 "Backgrounds") are a LATER stage and are deliberately NOT
+   * modelled here.
+   */
+  background?: string;
+  /** Free-text personality notes, rendered as a multiline textarea. */
+  personality?: string;
+
   /** Creation timestamp (epoch ms). */
   createdAt: number;
   /** Last-modified timestamp (epoch ms). */

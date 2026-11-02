@@ -88,6 +88,10 @@ export function createCharacter(name = ''): Character {
     // to avoid sharing the nested objects across characters.
     skills: { ...BLANK_CHARACTER.skills },
     saveProficiencies: { ...BLANK_CHARACTER.saveProficiencies },
+    // Stage-7 Personal Details fields (alignment/faith/sex/age/height/weight/
+    // eyes/hair/skin/background/personality) default to unset via the spread
+    // above — they are primitive strings, so there is no shared reference to
+    // detach (unlike the maps copied above).
     createdAt: now,
     updatedAt: now,
   };

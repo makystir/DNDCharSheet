@@ -128,4 +128,69 @@ describe('character-store', () => {
     expect(c.class).toBeUndefined();
     expect(c.houseRules).toBeUndefined();
   });
+
+  // Stage 7: Personal Details additive-optional fields.
+  it('round-trips every Stage-7 personal-details field', async () => {
+    const base = createCharacter('Identity');
+    const withDetails = {
+      ...base,
+      alignment: 'Chaotic Good' as const,
+      faith: 'Sigmar',
+      sex: 'Female',
+      age: '27',
+      height: "5'8\"",
+      weight: '140 lb',
+      eyes: 'Green',
+      hair: 'Auburn',
+      skin: 'Fair',
+      background: 'Soldier',
+      personality: 'Brave and reckless.',
+    };
+    const saved = await saveCharacter(withDetails);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.alignment).toBe('Chaotic Good');
+    expect(loaded?.faith).toBe('Sigmar');
+    expect(loaded?.sex).toBe('Female');
+    expect(loaded?.age).toBe('27');
+    expect(loaded?.height).toBe("5'8\"");
+    expect(loaded?.weight).toBe('140 lb');
+    expect(loaded?.eyes).toBe('Green');
+    expect(loaded?.hair).toBe('Auburn');
+    expect(loaded?.skin).toBe('Fair');
+    expect(loaded?.background).toBe('Soldier');
+    expect(loaded?.personality).toBe('Brave and reckless.');
+  });
+
+  it('loads a pre-Stage-7 record without personal-details fields unchanged', async () => {
+    const legacy = createCharacter('Legacy7');
+    const saved = await saveCharacter(legacy);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    for (const field of [
+      'alignment',
+      'faith',
+      'sex',
+      'age',
+      'height',
+      'weight',
+      'eyes',
+      'hair',
+      'skin',
+      'background',
+      'personality',
+    ] as const) {
+      expect(loaded?.[field]).toBeUndefined();
+    }
+  });
+
+  it('createCharacter leaves Stage-7 fields unset and does not alias them', () => {
+    const a = createCharacter('A');
+    const b = createCharacter('B');
+    expect(a.alignment).toBeUndefined();
+    expect(a.personality).toBeUndefined();
+    // Primitive strings: setting one must never affect the other.
+    a.personality = 'only A';
+    expect(b.personality).toBeUndefined();
+  });
 });
