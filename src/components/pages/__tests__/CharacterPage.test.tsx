@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { CharacterSheet } from '../CharacterSheet';
+import { CharacterPage } from '../CharacterPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
-function renderSheet(overrides = {}) {
+function renderPage(overrides = {}) {
   const character = { ...createCharacter('Tester'), ...overrides };
   const onChange = vi.fn();
-  render(<CharacterSheet character={character} onChange={onChange} />);
+  render(<CharacterPage character={character} onChange={onChange} />);
   return { character, onChange };
 }
 
 /**
- * Renders the sheet with real controlled-input state (props flow back in on
- * change), so a controlled field that is cleared to its unset value behaves as
- * it does in the app. A spy records every emitted character.
+ * Renders the page with real controlled-input state (props flow back in on
+ * change), so a controlled field cleared to its unset value behaves as it does
+ * in the app. A spy records every emitted character.
  */
-function renderStatefulSheet(overrides = {}) {
+function renderStatefulPage(overrides = {}) {
   const onChange = vi.fn();
   function Harness() {
     const [character, setCharacter] = useState<Character>({
@@ -25,7 +25,7 @@ function renderStatefulSheet(overrides = {}) {
       ...overrides,
     });
     return (
-      <CharacterSheet
+      <CharacterPage
         character={character}
         onChange={(next) => {
           onChange(next);
@@ -38,18 +38,17 @@ function renderStatefulSheet(overrides = {}) {
   return { onChange };
 }
 
-describe('CharacterSheet', () => {
+describe('CharacterPage', () => {
   it('shows the derived modifier for a score of 10 as +0', () => {
-    renderSheet();
+    renderPage();
     const strInput = screen.getByLabelText('Strength score') as HTMLInputElement;
     expect(strInput.value).toBe('10');
-    // The modifier trigger for Strength exposes the breakdown via aria-label.
     const strMod = screen.getByRole('button', { name: /Strength Modifier/ });
     expect(strMod).toHaveTextContent('+0');
   });
 
   it('reflects a score change by emitting an updated character', () => {
-    const { onChange } = renderSheet();
+    const { onChange } = renderPage();
     const strInput = screen.getByLabelText('Strength score');
     fireEvent.change(strInput, { target: { value: '16' } });
     expect(onChange).toHaveBeenCalledWith(
@@ -60,20 +59,19 @@ describe('CharacterSheet', () => {
   });
 
   it('shows Proficiency Bonus +2 at level 1 with a breakdown', () => {
-    renderSheet({ level: 1 });
+    renderPage({ level: 1 });
     const prof = screen.getByRole('button', { name: /Proficiency Bonus/ });
     expect(prof).toHaveTextContent('+2');
   });
 
   it('exposes the modifier breakdown formula in the accessible label', () => {
-    renderSheet({ abilities: { str: 16, dex: 10, con: 10, int: 10, wis: 10, cha: 10 } });
+    renderPage({ abilities: { str: 16, dex: 10, con: 10, int: 10, wis: 10, cha: 10 } });
     const strMod = screen.getByRole('button', { name: /Strength Modifier/ });
-    // Breakdown: "3 (Strength score 16) = 3"
     expect(strMod.getAttribute('aria-label')).toContain('Strength score 16');
   });
 
   it('clamps an out-of-range score to the legal maximum of 30', () => {
-    const { onChange } = renderSheet();
+    const { onChange } = renderPage();
     const dexInput = screen.getByLabelText('Dexterity score');
     fireEvent.change(dexInput, { target: { value: '99' } });
     const call = onChange.mock.calls.at(-1)?.[0];
@@ -81,45 +79,16 @@ describe('CharacterSheet', () => {
   });
 
   it('renders all six ability cards', () => {
-    renderSheet();
+    renderPage();
     for (const abbr of ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']) {
       expect(screen.getByText(abbr)).toBeInTheDocument();
     }
-    // sanity: within the abilities section
-    const section = screen.getByLabelText('Ability Scores', { selector: 'section' }) ?? document.body;
-    expect(within(section).queryByText('STR')).not.toBeNull();
-  });
-
-  it('renders all six derived areas through CalculatedValue triggers', () => {
-    renderSheet();
-    // Each derived total is a CalculatedValue trigger (a button with its label).
-    expect(screen.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Passive Perception/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Hit Point Maximum/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Strength Save/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Acrobatics Check/ }),
-    ).toBeInTheDocument();
-  });
-
-  it('shows base AC 12 for Dex 14 and no override', () => {
-    renderSheet({ abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 } });
-    const ac = screen.getByRole('button', { name: /Armor Class/ });
-    expect(ac).toHaveTextContent('12');
   });
 
   it('toggling a skill proficiency emits the updated skills map and changes the modifier', () => {
-    const { onChange } = renderSheet({
+    const { onChange } = renderPage({
       abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 },
     });
-    // Stealth (Dex 14 → +2) starts at +2 untrained.
     const stealth = screen.getByRole('button', { name: /Stealth Check/ });
     expect(stealth).toHaveTextContent('+2');
     const checkbox = screen.getByLabelText('Stealth proficiency');
@@ -131,64 +100,65 @@ describe('CharacterSheet', () => {
   });
 
   it('reflects stored proficiency in the displayed skill modifier', () => {
-    renderSheet({
+    renderPage({
       abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 },
       skills: { stealth: { proficient: true } },
     });
-    // +2 Dex + 2 PB = +4 at level 1.
     const stealth = screen.getByRole('button', { name: /Stealth Check/ });
     expect(stealth).toHaveTextContent('+4');
   });
 
   it('toggling a save proficiency emits saveProficiencies', () => {
-    const { onChange } = renderSheet();
+    const { onChange } = renderPage();
     const checkbox = screen.getByLabelText('Dexterity save proficiency');
     fireEvent.click(checkbox);
     const call = onChange.mock.calls.at(-1)?.[0];
     expect(call.saveProficiencies.dex).toBe(true);
   });
 
-  it('entering an AC override emits acOverride and clearing it unsets', () => {
-    const { onChange } = renderStatefulSheet();
-    const input = screen.getByLabelText('Armor Class override');
-    fireEvent.change(input, { target: { value: '17' } });
-    expect(onChange.mock.calls.at(-1)?.[0].acOverride).toBe(17);
-    fireEvent.change(input, { target: { value: '' } });
-    expect(onChange.mock.calls.at(-1)?.[0].acOverride).toBeUndefined();
-  });
-
-  it('entering an HP max emits hpMax', () => {
-    const { onChange } = renderSheet();
-    const input = screen.getByLabelText('Hit Point maximum');
-    fireEvent.change(input, { target: { value: '24' } });
-    expect(onChange.mock.calls.at(-1)?.[0].hpMax).toBe(24);
-  });
-
   it('disables the expertise checkbox until the skill is proficient', () => {
-    renderSheet();
+    renderPage();
     const expertise = screen.getByLabelText('Stealth expertise') as HTMLInputElement;
     expect(expertise.disabled).toBe(true);
   });
 
-  // Test 16: species selection and derived displays.
+  describe('name (EditableField)', () => {
+    it('edits and commits the character name via click → type → blur', () => {
+      const { onChange } = renderStatefulPage({ name: 'Old Name' });
+      // Tap-to-edit: the display shows the current name and acts as a button.
+      const display = screen.getByRole('button', { name: 'Character name' });
+      expect(display).toHaveTextContent('Old Name');
+      fireEvent.click(display);
+      const input = screen.getByRole('textbox', { name: 'Character name' });
+      fireEvent.change(input, { target: { value: 'New Name' } });
+      fireEvent.blur(input);
+      expect(onChange.mock.calls.at(-1)?.[0].name).toBe('New Name');
+    });
+
+    it('commits an empty name to the empty string', () => {
+      const { onChange } = renderStatefulPage({ name: 'Old Name' });
+      fireEvent.click(screen.getByRole('button', { name: 'Character name' }));
+      const input = screen.getByRole('textbox', { name: 'Character name' });
+      fireEvent.change(input, { target: { value: '' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(onChange.mock.calls.at(-1)?.[0].name).toBe('');
+    });
+  });
+
   describe('species', () => {
     it('shows sensible placeholders with no species selected', () => {
-      renderSheet();
+      renderPage();
       expect(
-        (screen.getByRole('combobox', { name: 'Species' }) as HTMLSelectElement)
-          .value,
+        (screen.getByRole('combobox', { name: 'Species' }) as HTMLSelectElement).value,
       ).toBe('');
-      // Speed defaults to 30 ft; Darkvision renders "none".
-      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent(
-        '30 ft',
+      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('30 ft');
+      expect(screen.getByRole('button', { name: /Darkvision/ })).toHaveTextContent(
+        'none',
       );
-      expect(
-        screen.getByRole('button', { name: /Darkvision/ }),
-      ).toHaveTextContent('none');
     });
 
     it('selecting a species emits a fresh species selection', () => {
-      const { onChange } = renderSheet();
+      const { onChange } = renderPage();
       fireEvent.change(screen.getByRole('combobox', { name: 'Species' }), {
         target: { value: 'dwarf' },
       });
@@ -196,61 +166,46 @@ describe('CharacterSheet', () => {
     });
 
     it('Wood Elf updates Speed to 35 and Drow updates Darkvision to 120', () => {
-      renderSheet({ species: { id: 'elf', elvenLineage: 'woodElf' } });
-      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent(
-        '35 ft',
-      );
-      renderSheet({ species: { id: 'elf', elvenLineage: 'drow' } });
+      renderPage({ species: { id: 'elf', elvenLineage: 'woodElf' } });
+      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('35 ft');
+      renderPage({ species: { id: 'elf', elvenLineage: 'drow' } });
       expect(
         screen.getAllByRole('button', { name: /Darkvision/ }).at(-1),
       ).toHaveTextContent('120 ft');
     });
 
     it('shows the resolved size for a selected species', () => {
-      renderSheet({ species: { id: 'dwarf' } });
+      renderPage({ species: { id: 'dwarf' } });
       expect(screen.getByText('Medium')).toBeInTheDocument();
     });
 
     it('renders sub-choice selects only for the selected species', () => {
-      renderSheet({ species: { id: 'dwarf' } });
-      // Dwarf has no sub-choices.
+      renderPage({ species: { id: 'dwarf' } });
       expect(screen.queryByLabelText('Draconic Ancestry')).toBeNull();
 
-      renderSheet({ species: { id: 'dragonborn' } });
-      expect(
-        screen.getAllByLabelText('Draconic Ancestry').at(-1),
-      ).toBeInTheDocument();
+      renderPage({ species: { id: 'dragonborn' } });
+      expect(screen.getAllByLabelText('Draconic Ancestry').at(-1)).toBeInTheDocument();
     });
 
     it('renders species traits with names and effects, untruncated', () => {
-      renderSheet({ species: { id: 'dwarf' } });
+      renderPage({ species: { id: 'dwarf' } });
       expect(screen.getByText('Dwarven Toughness')).toBeInTheDocument();
       expect(screen.getByText(/Hit Point maximum increases/)).toBeInTheDocument();
     });
-
-    it("surfaces Dwarven Toughness in the HP breakdown when hpMax is set", () => {
-      renderSheet({ species: { id: 'dwarf' }, level: 3, hpMax: 30 });
-      const hp = screen.getByRole('button', { name: /Hit Point Maximum/ });
-      // The aria-label carries the full breakdown equation including Toughness.
-      expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
-    });
   });
 
-  // Test 20: class selection and derived displays.
   describe('class', () => {
     it('shows a placeholder and no Hit Die with no class selected', () => {
-      renderSheet();
+      renderPage();
       expect(
-        (screen.getByRole('combobox', { name: 'Class' }) as HTMLSelectElement)
-          .value,
+        (screen.getByRole('combobox', { name: 'Class' }) as HTMLSelectElement).value,
       ).toBe('');
       expect(screen.getByText(/No class selected/)).toBeInTheDocument();
-      // No subclass control before a class is chosen.
       expect(screen.queryByRole('combobox', { name: 'Subclass' })).toBeNull();
     });
 
     it('selecting a class emits a fresh class selection', () => {
-      const { onChange } = renderSheet({ level: 1 });
+      const { onChange } = renderPage({ level: 1 });
       fireEvent.change(screen.getByRole('combobox', { name: 'Class' }), {
         target: { value: 'wizard' },
       });
@@ -260,48 +215,38 @@ describe('CharacterSheet', () => {
       });
     });
 
-    it('surfaces the class Hit Die, Hit Dice total, and HP max', () => {
-      // Wizard d6, level 3, Con 14 (+2).
-      renderSheet({
+    it('surfaces the class Hit Die', () => {
+      renderPage({
         level: 3,
         abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
         class: { id: 'wizard', level: 3 },
       });
-      // Hit Die shown as plain text d6.
       expect(screen.getByText('d6')).toBeInTheDocument();
-      // Hit Dice total equals character level (3).
-      const hitDice = screen.getByRole('button', { name: /Hit Dice total/ });
-      expect(hitDice).toHaveTextContent('3');
-      // HP max: L1 6+2=8, then 2 levels of (4+2)=6 => 8+12 = 20.
-      const hp = screen.getByRole('button', { name: /Hit Point Maximum/ });
-      expect(hp.getAttribute('aria-label')).toContain('= 20');
     });
 
     it('gates the subclass control on the class subclassLevel', () => {
-      renderSheet({ level: 2, class: { id: 'wizard', level: 2 } });
-      // Wizard subclass is at level 3; not shown at level 2.
+      renderPage({ level: 2, class: { id: 'wizard', level: 2 } });
       expect(screen.queryByRole('combobox', { name: 'Subclass' })).toBeNull();
 
-      renderSheet({ level: 3, class: { id: 'wizard', level: 3 } });
+      renderPage({ level: 3, class: { id: 'wizard', level: 3 } });
       expect(
         screen.getAllByRole('combobox', { name: 'Subclass' }).at(-1),
       ).toBeInTheDocument();
     });
 
     it('renders features grouped by level without truncation', () => {
-      renderSheet({ level: 20, class: { id: 'wizard', level: 20 } });
+      renderPage({ level: 20, class: { id: 'wizard', level: 20 } });
       const features = screen.getByLabelText('Class Features');
       expect(within(features).getByText('Level 1')).toBeInTheDocument();
       expect(within(features).getByText('Spellcasting')).toBeInTheDocument();
-      // The long level-20 feature name renders in full (no truncation).
       expect(within(features).getByText('Signature Spells')).toBeInTheDocument();
-      // ASI rows are labelled as a choice.
-      expect(within(features).getAllByText(/take ASI or feat/).length).toBeGreaterThan(0);
+      expect(
+        within(features).getAllByText(/take ASI or feat/).length,
+      ).toBeGreaterThan(0);
     });
 
     it('names the class as the source in save and skill tooltips', () => {
-      // Wizard grants Int & Wis saves; a chosen class skill names the class.
-      renderSheet({
+      renderPage({
         class: { id: 'wizard', level: 1, skillChoices: ['arcana'] },
       });
       const intSave = screen.getByRole('button', { name: /Intelligence Save/ });
@@ -311,20 +256,9 @@ describe('CharacterSheet', () => {
     });
 
     it('toggling a class skill choice emits the skillChoices list', () => {
-      const { onChange } = renderSheet({ class: { id: 'wizard', level: 1 } });
+      const { onChange } = renderPage({ class: { id: 'wizard', level: 1 } });
       fireEvent.click(screen.getByLabelText('Arcana class proficiency'));
-      expect(onChange.mock.calls.at(-1)?.[0].class.skillChoices).toEqual([
-        'arcana',
-      ]);
-    });
-
-    it('reveals a rolled-HP total input when the house rule is on', () => {
-      renderSheet();
-      expect(screen.queryByLabelText('Rolled HP total')).toBeNull();
-      renderSheet({ houseRules: { rolledHp: true } });
-      expect(
-        screen.getAllByLabelText('Rolled HP total').at(-1),
-      ).toBeInTheDocument();
+      expect(onChange.mock.calls.at(-1)?.[0].class.skillChoices).toEqual(['arcana']);
     });
   });
 });

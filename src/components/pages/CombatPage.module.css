@@ -1,0 +1,116 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.speciesNote {
+  color: var(--text-secondary);
+  font-size: 0.82em;
+}
+
+/* Core derived combat stats (AC / Initiative / Passive Perception / HP max). */
+.derivedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.derivedCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.derivedValue {
+  font-size: 2rem;
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.derivedInputLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.derivedInput {
+  width: 72px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+}
+
+.derivedInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Hit Dice row. */
+.hitDiceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.statValue {
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.checkboxCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-gold);
+}
+
+.checkboxText {
+  user-select: none;
+}
+
+/* Mobile: enlarge tap targets. */
+@media (hover: none), (max-width: 767px) {
+  .checkbox {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkboxCell {
+    min-height: 44px;
+  }
+
+  .derivedInput {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,35 @@
+/* Surface/elevation primitive. The WFRP source composed an `animateEnter`
+   micro-interaction class that is not ported; the card is a plain surface. */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--elevation-1);
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+}
+
+.card + .card {
+  margin-top: 12px;
+}
+
+@media (max-width: 767px) {
+  .card {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+  }
+
+  .card h2,
+  .card h3,
+  .card h4 {
+    font-size: max(14px, inherit);
+  }
+}

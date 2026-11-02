@@ -21,6 +21,17 @@
   --accent-red: #8c2f2f;
   --shadow: rgba(0, 0, 0, 0.5);
 
+  /* Overlay scrim for modal dialogs. */
+  --overlay: rgba(0, 0, 0, 0.6);
+  /* Positive/confirmation accent (reuses the gold tone). */
+  --success: #6e9a5a;
+
+  /* Shell layout metrics (ported from the WFRP shell). */
+  --nav-width: 220px;
+  --nav-height-mobile: 60px;
+  --section-gap: 24px;
+  --elevation-1: 0 2px 8px var(--shadow);
+
   /* Radii */
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -42,6 +53,8 @@
   --accent-gold: #9a7b3a;
   --accent-red: #8c2f2f;
   --shadow: rgba(0, 0, 0, 0.15);
+  --overlay: rgba(0, 0, 0, 0.35);
+  --success: #4f7a3c;
 }
 
 * {

@@ -5,7 +5,14 @@ import {
   createCharacter,
   saveCharacter,
 } from './storage/character-store';
-import { CharacterSheet } from './components/pages/CharacterSheet';
+import { useHashRoute } from './hooks/useHashRoute';
+import { Navigation } from './components/layout/Navigation';
+import { PageContainer } from './components/layout/PageContainer';
+import { NAV_ITEMS } from './components/layout/navItems';
+import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
+import { CharacterPage } from './components/pages/CharacterPage';
+import { CombatPage } from './components/pages/CombatPage';
+import { SettingsPage } from './components/pages/SettingsPage';
 import styles from './App.module.css';
 
 const THEME_KEY = 'dnd-theme';
@@ -24,6 +31,7 @@ function App() {
       return 'dark';
     }
   });
+  const { page, navigate } = useHashRoute();
 
   // Load the most recent character, or create a fresh one if none exist.
   useEffect(() => {
@@ -43,7 +51,8 @@ function App() {
         if (cancelled) return;
         setState({
           status: 'error',
-          message: err instanceof Error ? err.message : 'Failed to load character data.',
+          message:
+            err instanceof Error ? err.message : 'Failed to load character data.',
         });
       }
     })();
@@ -70,33 +79,45 @@ function App() {
     });
   }, []);
 
+  const toggleTheme = useCallback(
+    () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
+    [],
+  );
+
+  const activeLabel = NAV_ITEMS.find((i) => i.id === page)?.label ?? '';
+
   return (
     <div className={styles.app}>
-      <header className={styles.topbar}>
-        <span className={styles.brand}>D&amp;D 5.5e Character Assistant</span>
-        <button
-          type="button"
-          className={styles.themeToggle}
-          onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-        >
-          {theme === 'dark' ? 'Light' : 'Dark'}
-        </button>
-      </header>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
 
-      <main id="main-content" className={styles.main}>
-        {state.status === 'loading' && (
-          <p className={styles.status}>Loading…</p>
-        )}
+      <Navigation activePage={page} onPageChange={navigate} />
+
+      <PageContainer pageKey={page}>
+        {state.status === 'loading' && <p className={styles.status}>Loading…</p>}
         {state.status === 'error' && (
           <p className={styles.status} role="alert">
             {state.message}
           </p>
         )}
         {state.status === 'ready' && (
-          <CharacterSheet character={state.character} onChange={handleChange} />
+          <>
+            {page === 'character' && (
+              <CharacterPage character={state.character} onChange={handleChange} />
+            )}
+            {page === 'combat' && (
+              <CombatPage character={state.character} onChange={handleChange} />
+            )}
+            {page === 'settings' && (
+              <SettingsPage theme={theme} onThemeToggle={toggleTheme} />
+            )}
+          </>
         )}
-      </main>
+      </PageContainer>
+
+      {/* Announces the active page label to assistive tech on route change. */}
+      <AriaLiveAnnouncer message={activeLabel} />
     </div>
   );
 }

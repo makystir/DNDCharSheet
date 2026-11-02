@@ -1,0 +1,54 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  border-image: linear-gradient(to right, var(--accent-gold), var(--border)) 1;
+  padding-bottom: 8px;
+}
+
+.header svg {
+  max-width: 14px;
+  max-height: 14px;
+  color: var(--text-secondary);
+}
+
+.title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--accent-gold);
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.collapseToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.chevron {
+  color: var(--text-secondary);
+  font-size: 12px;
+  transition: transform 0.15s ease;
+  transform: rotate(-90deg);
+  margin-left: auto;
+}
+
+.chevronExpanded {
+  color: var(--text-secondary);
+  font-size: 12px;
+  transition: transform 0.15s ease;
+  transform: rotate(0deg);
+  margin-left: auto;
+}

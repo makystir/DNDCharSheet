@@ -1,0 +1,64 @@
+/* Toast notification styles */
+
+.container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px var(--shadow);
+  padding: 10px 20px;
+  font-size: 14px;
+  animation: fadeIn 200ms ease-out;
+  pointer-events: auto;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+.actionButton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--accent-gold);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.actionButton:hover {
+  background: var(--bg-tertiary);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
