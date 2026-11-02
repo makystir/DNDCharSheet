@@ -235,4 +235,96 @@ describe('CharacterSheet', () => {
       expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
     });
   });
+
+  // Test 20: class selection and derived displays.
+  describe('class', () => {
+    it('shows a placeholder and no Hit Die with no class selected', () => {
+      renderSheet();
+      expect(
+        (screen.getByRole('combobox', { name: 'Class' }) as HTMLSelectElement)
+          .value,
+      ).toBe('');
+      expect(screen.getByText(/No class selected/)).toBeInTheDocument();
+      // No subclass control before a class is chosen.
+      expect(screen.queryByRole('combobox', { name: 'Subclass' })).toBeNull();
+    });
+
+    it('selecting a class emits a fresh class selection', () => {
+      const { onChange } = renderSheet({ level: 1 });
+      fireEvent.change(screen.getByRole('combobox', { name: 'Class' }), {
+        target: { value: 'wizard' },
+      });
+      expect(onChange.mock.calls.at(-1)?.[0].class).toEqual({
+        id: 'wizard',
+        level: 1,
+      });
+    });
+
+    it('surfaces the class Hit Die, Hit Dice total, and HP max', () => {
+      // Wizard d6, level 3, Con 14 (+2).
+      renderSheet({
+        level: 3,
+        abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
+        class: { id: 'wizard', level: 3 },
+      });
+      // Hit Die shown as plain text d6.
+      expect(screen.getByText('d6')).toBeInTheDocument();
+      // Hit Dice total equals character level (3).
+      const hitDice = screen.getByRole('button', { name: /Hit Dice total/ });
+      expect(hitDice).toHaveTextContent('3');
+      // HP max: L1 6+2=8, then 2 levels of (4+2)=6 => 8+12 = 20.
+      const hp = screen.getByRole('button', { name: /Hit Point Maximum/ });
+      expect(hp.getAttribute('aria-label')).toContain('= 20');
+    });
+
+    it('gates the subclass control on the class subclassLevel', () => {
+      renderSheet({ level: 2, class: { id: 'wizard', level: 2 } });
+      // Wizard subclass is at level 3; not shown at level 2.
+      expect(screen.queryByRole('combobox', { name: 'Subclass' })).toBeNull();
+
+      renderSheet({ level: 3, class: { id: 'wizard', level: 3 } });
+      expect(
+        screen.getAllByRole('combobox', { name: 'Subclass' }).at(-1),
+      ).toBeInTheDocument();
+    });
+
+    it('renders features grouped by level without truncation', () => {
+      renderSheet({ level: 20, class: { id: 'wizard', level: 20 } });
+      const features = screen.getByLabelText('Class Features');
+      expect(within(features).getByText('Level 1')).toBeInTheDocument();
+      expect(within(features).getByText('Spellcasting')).toBeInTheDocument();
+      // The long level-20 feature name renders in full (no truncation).
+      expect(within(features).getByText('Signature Spells')).toBeInTheDocument();
+      // ASI rows are labelled as a choice.
+      expect(within(features).getAllByText(/take ASI or feat/).length).toBeGreaterThan(0);
+    });
+
+    it('names the class as the source in save and skill tooltips', () => {
+      // Wizard grants Int & Wis saves; a chosen class skill names the class.
+      renderSheet({
+        class: { id: 'wizard', level: 1, skillChoices: ['arcana'] },
+      });
+      const intSave = screen.getByRole('button', { name: /Intelligence Save/ });
+      expect(intSave.getAttribute('aria-label')).toContain('Wizard (class)');
+      const arcana = screen.getByRole('button', { name: /Arcana Check/ });
+      expect(arcana.getAttribute('aria-label')).toContain('Wizard (class)');
+    });
+
+    it('toggling a class skill choice emits the skillChoices list', () => {
+      const { onChange } = renderSheet({ class: { id: 'wizard', level: 1 } });
+      fireEvent.click(screen.getByLabelText('Arcana class proficiency'));
+      expect(onChange.mock.calls.at(-1)?.[0].class.skillChoices).toEqual([
+        'arcana',
+      ]);
+    });
+
+    it('reveals a rolled-HP total input when the house rule is on', () => {
+      renderSheet();
+      expect(screen.queryByLabelText('Rolled HP total')).toBeNull();
+      renderSheet({ houseRules: { rolledHp: true } });
+      expect(
+        screen.getAllByLabelText('Rolled HP total').at(-1),
+      ).toBeInTheDocument();
+    });
+  });
 });

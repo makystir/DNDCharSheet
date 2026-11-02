@@ -64,3 +64,58 @@ describe('allSavingThrowBreakdowns', () => {
     }
   });
 });
+
+describe('class-granted save proficiencies (test #15)', () => {
+  // Barbarian grants Str and Con saves (PHB 2024 "Core Barbarian Traits").
+  it('(a) a class-granted save shows "Proficiency (<Class> (class))" with PB once', () => {
+    const c = {
+      ...createCharacter('B'),
+      level: 1,
+      class: { id: 'barbarian' as const, level: 1 },
+    };
+    const all = allSavingThrowBreakdowns(c);
+    const conProf = all.con.components.find((comp) =>
+      comp.label.startsWith('Proficiency'),
+    );
+    expect(conProf?.label).toBe('Proficiency (Barbarian (class))');
+    expect(conProf?.value).toBe(proficiencyBonus(1)); // +2, added once.
+  });
+
+  it('(b) PB added once even when the user also toggled the class-granted save', () => {
+    const c = {
+      ...createCharacter('B'),
+      level: 1,
+      class: { id: 'barbarian' as const, level: 1 },
+      saveProficiencies: { str: true },
+    };
+    const all = allSavingThrowBreakdowns(c);
+    const strProf = all.str.components.find((comp) =>
+      comp.label.startsWith('Proficiency'),
+    );
+    // Still labelled by class source and still a single PB (no stacking).
+    expect(strProf?.label).toBe('Proficiency (Barbarian (class))');
+    expect(strProf?.value).toBe(proficiencyBonus(1));
+    expect(all.str.components.reduce((s, x) => s + x.value, 0)).toBe(all.str.total);
+  });
+
+  it('(c) non-class saves are unchanged (plain "Proficiency" label)', () => {
+    const c = {
+      ...createCharacter('B'),
+      level: 1,
+      class: { id: 'barbarian' as const, level: 1 },
+      saveProficiencies: { dex: true },
+    };
+    const all = allSavingThrowBreakdowns(c);
+    const dexProf = all.dex.components.find((comp) =>
+      comp.label.startsWith('Proficiency'),
+    );
+    expect(dexProf?.label).toBe('Proficiency');
+    expect(dexProf?.value).toBe(proficiencyBonus(1));
+    // Wisdom (neither class-granted nor toggled) has 0 proficiency.
+    const wisProf = all.wis.components.find((comp) =>
+      comp.label.startsWith('Proficiency'),
+    );
+    expect(wisProf?.label).toBe('Proficiency');
+    expect(wisProf?.value).toBe(0);
+  });
+});

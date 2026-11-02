@@ -22,6 +22,11 @@ import type {
   SpeciesId,
 } from '../data/species';
 
+// Stage-4 class id/subclass unions, re-exported from the data catalog so the
+// persisted shape and the catalog cannot drift (same pattern as SpeciesId).
+// See src/data/classes.ts for the source of truth.
+import type { ClassId, SubclassId } from '../data/classes';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -136,6 +141,42 @@ export interface SpeciesSelection {
   skillfulSkill?: SkillId;
 }
 
+/**
+ * A character's class selection and the choices it requires. In 2024 a class
+ * sets the Hit Die, save proficiencies, armor/weapon/tool proficiencies, a
+ * starting skill choice, and level-by-level features (PHB 2024 Chapter 3).
+ *
+ * Additive-optional on Character (no CURRENT_VERSION bump): an absent `class`
+ * means "no class chosen", a valid pre-Stage-4 state, so no migration is needed
+ * (same convention as the Stage-3 optional `species` field above). Sub-choice
+ * fields are optional so a class can be chosen before its subclass/skills are.
+ */
+export interface ClassSelection {
+  /** Catalog key, e.g. 'wizard'. An unknown/invalid id is treated as no class. */
+  id: ClassId;
+  /** Chosen subclass id (valid from the class's subclassLevel). */
+  subclassId?: SubclassId;
+  /**
+   * Levels in this class. For a single-class character this equals the
+   * character level; multiclassing is a later stage (PHB 2024 "Multiclassing").
+   */
+  level: number;
+  /** The starting skill proficiencies chosen for this class. */
+  skillChoices?: SkillId[];
+}
+
+/**
+ * Opt-in house rules. Rules-as-written is the default; each flag gates an
+ * optional/variant rule (PHB 2024 "Optional Rule" sidebars). `rolledHp`
+ * selects rolling the Hit Die for HP each level instead of the fixed value
+ * (PHB 2024 "Hit Points": the fixed value is the default, rolling is the
+ * optional alternative).
+ */
+export interface HouseRules {
+  /** When true, HP gains per level use a rolled total instead of the fixed value. */
+  rolledHp?: boolean;
+}
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -186,6 +227,24 @@ export interface Character {
    * load unchanged (PHB 2024 "Parts of a Species").
    */
   species?: SpeciesSelection;
+  /**
+   * Selected class and its required choices. Absent = no class chosen (a valid
+   * state). Additive-optional: pre-Stage-4 records without this field load
+   * unchanged (PHB 2024 Chapter 3 "Character Classes").
+   */
+  class?: ClassSelection;
+  /**
+   * Hit Dice spent on Short Rests (for HP recovery). Absent = none spent
+   * (PHB 2024 "Short Rest": spend Hit Dice to regain HP).
+   */
+  hitDiceSpent?: number;
+  /**
+   * The rolled HP maximum when the rolledHp house rule is in effect. Absent
+   * means the fixed-value HP max is used (PHB 2024 "Hit Points").
+   */
+  rolledHpTotal?: number;
+  /** Opt-in house rules; absent = rules-as-written. */
+  houseRules?: HouseRules;
   /** Creation timestamp (epoch ms). */
   createdAt: number;
   /** Last-modified timestamp (epoch ms). */

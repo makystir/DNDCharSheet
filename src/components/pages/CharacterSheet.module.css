@@ -209,6 +209,107 @@
   }
 }
 
+/* Class selection + sub-choices (mirrors the species grid). */
+.classGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Class starting-skill choice checkboxes. */
+.classSkills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.classSkillList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 4px 12px;
+}
+
+.classSkillRow {
+  display: flex;
+}
+
+/* Class features: grouped by level, each a rich two-line row. The feature
+   name is never truncated (ui-layout rule 5). */
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.featureLevelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.featureLevelHeading {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 4px 0 2px;
+}
+
+.featureRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.featureName {
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.featureTag {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent-gold);
+}
+
+.featureEffect {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+}
+
+.featureSource {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.classProficiencies {
+  margin-bottom: 16px;
+}
+
+.classPlaceholder {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin: 0 0 16px;
+}
+
+/* Mobile: give the class selects a 44px tap target. */
+@media (hover: none), (max-width: 767px) {
+  .classGrid .speciesSelect {
+    min-height: 44px;
+  }
+}
+
 /* Core derived stats (AC / Initiative / Passive Perception / HP max). */
 .derivedGrid {
   display: grid;

@@ -19,6 +19,13 @@ import {
 import { formatSigned } from '../../logic/breakdown';
 import { armorClassBreakdown } from '../../logic/armor-class';
 import { hitPointMaxBreakdown } from '../../logic/hit-points';
+import {
+  resolveClass,
+  resolveSubclass,
+  classProficiencies,
+  classFeaturesByLevel,
+  hitDiceTotal,
+} from '../../logic/classes';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
@@ -39,7 +46,15 @@ import type {
   SpeciesChoiceSpec,
   SpeciesData,
 } from '../../data/species';
-import type { SpeciesSelection } from '../../types/character';
+import {
+  CLASS_LIST,
+  getClass,
+} from '../../data/classes';
+import type { ClassData } from '../../data/classes';
+import type {
+  ClassSelection,
+  SpeciesSelection,
+} from '../../types/character';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './CharacterSheet.module.css';
 
@@ -59,6 +74,25 @@ function choiceOptions(spec: SpeciesChoiceSpec): SpeciesChoiceOption[] {
     return SKILLS.map((s) => ({ id: s.id as string, label: s.name }));
   }
   return spec.options;
+}
+
+/**
+ * The SRD badge text + hover copy for a class/subclass/species srd flag. A
+ * 'non-srd' entry reads 'non-SRD'; anything else ('uncertain') reads 'SRD
+ * status unconfirmed' (the Stage-3 copy mapping, reused here).
+ */
+function srdBadge(srd: string): { text: string; title: string } {
+  return srd === 'non-srd'
+    ? {
+        text: 'non-SRD',
+        title:
+          'Not confirmed as SRD content — review licensing before redistributing.',
+      }
+    : {
+        text: 'SRD status unconfirmed',
+        title:
+          'SRD status unconfirmed — review licensing before redistributing.',
+      };
 }
 
 export interface CharacterSheetProps {
@@ -125,6 +159,69 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
   const setInitiativeBonus = (raw: string) =>
     onChange({ ...character, initiativeBonus: parseNumberInput(raw, false) });
 
+  const setHitDiceSpent = (raw: string, total: number) => {
+    const parsed = parseNumberInput(raw, true);
+    const clamped =
+      parsed === undefined ? undefined : Math.min(parsed, total);
+    onChange({ ...character, hitDiceSpent: clamped });
+  };
+
+  const setRolledHpTotal = (raw: string) =>
+    onChange({ ...character, rolledHpTotal: parseNumberInput(raw, true) });
+
+  // Toggles the rolled-HP house rule; leaves rolledHpTotal untouched so a
+  // previously-entered total is preserved if the rule is re-enabled.
+  const setRolledHpRule = (on: boolean) =>
+    onChange({
+      ...character,
+      houseRules: { ...character.houseRules, rolledHp: on },
+    });
+
+  // Selecting a class starts a fresh selection (dropping a stale subclass/skill
+  // choice from a previous class); the empty value clears the class entirely.
+  // The class level mirrors the character level this stage (single-class).
+  const setClass = (raw: string) => {
+    if (raw === '' || getClass(raw) === undefined) {
+      const next = { ...character };
+      delete next.class;
+      onChange(next);
+      return;
+    }
+    onChange({
+      ...character,
+      class: { id: raw as ClassSelection['id'], level: character.level },
+    });
+  };
+
+  const setSubclass = (raw: string) => {
+    if (character.class === undefined) return;
+    const next: ClassSelection = { ...character.class };
+    if (raw === '') {
+      delete next.subclassId;
+    } else {
+      next.subclassId = raw as ClassSelection['subclassId'];
+    }
+    onChange({ ...character, class: next });
+  };
+
+  // Toggles a single class skill-choice proficiency, deduped and capped at the
+  // class's allowed count (PHB 2024 Core <Class> Traits: Skill Proficiencies).
+  const setClassSkill = (skillId: SkillId, checked: boolean, count: number) => {
+    if (character.class === undefined) return;
+    const current = character.class.skillChoices ?? [];
+    let next: SkillId[];
+    if (checked) {
+      if (current.includes(skillId)) return;
+      next = [...current, skillId].slice(0, count);
+    } else {
+      next = current.filter((s) => s !== skillId);
+    }
+    onChange({
+      ...character,
+      class: { ...character.class, skillChoices: next },
+    });
+  };
+
   // Selecting a species starts a fresh selection (dropping stale sub-choices
   // from a previous species); the empty value clears the species entirely.
   const setSpecies = (raw: string) => {
@@ -163,14 +260,40 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
   const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride);
   const initBreakdown = initiativeBreakdown(character.abilities, character.initiativeBonus);
   const ppBreakdown = passivePerceptionBreakdown(character);
-  const hpBreakdown = hitPointMaxBreakdown(
-    character.abilities,
-    character.level,
-    character.hpMax,
+  const hpBreakdown = hitPointMaxBreakdown({
+    scores: character.abilities,
+    level: character.level,
+    hitDie: resolveClass(character)?.hitDie,
+    hpMax: character.hpMax,
     hpPerLevel,
-  );
+    rolledHp: character.houseRules?.rolledHp,
+    rolledHpTotal: character.rolledHpTotal,
+  });
   const saveBreakdowns = allSavingThrowBreakdowns(character);
   const skillBreakdowns = allSkillBreakdowns(character);
+
+  const selectedClass: ClassData | undefined = resolveClass(character);
+  const selectedSubclass = resolveSubclass(character);
+  const classProfs = classProficiencies(character);
+  const featuresByLevel = classFeaturesByLevel(character);
+  // Hit Dice total equals the character level (PHB 2024 "Hit Points"); shown as
+  // a CalculatedValue with a single summing component so the total is explained.
+  const hitDiceTotalValue = hitDiceTotal(character);
+  const hitDiceBreakdown = {
+    total: hitDiceTotalValue,
+    components: [{ label: 'Character level', value: hitDiceTotalValue }],
+  };
+  const hitDiceSpent = character.hitDiceSpent ?? 0;
+  const rolledHpOn = character.houseRules?.rolledHp ?? false;
+  // The class's starting skill-choice list ('any' means every skill is
+  // eligible — PHB 2024 Core <Class> Traits: Skill Proficiencies).
+  const classSkillOptions =
+    selectedClass === undefined
+      ? []
+      : selectedClass.skillChoices.from === 'any'
+        ? SKILLS.map((s) => s.id as SkillId)
+        : selectedClass.skillChoices.from;
+  const chosenClassSkills = character.class?.skillChoices ?? [];
 
   return (
     <div className={styles.page}>
@@ -271,15 +394,9 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
             {selectedSpecies && (
               <span
                 className={styles.srdBadge}
-                title={
-                  selectedSpecies.srd === 'non-srd'
-                    ? 'Not confirmed as SRD content — review licensing before redistributing.'
-                    : 'SRD status unconfirmed — review licensing before redistributing.'
-                }
+                title={srdBadge(selectedSpecies.srd).title}
               >
-                {selectedSpecies.srd === 'non-srd'
-                  ? 'non-SRD'
-                  : 'SRD status unconfirmed'}
+                {srdBadge(selectedSpecies.srd).text}
               </span>
             )}
           </div>
@@ -339,6 +456,213 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section aria-labelledby="class-heading">
+        <h2 id="class-heading" className={styles.sectionTitle}>
+          Class
+        </h2>
+        <div className={styles.classGrid}>
+          <div className={styles.speciesField}>
+            <label className={styles.fieldLabel} htmlFor="class-select">
+              Class
+            </label>
+            <select
+              id="class-select"
+              className={styles.speciesSelect}
+              value={character.class?.id ?? ''}
+              aria-label="Class"
+              onChange={(e) => setClass(e.target.value)}
+            >
+              <option value="">— None —</option>
+              {CLASS_LIST.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {selectedClass && (
+              <span
+                className={styles.srdBadge}
+                title={srdBadge(selectedClass.srd).title}
+              >
+                {srdBadge(selectedClass.srd).text}
+              </span>
+            )}
+          </div>
+
+          {selectedClass &&
+            character.level >= selectedClass.subclassLevel && (
+              <div className={styles.speciesField}>
+                <label className={styles.fieldLabel} htmlFor="subclass-select">
+                  Subclass
+                </label>
+                <select
+                  id="subclass-select"
+                  className={styles.speciesSelect}
+                  value={character.class?.subclassId ?? ''}
+                  aria-label="Subclass"
+                  onChange={(e) => setSubclass(e.target.value)}
+                >
+                  <option value="">choose…</option>
+                  {selectedClass.subclasses.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                {selectedSubclass && (
+                  <span
+                    className={styles.srdBadge}
+                    title={srdBadge(selectedSubclass.srd).title}
+                  >
+                    {srdBadge(selectedSubclass.srd).text}
+                  </span>
+                )}
+              </div>
+            )}
+
+          <div className={styles.speciesField}>
+            <span className={styles.fieldLabel}>Hit Die</span>
+            <span className={styles.speciesText}>
+              {selectedClass ? `d${selectedClass.hitDie}` : '—'}
+            </span>
+          </div>
+
+          <div className={styles.speciesField}>
+            <span className={styles.fieldLabel}>Hit Dice</span>
+            <span className={styles.speciesText}>
+              <CalculatedValue label="Hit Dice total" breakdown={hitDiceBreakdown}>
+                {hitDiceTotalValue}
+              </CalculatedValue>
+              {' spent: '}
+              <input
+                className={styles.derivedInput}
+                type="number"
+                min={0}
+                max={hitDiceTotalValue}
+                value={character.hitDiceSpent ?? ''}
+                placeholder="0"
+                aria-label="Hit Dice spent"
+                onChange={(e) => setHitDiceSpent(e.target.value, hitDiceTotalValue)}
+              />
+              <span className={styles.speciesNote}>
+                {' '}
+                {hitDiceSpent} / {hitDiceTotalValue}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        {selectedClass && classSkillOptions.length > 0 && (
+          <div className={styles.classSkills}>
+            <span className={styles.fieldLabel}>
+              Skill Proficiencies — choose {selectedClass.skillChoices.count} (
+              {chosenClassSkills.length} chosen)
+            </span>
+            <ul className={styles.classSkillList} aria-label="Class skill choices">
+              {classSkillOptions.map((skillId) => {
+                const skill = SKILLS.find((s) => s.id === skillId);
+                if (!skill) return null;
+                const checked = chosenClassSkills.includes(skillId);
+                const atCap =
+                  chosenClassSkills.length >= selectedClass.skillChoices.count;
+                return (
+                  <li key={skillId} className={styles.classSkillRow}>
+                    <label className={styles.checkboxCell}>
+                      <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        checked={checked}
+                        disabled={!checked && atCap}
+                        aria-label={`${skill.name} class proficiency`}
+                        onChange={(e) =>
+                          setClassSkill(
+                            skillId,
+                            e.target.checked,
+                            selectedClass.skillChoices.count,
+                          )
+                        }
+                      />
+                      <span className={styles.checkboxText}>{skill.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {featuresByLevel.size > 0 && (
+          <div className={styles.featureList} aria-label="Class Features">
+            {[...featuresByLevel.entries()].map(([level, features]) => (
+              <div key={level} className={styles.featureLevelGroup}>
+                <h3 className={styles.featureLevelHeading}>Level {level}</h3>
+                {features.map((feature) => (
+                  <div key={feature.name} className={styles.featureRow}>
+                    <span className={styles.featureName}>
+                      {feature.name}
+                      {feature.kind === 'asi-marker' && (
+                        <span className={styles.featureTag}> — take ASI or feat</span>
+                      )}
+                    </span>
+                    <span className={styles.featureEffect}>{feature.effect}</span>
+                    <span className={styles.featureSource}>
+                      source: {feature.source}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {selectedClass && (
+          <div className={styles.classProficiencies}>
+            <h3 className={styles.featureLevelHeading}>
+              Equipment Training &amp; Proficiencies
+            </h3>
+            <ul className={styles.traitList}>
+              <li className={styles.traitRow}>
+                <span className={styles.traitName}>Armor Training</span>
+                <span className={styles.traitEffect}>
+                  {classProfs.armor.length > 0
+                    ? classProfs.armor.join(', ')
+                    : 'None'}
+                </span>
+              </li>
+              <li className={styles.traitRow}>
+                <span className={styles.traitName}>Weapons</span>
+                <span className={styles.traitEffect}>
+                  {classProfs.weapons.length > 0
+                    ? classProfs.weapons.join(', ')
+                    : 'None'}
+                </span>
+              </li>
+              <li className={styles.traitRow}>
+                <span className={styles.traitName}>Tools</span>
+                <span className={styles.traitEffect}>
+                  {classProfs.tools.length > 0
+                    ? classProfs.tools.join(', ')
+                    : 'None'}
+                </span>
+              </li>
+              <li className={styles.traitRow}>
+                <span className={styles.traitName}>Starting Equipment</span>
+                <span className={styles.traitEffect}>
+                  {selectedClass.startingEquipment}
+                </span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {selectedClass === undefined && (
+          <p className={styles.classPlaceholder}>
+            No class selected. Choose a class to see its Hit Die, features,
+            proficiencies, and Hit Point maximum.
+          </p>
         )}
       </section>
 
@@ -434,6 +758,33 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
               aria-label="Hit Point maximum"
               onChange={(e) => setHpMax(e.target.value)}
             />
+            <label className={styles.checkboxCell}>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={rolledHpOn}
+                aria-label="Use rolled HP (house rule)"
+                onChange={(e) => setRolledHpRule(e.target.checked)}
+              />
+              <span className={styles.checkboxText}>Use rolled HP (house rule)</span>
+            </label>
+            {rolledHpOn && (
+              <>
+                <label className={styles.derivedInputLabel} htmlFor="rolled-hp-total">
+                  Rolled HP total
+                </label>
+                <input
+                  id="rolled-hp-total"
+                  className={styles.derivedInput}
+                  type="number"
+                  min={0}
+                  value={character.rolledHpTotal ?? ''}
+                  placeholder="0"
+                  aria-label="Rolled HP total"
+                  onChange={(e) => setRolledHpTotal(e.target.value)}
+                />
+              </>
+            )}
           </div>
         </div>
       </section>

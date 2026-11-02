@@ -176,6 +176,82 @@ describe('species-granted skill proficiencies', () => {
   });
 });
 
+describe('class-granted/chosen skill proficiencies (test #16)', () => {
+  it('(a) a class-chosen skill shows the class source label and PB once', () => {
+    const c = {
+      ...createCharacter('B'),
+      level: 1,
+      // Barbarian's starting skill list includes Athletics (PHB 2024).
+      class: { id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] },
+    };
+    const all = allSkillBreakdowns(c);
+    const prof = all.athletics.components.find((x) =>
+      x.label.startsWith('Proficiency'),
+    );
+    expect(prof?.label).toBe('Proficiency (Barbarian (class))');
+    expect(prof?.value).toBe(proficiencyBonus(1));
+    // PB added once even if the user also toggled it.
+    const toggled = {
+      ...c,
+      skills: { athletics: { proficient: true } },
+    };
+    const toggledAll = allSkillBreakdowns(toggled);
+    const toggledProf = toggledAll.athletics.components.find((x) =>
+      x.label.startsWith('Proficiency'),
+    );
+    expect(toggledProf?.value).toBe(proficiencyBonus(1));
+    expect(
+      toggledAll.athletics.components.reduce((s, x) => s + x.value, 0),
+    ).toBe(toggledAll.athletics.total);
+  });
+
+  it('(b) a skill granted by BOTH a species trait and the class names both sources, PB once', () => {
+    const c = {
+      ...createCharacter('E'),
+      level: 1,
+      // Elf Keen Senses grants Perception; Barbarian also chooses Perception.
+      species: { id: 'elf' as const, keenSensesSkill: 'perception' as const },
+      class: {
+        id: 'barbarian' as const,
+        level: 1,
+        skillChoices: ['perception' as const],
+      },
+    };
+    const all = allSkillBreakdowns(c);
+    const prof = all.perception.components.find((x) =>
+      x.label.startsWith('Proficiency'),
+    );
+    expect(prof?.label).toBe(
+      'Proficiency (Elf: Keen Senses / Barbarian (class))',
+    );
+    // Single PB despite two granting sources.
+    expect(prof?.value).toBe(proficiencyBonus(1));
+    expect(all.perception.components.reduce((s, x) => s + x.value, 0)).toBe(
+      all.perception.total,
+    );
+  });
+
+  it('(c) expertise is still computed off effective (class-granted) proficiency', () => {
+    const c = {
+      ...createCharacter('B'),
+      level: 1,
+      class: { id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] },
+      // Mark expertise but NOT proficient: class grant makes it effective.
+      skills: { athletics: { proficient: false, expertise: true } },
+    };
+    const all = allSkillBreakdowns(c);
+    const prof = all.athletics.components.find((x) =>
+      x.label.startsWith('Proficiency'),
+    );
+    const exp = all.athletics.components.find((x) => x.label === 'Expertise');
+    expect(prof?.value).toBe(proficiencyBonus(1));
+    expect(exp?.value).toBe(proficiencyBonus(1));
+    expect(all.athletics.components.reduce((s, x) => s + x.value, 0)).toBe(
+      all.athletics.total,
+    );
+  });
+});
+
 describe('getSkillTraining', () => {
   it('defaults absent entries to untrained', () => {
     const c = createCharacter('T');

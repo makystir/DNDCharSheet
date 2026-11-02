@@ -83,4 +83,49 @@ describe('character-store', () => {
     const c = createCharacter('Fresh');
     expect(c.species).toBeUndefined();
   });
+
+  // Test 18: a full class selection round-trips through storage unchanged.
+  it('round-trips a full class selection', async () => {
+    const base = createCharacter('Gandry');
+    const withClass = {
+      ...base,
+      level: 3,
+      class: {
+        id: 'wizard' as const,
+        subclassId: 'evoker' as const,
+        level: 3,
+        skillChoices: ['arcana' as const, 'history' as const],
+      },
+      hitDiceSpent: 1,
+      rolledHpTotal: 17,
+      houseRules: { rolledHp: true },
+    };
+    const saved = await saveCharacter(withClass);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.class).toEqual(withClass.class);
+    expect(loaded?.hitDiceSpent).toBe(1);
+    expect(loaded?.rolledHpTotal).toBe(17);
+    expect(loaded?.houseRules).toEqual({ rolledHp: true });
+  });
+
+  // Test 19: backward-compat — a pre-Stage-4 record (no class) loads unchanged.
+  it('loads a pre-Stage-4 record without class fields unchanged', async () => {
+    const legacy = createCharacter('OldTimer');
+    delete (legacy as { class?: unknown }).class;
+    delete (legacy as { hitDiceSpent?: unknown }).hitDiceSpent;
+    delete (legacy as { rolledHpTotal?: unknown }).rolledHpTotal;
+    delete (legacy as { houseRules?: unknown }).houseRules;
+    const saved = await saveCharacter(legacy);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.class).toBeUndefined();
+    expect(loaded?.hitDiceSpent).toBeUndefined();
+    expect(loaded?.houseRules).toBeUndefined();
+  });
+
+  it('createCharacter yields a valid class-less character', () => {
+    const c = createCharacter('Fresh');
+    expect(c.class).toBeUndefined();
+    expect(c.houseRules).toBeUndefined();
+  });
 });

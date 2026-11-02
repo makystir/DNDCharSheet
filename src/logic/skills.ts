@@ -24,6 +24,7 @@ import type {
 import { ABILITY_NAMES, SKILLS } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
+import { classGrantedSkills } from './classes';
 
 /** The governing ability of a skill, from the canonical SKILLS table. */
 function skillAbility(skillId: SkillId): Ability {
@@ -141,7 +142,20 @@ export function speciesGrantedSkills(
 export function allSkillBreakdowns(
   character: Character,
 ): Record<SkillId, Breakdown> {
-  const granted = speciesGrantedSkills(character);
+  // Merge species-granted and class-granted skill proficiencies into one label
+  // map. On a collision (both grant the same skill) the label names BOTH
+  // sources so the tooltip shows every contributor; the Proficiency Bonus is
+  // still added once by skillModifierBreakdown (PB multiplied only once).
+  const speciesGranted = speciesGrantedSkills(character);
+  const classGranted = classGrantedSkills(character);
+  const granted: Partial<Record<SkillId, string>> = { ...speciesGranted };
+  for (const skill of SKILLS) {
+    const classLabel = classGranted[skill.id];
+    if (classLabel === undefined) continue;
+    const speciesLabel = granted[skill.id];
+    granted[skill.id] =
+      speciesLabel === undefined ? classLabel : `${speciesLabel} / ${classLabel}`;
+  }
   const result = {} as Record<SkillId, Breakdown>;
   for (const skill of SKILLS) {
     result[skill.id] = skillModifierBreakdown(
