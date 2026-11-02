@@ -1,0 +1,21 @@
+{
+  "name": "D&D 5.5e Character Assistant",
+  "short_name": "D&D Assistant",
+  "description": "Dungeons & Dragons 5.5e (2024) character assistant — offline-capable PWA",
+  "start_url": "/DNDCharSheet/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "/DNDCharSheet/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/DNDCharSheet/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#121212" />
+    <title>D&D 5.5e Character Assistant</title>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <script>
+      // Apply saved theme before React renders to prevent flash
+      try { var t = localStorage.getItem('dnd-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+    </script>
+    <div id="splash" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#121212;pointer-events:none;transition:opacity 300ms ease;">
+      <style>
+        #splash svg { width: 64px; height: 64px; margin-bottom: 16px; }
+        #splash p { margin: 0 0 24px; font-family: 'Cinzel', Georgia, serif; font-size: 1.25rem; color: #c8a96e; text-align: center; letter-spacing: 0.02em; }
+        #splash .pulse-loader { width: 40px; height: 4px; border-radius: 2px; background: #c8a96e; opacity: 0.6; animation: splash-pulse 1.2s ease-in-out infinite; }
+        @keyframes splash-pulse { 0%, 100% { opacity: 0.3; transform: scaleX(0.6); } 50% { opacity: 0.8; transform: scaleX(1); } }
+        @media (prefers-reduced-motion: reduce) { #splash .pulse-loader { animation: none; opacity: 0.6; } }
+      </style>
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+      <p>D&amp;D 5.5e Character Assistant</p>
+      <div class="pulse-loader"></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
