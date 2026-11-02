@@ -51,4 +51,36 @@ describe('character-store', () => {
     await deleteCharacter(char.id);
     expect(await getCharacter(char.id)).toBeNull();
   });
+
+  // Test 14: species selection round-trips through storage unchanged.
+  it('round-trips a full species selection', async () => {
+    const base = createCharacter('Elowen');
+    const withSpecies = {
+      ...base,
+      species: {
+        id: 'elf' as const,
+        elvenLineage: 'drow' as const,
+        spellcastingAbility: 'int' as const,
+        keenSensesSkill: 'perception' as const,
+      },
+    };
+    const saved = await saveCharacter(withSpecies);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.species).toEqual(withSpecies.species);
+  });
+
+  // Test 15: backward-compat — a pre-Stage-3 record (no species) loads unchanged.
+  it('loads a pre-Stage-3 record without a species field unchanged', async () => {
+    const legacy = createCharacter('Legacy');
+    delete (legacy as { species?: unknown }).species;
+    const saved = await saveCharacter(legacy);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.species).toBeUndefined();
+  });
+
+  it('createCharacter yields a valid species-less character', () => {
+    const c = createCharacter('Fresh');
+    expect(c.species).toBeUndefined();
+  });
 });

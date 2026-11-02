@@ -96,6 +96,86 @@ describe('skillModifierBreakdown', () => {
   });
 });
 
+describe('species-granted skill proficiencies', () => {
+  // Test 13.
+  const pbAtL1 = proficiencyBonus(1);
+
+  it('(a) Human Skillful: chosen skill shows "Proficiency (Human: Skillful)", PB once, even with proficient:false', () => {
+    const bd = skillModifierBreakdown(
+      SCORES,
+      1,
+      'arcana',
+      { proficient: false },
+      'Human: Skillful',
+    );
+    const prof = bd.components.find((c) => c.label.startsWith('Proficiency'));
+    expect(prof?.label).toBe('Proficiency (Human: Skillful)');
+    expect(prof?.value).toBe(pbAtL1);
+    // Int 16 → +3, plus one PB (+2) = +5. PB added once.
+    expect(bd.total).toBe(abilityModifier(SCORES.int) + pbAtL1);
+  });
+
+  it('(b) Elf Keen Senses: chosen skill shows "Proficiency (Elf: Keen Senses)" identically', () => {
+    const bd = skillModifierBreakdown(
+      SCORES,
+      1,
+      'perception',
+      {},
+      'Elf: Keen Senses',
+    );
+    const prof = bd.components.find((c) => c.label.startsWith('Proficiency'));
+    expect(prof?.label).toBe('Proficiency (Elf: Keen Senses)');
+    expect(prof?.value).toBe(pbAtL1);
+  });
+
+  it('(c) expertise counts off effective proficiency: species-granted + proficient:false + expertise:true → Prof=PB and Exp=PB', () => {
+    const bd = skillModifierBreakdown(
+      SCORES,
+      1,
+      'survival',
+      { proficient: false, expertise: true },
+      'Elf: Keen Senses',
+    );
+    const prof = bd.components.find((c) => c.label.startsWith('Proficiency'));
+    const exp = bd.components.find((c) => c.label === 'Expertise');
+    expect(prof?.value).toBe(pbAtL1);
+    expect(exp?.value).toBe(pbAtL1);
+    // A non-granted, non-proficient skill with expertise:true still yields 0.
+    const none = skillModifierBreakdown(SCORES, 1, 'stealth', {
+      proficient: false,
+      expertise: true,
+    });
+    expect(none.components.find((c) => c.label === 'Expertise')?.value).toBe(0);
+  });
+
+  it('allSkillBreakdowns surfaces both grants from the character species selection', () => {
+    const elf = {
+      ...createCharacter('E'),
+      species: { id: 'elf' as const, keenSensesSkill: 'insight' as const },
+    };
+    const elfAll = allSkillBreakdowns(elf);
+    expect(
+      elfAll.insight.components.find((c) => c.label.startsWith('Proficiency'))
+        ?.label,
+    ).toBe('Proficiency (Elf: Keen Senses)');
+
+    const human = {
+      ...createCharacter('H'),
+      species: { id: 'human' as const, skillfulSkill: 'athletics' as const },
+    };
+    const humanAll = allSkillBreakdowns(human);
+    expect(
+      humanAll.athletics.components.find((c) => c.label.startsWith('Proficiency'))
+        ?.label,
+    ).toBe('Proficiency (Human: Skillful)');
+    // A non-granted skill is unchanged.
+    expect(
+      humanAll.stealth.components.find((c) => c.label.startsWith('Proficiency'))
+        ?.label,
+    ).toBe('Proficiency');
+  });
+});
+
 describe('getSkillTraining', () => {
   it('defaults absent entries to untrained', () => {
     const c = createCharacter('T');

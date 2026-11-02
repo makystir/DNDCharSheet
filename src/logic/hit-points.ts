@@ -33,11 +33,22 @@ import type { Breakdown } from './breakdown';
  * When `hpMax` is undefined the breakdown is total 0 with a single
  * "HP max — not set" component — no misleading negative residual and no Con
  * component — and the UI renders its "enter HP max" placeholder.
+ *
+ * `hpPerLevel` is the optional species Hit-Point-per-level rider. The only
+ * 2024 PHB species trait of this kind is Dwarven Toughness (PHB 2024 "Dwarf
+ * Traits": "+1, and +1 again whenever you gain a level" = +1 × level), so when
+ * it is set and `hpMax` is entered, a "Dwarven Toughness" component of
+ * `hpPerLevel × level` is appended and the Hit-Dice residual is recomputed so
+ * all three components still sum to `hpMax` (the entered max stays the source
+ * of truth; the breakdown just attributes more of it). When `hpPerLevel` is
+ * absent/0 the two-component output is unchanged, and the `hpMax === undefined`
+ * branch is never affected by the species.
  */
 export function hitPointMaxBreakdown(
   scores: AbilityScores,
   level: number,
   hpMax?: number,
+  hpPerLevel?: number,
 ): Breakdown {
   if (hpMax === undefined || !Number.isFinite(hpMax)) {
     return {
@@ -47,11 +58,22 @@ export function hitPointMaxBreakdown(
   }
 
   const conContribution = abilityModifier(scores.con) * level;
-  return {
-    total: hpMax,
-    components: [
-      { label: 'HP from Hit Dice (derived)', value: hpMax - conContribution },
-      { label: 'Con mod × level', value: conContribution },
-    ],
-  };
+  // PHB 2024 "Dwarf Traits: Dwarven Toughness": +1 HP max per level.
+  const toughness =
+    hpPerLevel !== undefined && Number.isFinite(hpPerLevel)
+      ? hpPerLevel * level
+      : 0;
+
+  const components = [
+    {
+      label: 'HP from Hit Dice (derived)',
+      value: hpMax - conContribution - toughness,
+    },
+    { label: 'Con mod × level', value: conContribution },
+  ];
+  if (toughness !== 0) {
+    components.push({ label: 'Dwarven Toughness', value: toughness });
+  }
+
+  return { total: hpMax, components };
 }

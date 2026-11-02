@@ -169,4 +169,70 @@ describe('CharacterSheet', () => {
     const expertise = screen.getByLabelText('Stealth expertise') as HTMLInputElement;
     expect(expertise.disabled).toBe(true);
   });
+
+  // Test 16: species selection and derived displays.
+  describe('species', () => {
+    it('shows sensible placeholders with no species selected', () => {
+      renderSheet();
+      expect(
+        (screen.getByRole('combobox', { name: 'Species' }) as HTMLSelectElement)
+          .value,
+      ).toBe('');
+      // Speed defaults to 30 ft; Darkvision renders "none".
+      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent(
+        '30 ft',
+      );
+      expect(
+        screen.getByRole('button', { name: /Darkvision/ }),
+      ).toHaveTextContent('none');
+    });
+
+    it('selecting a species emits a fresh species selection', () => {
+      const { onChange } = renderSheet();
+      fireEvent.change(screen.getByRole('combobox', { name: 'Species' }), {
+        target: { value: 'dwarf' },
+      });
+      expect(onChange.mock.calls.at(-1)?.[0].species).toEqual({ id: 'dwarf' });
+    });
+
+    it('Wood Elf updates Speed to 35 and Drow updates Darkvision to 120', () => {
+      renderSheet({ species: { id: 'elf', elvenLineage: 'woodElf' } });
+      expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent(
+        '35 ft',
+      );
+      renderSheet({ species: { id: 'elf', elvenLineage: 'drow' } });
+      expect(
+        screen.getAllByRole('button', { name: /Darkvision/ }).at(-1),
+      ).toHaveTextContent('120 ft');
+    });
+
+    it('shows the resolved size for a selected species', () => {
+      renderSheet({ species: { id: 'dwarf' } });
+      expect(screen.getByText('Medium')).toBeInTheDocument();
+    });
+
+    it('renders sub-choice selects only for the selected species', () => {
+      renderSheet({ species: { id: 'dwarf' } });
+      // Dwarf has no sub-choices.
+      expect(screen.queryByLabelText('Draconic Ancestry')).toBeNull();
+
+      renderSheet({ species: { id: 'dragonborn' } });
+      expect(
+        screen.getAllByLabelText('Draconic Ancestry').at(-1),
+      ).toBeInTheDocument();
+    });
+
+    it('renders species traits with names and effects, untruncated', () => {
+      renderSheet({ species: { id: 'dwarf' } });
+      expect(screen.getByText('Dwarven Toughness')).toBeInTheDocument();
+      expect(screen.getByText(/Hit Point maximum increases/)).toBeInTheDocument();
+    });
+
+    it("surfaces Dwarven Toughness in the HP breakdown when hpMax is set", () => {
+      renderSheet({ species: { id: 'dwarf' }, level: 3, hpMax: 30 });
+      const hp = screen.getByRole('button', { name: /Hit Point Maximum/ });
+      // The aria-label carries the full breakdown equation including Toughness.
+      expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
+    });
+  });
 });

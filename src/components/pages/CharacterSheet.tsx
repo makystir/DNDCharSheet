@@ -23,8 +23,43 @@ import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
 import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
+import {
+  darkvisionBreakdown,
+  resolveSize,
+  resolveSpecies,
+  speciesTraits,
+  speedBreakdown,
+} from '../../logic/species';
+import {
+  SPECIES_LIST,
+  getSpecies,
+} from '../../data/species';
+import type {
+  SpeciesChoiceOption,
+  SpeciesChoiceSpec,
+  SpeciesData,
+} from '../../data/species';
+import type { SpeciesSelection } from '../../types/character';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './CharacterSheet.module.css';
+
+/** Human-readable size labels. */
+const SIZE_LABELS: Record<string, string> = {
+  small: 'Small',
+  medium: 'Medium',
+};
+
+/**
+ * The options a sub-choice presents. Human's Skillful choice has empty data
+ * options (any skill), so its list is filled from the SKILLS table here, keeping
+ * the data module choice-spec free of the full skill list.
+ */
+function choiceOptions(spec: SpeciesChoiceSpec): SpeciesChoiceOption[] {
+  if (spec.kind === 'skillfulSkill') {
+    return SKILLS.map((s) => ({ id: s.id as string, label: s.name }));
+  }
+  return spec.options;
+}
 
 export interface CharacterSheetProps {
   character: Character;
@@ -90,6 +125,40 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
   const setInitiativeBonus = (raw: string) =>
     onChange({ ...character, initiativeBonus: parseNumberInput(raw, false) });
 
+  // Selecting a species starts a fresh selection (dropping stale sub-choices
+  // from a previous species); the empty value clears the species entirely.
+  const setSpecies = (raw: string) => {
+    if (raw === '' || getSpecies(raw) === undefined) {
+      const next = { ...character };
+      delete next.species;
+      onChange(next);
+      return;
+    }
+    onChange({ ...character, species: { id: raw as SpeciesSelection['id'] } });
+  };
+
+  // Writes a single sub-choice field; an empty value unsets that field.
+  const setSpeciesChoice = (field: SpeciesChoiceSpec['field'], raw: string) => {
+    if (character.species === undefined) return;
+    const next: SpeciesSelection = { ...character.species };
+    if (raw === '') {
+      delete next[field];
+    } else {
+      // The field/value pairing is constrained by the choice spec; the union
+      // over SpeciesSelection fields is widened here to a single assignment.
+      (next as unknown as Record<string, unknown>)[field] = raw;
+    }
+    onChange({ ...character, species: next });
+  };
+
+  const selectedSpecies: SpeciesData | undefined = resolveSpecies(character);
+  const speedBd = speedBreakdown(character);
+  const darkvisionBd = darkvisionBreakdown(character);
+  const size = resolveSize(character);
+  const traits = speciesTraits(character);
+  const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
+    ?.mechanics?.hpPerLevel;
+
   const profBreakdown = proficiencyBonusBreakdown(character.level);
   const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride);
   const initBreakdown = initiativeBreakdown(character.abilities, character.initiativeBonus);
@@ -98,6 +167,7 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
     character.abilities,
     character.level,
     character.hpMax,
+    hpPerLevel,
   );
   const saveBreakdowns = allSavingThrowBreakdowns(character);
   const skillBreakdowns = allSkillBreakdowns(character);
@@ -175,11 +245,126 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
         </div>
       </section>
 
+      <section aria-labelledby="species-heading">
+        <h2 id="species-heading" className={styles.sectionTitle}>
+          Species
+        </h2>
+        <div className={styles.speciesGrid}>
+          <div className={styles.speciesField}>
+            <label className={styles.fieldLabel} htmlFor="species-select">
+              Species
+            </label>
+            <select
+              id="species-select"
+              className={styles.speciesSelect}
+              value={character.species?.id ?? ''}
+              aria-label="Species"
+              onChange={(e) => setSpecies(e.target.value)}
+            >
+              <option value="">— None —</option>
+              {SPECIES_LIST.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            {selectedSpecies && (
+              <span
+                className={styles.srdBadge}
+                title={
+                  selectedSpecies.srd === 'non-srd'
+                    ? 'Not confirmed as SRD content — review licensing before redistributing.'
+                    : 'SRD status unconfirmed — review licensing before redistributing.'
+                }
+              >
+                {selectedSpecies.srd === 'non-srd'
+                  ? 'non-SRD'
+                  : 'SRD status unconfirmed'}
+              </span>
+            )}
+          </div>
+
+          {selectedSpecies?.choices?.map((spec) => {
+            const value =
+              (character.species?.[spec.field] as string | undefined) ?? '';
+            const options = choiceOptions(spec);
+            const selectId = `species-choice-${spec.field}`;
+            return (
+              <div key={spec.field} className={styles.speciesField}>
+                <label className={styles.fieldLabel} htmlFor={selectId}>
+                  {spec.label}
+                </label>
+                <select
+                  id={selectId}
+                  className={styles.speciesSelect}
+                  value={value}
+                  aria-label={spec.label}
+                  onChange={(e) => setSpeciesChoice(spec.field, e.target.value)}
+                >
+                  <option value="">choose…</option>
+                  {options.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                      {o.note ? ` (${o.note})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          })}
+
+          <div className={styles.speciesField}>
+            <span className={styles.fieldLabel}>Size</span>
+            <span className={styles.speciesText}>
+              {size ? SIZE_LABELS[size] : '—'}
+            </span>
+          </div>
+
+          <div className={styles.speciesField}>
+            <span className={styles.fieldLabel}>Languages</span>
+            <span className={styles.speciesText}>
+              Common + 2 chosen
+              <span className={styles.speciesNote}> (from character creation)</span>
+            </span>
+          </div>
+        </div>
+
+        {traits.length > 0 && (
+          <ul className={styles.traitList} aria-label="Species Traits">
+            {traits.map((trait) => (
+              <li key={trait.name} className={styles.traitRow}>
+                <span className={styles.traitName}>{trait.name}</span>
+                <span className={styles.traitEffect}>{trait.effect}</span>
+                <span className={styles.traitSource}>source: {trait.source}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section aria-labelledby="derived-heading">
         <h2 id="derived-heading" className={styles.sectionTitle}>
           Core Stats
         </h2>
         <div className={styles.derivedGrid}>
+          <div className={styles.derivedCard}>
+            <span className={styles.fieldLabel}>Speed</span>
+            <span className={styles.derivedValue}>
+              <CalculatedValue label="Speed" breakdown={speedBd}>
+                {speedBd.total} ft
+              </CalculatedValue>
+            </span>
+          </div>
+
+          <div className={styles.derivedCard}>
+            <span className={styles.fieldLabel}>Darkvision</span>
+            <span className={styles.derivedValue}>
+              <CalculatedValue label="Darkvision" breakdown={darkvisionBd}>
+                {darkvisionBd.total > 0 ? `${darkvisionBd.total} ft` : 'none'}
+              </CalculatedValue>
+            </span>
+          </div>
+
           <div className={styles.derivedCard}>
             <span className={styles.fieldLabel}>Armor Class</span>
             <span className={styles.derivedValue}>

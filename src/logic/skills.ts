@@ -64,31 +64,74 @@ export function skillModifier(
   return skillModifierBreakdown(scores, level, skillId, training).total;
 }
 
-/** The skill-check modifier with a breakdown for a tooltip. */
+/**
+ * The skill-check modifier with a breakdown for a tooltip.
+ *
+ * `speciesSource` is the optional label of a species trait that grants
+ * proficiency in this skill (e.g. 'Elf: Keen Senses', 'Human: Skillful' — PHB
+ * 2024 "Elf Traits" / "Human Traits"). When set, the character is effectively
+ * proficient regardless of the stored `proficient` flag, so:
+ *   effectiveProficient = storedProficient || speciesProficient.
+ * The Proficiency Bonus is added once (RAW: the PB can be multiplied only
+ * once — no stacking even if the user also toggled the skill), and the
+ * Proficiency component is labelled with the species source. Expertise counts
+ * off effective proficiency (expertise requires proficiency), so a
+ * species-granted skill the user has also marked as expertise gets the second
+ * PB.
+ */
 export function skillModifierBreakdown(
   scores: AbilityScores,
   level: number,
   skillId: SkillId,
   training: SkillTraining,
+  speciesSource?: string,
 ): Breakdown {
   const ability = skillAbility(skillId);
   const abilityMod = abilityModifier(scores[ability]);
   const pb = proficiencyBonus(level);
-  const proficient = training.proficient ?? false;
+  const speciesProficient = speciesSource !== undefined;
+  const effectiveProficient = (training.proficient ?? false) || speciesProficient;
   const expertise = training.expertise ?? false;
 
-  const profValue = proficient ? pb : 0;
-  // Expertise adds a second PB only when proficient (PB multiplied only once).
-  const expertiseValue = proficient && expertise ? pb : 0;
+  const profValue = effectiveProficient ? pb : 0;
+  // Expertise adds a second PB only when (effectively) proficient (PB
+  // multiplied only once).
+  const expertiseValue = effectiveProficient && expertise ? pb : 0;
+  const profLabel = speciesProficient
+    ? `Proficiency (${speciesSource})`
+    : 'Proficiency';
 
   return {
     total: abilityMod + profValue + expertiseValue,
     components: [
       { label: `${ABILITY_NAMES[ability]} mod`, value: abilityMod },
-      { label: 'Proficiency', value: profValue },
+      { label: profLabel, value: profValue },
       { label: 'Expertise', value: expertiseValue },
     ],
   };
+}
+
+/**
+ * Builds the map of species-granted skill proficiencies for a character, keyed
+ * by SkillId with the granting trait's label as the value. Only the two 2024
+ * PHB species traits that grant a skill proficiency by player choice are
+ * surfaced: Human Skillful (any skill) and Elf Keen Senses
+ * (Insight/Perception/Survival) — PHB 2024 "Human Traits" / "Elf Traits". The
+ * stored `character.skills` map is never mutated; this is a derived view.
+ */
+export function speciesGrantedSkills(
+  character: Character,
+): Partial<Record<SkillId, string>> {
+  const result: Partial<Record<SkillId, string>> = {};
+  const species = character.species;
+  if (!species) return result;
+  if (species.id === 'human' && species.skillfulSkill) {
+    result[species.skillfulSkill] = 'Human: Skillful';
+  }
+  if (species.id === 'elf' && species.keenSensesSkill) {
+    result[species.keenSensesSkill] = 'Elf: Keen Senses';
+  }
+  return result;
 }
 
 /**
@@ -98,6 +141,7 @@ export function skillModifierBreakdown(
 export function allSkillBreakdowns(
   character: Character,
 ): Record<SkillId, Breakdown> {
+  const granted = speciesGrantedSkills(character);
   const result = {} as Record<SkillId, Breakdown>;
   for (const skill of SKILLS) {
     result[skill.id] = skillModifierBreakdown(
@@ -105,6 +149,7 @@ export function allSkillBreakdowns(
       character.level,
       skill.id,
       getSkillTraining(character, skill.id),
+      granted[skill.id],
     );
   }
   return result;

@@ -9,6 +9,19 @@
  * rules-compliance steering file for edition precedence and sourcing rules.
  */
 
+// Stage-3 species id/sub-choice unions, re-exported from the data catalog so
+// the persisted shape and the catalog cannot drift (same pattern as SkillId
+// being derived from SKILLS). See src/data/species.ts for the source of truth.
+import type {
+  CreatureSize,
+  DraconicAncestry,
+  ElvenLineageId,
+  FiendishLegacyId,
+  GiantAncestryId,
+  GnomishLineageId,
+  SpeciesId,
+} from '../data/species';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -89,6 +102,40 @@ export const SKILLS = [
 
 export type SkillId = (typeof SKILLS)[number]['id'];
 
+/**
+ * A character's species selection and the sub-choices the 2024 rules require
+ * for it (lineage/ancestry/legacy, size when the species offers Small/Medium,
+ * and the skill/ability picks some species traits grant). All sub-choice
+ * fields are optional: a species can be chosen before its sub-choices are made,
+ * and the sheet renders fine with them unset (PHB 2024 "Parts of a Species").
+ *
+ * Additive-optional on Character (no CURRENT_VERSION bump): an absent `species`
+ * means "no species chosen", a valid pre-Stage-3 state, so no migration is
+ * needed (same convention as the Stage-2 optional fields below).
+ */
+export interface SpeciesSelection {
+  /** Catalog key, e.g. 'dwarf'. An unknown/invalid id is treated as no species. */
+  id: SpeciesId;
+  /** Chosen size when the species offers Small/Medium (Aasimar/Human/Tiefling). */
+  size?: CreatureSize;
+  /** Dragonborn Draconic Ancestry (sets Breath Weapon / Resistance damage type). */
+  draconicAncestry?: DraconicAncestry;
+  /** Elf Elven Lineage (Drow/High Elf/Wood Elf) — affects Speed & Darkvision. */
+  elvenLineage?: ElvenLineageId;
+  /** Gnome Gnomish Lineage (Forest/Rock). */
+  gnomishLineage?: GnomishLineageId;
+  /** Goliath Giant Ancestry (one of six). */
+  giantAncestry?: GiantAncestryId;
+  /** Tiefling Fiendish Legacy (Abyssal/Chthonic/Infernal). */
+  fiendishLegacy?: FiendishLegacyId;
+  /** Spellcasting-ability choice for lineage/legacy traits (Int/Wis/Cha). */
+  spellcastingAbility?: Ability;
+  /** Elf Keen Senses skill choice (Insight/Perception/Survival). */
+  keenSensesSkill?: Extract<SkillId, 'insight' | 'perception' | 'survival'>;
+  /** Human Skillful skill proficiency choice (any single skill). */
+  skillfulSkill?: SkillId;
+}
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -133,6 +180,12 @@ export interface Character {
   hpMax?: number;
   /** Generic manual bonus to Initiative (PHB 2024: Initiative). */
   initiativeBonus?: number;
+  /**
+   * Selected species and its required sub-choices. Absent = no species chosen
+   * (a valid state). Additive-optional: pre-Stage-3 records without this field
+   * load unchanged (PHB 2024 "Parts of a Species").
+   */
+  species?: SpeciesSelection;
   /** Creation timestamp (epoch ms). */
   createdAt: number;
   /** Last-modified timestamp (epoch ms). */
