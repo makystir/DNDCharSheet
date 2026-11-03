@@ -1,0 +1,224 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ── Summary ─────────────────────────────────────────────────────────────── */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.summaryStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryValue {
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.summaryText {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.focusNote {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ── Slots ───────────────────────────────────────────────────────────────── */
+.slotRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.slotLabel {
+  flex: 0 0 90px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.slotMax {
+  font-variant-numeric: tabular-nums;
+}
+
+.slotMaxCaption {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.slotControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.slotButton {
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.slotButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slotButton:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.slotCount {
+  min-width: 56px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.slotNote {
+  flex: 1 1 100%;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+/* ── Prepared / Cantrips / Spellbook ─────────────────────────────────────── */
+.capLabel {
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.pickList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px 16px;
+}
+
+.pickRow {
+  display: flex;
+}
+
+.pickLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-gold);
+}
+
+.pickName {
+  color: var(--text-primary);
+}
+
+.pickLevel,
+.pickRow input:disabled + .pickName {
+  color: var(--text-secondary);
+}
+
+/* ── Browse ──────────────────────────────────────────────────────────────── */
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filterSelect {
+  min-width: 140px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.filterSelect:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.filterCheck {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.browseList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.browseRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.browseName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.browseMeta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.browseDescription {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}

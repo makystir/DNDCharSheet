@@ -32,6 +32,10 @@ import {
   speciesTraits,
   speedBreakdown,
 } from '../../logic/species';
+import {
+  reconcileSpellcastingForLevel,
+  shouldResetSpellcasting,
+} from '../../logic/spellcasting';
 import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
 import { CLASS_LIST, getClass } from '../../data/classes';
@@ -134,7 +138,17 @@ export function CharacterPage({
 
   const setLevel = (raw: string) => {
     const level = clampLevel(Number.parseInt(raw, 10));
-    onChange({ ...character, level });
+    const next: Character = { ...character, level };
+    // Reconcile spell selections to the new level: lowering a level can strand
+    // cantrips over the cap or prepared/spellbook spells above the highest
+    // castable level, which would otherwise stay hidden yet still count toward
+    // caps and be unremovable (review finding: level reduction strands state).
+    if (next.spellcasting) {
+      const reconciled = reconcileSpellcastingForLevel(next);
+      if (reconciled) next.spellcasting = reconciled;
+      else delete next.spellcasting;
+    }
+    onChange(next);
   };
 
   const setScore = (ability: Ability, raw: string) => {
@@ -166,25 +180,33 @@ export function CharacterPage({
   const setClass = (raw: string) => {
     if (raw === '' || getClass(raw) === undefined) {
       const next = { ...character };
+      const nextClass = undefined;
       delete next.class;
+      // Drop spell selections tied to the old class's list (review finding:
+      // spell state must not survive an incompatible class change).
+      if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
       onChange(next);
       return;
     }
-    onChange({
-      ...character,
-      class: { id: raw as ClassSelection['id'], level: character.level },
-    });
+    const nextClass: ClassSelection = { id: raw as ClassSelection['id'], level: character.level };
+    const next: Character = { ...character, class: nextClass };
+    if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
+    onChange(next);
   };
 
   const setSubclass = (raw: string) => {
     if (character.class === undefined) return;
-    const next: ClassSelection = { ...character.class };
+    const nextClass: ClassSelection = { ...character.class };
     if (raw === '') {
-      delete next.subclassId;
+      delete nextClass.subclassId;
     } else {
-      next.subclassId = raw as ClassSelection['subclassId'];
+      nextClass.subclassId = raw as ClassSelection['subclassId'];
     }
-    onChange({ ...character, class: next });
+    const next: Character = { ...character, class: nextClass };
+    // A subclass change on a subclass caster (Eldritch Knight / Arcane
+    // Trickster) changes the spell source, so reconcile the spell state.
+    if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
+    onChange(next);
   };
 
   // Toggles a single class skill-choice proficiency, deduped and capped at the

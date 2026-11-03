@@ -3,7 +3,7 @@
  * page navigation. Ported from the WFRP shell, narrowed to the D&D tab set.
  */
 
-export const VALID_PAGES = ['character', 'combat', 'settings'] as const;
+export const VALID_PAGES = ['character', 'combat', 'spells', 'settings'] as const;
 
 /**
  * The set of valid top-level pages. Identical union to `PageSection` (the nav
@@ -19,6 +19,7 @@ export type ValidPage = (typeof VALID_PAGES)[number];
  */
 export const PAGE_DEFAULT_SUBTABS: Partial<Record<ValidPage, string>> = {
   character: 'overview',
+  spells: 'summary',
 };
 
 /**

@@ -27,6 +27,11 @@ import type {
 // See src/data/classes.ts for the source of truth.
 import type { ClassId, SubclassId } from '../data/classes';
 
+// Stage-8 spell catalog key, re-exported from the data catalog so the persisted
+// spellcasting state and the catalog cannot drift (same pattern as SpeciesId /
+// ClassId). See src/data/spells.ts for the source of truth.
+import type { SpellId } from '../data/spells';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -166,6 +171,53 @@ export interface ClassSelection {
 }
 
 /**
+ * A character's spellcasting selections and slot tracking (Stage 8).
+ *
+ * Additive-optional on Character (no CURRENT_VERSION bump): absent = "no
+ * spellcasting state", a valid state for non-casters and for casters who have
+ * not chosen anything yet — same convention as the Stage-3 `species` and
+ * Stage-4 `class` optional fields. 2024 RAW models every caster uniformly as
+ * cantrips + a changeable prepared set (PHB 2024 Chapter 7 "Spellcasting"),
+ * so there is no separate "known" collection.
+ */
+export interface SpellcastingState {
+  /** Cantrip spell ids the character knows (always available, never use slots). */
+  cantrips?: SpellId[];
+  /** Leveled spell ids currently prepared (the changeable prepared list). */
+  prepared?: SpellId[];
+  /**
+   * Wizard only: the superset of leveled spells scribed in the spellbook, from
+   * which the prepared list is chosen (PHB 2024 "Wizard: Spellcasting"). A
+   * minimal field this stage; full scribe/copy mechanics are a later stage.
+   */
+  spellbook?: SpellId[];
+  /**
+   * Standard spell slots expended, keyed by spell level, e.g. { 1: 2, 3: 1 }.
+   * Absent = none spent (PHB 2024: slots recover on a Long Rest).
+   */
+  slotsExpended?: Partial<Record<number, number>>;
+  /**
+   * Warlock Pact Magic slots expended (all one level). Absent = none spent
+   * (PHB 2024 "Warlock: Pact Magic": slots recover on a Short OR Long Rest).
+   */
+  pactSlotsExpended?: number;
+  /**
+   * Warlock only: the Mystic Arcanum spells chosen at Warlock levels 11/13/15/
+   * 17, keyed by arcanum spell level (6/7/8/9), e.g. { 6: 'disintegrate' }.
+   * These are cast without a spell slot and recover on a Long Rest, so they are
+   * tracked SEPARATELY from Pact Magic slots and the prepared cap (PHB 2024
+   * "Warlock: Mystic Arcanum"). Absent = none chosen.
+   */
+  mysticArcana?: Partial<Record<number, SpellId>>;
+  /**
+   * Warlock only: which Mystic Arcanum uses are expended, keyed by arcanum
+   * spell level (6/7/8/9). true = that arcanum has been cast and not yet
+   * recovered (PHB 2024: recovers on a Long Rest). Absent = none expended.
+   */
+  mysticArcanaExpended?: Partial<Record<number, boolean>>;
+}
+
+/**
  * Opt-in house rules. Rules-as-written is the default; each flag gates an
  * optional/variant rule (PHB 2024 "Optional Rule" sidebars). `rolledHp`
  * selects rolling the Hit Die for HP each level instead of the fixed value
@@ -253,6 +305,12 @@ export interface Character {
    * unchanged (PHB 2024 Chapter 3 "Character Classes").
    */
   class?: ClassSelection;
+  /**
+   * Spellcasting selections & slot tracking. Absent = none (a valid state for
+   * non-casters and un-chosen casters). Additive-optional: pre-Stage-8 records
+   * without this field load unchanged (PHB 2024 Chapter 7 "Spellcasting").
+   */
+  spellcasting?: SpellcastingState;
   /**
    * Hit Dice spent on Short Rests (for HP recovery). Absent = none spent
    * (PHB 2024 "Short Rest": spend Hit Dice to regain HP).

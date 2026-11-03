@@ -193,4 +193,73 @@ describe('character-store', () => {
     a.personality = 'only A';
     expect(b.personality).toBeUndefined();
   });
+
+  // Stage 8: Spellcasting state additive-optional field.
+  it('round-trips a full spellcasting state', async () => {
+    const base = createCharacter('Mystra');
+    const withSpells = {
+      ...base,
+      level: 5,
+      class: { id: 'wizard' as const, level: 5 },
+      spellcasting: {
+        cantrips: ['fire-bolt' as const, 'mage-hand' as const, 'light' as const],
+        prepared: ['magic-missile' as const, 'shield' as const, 'fireball' as const],
+        spellbook: ['magic-missile' as const, 'shield' as const, 'fireball' as const, 'misty-step' as const],
+        slotsExpended: { 1: 2, 3: 1 },
+      },
+    };
+    const saved = await saveCharacter(withSpells);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.spellcasting).toEqual(withSpells.spellcasting);
+  });
+
+  it('round-trips Warlock pact-slot tracking', async () => {
+    const base = createCharacter('Pactbound');
+    const withPact = {
+      ...base,
+      level: 5,
+      class: { id: 'warlock' as const, level: 5 },
+      spellcasting: { pactSlotsExpended: 1 },
+    };
+    const saved = await saveCharacter(withPact);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.spellcasting?.pactSlotsExpended).toBe(1);
+  });
+
+  it('round-trips Warlock Mystic Arcanum choices and expended flags', async () => {
+    // Mystic Arcanum state is tracked separately from Pact slots and the
+    // prepared cap (PHB 2024 "Warlock: Mystic Arcanum"); confirm it persists.
+    const base = createCharacter('Arcanist');
+    const withArcana = {
+      ...base,
+      level: 17,
+      class: { id: 'warlock' as const, level: 17 },
+      spellcasting: {
+        mysticArcana: {
+          6: 'eyebite' as const,
+          7: 'forcecage' as const,
+          8: 'power-word-stun' as const,
+          9: 'power-word-kill' as const,
+        },
+        mysticArcanaExpended: { 6: true },
+      },
+    };
+    const saved = await saveCharacter(withArcana);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.spellcasting?.mysticArcana).toEqual(withArcana.spellcasting.mysticArcana);
+    expect(loaded?.spellcasting?.mysticArcanaExpended).toEqual({ 6: true });
+  });
+
+  it('loads a pre-Stage-8 record without a spellcasting field unchanged', async () => {
+    const legacy = createCharacter('Legacy8');
+    delete (legacy as { spellcasting?: unknown }).spellcasting;
+    const saved = await saveCharacter(legacy);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.spellcasting).toBeUndefined();
+  });
+
+  it('createCharacter leaves spellcasting unset', () => {
+    expect(createCharacter('Fresh').spellcasting).toBeUndefined();
+  });
 });

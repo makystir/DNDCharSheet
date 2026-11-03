@@ -92,6 +92,8 @@ export function createCharacter(name = ''): Character {
     // eyes/hair/skin/background/personality) default to unset via the spread
     // above — they are primitive strings, so there is no shared reference to
     // detach (unlike the maps copied above).
+    // Stage-8 `spellcasting` likewise defaults to unset via the spread (absent =
+    // no spellcasting state, a valid state); no nested default map to detach.
     createdAt: now,
     updatedAt: now,
   };

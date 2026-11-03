@@ -1,13 +1,20 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { PanelLeftClose, PanelLeftOpen, ChevronRight } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { NAV_ITEMS } from './navItems';
+import { visibleNavItems } from './navItems';
 import type { PageSection } from './navItems';
+import type { Character } from '../../types/character';
 import styles from './Navigation.module.css';
 
 interface NavigationProps {
   activePage: PageSection;
   onPageChange: (page: PageSection) => void;
+  /**
+   * The active character, used to filter conditional nav items (the
+   * level-gated Spells tab). Undefined while loading — no conditional item is
+   * shown until a character is available.
+   */
+  character?: Character;
 }
 
 function getInitialCollapsed(): boolean {
@@ -23,10 +30,14 @@ function getInitialCollapsed(): boolean {
  * scrollable tab bar on mobile. Rendered from the single NAV_ITEMS source of
  * truth; number-key shortcuts and aria-current all derive from it.
  */
-export function Navigation({ activePage, onPageChange }: NavigationProps) {
+export function Navigation({ activePage, onPageChange, character }: NavigationProps) {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const isMobile = useMediaQuery('(max-width: 767px)');
   const activeItemRef = useRef<HTMLButtonElement>(null);
+
+  // Items visible for the active character: the conditional Spells tab is
+  // filtered out for a non-caster (or a sub-caster below its casting level).
+  const navItems = visibleNavItems(character);
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => {
@@ -61,14 +72,15 @@ export function Navigation({ activePage, onPageChange }: NavigationProps) {
       ) {
         return;
       }
-      const item = NAV_ITEMS.find((n) => n.shortcut === e.key);
+      // Only the VISIBLE items' shortcuts fire; a hidden tab's key is inert.
+      const item = navItems.find((n) => n.shortcut === e.key);
       if (item) {
         onPageChange(item.id);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onPageChange]);
+  }, [onPageChange, navItems]);
 
   // Prevent synthesized clicks from carrying over to the new page after
   // touch-based navigation: calling preventDefault() on touchend stops the
@@ -83,7 +95,7 @@ export function Navigation({ activePage, onPageChange }: NavigationProps) {
 
   const renderMobileNav = () => (
     <div className={styles.mobileScrollRow}>
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const isActive = activePage === item.id;
         const Icon = item.icon;
         return (
@@ -113,7 +125,7 @@ export function Navigation({ activePage, onPageChange }: NavigationProps) {
   );
 
   const renderDesktopNav = () =>
-    NAV_ITEMS.map((item) => {
+    navItems.map((item) => {
       const isActive = activePage === item.id;
       const Icon = item.icon;
       return (

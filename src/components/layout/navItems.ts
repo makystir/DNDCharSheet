@@ -1,5 +1,7 @@
-import { User, Swords, Settings } from 'lucide-react';
+import { User, Swords, Sparkles, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { Character } from '../../types/character';
+import { isSpellcaster } from '../../logic/spellcasting';
 
 /**
  * The routing key for a top-level page. This is the single source of truth for
@@ -7,7 +9,7 @@ import type { LucideIcon } from 'lucide-react';
  * here (rather than from a component) so the pure routing logic stays free of
  * React imports and there is no circular dependency.
  */
-export type PageSection = 'character' | 'combat' | 'settings';
+export type PageSection = 'character' | 'combat' | 'spells' | 'settings';
 
 export interface NavItem {
   id: PageSection;
@@ -21,6 +23,13 @@ export interface NavItem {
    * change the routing key (`#<id>`).
    */
   subTabHint?: string;
+  /**
+   * Optional visibility predicate over the active character. When present and
+   * it returns false, the tab is NOT rendered, its route is guarded, and its
+   * number-key shortcut is inert. Used for the conditional, level-gated Spells
+   * tab (shown only to a spellcaster at/above its casting level).
+   */
+  predicate?: (character: Character) => boolean;
 }
 
 /**
@@ -39,5 +48,33 @@ export const NAV_ITEMS: NavItem[] = [
     subTabHint: 'Overview · Skills & Saves · Species · Class & Features',
   },
   { id: 'combat', label: 'Combat', icon: Swords, shortcut: '2' },
+  // Conditional + level-gated: shown only when the active character can cast
+  // (isSpellcaster is level-aware — Eldritch Knight / Arcane Trickster appear
+  // only from level 3). Given its OWN shortcut '4' so existing tabs keep their
+  // keys (Character '1', Combat '2', Settings '3' are unchanged). DELIBERATE:
+  // Spells renders third (between Combat and Settings) but is keyed '4', so its
+  // key does not match its visual position. This is intentional — stable
+  // shortcuts that don't churn muscle memory/tests are preferred over renumbering
+  // Settings. Do NOT "fix" the mismatch by renumbering (confirmed with the user).
+  {
+    id: 'spells',
+    label: 'Spells',
+    icon: Sparkles,
+    shortcut: '4',
+    subTabHint: 'Summary · Slots · Prepared · Browse',
+    predicate: isSpellcaster,
+  },
   { id: 'settings', label: 'Settings', icon: Settings, shortcut: '3' },
 ];
+
+/**
+ * The nav items visible for a given character: items without a predicate are
+ * always shown; a predicated item (Spells) is shown only when its predicate
+ * passes. Used by Navigation to render + to gate the number-key shortcuts, and
+ * by the shell to guard the active route.
+ */
+export function visibleNavItems(character: Character | undefined): NavItem[] {
+  return NAV_ITEMS.filter(
+    (item) => !item.predicate || (character !== undefined && item.predicate(character)),
+  );
+}

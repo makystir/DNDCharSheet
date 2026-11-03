@@ -6,6 +6,7 @@ import {
   saveCharacter,
 } from './storage/character-store';
 import { useHashRoute } from './hooks/useHashRoute';
+import { useConditionalRouteGuard } from './hooks/useConditionalRouteGuard';
 import { usePortrait } from './hooks/usePortrait';
 import { Navigation } from './components/layout/Navigation';
 import { PageContainer } from './components/layout/PageContainer';
@@ -13,7 +14,9 @@ import { NAV_ITEMS } from './components/layout/navItems';
 import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { CombatPage } from './components/pages/CombatPage';
+import { SpellsPage } from './components/pages/SpellsPage';
 import { SettingsPage } from './components/pages/SettingsPage';
+import { isSpellcaster } from './logic/spellcasting';
 import styles from './App.module.css';
 
 const THEME_KEY = 'dnd-theme';
@@ -80,6 +83,17 @@ function App() {
     }
   }, [theme]);
 
+  // Route guard: if the active route points at a conditional tab the current
+  // character can no longer see (e.g. #spells after switching to a non-caster
+  // class or dropping below the subclass casting level), redirect to Character.
+  // Extracted into a hook so the reactive invalidation (character changes while
+  // the route stays active) is unit-testable in isolation (blueprint §6.4).
+  useConditionalRouteGuard(
+    state.status === 'ready' ? state.character : undefined,
+    page,
+    navigate,
+  );
+
   const handleChange = useCallback((next: Character) => {
     setState({ status: 'ready', character: next });
     // Persist in the background; the UI already reflects the change.
@@ -101,7 +115,11 @@ function App() {
         Skip to main content
       </a>
 
-      <Navigation activePage={page} onPageChange={navigate} />
+      <Navigation
+        activePage={page}
+        onPageChange={navigate}
+        character={state.status === 'ready' ? state.character : undefined}
+      />
 
       <PageContainer pageKey={page}>
         {state.status === 'loading' && <p className={styles.status}>Loading…</p>}
@@ -125,6 +143,16 @@ function App() {
             )}
             {page === 'combat' && (
               <CombatPage character={state.character} onChange={handleChange} />
+            )}
+            {/* Belt-and-braces with the route guard: only render Spells for a
+                spellcaster (the guard rewrites the hash, this gates the view). */}
+            {page === 'spells' && isSpellcaster(state.character) && (
+              <SpellsPage
+                character={state.character}
+                onChange={handleChange}
+                subTab={subTab}
+                onSubTabChange={(tab) => navigate('spells', tab)}
+              />
             )}
             {page === 'settings' && (
               <SettingsPage theme={theme} onThemeToggle={toggleTheme} />
