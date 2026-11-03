@@ -283,6 +283,46 @@ export const SPELL_OVERRIDES: Record<string, SpellOverride> = {
     reason:
       'PHB 2024 p.315: two-column OCR scramble merged Scorching Ray with Sacred Flame; fields + verbatim effect restored.',
   },
+  // PHB 2024 p.316: Summon Undead (Level 3 Necromancy). GROUP B (embedded stat
+  // block) — unlike Giant Insect, Option A keeps the embedded Undead Spirit stat
+  // block as verbatim text but de-garbles its OCR noise. The source scrambled
+  // the block: the ability-grid header printed as "MOD SAVE IAOD SAVE t.1O0
+  // SAVE" (three MOD/SAVE column groups), the ability rows used an 'l' glyph for
+  // '1' ("+l" -> "+1") and "Wts 10" for "WIS 10", and the Incorporeal Passage
+  // (Ghostly Only) trait sentence was SPLIT — its tail ("...were Difficult
+  // Terrain. If it ends its turn inside an object, ...1d10 Force damage for every
+  // 5 feet traveled.") was stranded as a paragraph BEFORE the ability table while
+  // its head ("Incorporeal Passage (Ghostly Only). The spirit can move through
+  // other creatures and objects as if they") sat later under TRAITS. The effect
+  // below restores the verbatim PHB stat block in correct order: AC/HP line, the
+  // de-garbled ability grid, Speed/Immunities/Senses-Languages-CR, TRAITS (with
+  // the Incorporeal Passage sentence rejoined), then ACTIONS. Only OCR glyphs are
+  // fixed and the split sentence rejoined; no mechanic is invented or changed
+  // (rules-compliance rules 1/6; every number verified against PHB p.316).
+  'summon-undead': {
+    patch: {
+      effect:
+        'You call forth an Undead spirit. It manifests in an unoccupied space that you can see within range and uses the Undead Spirit stat block. When you cast the spell, choose the creature\'s form: Ghostly, Putrid, or Skeletal. The spirit resembles an Undead creature with the chosen form, which determines certain details in its stat block. The creature disappears when it drops to 0 Hit Points or when the spell ends.\n\nThe creature is an ally to you and your allies. In combat, the creature shares your Initiative count, but it takes its turn immediately after yours. It obeys your verbal commands (no action required by you). If you don\'t issue any, it takes the Dodge action and uses its movement to avoid danger.\n\nUsing a Higher-Level Spell Slot. Use the spell slot\'s level for the spell\'s level in the stat block.\n\n## UNDEAD SPIRIT\n\nMedium Undead, Neutral\n\nAC 11 + the spell\'s level HP 30 (Ghostly and Putrid only) or 20 (Skeletal only) + 10 for each spell level above 3\n\nMOD SAVE MOD SAVE MOD SAVE\nSTR 12 +1 +1 DEX 16 +3 +3 CON 15 +2 +2\nINT 4 -3 -3 WIS 10 +0 +0 CHA 9 -1 -1\n\nSpeed 30 ft.; Fly 40 ft. (hover; Ghostly only)\n\nImmunities Necrotic, Poison; Exhaustion, Frightened, Paralyzed, Poisoned\n\nSenses Darkvision 60 ft., Passive Perception 10 Languages Understands the languages you know CR None (XP 0; PB equals your Proficiency Bonus)\n\n## TRAITS\n\nFestering Aura (Putrid Only). Constitution Saving Throw: DC equals your spell save DC, any creature (other than you) that starts its turn within a 5-foot Emanation originating from the spirit. Failure: The creature has the Poisoned condition until the start of its next turn.\n\nIncorporeal Passage (Ghostly Only). The spirit can move through other creatures and objects as if they were Difficult Terrain. If it ends its turn inside an object, it is shunted to the nearest unoccupied space and takes 1d10 Force damage for every 5 feet traveled.\n\n## ACTIONS\n\nMultiattack. The spirit makes a number of attacks equal to half this spell\'s level (round down).\n\nDeathly Touch (Ghostly Only). Melee Attack Roll: Bonus equals your spell attack modifier, reach 5 ft. Hit: 1d8 + 3 + the spell\'s level Necrotic damage, and the target has the Frightened condition until the end of its next turn.\n\nGrave Bolt (Skeletal Only). Ranged Attack Roll: Bonus equals your spell attack modifier, range 150 ft. Hit: 2d4 + 3 + the spell\'s level Necrotic damage.\n\nRotting Claw (Putrid Only). Melee Attack Roll: Bonus equals your spell attack modifier, reach 5 ft. Hit: 1d6 + 3 + the spell\'s level Slashing damage. If the target has the Poisoned condition, it has the Paralyzed condition until the end of its next turn.',
+    },
+    reason:
+      'PHB 2024 p.316: de-garbled the embedded Undead Spirit stat block in Summon Undead\'s effect — fixed the ability-grid header ("MOD SAVE IAOD SAVE t.1O0 SAVE" -> three "MOD SAVE" groups), digit glyphs ("+l" -> "+1") and "Wts 10" -> "WIS 10", and rejoined the Incorporeal Passage (Ghostly Only) trait sentence with its orphaned tail in correct order; verbatim, no mechanics changed.',
+  },
+  // PHB 2024 p.312: Reincarnate (Level 5 Necromancy). The embedded d10 species
+  // roll table was OCR-scrambled: the two-column header printed as "ldlO Species
+  // ldlO Species" (should be "1d10 Species" column headers), the row index 1 as
+  // "l Aasimar", and "9 Ore" instead of "9 Orc". Per Option A this stays inline
+  // text; the override de-garbles the glyphs only and keeps the surrounding prose
+  // verbatim. Species list/numbering verified against PHB p.312: 1 Aasimar,
+  // 2 Dragonborn, 3 Dwarf, 4 Elf, 5 Gnome, 6 Goliath, 7 Halfling, 8 Human,
+  // 9 Orc, 10 Tiefling (rules-compliance rules 1/6; no mechanics invented).
+  reincarnate: {
+    patch: {
+      effect:
+        'You touch a dead Humanoid or a piece of one. If the creature has been dead no longer than 10 days, the spell forms a new body for it and calls the soul to enter that body. Roll 1d10 and consult the table below to determine the body\'s species, or the DM chooses another playable species.\n\n1d10 Species 1d10 Species\n1 Aasimar 6 Goliath\n2 Dragonborn 7 Halfling\n3 Dwarf 8 Human\n4 Elf 9 Orc\n5 Gnome 10 Tiefling\n\nThe reincarnated creature makes any choices that a species\' description offers, and the creature recalls its former life. It retains the capabilities it had in its original form, except it loses the traits of its previous species and gains the traits of its new one.',
+    },
+    reason:
+      'PHB 2024 p.312: de-garbled Reincarnate\'s embedded d10 species table — "ldlO Species" -> "1d10 Species" headers, "l Aasimar" -> "1 Aasimar", and "9 Ore" -> "9 Orc"; kept inline (Option A) with surrounding prose verbatim.',
+  },
 };
 
 /** Apply the override for a parsed spell, returning the corrected record. */

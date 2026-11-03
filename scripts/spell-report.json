@@ -22,7 +22,7 @@
     "ranger": 59,
     "paladin": 49
   },
-  "flaggedCount": 33,
+  "flaggedCount": 35,
   "flagged": [
     {
       "id": "animal-friendship",
@@ -207,6 +207,13 @@
       ]
     },
     {
+      "id": "reincarnate",
+      "name": "Reincarnate",
+      "flags": [
+        "override:PHB 2024 p.312: de-garbled Reincarnate's embedded d10 species table — \"ldlO Species\" -> \"1d10 Species\" headers, \"l Aasimar\" -> \"1 Aasimar\", and \"9 Ore\" -> \"9 Orc\"; kept inline (Option A) with surrounding prose verbatim."
+      ]
+    },
+    {
       "id": "sacred-flame",
       "name": "Sacred Flame",
       "flags": [
@@ -232,6 +239,13 @@
       "name": "Staggering Smite",
       "flags": [
         "override:PHB 2024 p.320: text-bleed from Steel Wind Strike appended foreign paragraphs to Staggering Smite; dropped the bleed, kept Staggering Smite's verbatim prose + upcast."
+      ]
+    },
+    {
+      "id": "summon-undead",
+      "name": "Summon Undead",
+      "flags": [
+        "override:PHB 2024 p.316: de-garbled the embedded Undead Spirit stat block in Summon Undead's effect — fixed the ability-grid header (\"MOD SAVE IAOD SAVE t.1O0 SAVE\" -> three \"MOD SAVE\" groups), digit glyphs (\"+l\" -> \"+1\") and \"Wts 10\" -> \"WIS 10\", and rejoined the Incorporeal Passage (Ghostly Only) trait sentence with its orphaned tail in correct order; verbatim, no mechanics changed."
       ]
     },
     {
