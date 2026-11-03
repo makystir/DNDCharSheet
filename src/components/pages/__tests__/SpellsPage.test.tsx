@@ -205,10 +205,11 @@ describe('SpellsPage — Browse filtering', () => {
   it('filters the class list by level and shows an effect summary', () => {
     renderStatefulPage(wizardLevel5);
     fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
-    // Browse rows carry the paraphrased description (finding 3): Fireball's
-    // summary names its damage + save.
+    // Browse rows carry the short description, now a bounded slice of the real
+    // PHB effect prose (catalog rebuild). Fireball's description opens with its
+    // verbatim effect text.
     expect(
-      screen.getByText(/8d6 Fire damage, Dexterity save/i),
+      screen.getByText(/A bright streak flashes from you to a point/i),
     ).toBeInTheDocument();
     // Filter to cantrips only; Fireball (level 3) should drop out.
     fireEvent.change(screen.getByLabelText('Filter by spell level'), {

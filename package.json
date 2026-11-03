@@ -12,7 +12,9 @@
     "build": "tsc --build && vite build",
     "build:docker": "tsc --build && vite build --base /",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "gen:spells": "node scripts/generate-spells.ts",
+    "gen:spells:check": "node scripts/generate-spells.ts --check"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.2.8",

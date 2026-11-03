@@ -1,0 +1,259 @@
+{
+  "total": 389,
+  "byLevel": {
+    "0": 34,
+    "1": 64,
+    "2": 62,
+    "3": 51,
+    "4": 41,
+    "5": 48,
+    "6": 34,
+    "7": 21,
+    "8": 18,
+    "9": 16
+  },
+  "byClass": {
+    "sorcerer": 148,
+    "wizard": 241,
+    "bard": 140,
+    "warlock": 91,
+    "druid": 134,
+    "cleric": 116,
+    "ranger": 59,
+    "paladin": 49
+  },
+  "flaggedCount": 33,
+  "flagged": [
+    {
+      "id": "animal-friendship",
+      "name": "Animal Friendship",
+      "flags": [
+        "override:PHB 2024 p.240: OCR glued the name \"ANIMALFRIENDSHIP\" -> \"Animal Friendship\"."
+      ]
+    },
+    {
+      "id": "arcane-gate",
+      "name": "Arcane Gate",
+      "flags": [
+        "override:PHB 2024 p.245: OCR glued the name \"ARCANEGATE\" -> \"Arcane Gate\"."
+      ]
+    },
+    {
+      "id": "arms-of-hadar",
+      "name": "Arms of Hadar",
+      "flags": [
+        "override:PHB 2024 p.243: two-column OCR scramble spliced Arms of Hadar's upcast line into its main sentence and stranded the tail; effect reconstructed verbatim in correct order."
+      ]
+    },
+    {
+      "id": "charm-monster",
+      "name": "Charm Monster",
+      "flags": [
+        "override:PHB 2024 p.252: OCR mangled \"CHarm MOnSTER\" -> \"Charm Monster\"."
+      ]
+    },
+    {
+      "id": "charm-person",
+      "name": "Charm Person",
+      "flags": [
+        "override:PHB 2024 p.252: OCR mangled \"CHarm Person\" -> \"Charm Person\"."
+      ]
+    },
+    {
+      "id": "chill-touch",
+      "name": "Chill Touch",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "conjure-fey",
+      "name": "Conjure Fey",
+      "flags": [
+        "override:PHB 2024 p.256: OCR glued the name \"CONJUREFEY\" -> \"Conjure Fey\"."
+      ]
+    },
+    {
+      "id": "detect-magic",
+      "name": "Detect Magic",
+      "flags": [
+        "override:PHB 2024 p.262: OCR glued the name \"DETECTMAGIC\" -> \"Detect Magic\"."
+      ]
+    },
+    {
+      "id": "dispel-evil-and-good",
+      "name": "Dispel Evil and Good",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "divine-smite",
+      "name": "Divine Smite",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "eldritch-blast",
+      "name": "Eldritch Blast",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "elemental-weapon",
+      "name": "Elemental Weapon",
+      "flags": [
+        "override:PHB 2024 p.268: OCR glued the name \"ELEMENTALWEAPON\" -> \"Elemental Weapon\"."
+      ]
+    },
+    {
+      "id": "find-the-path",
+      "name": "Find the Path",
+      "flags": [
+        "override:PHB 2024 p.273: OCR mangled the name \"FINd THe PATí\" -> \"Find the Path\"."
+      ]
+    },
+    {
+      "id": "giant-insect",
+      "name": "Giant Insect",
+      "flags": [
+        "override:PHB 2024 p.279: Giant Insect's player-facing prose was spliced (\"...after yours. It\" cut from \"obeys your verbal commands...\") across its embedded stat block; restored the prose only + upcast, leaving the embedded stat block as the deferred OCR follow-up (not transcribed this pass)."
+      ]
+    },
+    {
+      "id": "hallow",
+      "name": "Hallow",
+      "flags": [
+        "override:PHB 2024 p.283: Hallow's \"Darkness\" extra-effect sentence was split across a paragraph break; rejoined (\"...Normal light, as well as magical light...\"), other prose carried verbatim (incl. source \"teleportarion\" glyph per the deferred-noise carve-out)."
+      ]
+    },
+    {
+      "id": "heat-metal",
+      "name": "Heat Metal",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "ice-knife",
+      "name": "Ice Knife",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "ice-storm",
+      "name": "Ice Storm",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "insect-plague",
+      "name": "Insect Plague",
+      "flags": [
+        "override:PHB 2024 p.288: two-column OCR scramble merged Insect Plague with Invisibility; fields + verbatim effect restored."
+      ]
+    },
+    {
+      "id": "invisibility",
+      "name": "Invisibility",
+      "flags": [
+        "override:PHB 2024 p.289: two-column OCR scramble merged Invisibility with Insect Plague; fields + verbatim effect restored."
+      ]
+    },
+    {
+      "id": "lightning-bolt",
+      "name": "Lightning Bolt",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "magic-jar",
+      "name": "Magic Jar",
+      "flags": [
+        "override:PHB 2024 p.294: OCR glued the name \"MAGICJAR\" -> \"Magic Jar\"; two-column scramble fused \"On a successful save, the...When the spell ends\" and stranded the \"target resists...\" clause; effect reconstructed verbatim in correct paragraph order."
+      ]
+    },
+    {
+      "id": "mending",
+      "name": "Mending",
+      "flags": [
+        "override:PHB 2024 p.294: OCR-mangled Components echo \"ponerter V. S M (tve lodesteres)\" leaked into Mending's effect/description; stripped so prose starts at the real text."
+      ]
+    },
+    {
+      "id": "mirror-image",
+      "name": "Mirror Image",
+      "flags": [
+        "override:PHB 2024 p.297: OCR glued the name \"MIRRORIMAGE\" -> \"Mirror Image\"."
+      ]
+    },
+    {
+      "id": "protection-from-evil-and-good",
+      "name": "Protection from Evil and Good",
+      "flags": [
+        "override:PHB 2024 p.311: an image caption (\"A HUMAN CLERIC CASTS RAISE DEAD...\") OCR'd into the middle of the effect, splitting the sentence; caption removed and verbatim prose restored."
+      ]
+    },
+    {
+      "id": "ray-of-frost",
+      "name": "Ray of Frost",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "sacred-flame",
+      "name": "Sacred Flame",
+      "flags": [
+        "override:PHB 2024 p.313: two-column OCR scramble merged Sacred Flame with Scorching Ray; fields + verbatim effect restored."
+      ]
+    },
+    {
+      "id": "scorching-ray",
+      "name": "Scorching Ray",
+      "flags": [
+        "override:PHB 2024 p.315: two-column OCR scramble merged Scorching Ray with Sacred Flame; fields + verbatim effect restored."
+      ]
+    },
+    {
+      "id": "searing-smite",
+      "name": "Searing Smite",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "staggering-smite",
+      "name": "Staggering Smite",
+      "flags": [
+        "override:PHB 2024 p.320: text-bleed from Steel Wind Strike appended foreign paragraphs to Staggering Smite; dropped the bleed, kept Staggering Smite's verbatim prose + upcast."
+      ]
+    },
+    {
+      "id": "thorn-whip",
+      "name": "Thorn Whip",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    },
+    {
+      "id": "wall-of-force",
+      "name": "Wall of Force",
+      "flags": [
+        "override:PHB 2024 p.338: text-bleed from Vitriolic Sphere appended foreign paragraphs to Wall of Force; dropped the bleed, kept Wall of Force's verbatim prose (its own \"speil\"/\"ethereai\" OCR glyphs carried per the deferred-noise carve-out)."
+      ]
+    },
+    {
+      "id": "wall-of-thorns",
+      "name": "Wall of Thorns",
+      "flags": [
+        "possible-ocr-digit-glyph"
+      ]
+    }
+  ]
+}
