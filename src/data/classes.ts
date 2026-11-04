@@ -45,6 +45,7 @@
  */
 
 import type { Ability, SkillId } from '../types/character';
+import type { WeaponProperty } from './weapons';
 
 /** A class Hit Die size. Only these four appear among the PHB classes. */
 export type HitDie = 6 | 8 | 10 | 12;
@@ -88,6 +89,14 @@ export interface SubclassData {
   source: string;
 }
 
+/** Structured class weapon proficiency (Stage A5d). PHB 2024 Core <Class> Traits. */
+export interface WeaponProficiencyRule {
+  simple: boolean;
+  martial: boolean;
+  /** Martial weapons that have ANY of these properties (e.g. Monk: Light). */
+  martialWithAnyOf?: WeaponProperty[];
+}
+
 /** A class' full mechanical profile. */
 export interface ClassData {
   id: string;
@@ -104,6 +113,14 @@ export interface ClassData {
   armorTraining: string[];
   /** Weapon proficiencies, display strings (PHB 2024 Core <Class> Traits). */
   weaponProficiencies: string[];
+  /**
+   * Weapon proficiencies in MACHINE-USABLE form (Stage A5d), so attack logic never
+   * parses the display strings above. `simple` / `martial` = proficient with every
+   * weapon of that category; `martialWithAnyOf` = proficient with Martial weapons that
+   * have at least one of the listed properties (Monk: Light; Rogue: Finesse or Light).
+   * An oracle test pins this to `weaponProficiencies` for all 12 classes.
+   */
+  weaponProficiency: WeaponProficiencyRule;
   /** Tool proficiencies, display strings (PHB 2024 Core <Class> Traits). */
   toolProficiencies: string[];
   /** Starting-equipment choice text (PHB 2024 Core <Class> Traits). */
@@ -139,6 +156,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Medium armor', 'Shields'], // PHB 2024 "Core Barbarian Traits" (line ~2385).
     weaponProficiencies: ['Simple weapons', 'Martial weapons'], // PHB 2024 "Core Barbarian Traits" (line ~2385).
+    weaponProficiency: { simple: true, martial: true }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Greataxe, 4 Handaxes, Explorer's Pack, 15 GP; or (B) 75 GP", // PHB 2024 "Core Barbarian Traits" (line ~2389).
@@ -319,6 +337,7 @@ export const CLASS_CATALOG = {
     skillChoices: { count: 3, from: 'any' }, // PHB 2024 "Core Bard Traits": Choose any 3 skills (line ~2691).
     armorTraining: ['Light armor'], // PHB 2024 "Core Bard Traits" (line ~2691).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Bard Traits" (line ~2691).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: ['Three Musical Instruments of your choice'], // PHB 2024 "Core Bard Traits" (line ~2691).
     startingEquipment:
       "(A) Leather Armor, 2 Daggers, Musical Instrument, Entertainer's Pack, 19 GP; or (B) 90 GP", // PHB 2024 "Core Bard Traits".
@@ -456,6 +475,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Medium armor', 'Shields'], // PHB 2024 "Core Cleric Traits" (line ~3122).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Cleric Traits" (line ~3122).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, 7 GP; or (B) 110 GP", // PHB 2024 "Core Cleric Traits" (line ~3122).
@@ -580,6 +600,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Shields'], // PHB 2024 "Core Druid Traits" (line ~3590).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Druid Traits" (line ~3590).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: ['Herbalism Kit'], // PHB 2024 "Core Druid Traits" (line ~3590).
     startingEquipment:
       "(A) Leather Armor, Shield, Sickle, Druidic Focus (Quarterstaff), Explorer's Pack, Herbalism Kit, 9 GP; or (B) 50 GP", // PHB 2024 "Core Druid Traits" (line ~3590).
@@ -717,6 +738,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Medium armor', 'Heavy armor', 'Shields'], // PHB 2024 "Core Fighter Traits" (line ~4089).
     weaponProficiencies: ['Simple weapons', 'Martial weapons'], // PHB 2024 "Core Fighter Traits" (line ~4089).
+    weaponProficiency: { simple: true, martial: true }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, 4 GP; (B) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, 11 GP; or (C) 155 GP", // PHB 2024 "Core Fighter Traits" (line ~4089).
@@ -904,6 +926,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: [], // PHB 2024 "Core Monk Traits": None (line ~4481).
     weaponProficiencies: ['Simple weapons', 'Martial weapons with the Light property'], // PHB 2024 "Core Monk Traits" (line ~4481).
+    weaponProficiency: { simple: true, martial: false, martialWithAnyOf: ['light'] }, // structured form of the line above (Stage A5d)
     toolProficiencies: ["One type of Artisan's Tools or Musical Instrument"], // PHB 2024 "Core Monk Traits" (line ~4481).
     startingEquipment:
       "(A) Spear, 5 Daggers, Artisan's Tools or Musical Instrument, Explorer's Pack, 11 GP; or (B) 50 GP", // PHB 2024 "Core Monk Traits".
@@ -1097,6 +1120,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Medium armor', 'Heavy armor', 'Shields'], // PHB 2024 "Core Paladin Traits" (line ~4820).
     weaponProficiencies: ['Simple weapons', 'Martial weapons'], // PHB 2024 "Core Paladin Traits" (line ~4820).
+    weaponProficiency: { simple: true, martial: true }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, 9 GP; or (B) 150 GP", // PHB 2024 "Core Paladin Traits" (line ~4820).
@@ -1261,6 +1285,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor', 'Medium armor', 'Shields'], // PHB 2024 "Core Ranger Traits" (line ~5333).
     weaponProficiencies: ['Simple weapons', 'Martial weapons'], // PHB 2024 "Core Ranger Traits" (line ~5331).
+    weaponProficiency: { simple: true, martial: true }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus, Explorer's Pack, 7 GP; or (B) 150 GP", // PHB 2024 "Core Ranger Traits" (line ~5334).
@@ -1425,6 +1450,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor'], // PHB 2024 "Core Rogue Traits" (line ~5874).
     weaponProficiencies: ['Simple weapons', 'Martial weapons with the Finesse or Light property'], // PHB 2024 "Core Rogue Traits" (line ~5874).
+    weaponProficiency: { simple: true, martial: false, martialWithAnyOf: ['finesse', 'light'] }, // structured form of the line above (Stage A5d)
     toolProficiencies: ["Thieves' Tools"], // PHB 2024 "Core Rogue Traits" (line ~5874).
     startingEquipment:
       "(A) Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, 8 GP; or (B) 100 GP", // PHB 2024 "Core Rogue Traits" (line ~5874).
@@ -1604,6 +1630,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: [], // PHB 2024 "Core Sorcerer Traits": None (line ~6232).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Sorcerer Traits" (line ~6232).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, 28 GP; or (B) 50 GP", // PHB 2024 "Core Sorcerer Traits" (line ~6232).
@@ -1737,6 +1764,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: ['Light armor'], // PHB 2024 "Core Warlock Traits" (line ~6784).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Warlock Traits" (line ~6784).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, 15 GP; or (B) 100 GP", // PHB 2024 "Core Warlock Traits" (line ~6784).
@@ -1870,6 +1898,7 @@ export const CLASS_CATALOG = {
     },
     armorTraining: [], // PHB 2024 "Core Wizard Traits": None (line ~7320).
     weaponProficiencies: ['Simple weapons'], // PHB 2024 "Core Wizard Traits" (line ~7320).
+    weaponProficiency: { simple: true, martial: false }, // structured form of the line above (Stage A5d)
     toolProficiencies: [],
     startingEquipment:
       "(A) 2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar's Pack, 5 GP; or (B) 55 GP", // PHB 2024 "Core Wizard Traits" (line ~7320).

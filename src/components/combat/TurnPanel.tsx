@@ -10,6 +10,7 @@ import {
   remainingMovementBreakdown,
   shouldPromptDeathSaveFor,
   turnContextOf,
+  TURN_WARNING_TEXT,
   type TurnEvent,
   type TurnWarning,
 } from '../../logic/turn-economy';
@@ -26,21 +27,6 @@ export interface TurnPanelProps {
   /** Starts the existing Death Saves roll flow (A5a); the panel never rolls itself. */
   onRollDeathSave: () => void;
 }
-
-/** Advisory wording for each warning. Formatting only: the logic raised the warning. */
-const WARNING_TEXT: Record<TurnWarning, string> = {
-  'action-already-used':
-    'You have already used your action this turn. A feature may grant another, so this is only a reminder.',
-  'bonus-already-used':
-    'You have already used your Bonus Action this turn. You can take only one unless a feature says otherwise.',
-  'reaction-already-used':
-    'You have already used your Reaction. It returns at the start of your next turn.',
-  'interaction-needs-utilize':
-    'You have already interacted with an object for free this turn. A second object needs the Utilize action.',
-  'over-speed': 'That move is more than your movement allowance this turn. Take the Dash action for more.',
-  incapacitated:
-    'You are Incapacitated: you cannot take actions, Bonus Actions or Reactions. Moving is still allowed.',
-};
 
 interface ChipSpec {
   event: TurnEvent;
@@ -257,7 +243,7 @@ export function TurnPanel({ character, onChange, onRollDeathSave }: TurnPanelPro
             <ul className={styles.warningList}>
               {warnings.map((w) => (
                 <li key={w} className={styles.warningItem}>
-                  {WARNING_TEXT[w]}
+                  {TURN_WARNING_TEXT[w]}
                 </li>
               ))}
             </ul>

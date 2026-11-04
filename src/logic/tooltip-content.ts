@@ -633,3 +633,119 @@ const TURN_RULE_TOOLTIPS: Record<TurnRuleTooltipKey, TooltipContent> = {
 export function resolveTurnRuleTooltip(key: string): TooltipContent | null {
   return Object.hasOwn(TURN_RULE_TOOLTIPS, key) ? TURN_RULE_TOOLTIPS[key as TurnRuleTooltipKey] : null;
 }
+
+/** Keys of the weapon attack rule tooltips (Stage A5d). */
+export const ATTACK_RULE_TOOLTIP_KEYS = ['attack-roll', 'critical-hit', 'cover', 'weapon-mastery'] as const;
+
+export type AttackRuleTooltipKey = (typeof ATTACK_RULE_TOOLTIP_KEYS)[number];
+
+const ATTACK_RULE_TOOLTIPS: Record<AttackRuleTooltipKey, TooltipContent> = {
+  'attack-roll': {
+    title: 'Attack Roll',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Roll a d20 and add your attack bonus. The attack hits if the total equals or exceeds the target\u2019s Armor Class.',
+      },
+      {
+        label: 'Bonus',
+        text: 'Use Strength for melee weapons and Unarmed Strikes, Dexterity for ranged weapons. Finesse lets you choose. Add your Proficiency Bonus if you are proficient with the weapon.',
+      },
+      {
+        label: '20 and 1',
+        text: 'A natural 20 always hits and is a Critical Hit. A natural 1 always misses. This applies to attack rolls only, and is judged on the die, not the total.',
+      },
+      {
+        label: 'Advantage and Disadvantage',
+        text: 'They never stack, and any mix of the two cancels to a normal roll. This app suggests sources; you choose which apply.',
+      },
+      {
+        label: 'This app',
+        text: 'Exhaustion reduces the roll by 2 per level and is shown as its own line.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Attack Rolls" (Docs/PlayersHandbook.md L432-492)' },
+    ],
+  },
+  'critical-hit': {
+    title: 'Critical Hit',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Roll all of the attack\u2019s damage dice twice and add them together, then add your modifiers as normal.',
+      },
+      {
+        label: 'Modifiers',
+        text: 'Ability modifiers and flat bonuses are added once, not doubled. A fixed damage amount with no dice stays the same.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Critical Hits" (L1087-1100) and "Critical Hit" (L20857)' },
+    ],
+  },
+  cover: {
+    title: 'Cover',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Half Cover gives the target +2 to AC and Dexterity saving throws. Three-Quarters Cover gives +5. Total Cover means the target cannot be targeted directly.',
+      },
+      {
+        label: 'No stacking',
+        text: 'If the target has several kinds of cover, only the most protective degree applies. They are not added together.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Cover" (L977-1000)' },
+    ],
+  },
+  'weapon-mastery': {
+    title: 'Weapon Mastery',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Every weapon has a mastery property, but you can use it only if a feature of yours unlocks it. Weapon Mastery lets you pick a number of weapon kinds and use their properties.',
+      },
+      {
+        label: 'Who has it',
+        text: 'Barbarians, Fighters, Paladins, Rangers and Rogues. Other classes have no Weapon Mastery, so every mastery stays locked.',
+      },
+      {
+        label: 'This app',
+        text: 'A mastery is usable only when your class unlocks it and you chose that weapon. Features from species, feats or subclasses that unlock masteries are not modelled.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Mastery Properties" (L9351-9352)' },
+    ],
+  },
+};
+
+/**
+ * Tooltip content for Attack Roll, Critical Hit, Cover or Weapon Mastery (short
+ * PHB-cited paraphrases). Returns null for an unknown key.
+ */
+export function resolveAttackRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(ATTACK_RULE_TOOLTIPS, key) ? ATTACK_RULE_TOOLTIPS[key as AttackRuleTooltipKey] : null;
+}
+
+/** Why a Weapon Mastery chip is locked (Stage A5d, decision D8). */
+const MASTERY_LOCK_TEXT: Record<string, string> = {
+  'no-class': 'No class is selected, so no feature unlocks weapon masteries.',
+  'no-feature': 'Your class has no Weapon Mastery feature. Only Barbarians, Fighters, Paladins, Rangers and Rogues have one.',
+  'not-chosen': 'You have not chosen this weapon for Weapon Mastery. Pick it in your mastery list to unlock its property.',
+  'not-eligible': 'Your class cannot use Weapon Mastery with this weapon (for example, Barbarians need a melee weapon and Rogues need one they are proficient with).',
+  'over-cap': 'You have chosen more weapons than your level allows, so this one is past the limit. Remove another to use it.',
+};
+
+/**
+ * Tooltip for a LOCKED Weapon Mastery chip, naming the reason (D8). Returns null for an
+ * unknown reason.
+ */
+export function resolveMasteryLockedTooltip(reason: string): TooltipContent | null {
+  if (!Object.hasOwn(MASTERY_LOCK_TEXT, reason)) return null;
+  return {
+    title: 'Weapon Mastery locked',
+    sections: [
+      { label: 'Why', text: MASTERY_LOCK_TEXT[reason] },
+      {
+        label: 'Rule',
+        text: 'A mastery property is usable only by a character who has a feature, such as Weapon Mastery, that unlocks it.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Mastery Properties" (L9351-9352)' },
+    ],
+  };
+}

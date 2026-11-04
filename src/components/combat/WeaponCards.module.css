@@ -1,0 +1,176 @@
+/* Weapons panel and Unarmed Strike card (Stage A5d).
+ * Presentation follows PWACharSheet WeaponCards.module.css: tertiary-background
+ * cards, heading-font name on its own line, gold stat values, and a compact list
+ * mode. ui-layout.md: line 1 is the full weapon name (wraps, never truncated);
+ * text containers carry min-width: 0 and flex: 1; controls are 44px touch targets. */
+.cardGrid,
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.cardGrid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+.list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.weaponCard,
+.unarmedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.weaponCard:focus-within,
+.unarmedCard:focus-within {
+  border-color: var(--accent-gold);
+}
+.name {
+  min-width: 0;
+  flex: 1;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+.statsLine,
+.chipLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-width: 0;
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.statLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-secondary);
+}
+.valueBtn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--accent-gold);
+}
+.versatile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.versatile input {
+  width: 20px;
+  height: 20px;
+}
+.attackBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 4px 14px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  background: rgba(201, 168, 76, 0.2);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.attackBtn:hover:not(:disabled) {
+  background: rgba(201, 168, 76, 0.3);
+}
+.attackBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.attackBtn:focus-visible,
+.versatile:focus-within {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.chipTrigger {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.chip,
+.masteryChip,
+.lockedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.masteryChip {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+.lockedChip {
+  color: var(--text-secondary);
+  border-style: dashed;
+}
+.note {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.unarmedGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+/* Compact list view */
+.listRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.06));
+}
+.listRow:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 767px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+  .name {
+    font-size: 13px;
+  }
+}

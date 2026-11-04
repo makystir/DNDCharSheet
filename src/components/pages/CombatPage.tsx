@@ -18,8 +18,14 @@ import { DeathSavesCard } from '../combat/DeathSavesCard';
 import { ConcentrationCard } from '../combat/ConcentrationCard';
 import { InitiativeTracker } from '../combat/InitiativeTracker';
 import { TurnPanel } from '../combat/TurnPanel';
+import { WeaponCards } from '../combat/WeaponCards';
+import { UnarmedStrikeCard } from '../combat/UnarmedStrikeCard';
+import { AmmoTracker } from '../combat/AmmoTracker';
+import { AttackFlow } from '../combat/AttackFlow';
+import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
 import { RestControls } from '../combat/RestControls';
 import { Swords } from 'lucide-react';
+import { DEFAULT_ATTACK_TARGET, type AttackTarget } from '../../logic/attack-flow';
 import { parseNumberInput } from './sheet-helpers';
 import styles from './CombatPage.module.css';
 
@@ -28,6 +34,12 @@ export interface CombatPageProps {
   onChange: (next: Character) => void;
   /** Optional app-level Toast sink (Concentration and rest results, Stage A5b). */
   onNotify?: (message: string) => void;
+  /**
+   * Stage A5d: called with an equipped weapon's inventory item id (or
+   * `UNARMED_ATTACK_ID` for an Unarmed Strike) when its Attack button is pressed.
+   * The Attack Flow dialog hooks in here; the buttons are disabled without it.
+   */
+  onAttack?: (weaponItemId: string) => void;
 }
 
 /**
@@ -36,7 +48,18 @@ export interface CombatPageProps {
  * Perception, Hit Point Maximum (incl. the rolled-HP house-rule toggle, kept
  * adjacent to the HP value it affects), and Hit Dice.
  */
-export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
+export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPageProps) {
+  // Stage A5d: Ammunition fired this fight, by inventory item id (UI state). Lives
+  // here so the Attack Flow can record shots too.
+  const [ammoUsed, setAmmoUsed] = useState<Record<string, number>>({});
+  // Stage A5d: the Attack Flow (open weapon id) and the last-used ad-hoc target, kept here so
+  // the target Armor Class and cover survive closing and reopening the flow.
+  const [attackWeaponId, setAttackWeaponId] = useState<string | null>(null);
+  const [attackTarget, setAttackTarget] = useState<AttackTarget>(DEFAULT_ATTACK_TARGET);
+  const openAttack = (weaponItemId: string) => {
+    onAttack?.(weaponItemId);
+    setAttackWeaponId(weaponItemId);
+  };
   // Stage A5c: the turn banner asks the Death Saves card to open its roll prompt.
   const [deathSaveRequest, setDeathSaveRequest] = useState(0);
 
@@ -150,6 +173,18 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         onChange={onChange}
         onRollDeathSave={() => setDeathSaveRequest((n) => n + 1)}
       />
+
+      {/* Stage A5d: Weapons, Unarmed Strike, Ammunition and Weapon Mastery, added
+          to the flat stack (the Attack / Defend / Status control comes in A5e). */}
+      <WeaponCards character={character} onAttack={openAttack} />
+      <UnarmedStrikeCard character={character} onAttack={openAttack} />
+      <AmmoTracker
+        character={character}
+        onChange={onChange}
+        usedByItem={ammoUsed}
+        onUsedChange={setAmmoUsed}
+      />
+      <WeaponMasteryChooser character={character} onChange={onChange} />
 
       <Card>
         <SectionHeader icon={Swords} title="Core Stats" />
@@ -285,6 +320,19 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         {/* Stage A5b: Short Rest and Long Rest, beside the Hit Dice they spend. */}
         <RestControls character={character} onChange={onChange} onNotify={onNotify} />
       </Card>
+
+      {attackWeaponId !== null && (
+        <AttackFlow
+          character={character}
+          onChange={onChange}
+          weaponId={attackWeaponId}
+          onClose={() => setAttackWeaponId(null)}
+          target={attackTarget}
+          onTargetChange={setAttackTarget}
+          ammoUsed={ammoUsed}
+          onAmmoUsedChange={setAmmoUsed}
+        />
+      )}
     </div>
   );
 }

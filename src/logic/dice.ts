@@ -38,6 +38,18 @@ export interface DiceRoll {
   total: number;
 }
 
+/**
+ * Combine Advantage / Disadvantage sources into one roll mode. They never stack,
+ * and any Advantage together with any Disadvantage cancels to a normal roll,
+ * whatever the number of sources of each. PHB 2024 "Advantage and Disadvantage"
+ * and "They Don't Stack" (Docs/PlayersHandbook.md L472-487).
+ */
+export function combineD20Mode(hasAdvantage: boolean, hasDisadvantage: boolean): D20Mode {
+  if (hasAdvantage && !hasDisadvantage) return 'advantage';
+  if (hasDisadvantage && !hasAdvantage) return 'disadvantage';
+  return 'normal';
+}
+
 /** Roll one die with `sides` faces from the injected RNG (face = floor(r*n)+1). */
 export function rollDie(rng: RNG, sides: number): number {
   const face = Math.floor(rng() * sides) + 1;

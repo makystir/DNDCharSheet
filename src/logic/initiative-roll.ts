@@ -28,7 +28,7 @@
  */
 import type { Character } from '../types/character';
 import { exhaustionLevelOf, impliedConditions } from './conditions';
-import { d20FromFaces, d20TestBreakdown, rollD20, type D20Mode } from './dice';
+import { combineD20Mode, d20FromFaces, d20TestBreakdown, rollD20, type D20Mode } from './dice';
 import { initiativeBreakdown } from './initiative';
 import { effectiveConditionIds } from './hit-points-state';
 import type { Breakdown, BreakdownComponent } from './breakdown';
@@ -82,11 +82,7 @@ export function initiativeRollMode(
   if (hasIncapacitated(character)) disadvantageFrom.push('incapacitated');
   if (input.manualDisadvantage === true) disadvantageFrom.push('manual');
 
-  const hasAdvantage = advantageFrom.length > 0;
-  const hasDisadvantage = disadvantageFrom.length > 0;
-  let mode: D20Mode = 'normal';
-  if (hasAdvantage && !hasDisadvantage) mode = 'advantage';
-  else if (hasDisadvantage && !hasAdvantage) mode = 'disadvantage';
+  const mode = combineD20Mode(advantageFrom.length > 0, disadvantageFrom.length > 0);
   return { mode, advantageFrom, disadvantageFrom };
 }
 

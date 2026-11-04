@@ -301,6 +301,16 @@ export interface InventoryItem {
   maxDoses?: number;
   /** Free-text per-instance notes. */
   notes?: string;
+  /**
+   * Weapon proficiency override (Stage A5d). true = proficient, false = not,
+   * absent = decided by the class. Covers feat- or species-granted proficiency,
+   * which is not modelled. Additive-optional; no `_v` bump.
+   */
+  proficiencyOverride?: boolean;
+  /** Magic or other flat bonus to this weapon's attack rolls (Stage A5d). Absent = 0. */
+  attackBonus?: number;
+  /** Magic or other flat bonus to this weapon's damage rolls (Stage A5d). Absent = 0. */
+  damageBonus?: number;
   // Reserved for the future magic-items stage: whether the item is attuned.
   // PHB 2024 attunement mechanics (slot limits, attunement requirements) are
   // OUT OF SCOPE for this arc and are NOT implemented here (rules-compliance
@@ -543,6 +553,15 @@ export interface Character {
    * Turn" (Docs/PlayersHandbook.md L870-909).
    */
   combat?: CombatState;
+  /**
+   * The weapon kinds (weapon catalog ids, e.g. 'longsword') whose Weapon Mastery
+   * property the character has chosen (Stage A5d, decision D8). The list is capped
+   * by the class's Weapon Mastery count at the current level; if the level drops so
+   * the list exceeds the cap it is kept, never silently deleted. Absent = none
+   * chosen. Additive-optional; no `_v` bump. PHB 2024 "Mastery Properties" (L9351)
+   * and the Barbarian, Fighter, Paladin, Ranger and Rogue "Weapon Mastery" features.
+   */
+  weaponMasteries?: string[];
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

@@ -57,6 +57,21 @@ export type TurnWarning =
   | 'over-speed'
   | 'incapacitated';
 
+/** Advisory wording for each warning. Formatting only: the reducer raised the warning. */
+export const TURN_WARNING_TEXT: Record<TurnWarning, string> = {
+  'action-already-used':
+    'You have already used your action this turn. A feature may grant another, so this is only a reminder.',
+  'bonus-already-used':
+    'You have already used your Bonus Action this turn. You can take only one unless a feature says otherwise.',
+  'reaction-already-used':
+    'You have already used your Reaction. It returns at the start of your next turn.',
+  'interaction-needs-utilize':
+    'You have already interacted with an object for free this turn. A second object needs the Utilize action.',
+  'over-speed': 'That move is more than your movement allowance this turn. Take the Dash action for more.',
+  incapacitated:
+    'You are Incapacitated: you cannot take actions, Bonus Actions or Reactions. Moving is still allowed.',
+};
+
 /** What the reducer needs to know about the character. */
 export interface TurnContext {
   /** Speed in feet. */

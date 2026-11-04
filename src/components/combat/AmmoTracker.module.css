@@ -1,0 +1,128 @@
+/* Ammunition tracker (Stage A5d). Presentation follows PWACharSheet
+ * AmmoTracker.module.css: tertiary tiles, large count (red at 3 or fewer),
+ * action buttons in a row. 44px touch targets; text containers wrap. */
+.ammoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ammoCard {
+  flex: 1;
+  min-width: min(100%, 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.ammoName {
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+.ammoCount {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.ammoCountValue {
+  min-width: 30px;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+}
+.ammoCountLow {
+  composes: ammoCountValue;
+  color: var(--accent-red);
+}
+.ammoCountNormal {
+  composes: ammoCountValue;
+  color: var(--accent-gold);
+}
+.label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.usedRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fireBtn,
+.recoverBtn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 4px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.fireBtn {
+  color: var(--accent-red);
+  background: rgba(200, 70, 70, 0.12);
+  border: 1px solid var(--accent-red);
+}
+.recoverBtn {
+  flex: 1;
+  color: var(--success);
+  background: rgba(90, 154, 90, 0.15);
+  border: 1px solid var(--success);
+}
+.fireBtn:disabled,
+.recoverBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.fireBtn:focus-visible,
+.recoverBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.valueBtn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: var(--accent-gold);
+}
+.rule {
+  margin: 8px 0 0;
+}
+.ruleTrigger {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
