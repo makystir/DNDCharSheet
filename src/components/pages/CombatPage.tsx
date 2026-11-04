@@ -14,6 +14,8 @@ import { ActiveConditions } from '../combat/ActiveConditions';
 import { HitPointsCard } from '../combat/HitPointsCard';
 import { TakeDamagePanel } from '../combat/TakeDamagePanel';
 import { DeathSavesCard } from '../combat/DeathSavesCard';
+import { ConcentrationCard } from '../combat/ConcentrationCard';
+import { RestControls } from '../combat/RestControls';
 import { Swords } from 'lucide-react';
 import { parseNumberInput } from './sheet-helpers';
 import styles from './CombatPage.module.css';
@@ -21,6 +23,8 @@ import styles from './CombatPage.module.css';
 export interface CombatPageProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** Optional app-level Toast sink (Concentration and rest results, Stage A5b). */
+  onNotify?: (message: string) => void;
 }
 
 /**
@@ -29,7 +33,7 @@ export interface CombatPageProps {
  * Perception, Hit Point Maximum (incl. the rolled-HP house-rule toggle, kept
  * adjacent to the HP value it affects), and Hit Dice.
  */
-export function CombatPage({ character, onChange }: CombatPageProps) {
+export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
   const setAcOverride = (raw: string) =>
     onChange({ ...character, acOverride: parseNumberInput(raw, true) });
 
@@ -124,7 +128,8 @@ export function CombatPage({ character, onChange }: CombatPageProps) {
           panel and, while it matters, the Death Saves card. The segmented
           Attack / Defend / Status layout comes in A5e. */}
       <HitPointsCard character={character} onChange={onChange} />
-      <TakeDamagePanel character={character} onChange={onChange} />
+      <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
+      <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
       <DeathSavesCard character={character} onChange={onChange} />
 
       {/* Active Conditions, with the read-only "from 0 HP" badges and the Knock
@@ -262,6 +267,8 @@ export function CombatPage({ character, onChange }: CombatPageProps) {
             {hitDiceSpent} / {hitDiceTotalValue}
           </span>
         </div>
+        {/* Stage A5b: Short Rest and Long Rest, beside the Hit Dice they spend. */}
+        <RestControls character={character} onChange={onChange} onNotify={onNotify} />
       </Card>
     </div>
   );

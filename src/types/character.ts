@@ -486,6 +486,19 @@ export interface Character {
    * of 0 are derived as dead and never write this flag. Additive-optional.
    */
   dead?: boolean;
+  /**
+   * The spell the character is concentrating on (Stage A5b). Absent = not
+   * concentrating. Additive-optional; no `_v` bump. PHB 2024 "Concentration"
+   * (Docs/PlayersHandbook.md L20767-20777).
+   */
+  concentration?: { spellId: SpellId };
+  /**
+   * When the character last finished a Long Rest, epoch milliseconds from an
+   * injected clock (Stage A5b, decision D5). Used only for the advisory
+   * 16-hour wait; it never blocks a rest. Additive-optional; no `_v` bump.
+   * PHB 2024 "Long Rest" (L21243).
+   */
+  lastLongRestAt?: number;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

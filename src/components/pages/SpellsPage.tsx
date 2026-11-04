@@ -28,6 +28,7 @@ import { SPELLCASTING_DESCRIPTORS } from '../../data/spell-progression';
 import { getSpell, spellsForClass } from '../../data/spells';
 import type { CatalogSpell, SpellId, SpellSchool } from '../../data/spells';
 import { ABILITY_NAMES } from '../../types/character';
+import { endConcentration, startConcentration } from '../../logic/concentration';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
@@ -44,6 +45,8 @@ export interface SpellsPageProps {
   subTab?: string | null;
   /** Called when the user selects a sub-tab, to sync the hash. */
   onSubTabChange?: (tab: string) => void;
+  /** Optional app-level Toast sink (Concentration changes, Stage A5b). */
+  onNotify?: (message: string) => void;
 }
 
 type SpellSubTab = 'summary' | 'slots' | 'prepared' | 'browse';
@@ -113,6 +116,7 @@ export function SpellsPage({
   onChange,
   subTab,
   onSubTabChange,
+  onNotify,
 }: SpellsPageProps) {
   const {
     orderedTabs,
@@ -268,6 +272,25 @@ export function SpellsPage({
     } else {
       patchSpellcasting({ prepared: chosenPrepared.filter((p) => p !== id) });
     }
+  };
+
+  // Stage A5b: the "Concentrating" toggle on a prepared concentration spell.
+  // Starting one ends any other (PHB 2024 "Concentration"), announced by Toast;
+  // the rule lives in logic/concentration.ts.
+  const setConcentrating = (id: SpellId, on: boolean) => {
+    if (!on) {
+      onChange(endConcentration(character));
+      onNotify?.(`Concentration on ${getSpell(id)?.name ?? id} ended.`);
+      return;
+    }
+    const started = startConcentration(character, id, getSpell(id)?.concentration === true);
+    onChange(started.character);
+    const name = getSpell(id)?.name ?? id;
+    onNotify?.(
+      started.endedPrevious
+        ? `Now concentrating on ${name}. Concentration on ${getSpell(started.endedPrevious)?.name ?? started.endedPrevious} ended.`
+        : `Now concentrating on ${name}.`,
+    );
   };
 
   const toggleSpellbook = (id: SpellId, checked: boolean) => {
@@ -651,6 +674,8 @@ export function SpellsPage({
                   lockedIds={alwaysPrepared}
                   lockedLabel="always prepared"
                   showLevel
+                  concentratingId={character.concentration?.spellId}
+                  onToggleConcentration={setConcentrating}
                 />
               ) : (
                 <EmptyState
@@ -856,6 +881,10 @@ interface SpellPickListProps {
   lockedIds?: SpellId[];
   /** Badge/aria text for locked rows (defaults to "required"). */
   lockedLabel?: string;
+  /** The spell currently concentrated on (Stage A5b); enables the toggle column. */
+  concentratingId?: SpellId;
+  /** When given, each chosen concentration spell shows a "Concentrating" toggle. */
+  onToggleConcentration?: (id: SpellId, on: boolean) => void;
 }
 
 /** A checkbox list of spells, disabling unchecked rows once the cap is reached. */
@@ -867,6 +896,8 @@ function SpellPickList({
   showLevel,
   lockedIds = [],
   lockedLabel = 'required',
+  concentratingId,
+  onToggleConcentration,
 }: SpellPickListProps) {
   if (spells.length === 0) {
     return (
@@ -904,6 +935,18 @@ function SpellPickList({
                 {showLevel && <span className={styles.pickLevel}> · L{s.level}</span>}
               </span>
             </label>
+            {onToggleConcentration && checked && s.concentration && (
+              <label className={styles.concentrateLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={concentratingId === s.id}
+                  aria-label={`Concentrating on ${s.name}`}
+                  onChange={(e) => onToggleConcentration(s.id, e.target.checked)}
+                />
+                <span>Concentrating</span>
+              </label>
+            )}
           </li>
         );
       })}

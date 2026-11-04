@@ -394,3 +394,99 @@ const HP_RULE_TOOLTIPS: Record<HpRuleTooltipKey, TooltipContent> = {
 export function resolveHitPointRuleTooltip(key: string): TooltipContent | null {
   return Object.hasOwn(HP_RULE_TOOLTIPS, key) ? HP_RULE_TOOLTIPS[key as HpRuleTooltipKey] : null;
 }
+
+/** Keys of the Concentration and rest rule tooltips (Stage A5b). */
+export const REST_RULE_TOOLTIP_KEYS = ['concentration', 'short-rest', 'long-rest'] as const;
+
+export type RestRuleTooltipKey = (typeof REST_RULE_TOOLTIP_KEYS)[number];
+
+const REST_RULE_TOOLTIPS: Record<RestRuleTooltipKey, TooltipContent> = {
+  concentration: {
+    title: 'Concentration',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Some spells need Concentration to stay active. If you lose it, the effect ends. You can end it at any time with no action.',
+      },
+      {
+        label: 'Another effect',
+        text: 'You lose Concentration the moment you start casting another spell that requires it.',
+      },
+      {
+        label: 'Damage',
+        text: 'When you take damage, make a Constitution saving throw. The DC is 10 or half the damage taken (round down), whichever is higher, up to 30.',
+      },
+      {
+        label: 'Incapacitated or dead',
+        text: 'It ends if you have the Incapacitated condition or you die. Unconscious, Paralyzed, Petrified and Stunned all include Incapacitated.',
+      },
+      {
+        label: 'This app',
+        text: 'Exhaustion reduces the save roll by 2 per level. A natural 1 or 20 has no special effect on a saving throw. Damage absorbed by Temporary Hit Points counts, unless you turn that off.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Concentration" (Docs/PlayersHandbook.md L20767-20777)' },
+    ],
+  },
+  'short-rest': {
+    title: 'Short Rest',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A Short Rest is 1 hour of light downtime. You need at least 1 Hit Point to start it.',
+      },
+      {
+        label: 'Hit Point Dice',
+        text: 'You may spend one or more Hit Point Dice. For each, roll the die, add your Constitution modifier, and regain that many Hit Points (minimum 1 per die). You can decide on another die after each roll.',
+      },
+      {
+        label: 'Recharge',
+        text: 'Warlock Pact Magic spell slots return. Standard spell slots do not. Features that a Short Rest recharges recharge as their descriptions say.',
+      },
+      {
+        label: 'Interruptions',
+        text: 'Rolling Initiative, casting a spell other than a cantrip, or taking any damage stops it, and an interrupted Short Rest gives no benefits.',
+      },
+      {
+        label: 'Source',
+        text: 'PHB 2024 "Short Rest" (L21475-21490); Warlock "Pact Magic" (L6854)',
+      },
+    ],
+  },
+  'long-rest': {
+    title: 'Long Rest',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A Long Rest is at least 8 hours, with at least 6 of sleep and no more than 2 of light activity. You need at least 1 Hit Point to start it, and you have the Unconscious condition while you sleep.',
+      },
+      {
+        label: 'Benefits',
+        text: 'You regain all lost Hit Points and all spent Hit Point Dice. Your Exhaustion level drops by 1. Temporary Hit Points are lost. Spell slots, Pact Magic slots and Mystic Arcanum return.',
+      },
+      {
+        label: '16 hours',
+        text: 'You must wait at least 16 hours before starting another. This app only warns you; it never blocks a rest.',
+      },
+      {
+        label: 'Interruptions',
+        text: 'Rolling Initiative, casting a spell other than a cantrip, taking any damage, or 1 hour of walking or other exertion stops it. If you rested at least 1 hour first, you gain the benefits of a Short Rest. Resuming costs 1 extra hour per interruption.',
+      },
+      {
+        label: 'Concentration',
+        text: 'Sleeping makes you Unconscious, which includes Incapacitated, so a Long Rest ends Concentration. The PHB does not state this in one sentence.',
+      },
+      {
+        label: 'Source',
+        text: 'PHB 2024 "Long Rest" (L21240-21262, L21296-21306); "Temporary Hit Points" (L1179-1193); Warlock "Mystic Arcanum" (L6892)',
+      },
+    ],
+  },
+};
+
+/**
+ * Tooltip content for Concentration, Short Rest or Long Rest (short PHB-cited
+ * paraphrases). Returns null for an unknown key.
+ */
+export function resolveRestRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(REST_RULE_TOOLTIPS, key) ? REST_RULE_TOOLTIPS[key as RestRuleTooltipKey] : null;
+}

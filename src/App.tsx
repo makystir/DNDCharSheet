@@ -18,6 +18,8 @@ import { InventoryPage } from './components/pages/InventoryPage';
 import { SpellsPage } from './components/pages/SpellsPage';
 import { SettingsPage } from './components/pages/SettingsPage';
 import { isSpellcaster } from './logic/spellcasting';
+import { Toast } from './components/shared/Toast';
+import { useConcentrationAutoEnd } from './hooks/useConcentrationAutoEnd';
 import styles from './App.module.css';
 
 const THEME_KEY = 'dnd-theme';
@@ -103,6 +105,19 @@ function App() {
     });
   }, []);
 
+  // Stage A5b: Concentration and rest results surface as a Toast. A fresh `id`
+  // remounts the Toast so an identical message still shows again.
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
+  const notify = useCallback(
+    (text: string) => setToast((prev) => ({ id: (prev?.id ?? 0) + 1, text })),
+    [],
+  );
+  useConcentrationAutoEnd(
+    state.status === 'ready' ? state.character : undefined,
+    handleChange,
+    notify,
+  );
+
   const toggleTheme = useCallback(
     () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
     [],
@@ -143,7 +158,7 @@ function App() {
               />
             )}
             {page === 'combat' && (
-              <CombatPage character={state.character} onChange={handleChange} />
+              <CombatPage character={state.character} onChange={handleChange} onNotify={notify} />
             )}
             {page === 'inventory' && (
               <InventoryPage character={state.character} onChange={handleChange} />
@@ -154,6 +169,7 @@ function App() {
               <SpellsPage
                 character={state.character}
                 onChange={handleChange}
+                onNotify={notify}
                 subTab={subTab}
                 onSubTabChange={(tab) => navigate('spells', tab)}
               />
@@ -169,6 +185,8 @@ function App() {
           </>
         )}
       </PageContainer>
+
+      <Toast key={toast?.id ?? 0} message={toast?.text ?? null} duration={5000} />
 
       {/* Announces the active page label to assistive tech on route change. */}
       <AriaLiveAnnouncer message={activeLabel} />

@@ -12,16 +12,20 @@ import {
   type DamageRequest,
 } from '../../logic/hit-points-state';
 import { resolveHitPointRuleTooltip } from '../../logic/tooltip-content';
+import { concentrationCheck, shouldEndConcentration } from '../../logic/concentration';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { parseNumberInput } from '../pages/sheet-helpers';
+import { ConcentrationCheckPrompt } from './ConcentrationCheckPrompt';
 import styles from './HitPoints.module.css';
 
 export interface TakeDamagePanelProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** Optional app-level Toast sink (Concentration results). */
+  onNotify?: (message: string) => void;
 }
 
 /**
@@ -40,7 +44,7 @@ export interface TakeDamagePanelProps {
  * No rule is computed here: the preview and the applied change both come from
  * applyDamageToCharacter (logic/hit-points-state.ts).
  */
-export function TakeDamagePanel({ character, onChange }: TakeDamagePanelProps) {
+export function TakeDamagePanel({ character, onChange, onNotify }: TakeDamagePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [amountRaw, setAmountRaw] = useState('');
   const [flatRaw, setFlatRaw] = useState('');
@@ -52,6 +56,8 @@ export function TakeDamagePanel({ character, onChange }: TakeDamagePanelProps) {
   // D4: default OFF, so damage absorbed by Temp HP still counts as damage taken.
   const [absorbedIsNoDamage, setAbsorbedIsNoDamage] = useState(false);
   const [status, setStatus] = useState('');
+  // Stage A5b: damage that forces a Concentration check, awaiting the save.
+  const [pendingCheck, setPendingCheck] = useState<number | null>(null);
   // Bumped after Apply so focus returns to the amount input once it re-renders.
   const [focusTick, setFocusTick] = useState(0);
   const amountRef = useRef<HTMLInputElement>(null);
@@ -63,6 +69,10 @@ export function TakeDamagePanel({ character, onChange }: TakeDamagePanelProps) {
     const input = amountRef.current;
     (input && !input.disabled ? input : statusRef.current)?.focus();
   }, [focusTick]);
+
+  // A pending check is moot once Concentration has ended (End Concentration,
+  // auto-end); drop it so it cannot reappear for a later spell.
+  if (pendingCheck !== null && !character.concentration) setPendingCheck(null);
 
   const max = hitPointMaxOf(character);
   const hp = effectiveHp(character);
@@ -111,11 +121,24 @@ export function TakeDamagePanel({ character, onChange }: TakeDamagePanelProps) {
     else if (r.failuresAdded > 0) {
       parts.push(`${r.failuresAdded} death-save failure${r.failuresAdded === 1 ? '' : 's'}.`);
     }
+    // Stage A5b, D4: a hit forces a Concentration check when it counts as damage
+    // taken (tookDamage already honours the Temp-HP toggle) and the character
+    // keeps concentrating. If the hit ends it (0 HP, Incapacitated, dead) there
+    // is nothing to save for; App's auto-end announces that.
+    const after = outcome.character;
+    const checkNeeded = r.tookDamage && !!after.concentration && shouldEndConcentration(after) === null;
+    if (checkNeeded) {
+      const dc = concentrationCheck(r.damageDealt).dc;
+      parts.push(`Concentration check required: Constitution save DC ${dc}.`);
+      setPendingCheck(r.damageDealt);
+    } else {
+      setPendingCheck(null);
+    }
     setStatus(parts.join(' '));
     reset();
-    setFocusTick((n) => n + 1);
+    // With a check pending, the prompt takes focus instead of the amount input.
+    if (!checkNeeded) setFocusTick((n) => n + 1);
   };
-
   return (
     <Card>
       <SectionHeader
@@ -331,6 +354,20 @@ export function TakeDamagePanel({ character, onChange }: TakeDamagePanelProps) {
             {status}
           </div>
         </div>
+      )}
+      {/* Outside the collapsible body so a collapsed panel still shows it. */}
+      {pendingCheck !== null && character.concentration && (
+        <ConcentrationCheckPrompt
+          character={character}
+          damage={pendingCheck}
+          onChange={onChange}
+          onNotify={onNotify}
+          onDone={(message) => {
+            setPendingCheck(null);
+            setStatus(message);
+            setFocusTick((n) => n + 1);
+          }}
+        />
       )}
     </Card>
   );

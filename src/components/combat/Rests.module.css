@@ -1,0 +1,283 @@
+/* Short Rest / Long Rest controls and dialogs (Stage A5b).
+ * Dialog shell follows RollPrompt / ConfirmDialog (local overlay, bottom sheet
+ * on mobile). ui-layout.md: text containers carry min-width: 0 and flex: 1,
+ * controls wrap instead of truncating text, 44px touch targets. */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+
+.controlGroup {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.status {
+  margin: 8px 0 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay);
+  z-index: 1100;
+  padding: 16px;
+}
+
+.dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 90%;
+  max-width: 440px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.text {
+  min-width: 0;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.muted {
+  min-width: 0;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.blocked {
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-red);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.advisory {
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.error {
+  margin: 0;
+  color: var(--accent-red);
+  font-size: 0.85rem;
+}
+
+.statList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statLabel {
+  min-width: 0;
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.statValue {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.diceList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0 0 0 20px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.resetList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 20px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.resetList li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.spendRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.input {
+  width: 96px;
+  min-height: 44px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px; /* >=16px avoids iOS zoom-on-focus */
+  text-align: center;
+}
+
+.interrupt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.interruptTitle {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.actionBtn,
+.ghostBtn,
+.primaryBtn {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.actionBtn {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-strong);
+}
+
+.actionBtn:hover:not(:disabled) {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.ghostBtn {
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--border);
+}
+
+.primaryBtn {
+  color: #000;
+  background: var(--accent-gold);
+  border: none;
+  font-weight: 600;
+}
+
+.actionBtn:disabled,
+.ghostBtn:disabled,
+.primaryBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.actionBtn:focus-visible,
+.ghostBtn:focus-visible,
+.primaryBtn:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    max-width: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .actionBtn,
+  .ghostBtn,
+  .primaryBtn {
+    width: 100%;
+  }
+}
