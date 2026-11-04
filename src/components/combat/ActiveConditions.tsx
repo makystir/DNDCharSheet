@@ -18,7 +18,9 @@ import {
   setExhaustion,
 } from '../../logic/conditions';
 import { resolveConditionTooltip, resolveExhaustionLevelTooltip } from '../../logic/tooltip-content';
+import { derivedConditionIds, knockOut } from '../../logic/hit-points-state';
 import { Card } from '../shared/Card';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { SectionHeader } from '../shared/SectionHeader';
 import { EmptyState } from '../shared/EmptyState';
 import { AddButton } from '../shared/AddButton';
@@ -36,16 +38,25 @@ export interface ActiveConditionsProps {
  * Active Conditions section for the Combat tab. Mirrors the PWACharSheet
  * CombatDashboard condition-badge row (colour-coded badge per condition with a
  * descriptive tooltip, a remove control, and an add control that opens the
- * ConditionPicker). Informational only: it records conditions and shows
- * derived information (implied conditions, Exhaustion penalties); it never
- * changes any other derived total.
+ * ConditionPicker). It records conditions and shows derived information
+ * (implied conditions, Exhaustion penalties); it never changes any other
+ * derived total.
+ *
+ * Stage A5a additions (decision D2): conditions the character has because it is
+ * at 0 HP (Unconscious plus the Incapacitated and Prone it implies) are shown as
+ * read-only "from 0 HP" badges and are never written to `character.conditions`;
+ * a separate, explicit "Knock out" button WRITES Unconscious (ends 'Short Rest').
  */
 export function ActiveConditions({ character, onChange }: ActiveConditionsProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [confirmKnockOut, setConfirmKnockOut] = useState(false);
   // De-duplicate by id so hand-edited/imported data cannot yield duplicate keys.
   const active = (character.conditions ?? []).filter((c, i, arr) => arr.findIndex((o) => o.id === c.id) === i);
   const exhaustion = exhaustionLevelOf(character);
-  const isEmpty = active.length === 0 && exhaustion === 0;
+  // Read-only conditions derived from 0 HP (never stored; decision D2).
+  const derived = derivedConditionIds(character);
+  const canKnockOut = knockOut(character) !== null;
+  const isEmpty = active.length === 0 && exhaustion === 0 && derived.length === 0;
 
   const badgeStyle = (id: ConditionId): CSSProperties => {
     const c = CONDITION_COLORS[id] ?? CONDITION_COLOR_FALLBACK;
@@ -66,7 +77,20 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
       <SectionHeader
         icon={AlertTriangle}
         title="Active Conditions"
-        action={<AddButton label="Add Condition" onClick={() => setPickerOpen(true)} />}
+        action={
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={styles.knockBtn}
+              disabled={!canKnockOut}
+              title="A melee attack that would reduce a creature to 0 HP can leave it at 1 HP and Unconscious instead"
+              onClick={() => setConfirmKnockOut(true)}
+            >
+              Knock out
+            </button>
+            <AddButton label="Add Condition" onClick={() => setPickerOpen(true)} />
+          </div>
+        }
       />
       {isEmpty ? (
         <EmptyState
@@ -121,6 +145,30 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
                     }
                   />
                 </label>
+              </div>
+            );
+          })}
+
+          {derived.map((id) => {
+            const data = getCondition(id);
+            const tip = resolveConditionTooltip(id);
+            return (
+              <div key={id} className={styles.row} data-testid={`derived-${id}`}>
+                <div className={styles.badgeLine}>
+                  <div className={styles.badge} style={badgeStyle(id)}>
+                    {tip ? (
+                      <ContentTooltip content={tip} className={styles.badgeName}>
+                        {data?.name ?? id}
+                      </ContentTooltip>
+                    ) : (
+                      <span>{data?.name ?? id}</span>
+                    )}
+                    <span className={styles.derivedTag}>from 0 HP</span>
+                  </div>
+                </div>
+                <span className={styles.implied}>
+                  Applies while at 0 Hit Points. It ends when Hit Points are regained, and cannot be removed here.
+                </span>
               </div>
             );
           })}
@@ -186,11 +234,24 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
                 </span>
               )}
               <span className={styles.implied}>
-                Informational only: not applied to skill, save, attack, or Speed totals.
+                Applied to in-app rolls such as Death Saving Throws; not applied to the static skill, save, attack, or Speed totals.
               </span>
             </div>
           )}
         </div>
+      )}
+
+      {confirmKnockOut && (
+        <ConfirmDialog
+          message="Knock out the character? Hit Points become 1 and the Unconscious condition is added (ends after a Short Rest)."
+          confirmLabel="Knock out"
+          onConfirm={() => {
+            setConfirmKnockOut(false);
+            const next = knockOut(character);
+            if (next) onChange(next);
+          }}
+          onCancel={() => setConfirmKnockOut(false)}
+        />
       )}
 
       {pickerOpen && (

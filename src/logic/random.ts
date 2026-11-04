@@ -13,6 +13,15 @@
 export type RNG = () => number;
 
 /**
+ * The default production RNG factory. This is the ONLY place in src/logic that
+ * may reference Math.random; every rules function receives an RNG (or the die
+ * result) as a parameter so it stays deterministic and testable.
+ */
+export function createDefaultRng(): RNG {
+  return () => Math.random();
+}
+
+/**
  * Pick one element from a non-empty array using the injected RNG.
  * Throws on an empty array (a programming-error guard, not a game rule) — this
  * matches the source helper's contract.

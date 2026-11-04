@@ -323,6 +323,17 @@ export interface ActiveCondition {
 }
 
 /**
+ * Death Saving Throw tally (Stage A5a). Each counter runs 0..3. `stable` means
+ * the creature is at 0 HP and no longer makes Death Saving Throws (PHB 2024
+ * "Stabilizing a Character", L1176-1177).
+ */
+export interface DeathSaveState {
+  successes: number;
+  failures: number;
+  stable?: boolean;
+}
+
+/**
  * Which inventory items a character currently has equipped (Stage A1).
  *
  * PHB 2024 "Armor: One at a Time" (Docs/PlayersHandbook.md L9638): a creature
@@ -450,6 +461,31 @@ export interface Character {
    * no `_v` bump. PHB 2024 "Exhaustion" (Docs/PlayersHandbook.md L21018-21028).
    */
   exhaustionLevel?: number;
+  /**
+   * Current Hit Points (Stage A5a). Absent = "at Hit Point maximum" and follows
+   * the maximum as it changes; an explicit 0 is a real value. Written back to
+   * absent when it equals the maximum. Additive-optional; no `_v` bump. PHB
+   * 2024 "Hit Points" (Docs/PlayersHandbook.md L1073-1079).
+   */
+  currentHp?: number;
+  /**
+   * Temporary Hit Points (Stage A5a). Absent = 0. They are not Hit Points and
+   * do not stack. Additive-optional; no `_v` bump. PHB 2024 "Temporary Hit
+   * Points" (L1179-1193).
+   */
+  tempHp?: number;
+  /**
+   * Death Saving Throw tally and Stable flag (Stage A5a). Absent = 0 successes,
+   * 0 failures, not Stable. Cleared when Hit Points are regained or on Stable.
+   * Additive-optional; no `_v` bump. PHB 2024 "Death Saving Throws" (L1155-1177).
+   */
+  deathSaves?: DeathSaveState;
+  /**
+   * Explicit death flag (Stage A5a), set by a third death-save failure or
+   * instant death. Absent = not dead. Exhaustion level 6 and a Hit Point maximum
+   * of 0 are derived as dead and never write this flag. Additive-optional.
+   */
+  dead?: boolean;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

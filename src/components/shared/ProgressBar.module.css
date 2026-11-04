@@ -27,6 +27,11 @@
   background: var(--text-secondary);
 }
 
+.fillHealthy {
+  composes: fill;
+  background: var(--success);
+}
+
 .fillWarning {
   composes: fill;
   background: var(--accent-gold);

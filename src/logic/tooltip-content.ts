@@ -280,3 +280,117 @@ export function resolveExhaustionLevelTooltip(level: number): TooltipContent | n
   });
   return { title: `Exhaustion level ${row.level}`, sections };
 }
+
+/** Keys of the Hit Point rule tooltips (Stage A5a). */
+export const HP_RULE_TOOLTIP_KEYS = [
+  'bloodied',
+  'stable',
+  'temp-hp',
+  'death-saves',
+  'massive-damage',
+] as const;
+
+export type HpRuleTooltipKey = (typeof HP_RULE_TOOLTIP_KEYS)[number];
+
+const HP_RULE_TOOLTIPS: Record<HpRuleTooltipKey, TooltipContent> = {
+  bloodied: {
+    title: 'Bloodied',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'You are Bloodied while you have half your Hit Points or fewer. It has no game effect on its own, but other effects can key off it.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Hit Points" (Docs/PlayersHandbook.md L1079)' },
+    ],
+  },
+  stable: {
+    title: 'Stable',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A Stable creature is at 0 Hit Points but makes no Death Saving Throws. It still has the Unconscious condition.',
+      },
+      {
+        label: 'Ends',
+        text: 'It stops being Stable when it takes damage and then makes Death Saving Throws again. If it is not healed, it regains 1 Hit Point after 1d4 hours.',
+      },
+      {
+        label: 'How',
+        text: 'Become Stable with a third Death Saving Throw success, or when someone takes the Help action and succeeds on a DC 10 Wisdom (Medicine) check.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Stabilizing a Character" (L1176-1177)' },
+    ],
+  },
+  'temp-hp': {
+    title: 'Temporary Hit Points',
+    sections: [
+      {
+        label: 'Buffer',
+        text: 'Temporary Hit Points are lost first when you take damage; leftover damage carries over to your Hit Points.',
+      },
+      {
+        label: 'No stacking',
+        text: 'They cannot be added together. When you receive more, you choose to keep what you have or take the new amount.',
+      },
+      {
+        label: 'Not Hit Points',
+        text: 'They are not Hit Points: healing cannot restore them, receiving them is not healing, and they do not wake you at 0 Hit Points.',
+      },
+      { label: 'Duration', text: 'They last until depleted or until you finish a Long Rest.' },
+      { label: 'Source', text: 'PHB 2024 "Temporary Hit Points" (L1179-1193)' },
+    ],
+  },
+  'death-saves': {
+    title: 'Death Saving Throws',
+    sections: [
+      {
+        label: 'When',
+        text: 'Make one whenever you start your turn with 0 Hit Points. It is a d20 that is not tied to an ability score.',
+      },
+      {
+        label: 'Result',
+        text: 'A 10 or higher succeeds; otherwise it fails. Three successes make you Stable; three failures mean death. They need not be consecutive.',
+      },
+      {
+        label: 'Natural 1 / 20',
+        text: 'A natural 1 counts as two failures. A natural 20 regains 1 Hit Point. These are judged on the die itself.',
+      },
+      {
+        label: 'Damage at 0 HP',
+        text: 'Any damage is one failure, or two from a Critical Hit. Damage equal to or above your Hit Point maximum kills you.',
+      },
+      {
+        label: 'Reset',
+        text: 'Both tallies reset when you regain any Hit Points or become Stable.',
+      },
+      {
+        label: 'Exhaustion',
+        text: 'The PHB does not say outright that a Death Saving Throw is a D20 Test. This app treats it as one, so Exhaustion reduces the roll by 2 per level.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Death Saving Throws" (L1155-1171)' },
+    ],
+  },
+  'massive-damage': {
+    title: 'Massive Damage',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'When damage reduces a character to 0 Hit Points and damage remains, the character dies if the remainder equals or exceeds their Hit Point maximum.',
+      },
+      {
+        label: 'Temporary Hit Points',
+        text: 'The PHB does not say how Temporary Hit Points interact. This app spends them first; what is left after they and your Hit Points are used up is the remainder.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Instant Death" (L1145)' },
+    ],
+  },
+};
+
+/**
+ * Tooltip content for a Hit Point rule term (Bloodied, Stable, Temporary Hit
+ * Points, Death Saving Throws, Massive Damage). Short PHB-cited paraphrases.
+ * Returns null for an unknown key.
+ */
+export function resolveHitPointRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(HP_RULE_TOOLTIPS, key) ? HP_RULE_TOOLTIPS[key as HpRuleTooltipKey] : null;
+}

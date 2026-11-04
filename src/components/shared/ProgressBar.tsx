@@ -1,10 +1,17 @@
 import type { EncumbranceLevel } from '../../logic/encumbrance';
 import styles from './ProgressBar.module.css';
 
+/**
+ * Severity of a bar. Encumbrance levels drive the Inventory bar; the Hit Point
+ * bar on the Combat tab uses 'healthy' | 'bloodied' | 'down' (Stage A5a), the
+ * D&D counterpart of the PWA wound bar's healthy / caution / danger bands.
+ */
+export type ProgressBarLevel = EncumbranceLevel | 'healthy' | 'bloodied' | 'down';
+
 export interface ProgressBarProps {
   current: number;
   max: number;
-  level: EncumbranceLevel;
+  level: ProgressBarLevel;
   label: string;
   ariaLabel: string;
 }
@@ -19,7 +26,10 @@ export interface ProgressBarProps {
  * binary (neutral/over); the two variant bands are only reachable under the
  * opt-in house rule (see logic/encumbrance.getEncumbranceLevel).
  */
-const fillClassByLevel: Record<EncumbranceLevel, string> = {
+const fillClassByLevel: Record<ProgressBarLevel, string> = {
+  healthy: styles.fillHealthy,
+  bloodied: styles.fillWarning,
+  down: styles.fillCritical,
   neutral: styles.fillNeutral,
   encumbered: styles.fillWarning,
   heavilyEncumbered: styles.fillDanger,

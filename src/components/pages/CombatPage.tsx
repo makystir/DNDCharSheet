@@ -11,6 +11,9 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { ActiveConditions } from '../combat/ActiveConditions';
+import { HitPointsCard } from '../combat/HitPointsCard';
+import { TakeDamagePanel } from '../combat/TakeDamagePanel';
+import { DeathSavesCard } from '../combat/DeathSavesCard';
 import { Swords } from 'lucide-react';
 import { parseNumberInput } from './sheet-helpers';
 import styles from './CombatPage.module.css';
@@ -116,8 +119,16 @@ export function CombatPage({ character, onChange }: CombatPageProps) {
 
   return (
     <div className={styles.page}>
-      {/* Active Conditions sits at the top of the Combat view, as the PWA
-          CombatDashboard places its condition-badge row (Stage A4). */}
+      {/* Stage A5a: the HP card leads the flat stack (blueprint section 5.3:
+          "HP card first, then Active Conditions"), followed by the Take Damage
+          panel and, while it matters, the Death Saves card. The segmented
+          Attack / Defend / Status layout comes in A5e. */}
+      <HitPointsCard character={character} onChange={onChange} />
+      <TakeDamagePanel character={character} onChange={onChange} />
+      <DeathSavesCard character={character} onChange={onChange} />
+
+      {/* Active Conditions, with the read-only "from 0 HP" badges and the Knock
+          out button (Stages A4, A5a). */}
       <ActiveConditions character={character} onChange={onChange} />
 
       <Card>
