@@ -29,9 +29,22 @@ describe('CurrencyInput', () => {
 });
 
 describe('CoinWeightBreakdownContent', () => {
-  it('renders an empty state when no coins are carried', () => {
+  it('renders the full zero-valued calculation (incl. every component) for an empty purse', () => {
     render(<CoinWeightBreakdownContent coins={ZERO_CURRENCY} />);
+    // Empty-state message is additive context, not a replacement for the breakdown.
     expect(screen.getByText('No coins carried')).toBeInTheDocument();
+    // calculated-totals: all five denomination rows, the sum, the ÷50 formula,
+    // and the resulting weight must be present even when everything is zero.
+    expect(screen.getByText('PP:')).toBeInTheDocument();
+    expect(screen.getByText('GP:')).toBeInTheDocument();
+    expect(screen.getByText('EP:')).toBeInTheDocument();
+    expect(screen.getByText('SP:')).toBeInTheDocument();
+    expect(screen.getByText('CP:')).toBeInTheDocument();
+    expect(screen.getByText('Sum:')).toBeInTheDocument();
+    // Five zero denominations + Sum: 0 → six "0" value cells.
+    expect(screen.getAllByText('0')).toHaveLength(6);
+    expect(screen.getByText(/÷ 50/)).toBeInTheDocument();
+    expect(screen.getByText('0 lb')).toBeInTheDocument();
   });
 
   it('renders per-denomination rows, the ÷50 divider, and the weight', () => {

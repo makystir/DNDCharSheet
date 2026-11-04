@@ -10,9 +10,11 @@ import { EQUIPMENT_LIST, getEquipment } from '../equipment';
 import type { InventoryItem } from '../../types/character';
 import {
   resolveWeaponTooltip,
+  resolveWeaponPropertyChips,
   resolveArmorTooltip,
   resolveItemTooltip,
 } from '../../logic/tooltip-content';
+import { getWeapon } from '../weapons';
 
 /**
  * DESCRIPTION-COMPLETENESS ORACLE (the permanent fix).
@@ -94,6 +96,24 @@ describe('completeness oracle — weapon tooltips', () => {
     const t = resolveWeaponTooltip(item)!;
     const props = t.sections.find((s) => s.label === 'Properties')!.text;
     expectIncludes('weapon lance', 'conditional Two-Handed', props, /Two-Handed \(unless mounted\)/);
+  });
+
+  it('Lance property CHIP carries the conditional on its label AND tooltip (finding #4)', () => {
+    // The chip resolver (not the context-free per-property resolver) is what the
+    // weapon card renders, so the "unless mounted" exception must be on the chip.
+    const lance = getWeapon('lance')!;
+    const chips = resolveWeaponPropertyChips(lance);
+    const twoHanded = chips.find((c) => c.label.startsWith('Two-Handed'))!;
+    expect(twoHanded.label).toBe('Two-Handed (unless mounted)');
+    expect(twoHanded.tooltip).not.toBeNull();
+    // Base property explanation is preserved, and the exception is appended.
+    const text = twoHanded.tooltip!.sections.map((s) => s.text).join(' ');
+    expect(text).toMatch(/two hands/i);
+    expect(text).toMatch(/does not require two hands while mounted/i);
+    // A non-conditional weapon's chip stays a plain title-cased label.
+    const longsword = getWeapon('longsword')!;
+    const versatile = resolveWeaponPropertyChips(longsword).find((c) => c.label === 'Versatile');
+    expect(versatile).toBeTruthy();
   });
 });
 

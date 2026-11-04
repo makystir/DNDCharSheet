@@ -1,0 +1,47 @@
+/* Ported from PWACharSheet ViewModeToggle.module.css; --border → --border,
+ * --accent-gold fallback kept to this app's token. */
+.group {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.btn,
+.btnActive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 28px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.btn + .btn,
+.btn + .btnActive,
+.btnActive + .btn,
+.btnActive + .btnActive {
+  border-left: 1px solid var(--border);
+}
+
+.btn:hover {
+  color: var(--text-primary);
+}
+
+.btnActive {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+}
+
+@media (max-width: 767px) {
+  .btn,
+  .btnActive {
+    min-width: 40px;
+    min-height: 36px;
+  }
+}

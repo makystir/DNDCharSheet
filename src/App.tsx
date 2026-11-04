@@ -14,6 +14,7 @@ import { NAV_ITEMS } from './components/layout/navItems';
 import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { CombatPage } from './components/pages/CombatPage';
+import { InventoryPage } from './components/pages/InventoryPage';
 import { SpellsPage } from './components/pages/SpellsPage';
 import { SettingsPage } from './components/pages/SettingsPage';
 import { isSpellcaster } from './logic/spellcasting';
@@ -144,6 +145,9 @@ function App() {
             {page === 'combat' && (
               <CombatPage character={state.character} onChange={handleChange} />
             )}
+            {page === 'inventory' && (
+              <InventoryPage character={state.character} onChange={handleChange} />
+            )}
             {/* Belt-and-braces with the route guard: only render Spells for a
                 spellcaster (the guard rewrites the hash, this gates the view). */}
             {page === 'spells' && isSpellcaster(state.character) && (
@@ -155,7 +159,12 @@ function App() {
               />
             )}
             {page === 'settings' && (
-              <SettingsPage theme={theme} onThemeToggle={toggleTheme} />
+              <SettingsPage
+                theme={theme}
+                onThemeToggle={toggleTheme}
+                character={state.character}
+                onChange={handleChange}
+              />
             )}
           </>
         )}

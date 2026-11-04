@@ -68,6 +68,50 @@ export function resolveWeaponPropertyTooltip(
 }
 
 /**
+ * A single property "chip" for a weapon card: its display label and the tooltip
+ * content, resolved WITH the owning weapon's context so a conditional exception
+ * is carried onto the chip (finding #4), not only the whole-weapon tooltip.
+ */
+export interface WeaponPropertyChip {
+  /** Chip label, e.g. "Two-Handed (unless mounted)" for the Lance. */
+  label: string;
+  /** Tooltip content for the chip (null when the property has no definition). */
+  tooltip: TooltipContent | null;
+}
+
+/**
+ * Resolve the property chips for a weapon WITH its context (finding #4). The
+ * context-free `resolveWeaponPropertyTooltip` is kept for callers that only
+ * have a bare property, but weapon cards must render chips through this so the
+ * Lance's Two-Handed "unless mounted" exception shows on the chip label AND its
+ * tooltip — not just in the whole-weapon tooltip. The base property definition
+ * is preserved; the conditional only appends the exception.
+ */
+export function resolveWeaponPropertyChips(w: WeaponData): WeaponPropertyChip[] {
+  return w.properties.map((p) => {
+    const cond = w.conditionalProperties?.find((c) => c.property === p);
+    const base = resolveWeaponPropertyTooltip(p);
+    if (!cond) return { label: titleCase(p), tooltip: base };
+    const label = `${titleCase(p)} (unless ${cond.unlessCondition})`;
+    // Append the exception to the base property explanation so the chip tooltip
+    // reads the full conditional rule (PHB 2024 Weapons table, Lance L9412).
+    const tooltip: TooltipContent | null = base
+      ? {
+          title: label,
+          sections: [
+            ...base.sections,
+            {
+              label: 'Exception',
+              text: `This weapon does not require two hands while ${cond.unlessCondition}.`,
+            },
+          ],
+        }
+      : null;
+    return { label, tooltip };
+  });
+}
+
+/**
  * Tooltip content for a single weapon MASTERY property, from the PHB-cited
  * definition table. Returns null for an unknown mastery.
  */

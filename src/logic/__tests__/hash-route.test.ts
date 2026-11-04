@@ -17,9 +17,9 @@ describe('hash-route', () => {
 
   it('falls back to character (null sub-tab) for an unknown hash', () => {
     expect(parseHash('#nonsense')).toEqual({ page: 'character', subTab: null });
-    // 'spells' is now a valid page (Stage 8); caster-gating is the App route
-    // guard's job, not the parser's. Use a different unknown page here.
-    expect(parseHash('#inventory')).toEqual({ page: 'character', subTab: null });
+    // 'spells' and 'inventory' are now valid pages; caster-gating is the App
+    // route guard's job, not the parser's. Use a genuinely unknown page here.
+    expect(parseHash('#gobbledygook')).toEqual({ page: 'character', subTab: null });
   });
 
   it('is case-insensitive on the page segment', () => {

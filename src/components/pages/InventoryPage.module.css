@@ -1,0 +1,355 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.actionRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Top encumbrance summary — rendered bare (no Card) to match GearTab's
+   top-of-tab ProgressBar structure (finding #5). */
+.encSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.encTotalLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Weapons (two-line cards) ── */
+.weaponList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weaponCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.weaponNameRow {
+  display: flex;
+  min-width: 0;
+}
+
+.weaponName {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.weaponStatsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.statChip {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.propChip {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.equipToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.equipToggle input {
+  min-width: 18px;
+  min-height: 18px;
+}
+
+/* ── Armor rows ── */
+.armorList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.armorRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.armorName {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.armorMeta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Other gear (cards / list) ── */
+.gearGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.gearCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 0;
+}
+
+.gearList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gearRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.gearName {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
+}
+
+.gearControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qtyInput {
+  width: 56px;
+  padding: 4px 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.deleteBtn {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--accent-red);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.deleteBtn:hover {
+  background: rgba(140, 47, 47, 0.1);
+  border-color: var(--accent-red);
+}
+
+.editBtn {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.editBtn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-gold);
+  color: var(--text-primary);
+}
+
+/* ── Custom item inline edit form (finding #2) ── */
+.customEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.customEditInput {
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.customEditRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.customEditLabel {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.customEditNumber {
+  width: 96px;
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.customEditDoneBtn {
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 4px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.customEditDoneBtn:hover {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+}
+
+/* ── Coin Purse + Encumbrance two-column ── */
+.wealthGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.coinGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.coinGroupLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.encBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.encRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.encLabel {
+  color: var(--text-secondary);
+}
+
+.encSeparator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.encTotalRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+@media (max-width: 767px) {
+  .deleteBtn,
+  .editBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .qtyInput {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

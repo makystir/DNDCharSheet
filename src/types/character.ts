@@ -32,6 +32,11 @@ import type { ClassId, SubclassId } from '../data/classes';
 // ClassId). See src/data/spells.ts for the source of truth.
 import type { SpellId } from '../data/spells';
 
+// Stage A2/A3 coin-purse shape, re-exported from the currency logic so the
+// persisted purse and the currency math cannot drift. currency.ts has no
+// dependency on this module, so this import introduces no cycle.
+import type { CurrencyAmount } from '../logic/currency';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -411,6 +416,14 @@ export interface Character {
    * equipped, a valid state. Additive-optional; no CURRENT_VERSION bump.
    */
   equipped?: EquippedState;
+  /**
+   * The carried coin purse in the five PHB denominations (Stage A3). Absent =
+   * no coins carried (ZERO_CURRENCY), a valid state. Additive-optional: pre-A3
+   * records without this field load unchanged, so there is no CURRENT_VERSION
+   * bump and no migration (same convention as `inventory`/`equipped` above).
+   * PHB 2024 "Coins" (Docs/PlayersHandbook.md L9247-9272).
+   */
+  coins?: CurrencyAmount;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

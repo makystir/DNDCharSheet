@@ -20,19 +20,14 @@ export interface CoinWeightBreakdownContentProps {
  */
 export function CoinWeightBreakdownContent({ coins }: CoinWeightBreakdownContentProps) {
   const sum = totalCoins(coins);
-
-  if (sum === 0) {
-    return (
-      <div>
-        <span className={styles.emptyMessage}>No coins carried</span>
-      </div>
-    );
-  }
-
   const weight = coinWeightLb(coins);
 
   return (
     <div>
+      {/* calculated-totals: show every component including zeros, so even an
+          empty purse's displayed 0 lb total is fully explained. The empty-state
+          message is additive context, not a replacement for the breakdown. */}
+      {sum === 0 && <div className={styles.emptyMessage}>No coins carried</div>}
       <div className={styles.row}>
         <span className={styles.label}>PP:</span>
         <span className={styles.value}>{coins.pp}</span>

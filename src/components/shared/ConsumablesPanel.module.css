@@ -1,0 +1,340 @@
+/* ConsumablesPanel — ported from PWACharSheet. WFRP theme tokens remapped to
+ * global.css: --danger → --accent-red, --text-muted → --text-secondary,
+ * --bg-inset → inline rgba. --success and --accent-gold exist in this app. */
+
+.container {
+  margin-bottom: 12px;
+}
+
+.consumableList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.consumableItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.consumableItemDepleted {
+  composes: consumableItem;
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.itemName {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.doseBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(110, 154, 90, 0.15);
+  border: 1px solid var(--success);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.doseBadgeDepleted {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(140, 47, 47, 0.15);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.itemEffect {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.itemActions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.decrementBtn,
+.incrementBtn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.decrementBtn:hover:not(:disabled),
+.incrementBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-gold);
+}
+
+.decrementBtn:disabled,
+.incrementBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.deleteBtn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--accent-red);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.deleteBtn:hover {
+  background: rgba(140, 47, 47, 0.1);
+  border-color: var(--accent-red);
+}
+
+.emptyState {
+  padding: 8px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 8px;
+}
+
+.inlineRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inlineInput {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  min-height: 36px;
+  font-family: inherit;
+}
+
+.inlineInput::placeholder,
+.inlineDosesInput::placeholder,
+.formInput::placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.inlineInput:focus,
+.inlineDosesInput:focus,
+.formInput:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.inlineDosesInput {
+  width: 64px;
+  flex-shrink: 0;
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  min-height: 36px;
+  font-family: inherit;
+}
+
+.inlineAddBtn {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 36px;
+  padding: 6px 12px;
+  background: rgba(200, 169, 110, 0.2);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  color: var(--accent-gold);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-heading);
+}
+
+.inlineAddBtn:hover:not(:disabled) {
+  background: rgba(200, 169, 110, 0.3);
+}
+
+.inlineAddBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.expandedFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.moreOptionsBtn {
+  background: none;
+  border: none;
+  color: var(--accent-gold);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.moreOptionsBtn:hover {
+  opacity: 0.8;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.formInput {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  min-height: 44px;
+  font-family: inherit;
+}
+
+.cancelBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.cancelBtn:hover {
+  color: var(--text-primary);
+}
+
+.addToggleBtn {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.addToggleBtn:hover {
+  background: rgba(200, 169, 110, 0.1);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+@media (max-width: 767px) {
+  .container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .consumableItem,
+  .consumableItemDepleted {
+    padding: 10px;
+  }
+
+  .inlineInput,
+  .inlineDosesInput,
+  .formInput {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .inlineAddBtn {
+    min-height: 44px;
+  }
+}

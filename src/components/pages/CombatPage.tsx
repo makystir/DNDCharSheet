@@ -1,6 +1,7 @@
 import type { Character } from '../../types/character';
 import { formatSigned } from '../../logic/breakdown';
 import { armorClassBreakdown } from '../../logic/armor-class';
+import { getArmor } from '../../data/armor';
 import { hitPointMaxBreakdown } from '../../logic/hit-points';
 import { resolveSpecies } from '../../logic/species';
 import { resolveClass, hitDiceTotal } from '../../logic/classes';
@@ -55,7 +56,37 @@ export function CombatPage({ character, onChange }: CombatPageProps) {
   const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
     ?.mechanics?.hpPerLevel;
 
-  const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride);
+  // Resolve the equipped armor/shield (A1 equipped state → inventory item →
+  // ArmorData catalog) so the EXISTING AC display reflects worn armour. A
+  // custom armor with no catalogId has no catalog stats, so it does not change
+  // the computed AC (unarmored); that is surfaced as no armor contribution.
+  const inventory = character.inventory ?? [];
+  const equipped = character.equipped;
+  const resolveEquippedArmor = (id: string | undefined) => {
+    if (!id) return undefined;
+    const item = inventory.find((i) => i.id === id);
+    return item?.catalogId ? getArmor(item.catalogId) : undefined;
+  };
+  const equippedArmor = resolveEquippedArmor(equipped?.armorItemId);
+  const equippedShield = resolveEquippedArmor(equipped?.shieldItemId);
+
+  // A worn armour item whose catalog lookup fails (a custom, catalog-less suit)
+  // cannot set a base AC — surface its name so the AC breakdown explains why the
+  // ticked "Worn" box left AC unchanged (finding #3). Only names a worn item
+  // that actually resolved to no ArmorData.
+  const wornArmorItem = equipped?.armorItemId
+    ? inventory.find((i) => i.id === equipped.armorItemId)
+    : undefined;
+  const wornArmorIgnoredName =
+    wornArmorItem && equippedArmor === undefined
+      ? (wornArmorItem.name ?? 'Custom armor')
+      : undefined;
+
+  const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride, {
+    armor: equippedArmor,
+    shield: equippedShield,
+    wornArmorIgnoredName,
+  });
   const initBreakdown = initiativeBreakdown(
     character.abilities,
     character.initiativeBonus,

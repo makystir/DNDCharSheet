@@ -1,22 +1,32 @@
 import { Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
+import type { Character } from '../../types/character';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
-import { EmptyState } from '../shared/EmptyState';
 import styles from './SettingsPage.module.css';
 
 export interface SettingsPageProps {
   theme: 'dark' | 'light';
   onThemeToggle: () => void;
+  character: Character;
+  onChange: (next: Character) => void;
 }
 
 /**
  * The Settings tab: the theme toggle (migrated from the former top-bar button)
- * plus a placeholder region marking where future house-rule/settings toggles
- * will land. Theme state remains owned by App; this page only triggers the
- * toggle callback.
+ * plus the House Rules card, which now hosts the variant-encumbrance toggle
+ * (A3). Theme state remains owned by App; the house-rule flag lives on the
+ * character and is updated via onChange (same pattern as CombatPage's rolledHp
+ * toggle).
  */
-export function SettingsPage({ theme, onThemeToggle }: SettingsPageProps) {
+export function SettingsPage({ theme, onThemeToggle, character, onChange }: SettingsPageProps) {
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
+
+  const variantEncumbrance = character.houseRules?.variantEncumbrance ?? false;
+  const setVariantEncumbrance = (on: boolean) =>
+    onChange({
+      ...character,
+      houseRules: { ...character.houseRules, variantEncumbrance: on },
+    });
   return (
     <div className={styles.page}>
       <Card>
@@ -41,11 +51,26 @@ export function SettingsPage({ theme, onThemeToggle }: SettingsPageProps) {
 
       <Card>
         <SectionHeader icon={SlidersHorizontal} title="House Rules" />
-        <EmptyState
-          icon={SlidersHorizontal}
-          heading="More settings coming soon"
-          description="House-rule and preference toggles will appear here as later stages land."
-        />
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>Variant Encumbrance</span>
+            <span className={styles.settingHint}>
+              Enables the Encumbered (Str × 5) / Heavily Encumbered (Str × 10)
+              speed-penalty bands. NOT a 2024 rule — this is an opt-in 2014-era
+              variant; off by default (rules-as-written is a binary over/under
+              capacity check).
+            </span>
+          </span>
+          <label className={styles.toggleControl}>
+            <input
+              type="checkbox"
+              checked={variantEncumbrance}
+              aria-label="Enable variant encumbrance (house rule)"
+              onChange={(e) => setVariantEncumbrance(e.target.checked)}
+            />
+            <span>{variantEncumbrance ? 'On' : 'Off'}</span>
+          </label>
+        </div>
       </Card>
     </div>
   );

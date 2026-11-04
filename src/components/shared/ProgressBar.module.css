@@ -1,0 +1,57 @@
+/* Ported from PWACharSheet ProgressBar.module.css; WFRP theme tokens remapped
+ * to this app's global.css (--warning/--danger absent → --accent-gold/
+ * --accent-red; --border-light → --border). */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track {
+  position: relative;
+  height: 10px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.fillNeutral {
+  composes: fill;
+  background: var(--text-secondary);
+}
+
+.fillWarning {
+  composes: fill;
+  background: var(--accent-gold);
+}
+
+.fillDanger {
+  composes: fill;
+  background: color-mix(in srgb, var(--accent-red) 70%, var(--accent-gold) 30%);
+}
+
+.fillCritical {
+  composes: fill;
+  background: var(--accent-red);
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.overEncumbered {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-red);
+}

@@ -1,4 +1,4 @@
-import { User, Swords, Sparkles, Settings } from 'lucide-react';
+import { User, Swords, Sparkles, Settings, Backpack } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { isSpellcaster } from '../../logic/spellcasting';
@@ -9,7 +9,7 @@ import { isSpellcaster } from '../../logic/spellcasting';
  * here (rather than from a component) so the pure routing logic stays free of
  * React imports and there is no circular dependency.
  */
-export type PageSection = 'character' | 'combat' | 'spells' | 'settings';
+export type PageSection = 'character' | 'combat' | 'inventory' | 'spells' | 'settings';
 
 export interface NavItem {
   id: PageSection;
@@ -48,6 +48,15 @@ export const NAV_ITEMS: NavItem[] = [
     subTabHint: 'Overview · Skills & Saves · Species · Class & Features',
   },
   { id: 'combat', label: 'Combat', icon: Swords, shortcut: '2' },
+  // Inventory: an UNCONDITIONAL top-level tab (every character has gear, so no
+  // predicate). Keyed '5' so the existing tabs keep their shortcuts (Character
+  // '1', Combat '2', Settings '3', Spells '4'); the number does not match the
+  // visual position, which is intentional — stable shortcuts are preferred over
+  // renumbering (same stable-shortcut rule as Spells above). This is a
+  // DELIBERATE ui-parity deviation from PWACharSheet (where Gear is a Character
+  // SUB-tab): the D&D nav was built for an Inventory top tab and AC lives on
+  // Combat, so Inventory sits naturally as a top-level tab (blueprint 7.6).
+  { id: 'inventory', label: 'Inventory', icon: Backpack, shortcut: '5' },
   // Conditional + level-gated: shown only when the active character can cast
   // (isSpellcaster is level-aware — Eldritch Knight / Arcane Trickster appear
   // only from level 3). Given its OWN shortcut '4' so existing tabs keep their

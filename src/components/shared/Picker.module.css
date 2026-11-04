@@ -1,0 +1,149 @@
+/* Picker styles — ported from PWACharSheet Picker.module.css. The source
+ * composed overlay/modalPanel from a shared styles module this app does not
+ * have, so those rules are inlined here (matching ConfirmDialog.module.css
+ * conventions) and re-themed to global.css tokens. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay);
+  z-index: 1100;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  margin: 0;
+  font-size: 16px;
+}
+
+.search {
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.item:hover {
+  background: var(--bg-tertiary);
+}
+
+.itemDisabled {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-style: italic;
+  cursor: default;
+  user-select: none;
+}
+
+.close {
+  padding: 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.emptyMessage {
+  padding: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupHeader {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .modal {
+    width: 95%;
+    max-width: none;
+    height: 85vh;
+    max-height: 85vh;
+    position: relative;
+    padding-top: 48px;
+  }
+
+  .item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .search {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

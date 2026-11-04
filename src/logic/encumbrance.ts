@@ -164,11 +164,11 @@ export function coinWeightBreakdown(coins: CurrencyAmount): Breakdown {
 // ───────────────────────────── Carried weight ──────────────────────────────
 
 /** Read the coin purse off a character; absent = no coins carried. */
-export function characterCoins(_character: Character): CurrencyAmount {
-  // Stage A2 introduces the currency LOGIC + types; the coin-purse FIELD on
-  // Character is wired by A3's Inventory UI. Until then a character carries no
-  // coins (a valid state). Flagged for A3: read the persisted purse here.
-  return ZERO_CURRENCY;
+export function characterCoins(character: Character): CurrencyAmount {
+  // Stage A3 persists the coin purse on Character.coins (additive-optional, no
+  // CURRENT_VERSION bump). Absent = carries no coins (a valid prior state), so
+  // fall back to ZERO_CURRENCY.
+  return character.coins ?? ZERO_CURRENCY;
 }
 
 /**

@@ -17,6 +17,22 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
+}
+
+.toggleControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleControl input {
+  min-width: 18px;
+  min-height: 18px;
 }
 
 .settingName {
