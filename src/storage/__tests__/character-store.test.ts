@@ -262,4 +262,48 @@ describe('character-store', () => {
   it('createCharacter leaves spellcasting unset', () => {
     expect(createCharacter('Fresh').spellcasting).toBeUndefined();
   });
+
+  // Stage A1: inventory + equipped additive-optional fields.
+  it('round-trips an inventory and equipped state', async () => {
+    const base = createCharacter('Packrat');
+    const withGear = {
+      ...base,
+      inventory: [
+        { id: 'w1', kind: 'weapon' as const, catalogId: 'longsword', quantity: 1 },
+        { id: 'a1', kind: 'armor' as const, catalogId: 'chain-shirt', quantity: 1 },
+        { id: 'e1', kind: 'equipment' as const, catalogId: 'rope', quantity: 2 },
+        {
+          id: 'c1',
+          kind: 'equipment' as const,
+          catalogId: 'antitoxin',
+          quantity: 1,
+          currentDoses: 1,
+          maxDoses: 1,
+          notes: 'from the healer',
+        },
+      ],
+      equipped: { armorItemId: 'a1', shieldItemId: undefined, weaponItemIds: ['w1'] },
+    };
+    const saved = await saveCharacter(withGear);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded?.inventory).toEqual(withGear.inventory);
+    expect(loaded?.equipped).toEqual(withGear.equipped);
+  });
+
+  it('loads a pre-A1 record without inventory/equipped fields unchanged', async () => {
+    const legacy = createCharacter('LegacyA1');
+    delete (legacy as { inventory?: unknown }).inventory;
+    delete (legacy as { equipped?: unknown }).equipped;
+    const saved = await saveCharacter(legacy);
+    const loaded = await getCharacter(saved.id);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.inventory).toBeUndefined();
+    expect(loaded?.equipped).toBeUndefined();
+  });
+
+  it('createCharacter leaves inventory and equipped unset', () => {
+    const c = createCharacter('Fresh');
+    expect(c.inventory).toBeUndefined();
+    expect(c.equipped).toBeUndefined();
+  });
 });

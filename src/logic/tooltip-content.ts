@@ -1,0 +1,193 @@
+/**
+ * Content-tooltip resolvers for inventory items (Stage A1 data layer).
+ *
+ * Ported IN STRUCTURE from PWACharSheet's src/logic/tooltip-content.ts: the
+ * `TooltipContent` shape ({ title, sections[] }) and the resolve*Tooltip →
+ * TooltipContent | null contract are retained; the data is retargeted to the
+ * D&D 5.5e (2024) catalogs built in this stage (weapons/armor/equipment) plus
+ * the weapon property/mastery definitions.
+ *
+ * SCOPE: A1 supplies the DATA resolvers only. Blueprint §2.6/§4.5 defer the
+ * RENDERING (wiring these into the shared Tooltip component on weapon cards,
+ * armor rows, gear cards, and property chips) to A3. This module is the A1
+ * deliverable the review (finding #5) requires so A3 has a data seam to consume.
+ *
+ * Every string surfaced here is a short PHB-cited paraphrase carried on the
+ * catalogs / property tables (never long verbatim PHB prose — rules-compliance
+ * rule 5).
+ */
+
+import type { InventoryItem } from '../types/character';
+import {
+  getWeapon,
+  WEAPON_PROPERTY_TEXT,
+  WEAPON_MASTERY_TEXT,
+  type WeaponData,
+  type WeaponProperty,
+  type MasteryProperty,
+} from '../data/weapons';
+import {
+  getArmor,
+  ARMOR_TRAINING_TEXT,
+  SHIELD_TRAINING_TEXT,
+  type ArmorData,
+  type ArmorCategory,
+} from '../data/armor';
+import { getEquipment, type EquipmentData } from '../data/equipment';
+
+/** Structured content for a tooltip popover (same shape as the PWA source). */
+export interface TooltipContent {
+  title: string;
+  sections: { label: string; text: string }[];
+}
+
+/** Title-case a property/mastery enum value for display ("two-handed" → "Two-Handed"). */
+function titleCase(value: string): string {
+  return value
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join('-');
+}
+
+/** Human-readable range summary for a weapon that has numeric ranges. */
+function rangeText(w: WeaponData): string | null {
+  if (w.normalRange === undefined || w.longRange === undefined) return null;
+  return `${w.normalRange}/${w.longRange} ft`;
+}
+
+/**
+ * Tooltip content for a single weapon PROPERTY, from the PHB-cited definition
+ * table. Returns null for an unknown property.
+ */
+export function resolveWeaponPropertyTooltip(
+  property: WeaponProperty,
+): TooltipContent | null {
+  const text = WEAPON_PROPERTY_TEXT[property];
+  if (!text) return null;
+  return { title: titleCase(property), sections: [{ label: 'Property', text }] };
+}
+
+/**
+ * Tooltip content for a single weapon MASTERY property, from the PHB-cited
+ * definition table. Returns null for an unknown mastery.
+ */
+export function resolveWeaponMasteryTooltip(
+  mastery: MasteryProperty,
+): TooltipContent | null {
+  const text = WEAPON_MASTERY_TEXT[mastery];
+  if (!text) return null;
+  return { title: `${titleCase(mastery)} (Mastery)`, sections: [{ label: 'Mastery', text }] };
+}
+
+/**
+ * Tooltip content for a weapon inventory item: its damage, properties, mastery,
+ * and range. Returns null when the item is not a catalog weapon (a custom
+ * weapon with no catalogId is handled by the UI stage).
+ */
+/**
+ * Render a weapon's property list for display, applying any machine-readable
+ * conditional exception (finding #4). The only 2024 case is the Lance's
+ * Two-Handed "unless mounted", which renders as "Two-Handed (unless mounted)"
+ * rather than an unconditional "Two-Handed", so the tooltip never states a
+ * restriction the PHB qualifies.
+ */
+function propertyLabels(w: WeaponData): string[] {
+  return w.properties.map((p) => {
+    const cond = w.conditionalProperties?.find((c) => c.property === p);
+    return cond ? `${titleCase(p)} (unless ${cond.unlessCondition})` : titleCase(p);
+  });
+}
+
+export function resolveWeaponTooltip(item: InventoryItem): TooltipContent | null {
+  if (item.kind !== 'weapon' || !item.catalogId) return null;
+  const w = getWeapon(item.catalogId);
+  if (!w) return null;
+
+  const labels = propertyLabels(w);
+  const propList = labels.length > 0 ? labels.join(', ') : 'None';
+  const damage = w.properties.includes('versatile') && w.versatileDice
+    ? `${w.damageDice} ${w.damageType} (${w.versatileDice} two-handed)`
+    : `${w.damageDice} ${w.damageType}`;
+
+  const sections: TooltipContent['sections'] = [
+    { label: 'Category', text: `${titleCase(w.category)} ${titleCase(w.range)}` },
+    { label: 'Damage', text: damage },
+    { label: 'Properties', text: propList },
+    { label: 'Mastery', text: `${titleCase(w.mastery)} — ${WEAPON_MASTERY_TEXT[w.mastery]}` },
+  ];
+  // Ranged/thrown weapons: surface the ammunition type and the numeric range so
+  // the Ammunition property's "listed type" is actually listed (finding #4).
+  const range = rangeText(w);
+  if (w.ammunitionType) {
+    sections.push({ label: 'Ammunition', text: w.ammunitionType });
+  }
+  if (range) sections.push({ label: 'Range', text: range });
+
+  return { title: item.name ?? w.name, sections };
+}
+
+/** Human-readable Dex-to-AC rule for an armor category. */
+function dexText(a: ArmorData): string {
+  if (a.category === 'shield') return 'Shield grants a flat +2 to AC.';
+  if (!a.addsDex) return 'No Dexterity modifier is added to AC (heavy armor).';
+  if (a.dexCap !== undefined) return `Add your Dexterity modifier (maximum +${a.dexCap}).`;
+  return 'Add your full Dexterity modifier.';
+}
+
+const ARMOR_CATEGORY_LABEL: Record<ArmorCategory, string> = {
+  light: 'Light Armor',
+  medium: 'Medium Armor',
+  heavy: 'Heavy Armor',
+  shield: 'Shield',
+};
+
+/**
+ * Tooltip content for an armor inventory item: base AC, Dex rule, Strength
+ * requirement, and stealth. Returns null when the item is not a catalog armor.
+ */
+export function resolveArmorTooltip(item: InventoryItem): TooltipContent | null {
+  if (item.kind !== 'armor' || !item.catalogId) return null;
+  const a = getArmor(item.catalogId);
+  if (!a) return null;
+
+  const sections: TooltipContent['sections'] = [
+    { label: 'Category', text: ARMOR_CATEGORY_LABEL[a.category] },
+    {
+      label: a.category === 'shield' ? 'AC Bonus' : 'Base AC',
+      text: a.category === 'shield' ? `+${a.baseAc}` : String(a.baseAc),
+    },
+    { label: 'Dexterity', text: dexText(a) },
+  ];
+  if (a.strengthRequirement !== undefined) {
+    sections.push({
+      label: 'Strength',
+      text: `Requires Strength ${a.strengthRequirement}; your Speed drops 10 feet while wearing it with less.`,
+    });
+  }
+  sections.push({
+    label: 'Stealth',
+    text: a.stealthDisadvantage
+      ? 'Disadvantage on Dexterity (Stealth) checks.'
+      : 'No Stealth penalty.',
+  });
+  // Universal armor/shield training prerequisite (finding #4): a number is never
+  // shown without the rule that gates it.
+  sections.push({
+    label: 'Training',
+    text: a.category === 'shield' ? SHIELD_TRAINING_TEXT : ARMOR_TRAINING_TEXT,
+  });
+
+  return { title: item.name ?? a.name, sections };
+}
+
+/**
+ * Tooltip content for a general equipment inventory item, from its catalog
+ * `description`. Returns null when the item is not a catalog equipment entry or
+ * carries no description (a custom item with no catalog entry).
+ */
+export function resolveItemTooltip(item: InventoryItem): TooltipContent | null {
+  if (item.kind !== 'equipment' || !item.catalogId) return null;
+  const e: EquipmentData | undefined = getEquipment(item.catalogId);
+  if (!e || !e.description) return null;
+  return { title: item.name ?? e.name, sections: [{ label: 'Description', text: e.description }] };
+}

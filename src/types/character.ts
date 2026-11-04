@@ -249,6 +249,67 @@ export const ALIGNMENTS = [
 
 export type Alignment = (typeof ALIGNMENTS)[number];
 
+/**
+ * A single carried item instance on a character's sheet (Stage A1).
+ *
+ * This is a per-CHARACTER instance, distinct from the per-CATALOG definitions in
+ * src/data/{weapons,armor,equipment}.ts. `kind` discriminates which catalog
+ * `catalogId` points at; the resolved stats are read from the catalog at
+ * display time (so the catalog stays the single source of truth), while the
+ * optional override fields support custom/homebrew items with no catalog entry.
+ *
+ * Additive-optional on Character (no CURRENT_VERSION bump): a record with no
+ * `inventory` loads unchanged — absent = empty inventory, a valid prior state
+ * (same convention as the `species`/`class`/`spellcasting` optional fields).
+ */
+export interface InventoryItem {
+  /** Instance id (crypto.randomUUID via the newCharacterId pattern). */
+  id: string;
+  /** Discriminates how to resolve stats + which catalog `catalogId` indexes. */
+  kind: 'weapon' | 'armor' | 'equipment';
+  /** Catalog key (WeaponData/ArmorData/EquipmentData id), or undefined if custom. */
+  catalogId?: string;
+  /** Custom/override display name; required when `catalogId` is absent. */
+  name?: string;
+  /** Count of this item (>= 1). */
+  quantity: number;
+  /** Per-instance weight override (lb) for custom items; else read from catalog. */
+  weightLb?: number;
+  /** Doses remaining for a dose-tracked consumable (ports Consumable.currentDoses). */
+  currentDoses?: number;
+  /** Maximum doses for a dose-tracked consumable (ports Consumable.maxDoses). */
+  maxDoses?: number;
+  /** Free-text per-instance notes. */
+  notes?: string;
+  // Reserved for the future magic-items stage: whether the item is attuned.
+  // PHB 2024 attunement mechanics (slot limits, attunement requirements) are
+  // OUT OF SCOPE for this arc and are NOT implemented here (rules-compliance
+  // rule 1: no invented mechanic). The field is reserved only, so the persisted
+  // shape need not change when the magic-items stage lands.
+  // attuned?: boolean;
+}
+
+/**
+ * Which inventory items a character currently has equipped (Stage A1).
+ *
+ * PHB 2024 "Armor: One at a Time" (Docs/PlayersHandbook.md L9638): a creature
+ * can wear only one suit of armor and wield only one Shield at a time — hence a
+ * single `armorItemId` and single `shieldItemId` rather than arrays. Weapons are
+ * an array because a character can ready more than one (surfaced on the Combat
+ * page in a later stage).
+ *
+ * Additive-optional on Character (no CURRENT_VERSION bump): absent = nothing
+ * equipped, a valid prior state.
+ */
+export interface EquippedState {
+  /** InventoryItem id worn as armour (0 or 1 suit — PHB "One at a Time"). */
+  armorItemId?: string;
+  /** InventoryItem id of the wielded shield (0 or 1 — PHB "One at a Time"). */
+  shieldItemId?: string;
+  /** InventoryItem ids of readied/wielded weapons. */
+  weaponItemIds?: string[];
+}
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -323,6 +384,19 @@ export interface Character {
   rolledHpTotal?: number;
   /** Opt-in house rules; absent = rules-as-written. */
   houseRules?: HouseRules;
+
+  /**
+   * Carried items (Stage A1). Absent = empty inventory, a valid state.
+   * Additive-optional: pre-A1 records without this field load unchanged (same
+   * convention as the `species`/`class`/`spellcasting` optional fields). No
+   * CURRENT_VERSION bump and no migration (PHB 2024 Chapter 6 "Equipment").
+   */
+  inventory?: InventoryItem[];
+  /**
+   * Which inventory items are currently equipped (Stage A1). Absent = nothing
+   * equipped, a valid state. Additive-optional; no CURRENT_VERSION bump.
+   */
+  equipped?: EquippedState;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or
