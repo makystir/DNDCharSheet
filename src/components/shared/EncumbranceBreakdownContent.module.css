@@ -1,0 +1,40 @@
+/* EncumbranceBreakdownContent — tooltip body for the carrying-capacity total.
+   Ported from PWACharSheet; D&D theme tokens retained. */
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  gap: 16px;
+}
+
+.label {
+  color: var(--text-secondary);
+}
+
+.value {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 6px 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-weight: 600;
+  gap: 16px;
+}
+
+.note {
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2px 0;
+  font-size: 0.9em;
+}

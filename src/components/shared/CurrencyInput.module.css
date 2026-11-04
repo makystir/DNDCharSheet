@@ -1,0 +1,70 @@
+/* CurrencyInput — combined currency adjustment input (ported from PWACharSheet;
+   D&D theme tokens substituted: --text-muted → --text-secondary,
+   --accent-gold-dark → --border-strong, --danger → --accent-red). */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  /* ≥44px touch target (ui-layout steering). */
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.input:focus {
+  border-color: var(--accent-gold);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.submitButton {
+  /* ≥44px touch target (ui-layout steering). */
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--bg-primary);
+  background: var(--accent-gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.submitButton:hover {
+  background: var(--border-strong);
+}
+
+.submitButton:active {
+  transform: scale(0.97);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--accent-red);
+  margin: 0;
+  padding: 2px 0;
+}

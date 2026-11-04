@@ -227,6 +227,20 @@ export interface SpellcastingState {
 export interface HouseRules {
   /** When true, HP gains per level use a rolled total instead of the fixed value. */
   rolledHp?: boolean;
+  /**
+   * When true, enable the variant "Encumbered / Heavily Encumbered" speed-penalty
+   * bands (Encumbered at Strength × 5 lb, Heavily Encumbered at Strength × 10 lb).
+   *
+   * RULES-COMPLIANCE NOTE (rule 1 / rule 2 / rule 4): these bands are NOT in the
+   * 2024 PHB (Docs/PlayersHandbook.md defines only Carrying Capacity = Str × 15;
+   * the index entry reads "encumbrance. See carrying capacity"). The band rule is
+   * a 2014-era variant (2014 PHB "Variant: Encumbrance"). It is therefore an
+   * OPT-IN house rule that is OFF by default — RAW 2024 behaviour is a binary
+   * over/under-capacity flag only. Enabling it requires a cited external source
+   * (the 2014 variant); the band thresholds live behind this flag in
+   * encumbrance.ts and are explicitly marked as not-2024-RAW there. Absent = off.
+   */
+  variantEncumbrance?: boolean;
 }
 
 /**
