@@ -3,6 +3,7 @@ import type { Character } from '../../types/character';
 import { proficiencyBonus } from '../../logic/abilities';
 import { formatSigned } from '../../logic/breakdown';
 import { unarmedStrike } from '../../logic/attacks';
+import { effectiveAbilityScores } from '../../logic/feats';
 import { UNARMED_ATTACK_ID } from '../../logic/attack-flow';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -21,7 +22,7 @@ export interface UnarmedStrikeCardProps {
  * (PHB 2024 "Unarmed Strike"). Always shown: every character can make one.
  */
 export function UnarmedStrikeCard({ character, onAttack }: UnarmedStrikeCardProps) {
-  const strike = unarmedStrike(character.abilities, proficiencyBonus(character.level));
+  const strike = unarmedStrike(effectiveAbilityScores(character), proficiencyBonus(character.level));
   return (
     <Card>
       <SectionHeader icon={Hand} title="Unarmed Strike" />

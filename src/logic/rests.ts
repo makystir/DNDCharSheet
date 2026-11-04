@@ -50,6 +50,7 @@ import type { Breakdown, BreakdownComponent } from './breakdown';
 import type { Character } from '../types/character';
 import { abilityModifier } from './abilities';
 import { hitDiceTotal, resolveClass } from './classes';
+import { effectiveAbilityScores } from './feats';
 import { exhaustionAfterLongRest, exhaustionLevelOf, setExhaustion } from './conditions';
 import { endConcentration } from './concentration';
 import {
@@ -234,7 +235,7 @@ export function shortRest(character: Character, options: ShortRestOptions): Rest
     }
   }
 
-  const conMod = abilityModifier(character.abilities.con);
+  const conMod = abilityModifier(effectiveAbilityScores(character).con);
   const components: BreakdownComponent[] = [];
   const rolled: number[] = [];
   faces.forEach((face, i) => {

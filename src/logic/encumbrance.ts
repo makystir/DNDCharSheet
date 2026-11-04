@@ -22,6 +22,7 @@ import type { Character, InventoryItem } from '../types/character';
 import type { Breakdown } from './breakdown';
 import type { CurrencyAmount } from './currency';
 import { ZERO_CURRENCY } from './currency';
+import { effectiveAbilityScores } from './feats';
 
 /**
  * Catalog getters the carried-weight math needs, injected so the function stays
@@ -90,7 +91,7 @@ export function carrySizeFor(_character: Character): CarrySize {
  */
 // PHB 2024 "Carrying Capacity" (L20757 + L20786-20800): Carry = Str × multiplier.
 export function carryingCapacityBreakdown(character: Character): Breakdown {
-  const str = character.abilities.str;
+  const str = effectiveAbilityScores(character).str;
   const size = carrySizeFor(character);
   const multiplier = CARRY_MULTIPLIER[size];
   const total = str * multiplier;

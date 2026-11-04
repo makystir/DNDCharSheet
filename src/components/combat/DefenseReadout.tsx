@@ -1,6 +1,7 @@
 import { Shield } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
+import { effectiveAbilityScores } from '../../logic/feats';
 import { getArmor } from '../../data/armor';
 import { speedBreakdown } from '../../logic/species';
 import {
@@ -52,7 +53,7 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
       ? (wornArmorItem.name ?? 'Custom armor')
       : undefined;
 
-  const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride, {
+  const acBreakdown = armorClassBreakdown(effectiveAbilityScores(character), character.acOverride, {
     armor: equippedArmor,
     shield: equippedShield,
     wornArmorIgnoredName,

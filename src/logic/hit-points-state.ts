@@ -64,6 +64,7 @@ import {
   exhaustionLevelOf,
 } from './conditions';
 import { d20TestBreakdown } from './dice';
+import { effectiveAbilityScores } from './feats';
 import { hitPointMaxBreakdown } from './hit-points';
 import { resolveSpecies } from './species';
 
@@ -187,7 +188,7 @@ export function characterHitPointMaxBreakdown(character: Character): Breakdown {
   const species = resolveSpecies(character);
   const hpPerLevel = species?.traits.find((t) => t.mechanics?.hpPerLevel)?.mechanics?.hpPerLevel;
   return hitPointMaxBreakdown({
-    scores: character.abilities,
+    scores: effectiveAbilityScores(character),
     level: character.level,
     hitDie: resolveClass(character)?.hitDie,
     hpMax: character.hpMax,

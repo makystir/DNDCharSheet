@@ -10,8 +10,11 @@
  * NO ABILITY SCORE INCREASES. In 2024 a species grants Creature Type, Size,
  * Speed, and Special Traits only — ability increases come from the Background
  * (PHB 2024 "Parts of a Species"; older-books rule: ignore species ASIs). This
- * module never reads or writes `character.abilities` and exposes no
- * ability-score function. (FR-9; locked in by species.test.ts.)
+ * module grants no ability-score increase and exposes no ability-score
+ * function. (FR-9; locked in by species.test.ts.) It does read the EFFECTIVE
+ * Strength score (base + feat increases) for the armour Strength-requirement
+ * Speed penalty (A6b rewire), so a feat that raises Strength can lift the
+ * penalty; it never mutates `character.abilities`.
  */
 
 import type { Character } from '../types/character';
@@ -20,6 +23,7 @@ import type { CreatureSize, SpeciesData, SpeciesTrait } from '../data/species';
 import { getSpecies } from '../data/species';
 import { getArmor } from '../data/armor';
 import { exhaustionLevelOf } from './conditions';
+import { effectiveAbilityScores } from './feats';
 
 /** The default walking speed shown when no species is selected, in feet. */
 const DEFAULT_SPEED_FT = 30;
@@ -100,7 +104,7 @@ export function speedBreakdown(character: Character): Breakdown {
   // 2. Combat penalties: worn-armour Strength requirement + Exhaustion (A5e).
   const penalties = speedPenaltyComponents(
     armorStrengthRequirementOf(character),
-    character.abilities.str,
+    effectiveAbilityScores(character).str,
     exhaustionLevelOf(character),
   );
 

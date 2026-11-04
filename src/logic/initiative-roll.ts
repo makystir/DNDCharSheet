@@ -31,6 +31,7 @@ import { exhaustionLevelOf, impliedConditions } from './conditions';
 import { combineD20Mode, d20FromFaces, d20TestBreakdown, rollD20, type D20Mode } from './dice';
 import { initiativeBreakdown } from './initiative';
 import { effectiveConditionIds } from './hit-points-state';
+import { effectiveAbilityScores } from './feats';
 import type { Breakdown, BreakdownComponent } from './breakdown';
 import type { RNG } from './random';
 
@@ -135,7 +136,7 @@ export function initiativeRoll(
 
 /** The character's Initiative modifier: Dexterity modifier plus the manual bonus. */
 export function characterInitiativeModifier(character: Character): Breakdown {
-  return initiativeBreakdown(character.abilities, character.initiativeBonus);
+  return initiativeBreakdown(effectiveAbilityScores(character), character.initiativeBonus);
 }
 
 /** Roll Initiative for a character with an injected RNG, using its resolved mode. */

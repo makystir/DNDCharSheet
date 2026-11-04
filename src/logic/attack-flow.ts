@@ -22,6 +22,7 @@ import type { Character, InventoryItem } from '../types/character';
 import { CONDITIONS, getCondition } from '../data/conditions';
 import type { WeaponData } from '../data/weapons';
 import { abilityModifier, proficiencyBonus } from './abilities';
+import { effectiveAbilityScores } from './feats';
 import {
   attackSuggestions,
   attackerConditionSuggestions,
@@ -109,8 +110,9 @@ export interface AttackPlan {
 export function buildAttackPlan(character: Character, weaponId: string, options: AttackOptions = {}): AttackPlan | undefined {
   const exhaustion = exhaustionLevelOf(character);
   if (weaponId === UNARMED_ATTACK_ID) {
-    const strike = unarmedStrike(character.abilities, proficiencyBonus(character.level));
-    const mod = abilityModifier(character.abilities.str);
+    const scores = effectiveAbilityScores(character);
+    const strike = unarmedStrike(scores, proficiencyBonus(character.level));
+    const mod = abilityModifier(scores.str);
     const flat: Breakdown = { total: mod, components: [{ label: 'Strength mod', value: mod }] };
     return {
       id: UNARMED_ATTACK_ID,
@@ -221,9 +223,10 @@ export function attackSourceList(character: Character, plan: AttackPlan, context
   const sources: AttackSource[] = [];
   let blocked = false;
 
+  const flowScores = effectiveAbilityScores(character);
   const ctx: AttackSuggestionContext = {
-    str: character.abilities.str,
-    dex: character.abilities.dex,
+    str: flowScores.str,
+    dex: flowScores.dex,
     thrown: context.thrown,
     distanceFt: context.distanceFt,
     hostileAdjacentSeesYou: context.hostileAdjacentSeesYou,

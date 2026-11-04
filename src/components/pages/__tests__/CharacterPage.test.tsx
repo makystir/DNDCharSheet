@@ -93,6 +93,32 @@ describe('CharacterPage', () => {
     }
   });
 
+  it('shows the EFFECTIVE score (base + feat) and a Base + feat-source breakdown (A6b)', () => {
+    // A character with a feat granting +2 Strength. The base stays 10; the
+    // EFFECTIVE Strength is 12 and drives the +1 modifier.
+    renderPage({
+      level: 4,
+      class: { id: 'fighter', level: 4 },
+      abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+      advancement: {
+        feats: [{ featId: 'ability-score-improvement', level: 4, abilityIncreases: { str: 2 } }],
+      },
+    });
+    // The base-score EDITOR still shows the creation value (10). Its accessible
+    // name folds in the visible "Base" label when a feat has raised the score
+    // (WCAG 2.5.3 Label in Name), so it reads "Strength base score" here.
+    expect((screen.getByLabelText('Strength base score') as HTMLInputElement).value).toBe('10');
+    // The modifier reflects the EFFECTIVE score (12 → +1).
+    const strMod = screen.getByRole('button', { name: /Strength Modifier/ });
+    expect(strMod).toHaveTextContent('+1');
+    // The effective-score value shows a Base + feat breakdown in its label.
+    const strScore = screen.getByRole('button', { name: /Strength Score/ });
+    expect(strScore).toHaveTextContent('12');
+    const label = strScore.getAttribute('aria-label') ?? '';
+    expect(label).toContain('Base');
+    expect(label).toContain('Ability Score Improvement');
+  });
+
   it('toggling a skill proficiency emits the updated skills map and changes the modifier', () => {
     const { onChange } = renderPage(
       {

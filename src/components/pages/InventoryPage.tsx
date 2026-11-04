@@ -11,6 +11,7 @@ import {
   getEncumbranceLevel,
 } from '../../logic/encumbrance';
 import { resolveWeapon } from '../../logic/weapons';
+import { effectiveAbilityScores } from '../../logic/feats';
 import {
   resolveWeaponTooltip,
   resolveWeaponPropertyChips,
@@ -108,7 +109,7 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
   const encLevel = getEncumbranceLevel(
     carriedBd.total,
     capacityBd.total,
-    character.abilities.str,
+    effectiveAbilityScores(character).str,
     character.houseRules?.variantEncumbrance,
   );
 

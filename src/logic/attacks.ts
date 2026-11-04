@@ -42,6 +42,7 @@ import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown, BreakdownComponent } from './breakdown';
 import { resolveClass } from './classes';
 import { exhaustionLevelOf } from './conditions';
+import { effectiveAbilityScores } from './feats';
 import {
   combineD20Mode,
   d20FromFaces,
@@ -688,7 +689,7 @@ export function weaponAttackProfile(
   const proficiency = weaponProficiency(character, item);
   const attack = attackBonusBreakdown({
     weapon,
-    scores: character.abilities,
+    scores: effectiveAbilityScores(character),
     proficient: proficiency.proficient,
     pb: proficiencyBonus(character.level),
     attackBonus: item.attackBonus,

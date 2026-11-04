@@ -17,6 +17,7 @@ import {
   MAX_LEVEL,
 } from '../../logic/abilities';
 import { resolveClass, resolveSubclass } from '../../logic/classes';
+import { effectiveAbilityScores } from '../../logic/feats';
 import {
   advancementLog,
   applyLevelUp,
@@ -35,6 +36,8 @@ import {
   type HpChoice,
   type LevelingMode,
 } from '../../logic/advancement';
+import { featSlotAssignments } from '../../logic/feats';
+import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
 
@@ -148,10 +151,12 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const log = advancementLog(character);
   const hpTip = hpChoiceTooltip(character);
 
-  // ── Choices pending: feat slots at asi-marker levels (A6b placeholders), the
-  //    subclass not chosen at level >= subclassLevel, and any level missing an HP
-  //    record. All read from the logic; none computed here.
-  const featLevels = featSlotLevels(character);
+  // ── Choices pending: UNFILLED feat slots at asi-marker levels, the subclass
+  //    not chosen at level >= subclassLevel, and any level missing an HP record.
+  //    All read from the logic; none computed here.
+  const unfilledFeatLevels = featSlotAssignments(character, featSlotLevels(character))
+    .filter((a) => a.filled === undefined)
+    .map((a) => a.level);
   const subclassDue =
     cls !== undefined && level >= cls.subclassLevel && subclass === undefined;
   const recordedHpLevels = new Set(
@@ -161,7 +166,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   for (let l = 2; l <= level; l += 1) {
     if (!recordedHpLevels.has(l)) unrecordedHpLevels.push(l);
   }
-  const pendingCount = featLevels.length + (subclassDue ? 1 : 0) + unrecordedHpLevels.length;
+  const pendingCount = unfilledFeatLevels.length + (subclassDue ? 1 : 0) + unrecordedHpLevels.length;
 
   return (
     <div className={styles.page}>
@@ -402,7 +407,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                         {
                           label: 'Rule',
                           text:
-                            'This level grants a feat (an Ability Score Improvement feat or another you qualify for; level 19 is an Epic Boon). Choosing the feat arrives in a later stage.',
+                            'This level grants a feat (an Ability Score Improvement feat or another you qualify for; level 19 is an Epic Boon). Choose it below in "Feats & Ability Score Improvements" after leveling up.',
                         },
                       ],
                     }}
@@ -451,6 +456,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         )}
       </Card>
 
+      {/* ── Feats & Ability Score Improvements ──────────────────────────────── */}
+      <FeatSlotsSection character={character} onChange={onChange} now={now} />
+
       {/* ── Choices pending ─────────────────────────────────────────────────── */}
       <Card>
         <SectionHeader icon={ListChecks} title={`Choices Pending (${pendingCount})`} />
@@ -459,9 +467,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         ) : (
           <ul className={styles.pendingList}>
             {subclassDue && <li className={styles.pendingItem}>Subclass not chosen (due at level {cls?.subclassLevel})</li>}
-            {featLevels.map((l) => (
+            {unfilledFeatLevels.map((l) => (
               <li key={`feat-${l}`} className={styles.pendingItem}>
-                Feat slot from level {l} — selection arrives in a later stage
+                Feat not chosen for level {l}
               </li>
             ))}
             {unrecordedHpLevels.map((l) => (
@@ -516,7 +524,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
             hpRoll === 'level-up' ? preview?.nextLevel ?? level : level
           }`}
           hitDie={cls.hitDie}
-          conMod={abilityModifier(character.abilities.con)}
+          conMod={abilityModifier(effectiveAbilityScores(character).con)}
           onResolve={(result) => {
             // The dialog's intent is recorded in hpRoll, so there is no need to
             // re-derive it from mayLevelUp (ambiguous in milestone mode). A

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { Character } from '../../types/character';
 import { formatSigned } from '../../logic/breakdown';
 import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
+import { effectiveAbilityScores } from '../../logic/feats';
 import { getArmor } from '../../data/armor';
 import { hitPointMaxBreakdown } from '../../logic/hit-points';
 import { resolveSpecies } from '../../logic/species';
@@ -160,21 +161,25 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
       ? (wornArmorItem.name ?? 'Custom armor')
       : undefined;
 
+  // A6b: every ability-derived combat total reads the EFFECTIVE scores (base +
+  // feat/ASI increases) so a feat that raises Dex/Con flows to AC, Initiative
+  // and HP (effectiveAbilityScores; base abilities are never mutated).
+  const effectiveScores = effectiveAbilityScores(character);
   // A5e: the AC display now passes the class-derived Unarmored Defense so the
   // number reflects it (Barbarian → Con-based AC; Monk loses it with a Shield).
-  const acBreakdown = armorClassBreakdown(character.abilities, character.acOverride, {
+  const acBreakdown = armorClassBreakdown(effectiveScores, character.acOverride, {
     armor: equippedArmor,
     shield: equippedShield,
     wornArmorIgnoredName,
     unarmoredDefense: unarmoredDefenseFor(character),
   });
   const initBreakdown = initiativeBreakdown(
-    character.abilities,
+    effectiveScores,
     character.initiativeBonus,
   );
   const ppBreakdown = passivePerceptionBreakdown(character);
   const hpBreakdown = hitPointMaxBreakdown({
-    scores: character.abilities,
+    scores: effectiveScores,
     level: character.level,
     hitDie: resolveClass(character)?.hitDie,
     hpMax: character.hpMax,

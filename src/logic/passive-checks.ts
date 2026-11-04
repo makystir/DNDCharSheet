@@ -12,6 +12,7 @@
 import type { Character } from '../types/character';
 import { skillModifierBreakdown, getSkillTraining } from './skills';
 import type { Breakdown } from './breakdown';
+import { effectiveAbilityScores } from './feats';
 
 /** A passive check score: 10 + the relevant check modifier. */
 export function passiveCheck(checkModifier: number): number {
@@ -26,7 +27,7 @@ export function passiveCheck(checkModifier: number): number {
  */
 export function passivePerceptionBreakdown(character: Character): Breakdown {
   const perception = skillModifierBreakdown(
-    character.abilities,
+    effectiveAbilityScores(character),
     character.level,
     'perception',
     getSkillTraining(character, 'perception'),

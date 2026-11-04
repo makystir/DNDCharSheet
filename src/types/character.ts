@@ -33,6 +33,11 @@ import type { ConditionId } from '../data/conditions';
 // ClassId). See src/data/spells.ts for the source of truth.
 import type { SpellId } from '../data/spells';
 
+// Stage A6b feat catalog key, re-exported from the data catalog so the persisted
+// feat selections and the catalog cannot drift (same pattern as SpellId /
+// ClassId). See src/data/feats.ts for the source of truth.
+import type { FeatId } from '../data/feats';
+
 // Stage A2/A3 coin-purse shape, re-exported from the currency logic so the
 // persisted purse and the currency math cannot drift. currency.ts has no
 // dependency on this module, so this import introduces no cycle.
@@ -411,7 +416,7 @@ export interface EquippedState {
 export interface AdvancementLogEntry {
   /** Epoch milliseconds from an injected clock. */
   timestamp: number;
-  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award';
+  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award' | 'feat';
   /** The level the entry concerns, when relevant. */
   level?: number;
   /** Human-readable detail, e.g. 'Level 4: HP +8 (fixed)'. */
@@ -436,17 +441,49 @@ export interface LevelUpRecord {
 }
 
 /**
- * Advancement / level-up state (Stage A6a). All fields additive-optional:
- * absent `advancement` (or any absent sub-field) means milestone leveling with
- * no per-level HP records and HP computed as today.
+ * One feat (or Ability Score Improvement) a character has taken (Stage A6b).
  *
- * NOTE (A6b-ready): a `feats?: FeatSelection[]` field will be added here when
- * feats/ASI land; the shape is deliberately left open so that addition needs no
- * migration (same additive-optional convention). PHB 2024 "Gaining a Level".
+ * In 2024 the ASI IS a feat: at an asi-marker slot level you take the Ability
+ * Score Improvement feat or any feat you qualify for (PHB 2024 "Ability Score
+ * Improvement" L8558, "Gaining a Level" L2011). The ability increases a feat
+ * grants are recorded here as TRACKED INCREASES and summed over the BASE
+ * `abilities` by effectiveAbilityScores — the base scores are NEVER mutated, so
+ * the creation value stays auditable and a feat can be removed cleanly (honours
+ * the no-ASI guard in the class logic). Each increase is clamped under its
+ * feat's cap (20 for General/ASI, 30 for Epic Boon).
+ */
+export interface FeatSelection {
+  /** Catalog key into FEAT_CATALOG (data/feats.ts). */
+  featId: FeatId;
+  /** The asi-marker slot level this feat fills (validated against featSlots). */
+  level: number;
+  /**
+   * For the ASI feat / any feat with an Ability Score Increase benefit: the
+   * increases the player allocated, e.g. { str: 2 } or { dex: 1, con: 1 }.
+   * Summed into the effective score; the base `abilities` is never mutated.
+   */
+  abilityIncreases?: Partial<Record<Ability, number>>;
+  /** Feat-granted skill/expertise/tool choices, for auditability (A6b: simple grants). */
+  choices?: { skills?: SkillId[]; expertise?: SkillId[]; tools?: string[]; notes?: string };
+}
+
+/**
+ * Advancement / level-up state (Stage A6a; feats added A6b). All fields
+ * additive-optional: absent `advancement` (or any absent sub-field) means
+ * milestone leveling with no per-level HP records, no feats, and HP computed as
+ * today.
  */
 export interface AdvancementState {
   /** Per-level HP choices, oldest level first (A6a). */
   levels?: LevelUpRecord[];
+  /**
+   * Feats / Ability Score Improvements taken, in the order chosen (A6b). The
+   * order matters: effective-score caps are applied per increase cumulatively
+   * in this order (an epic-boon increase can carry a total above 20). Each is
+   * tied to an asi-marker slot level. PHB 2024 "Gaining a Level" / "Ability
+   * Score Improvement". Additive-optional; no CURRENT_VERSION bump.
+   */
+  feats?: FeatSelection[];
   /** Leveling model + XP. Absent = milestone (the RAW-neutral default). */
   leveling?: { mode: 'milestone' | 'xp'; xp?: number };
   /** Minimal append-only audit trail, oldest-first (UI reverses). */

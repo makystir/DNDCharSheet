@@ -167,10 +167,21 @@ describe('AdvancementPage — next-level preview flags', () => {
 });
 
 describe('AdvancementPage — choices pending', () => {
-  it('shows feat slots as forward-looking placeholders', () => {
-    // Fighter level 4 has one asi-marker (level 4).
+  it('shows an UNFILLED feat slot as a pending choice (A6b)', () => {
+    // Fighter level 4 has one asi-marker (level 4); with no feat taken it is a
+    // pending choice. (The slot itself is filled via the Feats section — A6b.)
     renderStateful(fighter4());
-    expect(screen.getByText(/Feat slot from level 4/)).toBeInTheDocument();
+    expect(screen.getByText(/Feat not chosen for level 4/)).toBeInTheDocument();
+  });
+
+  it('drops the feat from Choices Pending once a feat fills the slot (A6b)', () => {
+    renderStateful({
+      ...fighter4(),
+      advancement: {
+        feats: [{ featId: 'ability-score-improvement', level: 4, abilityIncreases: { str: 2 } }],
+      },
+    });
+    expect(screen.queryByText(/Feat not chosen for level 4/)).not.toBeInTheDocument();
   });
 
   it('flags the subclass as pending at or above the subclass level', () => {

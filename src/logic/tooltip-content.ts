@@ -35,6 +35,8 @@ import {
 } from '../data/armor';
 import { getEquipment, type EquipmentData } from '../data/equipment';
 import { EXHAUSTION, EXHAUSTION_TRACK, getCondition } from '../data/conditions';
+import { getFeat, type FeatCategory } from '../data/feats';
+import { ABILITY_NAMES, type Ability } from '../types/character';
 
 /** Structured content for a tooltip popover (same shape as the PWA source). */
 export interface TooltipContent {
@@ -748,4 +750,50 @@ export function resolveMasteryLockedTooltip(reason: string): TooltipContent | nu
       { label: 'Source', text: 'PHB 2024 "Mastery Properties" (L9351-9352)' },
     ],
   };
+}
+
+/** Human-readable category label for a feat tooltip. */
+const FEAT_CATEGORY_LABEL: Record<FeatCategory, string> = {
+  origin: 'Origin Feat',
+  general: 'General Feat',
+  'fighting-style': 'Fighting Style Feat',
+  'epic-boon': 'Epic Boon Feat',
+};
+
+/** Format a feat's prerequisite as a single human-readable string, or null if none. */
+function featPrerequisiteText(feat: ReturnType<typeof getFeat>): string | null {
+  const prereq = feat?.prerequisite;
+  if (!prereq) return null;
+  const parts: string[] = [];
+  if (prereq.minLevel !== undefined) parts.push(`Level ${prereq.minLevel}+`);
+  if (prereq.abilityMin) {
+    for (const ability of Object.keys(prereq.abilityMin) as Ability[]) {
+      const min = prereq.abilityMin[ability];
+      if (min !== undefined) parts.push(`${ABILITY_NAMES[ability]} ${min}+`);
+    }
+  }
+  if (prereq.note) parts.push(prereq.note);
+  return parts.length > 0 ? parts.join(', ') : null;
+}
+
+/**
+ * Tooltip content for a feat (Stage A6b), from the FEAT_CATALOG entry: its
+ * category, prerequisite (when any), paraphrased benefit, and repeatable flag.
+ * Returns null for an unknown feat id. PART 1 wires this to the data/feats.ts
+ * shape; PART 2 backfills the catalog so more ids resolve with no change here.
+ */
+export function resolveFeatTooltip(featId: string): TooltipContent | null {
+  const feat = getFeat(featId);
+  if (!feat) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: 'Category', text: FEAT_CATEGORY_LABEL[feat.category] },
+  ];
+  const prereq = featPrerequisiteText(feat);
+  if (prereq) sections.push({ label: 'Prerequisite', text: prereq });
+  sections.push({ label: 'Benefit', text: feat.effect });
+  if (feat.repeatable) {
+    sections.push({ label: 'Repeatable', text: 'You can take this feat more than once.' });
+  }
+  sections.push({ label: 'Source', text: feat.source });
+  return { title: feat.name, sections };
 }

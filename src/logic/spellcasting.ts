@@ -24,6 +24,7 @@ import { ABILITY_NAMES } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { resolveClass } from './classes';
+import { effectiveAbilityScores } from './feats';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
 import {
@@ -98,7 +99,7 @@ export function spellSaveDcBreakdown(character: Character): Breakdown | undefine
   const ability = spellcastingAbility(character);
   if (ability === undefined) return undefined;
   const pb = proficiencyBonus(character.level);
-  const mod = abilityModifier(character.abilities[ability]);
+  const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
   return {
     total: 8 + pb + mod,
     components: [
@@ -118,7 +119,7 @@ export function spellAttackBreakdown(character: Character): Breakdown | undefine
   const ability = spellcastingAbility(character);
   if (ability === undefined) return undefined;
   const pb = proficiencyBonus(character.level);
-  const mod = abilityModifier(character.abilities[ability]);
+  const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
   return {
     total: pb + mod,
     components: [

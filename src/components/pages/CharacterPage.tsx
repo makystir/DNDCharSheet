@@ -16,6 +16,7 @@ import {
   clampAbilityScore,
   clampLevel,
 } from '../../logic/abilities';
+import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats';
 import { formatSigned } from '../../logic/breakdown';
 import {
   resolveClass,
@@ -260,6 +261,10 @@ export function CharacterPage({
   const traits = speciesTraits(character);
 
   const profBreakdown = proficiencyBonusBreakdown(character.level);
+  // Effective ability scores (base + feat increases) drive the displayed
+  // modifier and every derived total; the base-score editor stays the creation
+  // value (A6b). effectiveAbilityScores is pure and never mutates abilities.
+  const effective = effectiveAbilityScores(character);
   const saveBreakdowns = allSavingThrowBreakdowns(character);
   const skillBreakdowns = allSkillBreakdowns(character);
 
@@ -336,8 +341,16 @@ export function CharacterPage({
         <h2 className={styles.fieldLabel}>Ability Scores</h2>
         <div className={styles.abilityGrid}>
           {ABILITIES.map((ability) => {
-            const score = character.abilities[ability];
-            const modBreakdown = abilityModifierBreakdown(ability, score);
+            // The base score is the point-buy/creation value the input edits; it
+            // is NEVER mutated by feats. The EFFECTIVE score (base + feat
+            // increases) is what the modifier and every derived total use, and is
+            // shown with a Base + each feat source breakdown (calculated-totals +
+            // the A6b user decision). PHB 2024 "Ability Scores"/"Ability Score
+            // Improvement".
+            const baseScore = character.abilities[ability];
+            const effectiveScore = effective[ability];
+            const modBreakdown = abilityModifierBreakdown(ability, effectiveScore);
+            const scoreBreakdown = abilityScoreBreakdown(character, ability);
             return (
               <div key={ability} className={styles.abilityCard}>
                 <span className={styles.abilityName} title={ABILITY_NAMES[ability]}>
@@ -351,13 +364,32 @@ export function CharacterPage({
                     {formatSigned(modBreakdown.total)}
                   </CalculatedValue>
                 </span>
+                {/* The EFFECTIVE score, with a Base + each feat source breakdown. */}
+                <span className={styles.abilityScoreTotal}>
+                  <CalculatedValue
+                    label={`${ABILITY_NAMES[ability]} Score`}
+                    breakdown={scoreBreakdown}
+                  >
+                    {effectiveScore}
+                  </CalculatedValue>
+                </span>
+                {/* The base-score EDITOR stays the creation value (never a running
+                    total). When a feat has raised the score, the editable base is
+                    labelled so it is clear this is the base, not the effective. */}
+                <label className={styles.abilityBaseLabel} htmlFor={`ability-base-${ability}`}>
+                  {effectiveScore !== baseScore ? 'Base' : 'Score'}
+                </label>
                 <input
+                  id={`ability-base-${ability}`}
                   className={styles.abilityScore}
                   type="number"
                   min={1}
                   max={30}
-                  value={score}
-                  aria-label={`${ABILITY_NAMES[ability]} score`}
+                  value={baseScore}
+                  // WCAG 2.5.3 (Label in Name): the accessible name must contain
+                  // the visible label, which reads "Base" once a feat has raised
+                  // the score, and "Score" otherwise.
+                  aria-label={`${ABILITY_NAMES[ability]} ${effectiveScore !== baseScore ? 'base ' : ''}score`}
                   onChange={(e) => setScore(ability, e.target.value)}
                 />
               </div>

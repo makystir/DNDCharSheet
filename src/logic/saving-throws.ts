@@ -14,6 +14,7 @@ import { ABILITIES, ABILITY_NAMES } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classSaveProficiencies } from './classes';
+import { effectiveAbilityScores } from './feats';
 
 /** The saving-throw modifier: abilityMod + (proficient ? PB : 0). */
 export function savingThrowModifier(
@@ -76,7 +77,7 @@ export function allSavingThrowBreakdowns(
   for (const ability of ABILITIES) {
     const proficient = character.saveProficiencies?.[ability] ?? false;
     result[ability] = savingThrowBreakdown(
-      character.abilities,
+      effectiveAbilityScores(character),
       character.level,
       ability,
       proficient,

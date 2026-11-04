@@ -31,6 +31,7 @@ import type { ClassFeature, HitDie } from '../data/classes';
 import type { Breakdown } from './breakdown';
 import { abilityModifier, clampLevel, proficiencyBonus, MAX_LEVEL, MIN_LEVEL } from './abilities';
 import { classFeaturesByLevel, resolveClass } from './classes';
+import { effectiveAbilityScores } from './feats';
 import { characterHitPointMaxBreakdown } from './hit-points-state';
 import { reconcileSpellcastingForLevel } from './spellcasting';
 
@@ -248,7 +249,7 @@ export function nextLevelPreview(character: Character): NextLevelPreview | null 
 export interface AdvancementLogEntry {
   /** Epoch milliseconds from an injected clock (also used as the display key). */
   timestamp: number;
-  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award';
+  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award' | 'feat';
   /** The level the entry concerns, when relevant. */
   level?: number;
   /** Human-readable detail, e.g. 'Level 4: HP +8 (fixed)'. */
@@ -300,7 +301,7 @@ export function setLevelHp(
   const targetLevel = clampLevel(level);
   const cls = resolveClass(character);
   const hitDie = cls?.hitDie;
-  const conMod = abilityModifier(character.abilities.con);
+  const conMod = abilityModifier(effectiveAbilityScores(character).con);
 
   // The per-level HP value recorded is the Hit-Dice portion ONLY (no Con rider),
   // so a later Con change recomputes the rider through hit-points.ts rather than

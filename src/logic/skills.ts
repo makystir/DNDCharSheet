@@ -25,6 +25,7 @@ import { ABILITY_NAMES, SKILLS } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classGrantedSkills } from './classes';
+import { effectiveAbilityScores } from './feats';
 
 /** The governing ability of a skill, from the canonical SKILLS table. */
 function skillAbility(skillId: SkillId): Ability {
@@ -159,7 +160,7 @@ export function allSkillBreakdowns(
   const result = {} as Record<SkillId, Breakdown>;
   for (const skill of SKILLS) {
     result[skill.id] = skillModifierBreakdown(
-      character.abilities,
+      effectiveAbilityScores(character),
       character.level,
       skill.id,
       getSkillTraining(character, skill.id),

@@ -82,6 +82,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+.abilityScoreTotal {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.abilityBaseLabel {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
 .abilityScore {
   width: 56px;
   text-align: center;

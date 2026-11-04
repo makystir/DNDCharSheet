@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { Breakdown } from '../../logic/breakdown';
 import type { Character } from '../../types/character';
 import { abilityModifier } from '../../logic/abilities';
+import { effectiveAbilityScores } from '../../logic/feats';
 import { hitDiceTotal, resolveClass } from '../../logic/classes';
 import { rollDie } from '../../logic/dice';
 import { createDefaultRng, type RNG } from '../../logic/random';
@@ -78,7 +79,7 @@ export function ShortRestDialog({
   const total = hitDiceTotal(character);
   const spentBefore = Math.max(0, character.hitDiceSpent ?? 0);
   const remaining = hitDiceAvailable(character) - faces.length;
-  const conMod = abilityModifier(character.abilities.con);
+  const conMod = abilityModifier(effectiveAbilityScores(character).con);
 
   // The start check and the preview both come from shortRest().
   const startCheck = shortRest(character, { rolls: [] });
