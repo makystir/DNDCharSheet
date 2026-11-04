@@ -1,0 +1,239 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.levelRow,
+.xpRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+}
+
+.xpRow {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.levelInput,
+.xpInput {
+  width: 72px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+
+.xpInput {
+  width: 120px;
+}
+
+.levelInput:focus-visible,
+.xpInput:focus-visible,
+.awardInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.derivedValue {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.derivedValueLarge {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.awardBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 320px;
+}
+
+.awardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.awardInput {
+  padding: 8px 10px;
+  min-height: 40px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.awardInput:first-child {
+  width: 110px;
+}
+
+.awardInput[type='text'] {
+  flex: 1 1 160px;
+}
+
+.awardBtn,
+.primaryBtn {
+  padding: 8px 16px;
+  min-height: 40px;
+  background: var(--accent-gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #000;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.awardBtn:disabled,
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: 40px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.secondaryBtn:focus-visible,
+.primaryBtn:focus-visible,
+.awardBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.hpChoiceRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.hpChoiceButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.previewHeading {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.previewList,
+.pendingList,
+.logList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.pendingItem,
+.logItem {
+  list-style: none;
+}
+
+.pendingList,
+.logList {
+  padding-left: 0;
+}
+
+.levelUpRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.placeholder {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Visually hidden but accessible to screen readers (aria-live regions for the
+   permitted-level and Hit-Point-maximum totals). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.logActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.logItem {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.logKind {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-gold);
+  min-width: 72px;
+}
+
+.logDetail {
+  color: var(--text-primary);
+}

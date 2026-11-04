@@ -16,6 +16,7 @@ import { CharacterPage } from './components/pages/CharacterPage';
 import { CombatPage } from './components/pages/CombatPage';
 import { InventoryPage } from './components/pages/InventoryPage';
 import { SpellsPage } from './components/pages/SpellsPage';
+import { AdvancementPage } from './components/pages/AdvancementPage';
 import { SettingsPage } from './components/pages/SettingsPage';
 import { isSpellcaster } from './logic/spellcasting';
 import { Toast } from './components/shared/Toast';
@@ -173,6 +174,9 @@ function App() {
                 subTab={subTab}
                 onSubTabChange={(tab) => navigate('spells', tab)}
               />
+            )}
+            {page === 'advancement' && (
+              <AdvancementPage character={state.character} onChange={handleChange} />
             )}
             {page === 'settings' && (
               <SettingsPage

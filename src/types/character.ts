@@ -402,6 +402,57 @@ export interface EquippedState {
   weaponItemIds?: string[];
 }
 
+/**
+ * One entry in the per-character advancement audit log (Stage A6a). Oldest-first;
+ * the UI reverses for display. Deliberately NOT coupled to the Phase B7 unified
+ * event log. `timestamp` doubles as the display key. See logic/advancement.ts
+ * for the append helpers.
+ */
+export interface AdvancementLogEntry {
+  /** Epoch milliseconds from an injected clock. */
+  timestamp: number;
+  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award';
+  /** The level the entry concerns, when relevant. */
+  level?: number;
+  /** Human-readable detail, e.g. 'Level 4: HP +8 (fixed)'. */
+  detail: string;
+  /** The XP awarded (xp-award entries only). */
+  xpAmount?: number;
+}
+
+/**
+ * A single level-up record (Stage A6a): the HP choice taken at that level. The
+ * stored HP `value` is the Hit-Dice portion only (fixed = Hit Die/2+1, rolled =
+ * the Hit Die face); the Constitution rider and the minimum-1 floor are applied
+ * by the HP math (logic/hit-points.ts), so a later Con change still recomputes
+ * the rider. Level 1 is never recorded (its HP is always the full Hit Die + Con,
+ * no choice). PHB 2024 "Gaining a Level" (L2011-2016).
+ */
+export interface LevelUpRecord {
+  /** The level this record is for (2..20). */
+  level: number;
+  /** The HP choice taken this level. Absent = not recorded (HP as computed). */
+  hp?: { mode: 'fixed' | 'rolled'; value: number };
+}
+
+/**
+ * Advancement / level-up state (Stage A6a). All fields additive-optional:
+ * absent `advancement` (or any absent sub-field) means milestone leveling with
+ * no per-level HP records and HP computed as today.
+ *
+ * NOTE (A6b-ready): a `feats?: FeatSelection[]` field will be added here when
+ * feats/ASI land; the shape is deliberately left open so that addition needs no
+ * migration (same additive-optional convention). PHB 2024 "Gaining a Level".
+ */
+export interface AdvancementState {
+  /** Per-level HP choices, oldest level first (A6a). */
+  levels?: LevelUpRecord[];
+  /** Leveling model + XP. Absent = milestone (the RAW-neutral default). */
+  leveling?: { mode: 'milestone' | 'xp'; xp?: number };
+  /** Minimal append-only audit trail, oldest-first (UI reverses). */
+  log?: AdvancementLogEntry[];
+}
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -562,6 +613,14 @@ export interface Character {
    * and the Barbarian, Fighter, Paladin, Ranger and Rogue "Weapon Mastery" features.
    */
   weaponMasteries?: string[];
+  /**
+   * Advancement / level-up state (Stage A6a): per-level HP choices, the
+   * leveling mode + XP, and a minimal audit log. Absent = milestone leveling,
+   * no per-level records, HP computed as today (a valid prior state).
+   * Additive-optional; no CURRENT_VERSION bump and no migration (same
+   * convention as the other Stage-A fields). PHB 2024 "Gaining a Level".
+   */
+  advancement?: AdvancementState;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

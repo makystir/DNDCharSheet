@@ -1,4 +1,4 @@
-import { User, Swords, Sparkles, Settings, Backpack } from 'lucide-react';
+import { User, Swords, Sparkles, Settings, Backpack, TrendingUp } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { isSpellcaster } from '../../logic/spellcasting';
@@ -9,7 +9,13 @@ import { isSpellcaster } from '../../logic/spellcasting';
  * here (rather than from a component) so the pure routing logic stays free of
  * React imports and there is no circular dependency.
  */
-export type PageSection = 'character' | 'combat' | 'inventory' | 'spells' | 'settings';
+export type PageSection =
+  | 'character'
+  | 'combat'
+  | 'inventory'
+  | 'spells'
+  | 'advancement'
+  | 'settings';
 
 export interface NavItem {
   id: PageSection;
@@ -72,6 +78,21 @@ export const NAV_ITEMS: NavItem[] = [
     shortcut: '4',
     subTabHint: 'Summary · Slots · Prepared · Browse',
     predicate: isSpellcaster,
+  },
+  // Advancement: an UNCONDITIONAL top-level tab (every character can level up, so
+  // no predicate). Keyed '6' — the next free number key — so every existing tab
+  // keeps its shortcut (Character '1', Combat '2', Settings '3', Spells '4',
+  // Inventory '5'). The key does NOT match the visual position (Advancement
+  // renders after Spells, before Settings), which is the same deliberate
+  // stable-shortcut convention used by Inventory '5' and Spells '4': stable
+  // shortcuts are preferred over renumbering so muscle memory / tests do not
+  // churn. Do NOT "fix" the mismatch by renumbering.
+  {
+    id: 'advancement',
+    label: 'Advancement',
+    icon: TrendingUp,
+    shortcut: '6',
+    subTabHint: 'Level · Hit Points · Next level · Log',
   },
   { id: 'settings', label: 'Settings', icon: Settings, shortcut: '3' },
 ];

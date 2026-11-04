@@ -1,0 +1,58 @@
+import { describe, it, expect, afterEach, beforeEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import App from '../../../App';
+
+/**
+ * The Advancement tab (Stage A6a) is an UNCONDITIONAL top-level tab keyed '6'.
+ * These exercise that it appears for every character, routes on click, and
+ * responds to its number-key shortcut.
+ */
+
+beforeEach(() => {
+  history.replaceState(null, '', '#');
+});
+
+afterEach(() => {
+  cleanup();
+  history.replaceState(null, '', '#');
+});
+
+async function renderApp() {
+  render(<App />);
+  await screen.findByText('Ability Scores');
+}
+
+describe('Advancement tab routing', () => {
+  it('shows the Advancement nav item unconditionally (even class-less)', async () => {
+    await renderApp();
+    expect(screen.getByRole('button', { name: 'Advancement' })).toBeInTheDocument();
+  });
+
+  it('routes to Advancement on click, moving aria-current and the hash', async () => {
+    await renderApp();
+    fireEvent.click(screen.getByRole('button', { name: 'Advancement' }));
+    await screen.findByRole('heading', { name: /Level & Experience/ });
+    expect(screen.getByRole('button', { name: 'Advancement' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(window.location.hash).toBe('#advancement');
+  });
+
+  it('switches to Advancement via its number-key shortcut (6)', async () => {
+    await renderApp();
+    fireEvent.keyDown(document.body, { key: '6' });
+    await screen.findByRole('heading', { name: /Level & Experience/ });
+    expect(screen.getByRole('button', { name: 'Advancement' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('deep-links #advancement directly', async () => {
+    history.replaceState(null, '', '#advancement');
+    render(<App />);
+    await screen.findByRole('heading', { name: /Level & Experience/ });
+    expect(window.location.hash).toBe('#advancement');
+  });
+});

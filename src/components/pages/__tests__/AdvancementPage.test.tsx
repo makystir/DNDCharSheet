@@ -1,0 +1,199 @@
+import { useState } from 'react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import { AdvancementPage } from '../AdvancementPage';
+import type { Character } from '../../../types/character';
+import { createCharacter } from '../../../storage/character-store';
+
+/**
+ * Component tests for the Advancement tab (Stage A6a). They assert the UI wires
+ * the pure advancement logic correctly; the rules themselves are covered by the
+ * logic + golden suites. No rule is recomputed in a test.
+ */
+
+/** Stateful harness so onChange-driven updates persist across renders. */
+function renderStateful(overrides: Partial<Character> = {}, now: () => number = () => 1000) {
+  const onChange = vi.fn();
+  let latest: Character = { ...createCharacter('Tester'), ...overrides };
+  function Harness() {
+    const [character, setCharacter] = useState<Character>(latest);
+    return (
+      <AdvancementPage
+        character={character}
+        now={now}
+        onChange={(next) => {
+          onChange(next);
+          latest = next;
+          setCharacter(next);
+        }}
+      />
+    );
+  }
+  render(<Harness />);
+  return { onChange, get: () => latest };
+}
+
+/** A level-4 Fighter (d10) with Con 14 (+2). */
+function fighter4(): Partial<Character> {
+  return {
+    level: 4,
+    class: { id: 'fighter', level: 4 },
+    abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
+  };
+}
+
+describe('AdvancementPage — level & mode', () => {
+  it('renders the authoritative Level control and Proficiency Bonus', () => {
+    renderStateful(fighter4());
+    expect((screen.getByLabelText('Level') as HTMLInputElement).value).toBe('4');
+    // PB at level 4 is +2 (shown as a CalculatedValue trigger displaying "+2").
+    expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  it('setting the level routes through the logic clamp', () => {
+    const { get } = renderStateful(fighter4());
+    fireEvent.change(screen.getByLabelText('Level'), { target: { value: '25' } });
+    expect(get().level).toBe(20); // clampLevel caps at 20
+  });
+
+  it('defaults to milestone mode (no XP controls shown)', () => {
+    renderStateful(fighter4());
+    expect(screen.getByRole('tab', { name: 'Milestone' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByLabelText('Experience Points')).not.toBeInTheDocument();
+  });
+
+  it('switching to XP mode reveals the XP entry and permitted level', () => {
+    const { get } = renderStateful(fighter4());
+    fireEvent.click(screen.getByRole('tab', { name: 'XP' }));
+    expect(get().advancement?.leveling?.mode).toBe('xp');
+    expect(screen.getByLabelText('Experience Points')).toBeInTheDocument();
+  });
+});
+
+describe('AdvancementPage — XP permits, never auto-levels', () => {
+  it('milestone mode permits a level-up regardless of XP', () => {
+    renderStateful(fighter4());
+    // The fixed-HP level-up button is enabled under milestone.
+    expect(screen.getByRole('button', { name: 'Level up (fixed HP)' })).not.toBeDisabled();
+  });
+
+  it('XP mode blocks level-up below the next threshold and permits it once met', () => {
+    // Level 4 → level 5 needs 6500 XP total (PHB). Start just below.
+    const { get } = renderStateful({
+      ...fighter4(),
+      advancement: { leveling: { mode: 'xp', xp: 6499 } },
+    });
+    expect(screen.getByRole('button', { name: 'Level up (fixed HP)' })).toBeDisabled();
+    // Raise XP to the threshold.
+    fireEvent.change(screen.getByLabelText('Experience Points'), { target: { value: '6500' } });
+    expect(get().advancement?.leveling?.xp).toBe(6500);
+    expect(screen.getByRole('button', { name: 'Level up (fixed HP)' })).not.toBeDisabled();
+    // Crossing the threshold does NOT auto-level: level stays 4 until applied.
+    expect(get().level).toBe(4);
+  });
+
+  it('applying a level-up advances exactly one level and logs it', () => {
+    const { get } = renderStateful(fighter4(), () => 2000);
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    expect(get().level).toBe(5);
+    const log = get().advancement?.log ?? [];
+    expect(log.some((e) => e.kind === 'level-up' && e.level === 5)).toBe(true);
+    expect(log.some((e) => e.kind === 'hp' && e.level === 5)).toBe(true);
+  });
+});
+
+describe('AdvancementPage — per-level HP choice + breakdown', () => {
+  it('shows the HP max as a CalculatedValue and records a fixed choice', () => {
+    const { get } = renderStateful(fighter4());
+    // Fighter d10, levels 1-4 fixed: 10 + 3*6 = 28 Hit-Dice; + Con 2*4 = 8 → 36.
+    const hpTrigger = screen.getByRole('button', { name: /Hit Point maximum:/ });
+    expect(hpTrigger).toHaveTextContent('36');
+    // Record a fixed HP choice for the current level.
+    fireEvent.click(screen.getByRole('button', { name: 'Take fixed value' }));
+    const rec = (get().advancement?.levels ?? []).find((l) => l.level === 4);
+    expect(rec?.hp).toEqual({ mode: 'fixed', value: 6 }); // d10 fixed = 6
+  });
+
+  it('records a rolled HP choice for the CURRENT level without leveling up (milestone)', () => {
+    // Regression for B1: in milestone mode a level-up is always permitted, but
+    // the Hit Points card's "Roll the Hit Die" button must RE-RECORD the current
+    // level's HP (a correction), NOT advance the character a level.
+    const { get } = renderStateful(fighter4());
+    // Open the current-level roller from the Hit Points card.
+    fireEvent.click(screen.getByRole('button', { name: 'Roll the Hit Die' }));
+    fireEvent.click(screen.getByRole('button', { name: /Roll d10/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Record HP' }));
+    // Level is unchanged; the roll is recorded against the CURRENT level (4).
+    expect(get().level).toBe(4);
+    const rec = (get().advancement?.levels ?? []).find((l) => l.level === 4);
+    expect(rec?.hp?.mode).toBe('rolled');
+    expect(rec?.hp?.value).toBeGreaterThanOrEqual(1);
+    expect(rec?.hp?.value).toBeLessThanOrEqual(10);
+    // No level-5 record was created.
+    expect((get().advancement?.levels ?? []).some((l) => l.level === 5)).toBe(false);
+  });
+
+  it('records a rolled HP choice via the Hit-Die dialog on level-up', () => {
+    const { get } = renderStateful(fighter4());
+    // Under milestone a level-up is permitted, so rolling HP applies the level-up
+    // and records the roll for the NEW level (5). Open the roller, resolve the
+    // auto-roll, then record.
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (roll HP)' }));
+    fireEvent.click(screen.getByRole('button', { name: /Roll d10/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Record HP' }));
+    expect(get().level).toBe(5);
+    const rec = (get().advancement?.levels ?? []).find((l) => l.level === 5);
+    expect(rec?.hp?.mode).toBe('rolled');
+    expect(rec?.hp?.value).toBeGreaterThanOrEqual(1);
+    expect(rec?.hp?.value).toBeLessThanOrEqual(10);
+  });
+});
+
+describe('AdvancementPage — next-level preview flags', () => {
+  it('flags the subclass choice at level 3 (Fighter at level 2)', () => {
+    renderStateful({ level: 2, class: { id: 'fighter', level: 2 } });
+    expect(within(screen.getByText(/Advancing to level 3/).closest('div')!).getByText('Choose a subclass')).toBeInTheDocument();
+  });
+
+  it('flags a feat slot opening at level 4 (Fighter at level 3)', () => {
+    renderStateful({ level: 3, class: { id: 'fighter', level: 3 } });
+    expect(screen.getByRole('button', { name: /A feat slot opens/ })).toBeInTheDocument();
+  });
+
+  it('flags a Proficiency Bonus change at level 5 (character at level 4)', () => {
+    renderStateful(fighter4());
+    expect(screen.getByText(/Proficiency Bonus rises to \+3/)).toBeInTheDocument();
+  });
+});
+
+describe('AdvancementPage — choices pending', () => {
+  it('shows feat slots as forward-looking placeholders', () => {
+    // Fighter level 4 has one asi-marker (level 4).
+    renderStateful(fighter4());
+    expect(screen.getByText(/Feat slot from level 4/)).toBeInTheDocument();
+  });
+
+  it('flags the subclass as pending at or above the subclass level', () => {
+    renderStateful({ level: 3, class: { id: 'fighter', level: 3 } });
+    expect(screen.getByText(/Subclass not chosen/)).toBeInTheDocument();
+  });
+});
+
+describe('AdvancementPage — audit log', () => {
+  it('records level-ups and HP choices, and clears via the confirm dialog', () => {
+    const { get } = renderStateful(fighter4(), () => 3000);
+    // Level up to generate log entries.
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    // Open the log entries.
+    fireEvent.click(screen.getByRole('button', { name: /Show entries/ }));
+    const list = screen.getByRole('list', { name: 'Advancement log entries' });
+    expect(within(list).getByText(/Advanced to level 5/)).toBeInTheDocument();
+    expect(within(list).getByText(/HP \+/)).toBeInTheDocument();
+    // Clear the log: open the confirm (trigger ends with an ellipsis), then
+    // confirm in the dialog.
+    fireEvent.click(screen.getByRole('button', { name: /Clear log…/ }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Clear log' }));
+    expect(get().advancement?.log).toBeUndefined();
+  });
+});
