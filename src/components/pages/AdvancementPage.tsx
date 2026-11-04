@@ -38,6 +38,8 @@ import {
 } from '../../logic/advancement';
 import { featSlotAssignments } from '../../logic/feats';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
+import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
+import { AdvancementPlanner } from './advancement/AdvancementPlanner';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
 
@@ -324,6 +326,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         )}
       </Card>
 
+      {/* ── Progression Advisor (read-only XP/milestone projection + prompts) ─ */}
+      <ProgressionAdvisor character={character} />
+
       {/* ── Hit Points ──────────────────────────────────────────────────────── */}
       <Card>
         <SectionHeader icon={Heart} title="Hit Points" />
@@ -455,6 +460,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
           </>
         )}
       </Card>
+
+      {/* ── Advancement Planner (read-only upcoming milestones + preview) ───── */}
+      <AdvancementPlanner character={character} />
 
       {/* ── Feats & Ability Score Improvements ──────────────────────────────── */}
       <FeatSlotsSection character={character} onChange={onChange} now={now} />
