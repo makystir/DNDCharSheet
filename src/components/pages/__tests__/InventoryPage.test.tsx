@@ -1,10 +1,24 @@
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { InventoryPage } from '../InventoryPage';
 import { CombatPage } from '../CombatPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
+
+/**
+ * The CombatPage now renders the Armor Class in two places (the Core Stats card
+ * and the Defend-mode "Defenses & Movement" readout, Stage A5e). These helpers
+ * scope the AC trigger to the Core Stats card so the integration assertions stay
+ * unambiguous. Both readouts share the same breakdown, so either is correct.
+ */
+function coreStatsCard(): HTMLElement {
+  return screen.getByRole('heading', { name: 'Core Stats' }).closest('div')!
+    .parentElement as HTMLElement;
+}
+function coreStatsAc(): HTMLElement {
+  return within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });
+}
 
 /** Stateful harness so equip/add toggles persist across renders. */
 function renderStateful(overrides: Partial<Character> = {}) {
@@ -162,7 +176,7 @@ describe('Inventory → Combat armour→AC integration', () => {
 
   it('CombatPage AC reflects equipped chain shirt (Dex capped) + shield = 17', () => {
     render(<CombatPage character={armoredCharacter()} onChange={vi.fn()} />);
-    const ac = screen.getByRole('button', { name: /Armor Class/ });
+    const ac = coreStatsAc();
     // 13 base + 2 (Dex +3 capped at +2) + 2 shield = 17.
     expect(ac).toHaveTextContent('17');
   });
@@ -187,11 +201,11 @@ describe('Inventory → Combat armour→AC integration', () => {
     }
     render(<Harness />);
     // AC starts at 17 (armored).
-    expect(screen.getByRole('button', { name: /Armor Class/ })).toHaveTextContent('17');
+    expect(coreStatsAc()).toHaveTextContent('17');
     // Unequip the chain shirt via its Worn toggle.
     fireEvent.click(screen.getByLabelText('Wear Chain Shirt'));
     // Now only the shield is worn: 10 + 3 (full Dex, unarmored) + 2 = 15.
-    expect(screen.getByRole('button', { name: /Armor Class/ })).toHaveTextContent('15');
+    expect(coreStatsAc()).toHaveTextContent('15');
   });
 
   it('worn custom (catalog-less) armour leaves AC unarmored and explains why (finding #3)', () => {
@@ -202,7 +216,7 @@ describe('Inventory → Combat armour→AC integration', () => {
       equipped: { armorItemId: 'c1' },
     };
     render(<CombatPage character={character} onChange={vi.fn()} />);
-    const ac = screen.getByRole('button', { name: /Armor Class/ });
+    const ac = coreStatsAc();
     // Catalog-less armour sets no base AC: unarmored 10 + Dex +2 = 12.
     expect(ac).toHaveTextContent('12');
     // Open the AC breakdown and confirm the worn-but-ignored note reconciles it.

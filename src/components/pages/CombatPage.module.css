@@ -4,6 +4,34 @@
   gap: 24px;
 }
 
+/* ── Segmented control: sticky at the top of the scroll area (in combat). ──
+   Mirrors PWACharSheet's .segmentedControlSticky. */
+.segmentedControlSticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-primary);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Mode tabpanel (in combat). ──
+   Panels stay MOUNTED and toggle via [hidden] so each panel's internal state
+   survives a mode switch (ux-audit Req 9.3). Gives the visible panel the same
+   vertical rhythm as the flat out-of-combat stack. */
+.modePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modePanel[hidden] {
+  display: none;
+}
+
 .fieldLabel {
   font-size: 0.72rem;
   letter-spacing: 0.08em;

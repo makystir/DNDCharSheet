@@ -150,12 +150,15 @@ describe('Active Conditions on the Combat page', () => {
   });
 
   it('exhaustion penalties are informational: AC and Initiative displays are unchanged', () => {
+    // Stage A5e: AC renders in both Core Stats and the Defend-mode readout, so
+    // read the first AC trigger (they share one breakdown). Exhaustion changes
+    // neither the static AC nor Initiative display (D1: it is a roll-time note).
     const { unmount } = render(<Harness initial={createCharacter('Tester')} />);
-    const ac = screen.getByRole('button', { name: /Armor Class/ }).textContent;
+    const ac = screen.getAllByRole('button', { name: /Armor Class/ })[0].textContent;
     const init = screen.getByRole('button', { name: /^Initiative/ }).textContent;
     unmount();
     renderPage({ exhaustionLevel: 4 });
-    expect(screen.getByRole('button', { name: /Armor Class/ }).textContent).toBe(ac);
+    expect(screen.getAllByRole('button', { name: /Armor Class/ })[0].textContent).toBe(ac);
     expect(screen.getByRole('button', { name: /^Initiative/ }).textContent).toBe(init);
   });
 });

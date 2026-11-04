@@ -54,7 +54,9 @@ describe('derived totals survive the page split', () => {
   it('CombatPage exposes every expected CalculatedValue trigger', () => {
     render(<CombatPage character={character} onChange={vi.fn()} />);
 
-    expect(screen.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
+    // Stage A5e: AC now appears in both the Core Stats card and the Defend-mode
+    // "Defenses & Movement" readout, so there is more than one AC trigger.
+    expect(screen.getAllByRole('button', { name: /Armor Class/ }).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Passive Perception/ }),

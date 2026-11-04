@@ -1,0 +1,52 @@
+.indicator {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  color: var(--accent-gold);
+  flex: 0 0 auto;
+}
+
+.title {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.ruleName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ruleDetail {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}

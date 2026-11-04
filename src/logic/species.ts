@@ -15,12 +15,33 @@
  */
 
 import type { Character } from '../types/character';
-import type { Breakdown } from './breakdown';
+import type { Breakdown, BreakdownComponent } from './breakdown';
 import type { CreatureSize, SpeciesData, SpeciesTrait } from '../data/species';
 import { getSpecies } from '../data/species';
+import { getArmor } from '../data/armor';
+import { exhaustionLevelOf } from './conditions';
 
 /** The default walking speed shown when no species is selected, in feet. */
 const DEFAULT_SPEED_FT = 30;
+
+/**
+ * The flat Speed reduction (feet) applied when worn armour lists a Strength
+ * score higher than the wearer's Strength SCORE.
+ *
+ * PHB 2024 "Armor" (Docs/PlayersHandbook.md L9616): "If the table shows a
+ * Strength score in the Strength column for an armor type, that armor reduces
+ * the wearer's speed by 10 feet unless the wearer has a Strength score equal to
+ * or higher than the listed score." A FLAT 10 ft — it does not scale with the
+ * shortfall and applies once.
+ */
+const ARMOR_STRENGTH_SPEED_PENALTY_FT = 10;
+
+/**
+ * Speed lost per Exhaustion level, in feet. PHB 2024 "Exhaustion [Condition]"
+ * (Docs/PlayersHandbook.md L21024): "Your Speed is reduced by a number of feet
+ * equal to 5 times your Exhaustion level."
+ */
+const EXHAUSTION_SPEED_PENALTY_PER_LEVEL_FT = 5;
 
 /** Resolves the selected species data, or undefined when unset/unknown. */
 export function resolveSpecies(character: Character): SpeciesData | undefined {
@@ -56,31 +77,132 @@ function woodElfSpeedOverride(character: Character): number | undefined {
  */
 export function speedBreakdown(character: Character): Breakdown {
   const species = resolveSpecies(character);
+
+  // 1. Species base component(s) — unchanged labels (locked by species.test.ts).
+  let base: BreakdownComponent[];
+  let note: string | undefined;
   if (!species) {
-    return {
-      total: DEFAULT_SPEED_FT,
-      components: [{ label: 'Base speed', value: DEFAULT_SPEED_FT }],
-    };
+    base = [{ label: 'Base speed', value: DEFAULT_SPEED_FT }];
+  } else {
+    const speciesBase = species.baseSpeedFt;
+    const override = woodElfSpeedOverride(character);
+    if (override === undefined) {
+      base = [{ label: 'Base species speed', value: speciesBase }];
+    } else {
+      base = [
+        { label: 'Base species speed', value: speciesBase },
+        { label: 'Wood Elf lineage', value: override - speciesBase },
+      ];
+      note = `Wood Elf lineage sets Speed to ${override} ft (PHB 2024 "Elven Lineages").`;
+    }
   }
 
-  const base = species.baseSpeedFt;
-  const override = woodElfSpeedOverride(character);
-  if (override === undefined) {
-    return {
-      total: base,
-      components: [{ label: 'Base species speed', value: base }],
-    };
-  }
+  // 2. Combat penalties: worn-armour Strength requirement + Exhaustion (A5e).
+  const penalties = speedPenaltyComponents(
+    armorStrengthRequirementOf(character),
+    character.abilities.str,
+    exhaustionLevelOf(character),
+  );
 
-  const bonus = override - base;
-  return {
-    total: override,
-    components: [
-      { label: 'Base species speed', value: base },
-      { label: 'Wood Elf lineage', value: bonus },
-    ],
-    note: `Wood Elf lineage sets Speed to ${override} ft (PHB 2024 "Elven Lineages").`,
-  };
+  return assembleSpeed(base, penalties, note);
+}
+
+/**
+ * Resolves the Strength requirement of the character's worn armour (A5e).
+ *
+ * Reads `character.equipped.armorItemId` → the inventory item → the A1 armour
+ * catalog (ArmorData.strengthRequirement). A worn custom item with no
+ * `catalogId` (or an unknown id) has no catalog stats, so NO requirement is
+ * invented (rules-compliance rule 1) and this returns undefined.
+ */
+function armorStrengthRequirementOf(character: Character): number | undefined {
+  const armorItemId = character.equipped?.armorItemId;
+  if (!armorItemId) return undefined;
+  const item = (character.inventory ?? []).find((i) => i.id === armorItemId);
+  if (!item?.catalogId) return undefined;
+  return getArmor(item.catalogId)?.strengthRequirement;
+}
+
+/**
+ * Builds the ordered Speed penalty components (armour Strength requirement, then
+ * Exhaustion) shared by `speedBreakdown` and `combatSpeedBreakdown` so their
+ * labels and values are identical.
+ *
+ * - Armour Strength requirement: a flat -10 when the worn armour lists a
+ *   Strength score greater than the character's Strength SCORE (PHB 2024
+ *   "Armor" L9616 — compare SCORES, not modifiers; flat, does not scale, once).
+ * - Exhaustion: -(5 × level) (PHB 2024 "Exhaustion" L21024). A single component
+ *   carrying the whole reduction, so the number stays legible against the level.
+ */
+function speedPenaltyComponents(
+  armorStrengthRequirement: number | undefined,
+  strScore: number,
+  exhaustionLevel: number,
+): BreakdownComponent[] {
+  const components: BreakdownComponent[] = [];
+  if (
+    armorStrengthRequirement !== undefined &&
+    armorStrengthRequirement > strScore
+  ) {
+    components.push({
+      label: `Armor Strength requirement (Str ${armorStrengthRequirement})`,
+      value: -ARMOR_STRENGTH_SPEED_PENALTY_FT,
+    });
+  }
+  if (exhaustionLevel > 0) {
+    components.push({
+      label: `Exhaustion (level ${exhaustionLevel})`,
+      value: -(exhaustionLevel * EXHAUSTION_SPEED_PENALTY_PER_LEVEL_FT),
+    });
+  }
+  return components;
+}
+
+/**
+ * Sums base + penalty components and floors the total at 0 (Speed is never
+ * negative — SPEED_CASES "Speed never goes below 0"). When the raw sum would be
+ * negative, a `Speed floor (minimum 0)` component is appended so the listed
+ * components STILL sum to the (floored) total (Breakdown invariant /
+ * calculated-totals: components sum to total).
+ */
+function assembleSpeed(
+  base: BreakdownComponent[],
+  penalties: BreakdownComponent[],
+  note: string | undefined,
+): Breakdown {
+  const components = [...base, ...penalties];
+  const raw = components.reduce((sum, c) => sum + c.value, 0);
+  const total = Math.max(0, raw);
+  if (raw < 0) {
+    components.push({ label: 'Speed floor (minimum 0)', value: total - raw });
+  }
+  return note !== undefined ? { total, components, note } : { total, components };
+}
+
+/**
+ * Core combat Speed breakdown from primitive inputs (A5e), used for the golden
+ * oracle and anywhere only the numbers (not a full Character) are known. The
+ * base component is labelled `Base speed`; the armour Strength requirement and
+ * Exhaustion penalties are the same components `speedBreakdown` appends.
+ *
+ * PHB 2024 "Armor" L9616 (armour Strength → -10 ft) and "Exhaustion" L21024
+ * (-5 ft × level); Speed floored at 0.
+ */
+export function combatSpeedBreakdown(input: {
+  baseSpeed: number;
+  str: number;
+  armorStrengthRequirement?: number;
+  exhaustion: number;
+}): Breakdown {
+  const base: BreakdownComponent[] = [
+    { label: 'Base speed', value: input.baseSpeed },
+  ];
+  const penalties = speedPenaltyComponents(
+    input.armorStrengthRequirement,
+    input.str,
+    input.exhaustion,
+  );
+  return assembleSpeed(base, penalties, undefined);
 }
 
 /**

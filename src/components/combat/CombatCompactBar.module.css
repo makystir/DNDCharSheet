@@ -1,0 +1,49 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  color: var(--accent-gold);
+  flex: 0 0 auto;
+}
+
+.value {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.slash {
+  color: var(--text-secondary);
+}
+
+.temp {
+  color: var(--accent-blue, #6aa0ff);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.srLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

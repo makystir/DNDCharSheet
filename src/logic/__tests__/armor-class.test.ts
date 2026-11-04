@@ -148,14 +148,17 @@ describe('armorClassBreakdown — worn catalog-less armour (finding #3)', () => 
   });
 });
 
-describe('armorClassBreakdown — deferred unarmored-defense hook', () => {
-  it('accepts unarmoredDefenseAbility but does not yet change the result (deferred)', () => {
-    const withHook = armorClassBreakdown(scoresWithDex(14), undefined, {
-      unarmoredDefenseAbility: 'con',
+describe('armorClassBreakdown — Unarmored Defense (A5e)', () => {
+  // The hook is now WIRED (A5e / D9): Barbarian adds Con, Monk adds Wis, only
+  // while no armour is worn. (Was previously a deferred no-op.)
+  it('Barbarian Unarmored Defense adds the Con modifier to 10 + Dex', () => {
+    const scores: AbilityScores = { str: 10, dex: 14, con: 16, int: 10, wis: 10, cha: 10 };
+    const bd = armorClassBreakdown(scores, undefined, {
+      unarmoredDefense: { ability: 'con', shieldAllowed: true, sourceLabel: 'Barbarian Unarmored Defense' },
     });
-    const without = armorClassBreakdown(scoresWithDex(14));
-    expect(withHook.total).toBe(without.total);
-    expect(withHook.components).toEqual(without.components);
+    expect(bd.total).toBe(15); // 10 + 2 (Dex) + 3 (Con)
+    expect(bd.components.some((c) => c.label === 'Constitution mod')).toBe(true);
+    expect(bd.components.reduce((s, c) => s + c.value, 0)).toBe(bd.total);
   });
 });
 

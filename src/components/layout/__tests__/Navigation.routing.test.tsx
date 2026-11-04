@@ -51,7 +51,7 @@ describe('Navigation routing (shell)', () => {
   it('routes to Combat on click, moving aria-current and the hash', async () => {
     await renderApp();
     fireEvent.click(navButton('Combat'));
-    await screen.findByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ });
     expect(navButton('Combat')).toHaveAttribute('aria-current', 'page');
     expect(navButton('Character')).not.toHaveAttribute('aria-current');
     expect(window.location.hash).toBe('#combat');
@@ -60,7 +60,7 @@ describe('Navigation routing (shell)', () => {
   it('switches tabs via number-key shortcuts', async () => {
     await renderApp();
     fireEvent.keyDown(document.body, { key: '2' });
-    await screen.findByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ });
     expect(navButton('Combat')).toHaveAttribute('aria-current', 'page');
 
     fireEvent.keyDown(document.body, { key: '3' });
@@ -96,7 +96,7 @@ describe('Navigation routing (shell)', () => {
   it('moves focus to the main content region on route change', async () => {
     await renderApp();
     fireEvent.click(navButton('Combat'));
-    await screen.findByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ });
     await waitFor(() => {
       const main = document.getElementById('main-content');
       expect(document.activeElement).toBe(main);
@@ -417,3 +417,4 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
     await waitFor(() => expect(screen.getByTestId('page')).toHaveTextContent('character'));
   });
 });
+
