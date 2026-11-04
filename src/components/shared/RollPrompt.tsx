@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { BreakdownComponent } from '../../logic/breakdown';
 import { d20FromFaces, d20TestBreakdown, rollD20, type D20Mode, type D20Roll } from '../../logic/dice';
 import { createDefaultRng, type RNG } from '../../logic/random';
@@ -28,6 +29,8 @@ export interface RollPromptProps {
   modifiers?: BreakdownComponent[];
   /** Optional line of guidance shown above the die (for example the DC). */
   hint?: string;
+  /** Optional extra content under the hint (for example the sources of Advantage / Disadvantage). */
+  notice?: ReactNode;
   initialMode?: D20Mode;
   /** Label of the button that hands the result back. */
   confirmLabel?: string;
@@ -70,6 +73,7 @@ export function RollPrompt({
   exhaustionLevel,
   modifiers = [],
   hint,
+  notice,
   initialMode = 'normal',
   confirmLabel = 'Apply result',
   onResolve,
@@ -138,6 +142,7 @@ export function RollPrompt({
           {title}
         </h2>
         {hint && <p className={styles.hint}>{hint}</p>}
+        {notice && <div className={styles.hint}>{notice}</div>}
 
         {rolled === null ? (
           <>

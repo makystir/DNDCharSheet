@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Character } from '../../types/character';
 import { formatSigned } from '../../logic/breakdown';
 import { armorClassBreakdown } from '../../logic/armor-class';
@@ -15,6 +16,8 @@ import { HitPointsCard } from '../combat/HitPointsCard';
 import { TakeDamagePanel } from '../combat/TakeDamagePanel';
 import { DeathSavesCard } from '../combat/DeathSavesCard';
 import { ConcentrationCard } from '../combat/ConcentrationCard';
+import { InitiativeTracker } from '../combat/InitiativeTracker';
+import { TurnPanel } from '../combat/TurnPanel';
 import { RestControls } from '../combat/RestControls';
 import { Swords } from 'lucide-react';
 import { parseNumberInput } from './sheet-helpers';
@@ -34,6 +37,9 @@ export interface CombatPageProps {
  * adjacent to the HP value it affects), and Hit Dice.
  */
 export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
+  // Stage A5c: the turn banner asks the Death Saves card to open its roll prompt.
+  const [deathSaveRequest, setDeathSaveRequest] = useState(0);
+
   const setAcOverride = (raw: string) =>
     onChange({ ...character, acOverride: parseNumberInput(raw, true) });
 
@@ -130,11 +136,20 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
       <HitPointsCard character={character} onChange={onChange} />
       <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
       <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
-      <DeathSavesCard character={character} onChange={onChange} />
+      <DeathSavesCard character={character} onChange={onChange} rollRequest={deathSaveRequest} />
 
       {/* Active Conditions, with the read-only "from 0 HP" badges and the Knock
           out button (Stages A4, A5a). */}
       <ActiveConditions character={character} onChange={onChange} />
+
+      {/* Stage A5c: Initiative tracker and the character's own turn, added to the
+          flat stack (the Attack / Defend / Status control comes in A5e). */}
+      <InitiativeTracker character={character} onChange={onChange} />
+      <TurnPanel
+        character={character}
+        onChange={onChange}
+        onRollDeathSave={() => setDeathSaveRequest((n) => n + 1)}
+      />
 
       <Card>
         <SectionHeader icon={Swords} title="Core Stats" />

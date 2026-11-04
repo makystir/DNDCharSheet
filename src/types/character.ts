@@ -334,6 +334,44 @@ export interface DeathSaveState {
 }
 
 /**
+ * One entry in the ad-hoc Initiative roster (Stage A5c, decision D13): a flat
+ * name plus Initiative count. No stat blocks and no HP for other combatants.
+ * `isCharacter` marks the sheet owner's own entry.
+ */
+export interface Combatant {
+  id: string;
+  name: string;
+  initiative: number;
+  isCharacter?: boolean;
+}
+
+/**
+ * The character's own turn economy (Stage A5c). `movementUsed` is in feet and
+ * `dashes` counts Dash actions taken this turn. The tracker is advisory, so
+ * these flags never block anything. PHB 2024 "Your Turn" (L880-909).
+ */
+export interface TurnState {
+  actionUsed: boolean;
+  bonusUsed: boolean;
+  reactionUsed: boolean;
+  objectInteractionUsed: boolean;
+  movementUsed: number;
+  dashes: number;
+}
+
+/** The combat tracker (Stage A5c). `combat` is absent when not in combat. */
+export interface CombatState {
+  inCombat: boolean;
+  /** Round number, starting at 1. */
+  round: number;
+  /** Roster in Initiative order (highest first; ties in the user's chosen order). */
+  combatants: Combatant[];
+  /** Index into `combatants` of the combatant whose turn it is. */
+  activeIndex: number;
+  turn: TurnState;
+}
+
+/**
  * Which inventory items a character currently has equipped (Stage A1).
  *
  * PHB 2024 "Armor: One at a Time" (Docs/PlayersHandbook.md L9638): a creature
@@ -499,6 +537,12 @@ export interface Character {
    * PHB 2024 "Long Rest" (L21243).
    */
   lastLongRestAt?: number;
+  /**
+   * The combat tracker (Stage A5c). Absent = not in combat; ending combat removes
+   * the field. Additive-optional; no `_v` bump. PHB 2024 "Initiative" and "Your
+   * Turn" (Docs/PlayersHandbook.md L870-909).
+   */
+  combat?: CombatState;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

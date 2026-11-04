@@ -490,3 +490,146 @@ const REST_RULE_TOOLTIPS: Record<RestRuleTooltipKey, TooltipContent> = {
 export function resolveRestRuleTooltip(key: string): TooltipContent | null {
   return Object.hasOwn(REST_RULE_TOOLTIPS, key) ? REST_RULE_TOOLTIPS[key as RestRuleTooltipKey] : null;
 }
+
+/** Keys of the Initiative and action economy rule tooltips (Stage A5c). */
+export const TURN_RULE_TOOLTIP_KEYS = [
+  'initiative',
+  'surprise',
+  'action',
+  'bonus-action',
+  'reaction',
+  'dash',
+] as const;
+
+export type TurnRuleTooltipKey = (typeof TURN_RULE_TOOLTIP_KEYS)[number];
+
+const TURN_RULE_TOOLTIPS: Record<TurnRuleTooltipKey, TooltipContent> = {
+  initiative: {
+    title: 'Initiative',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'When combat starts, everyone makes a Dexterity check. The total is your Initiative count, and turns go from the highest count to the lowest. The order stays the same every round.',
+      },
+      {
+        label: 'Ties',
+        text: 'The players decide the order among tied characters. The DM decides among tied monsters, and in a tie between a monster and a player character. This app never breaks a tie for you; use the arrows to reorder tied entries.',
+      },
+      {
+        label: 'Advantage and Disadvantage',
+        text: 'Being surprised or Incapacitated gives Disadvantage on the roll. Being Invisible gives Advantage. They never stack, and any mix of the two cancels to a normal roll.',
+      },
+      {
+        label: 'This app',
+        text: 'Exhaustion reduces the roll by 2 per level. A natural 1 or 20 has no special effect on a Dexterity check. Feats and features that add to Initiative are not modelled; use the Initiative bonus.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Initiative" (Docs/PlayersHandbook.md L870-879); Incapacitated, Invisible and "Advantage/Disadvantage" (L472-487)' },
+    ],
+  },
+  surprise: {
+    title: 'Surprise',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A combatant caught unawares by the start of combat is surprised and has Disadvantage on its Initiative roll. For example, a foe who does not know an ambusher is about to attack is surprised.',
+      },
+      {
+        label: 'No surprise round',
+        text: 'There is no separate surprise round in the 2024 rules. A surprised combatant still takes its turn in Initiative order.',
+      },
+      {
+        label: 'Related',
+        text: 'If you are Incapacitated when you roll Initiative, you also have Disadvantage. Disadvantage from several sources is still just Disadvantage.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Surprise" (L21625-21628); "Initiative" (L875)' },
+    ],
+  },
+  action: {
+    title: 'Action',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'On your turn you can move up to your Speed and take one action, in either order. You can take only one action at a time.',
+      },
+      {
+        label: 'Choices',
+        text: 'Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study and Utilize, plus any actions your features give you.',
+      },
+      {
+        label: 'Free interaction',
+        text: 'You can interact with one object for free during your move or action. A second object needs the Utilize action.',
+      },
+      {
+        label: 'This app',
+        text: 'The tracker only advises. If a feature gives you another action, you can record it and the warning is just a reminder.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Actions" (L586-613); "Your Turn" (L880-897)' },
+    ],
+  },
+  'bonus-action': {
+    title: 'Bonus Action',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A special action you can take on a turn when a class feature, spell or other rule says you can. Without such a rule you have no Bonus Action.',
+      },
+      {
+        label: 'Limit',
+        text: 'You can take only one Bonus Action on your turn, so choose if you have several. You choose when to take it unless its timing is specified.',
+      },
+      {
+        label: 'Incapacitated',
+        text: 'Anything that stops you taking actions also stops Bonus Actions, such as the Incapacitated condition.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Bonus Actions" (L615-621); glossary "Bonus Action" (L20695)' },
+    ],
+  },
+  reaction: {
+    title: 'Reaction',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'An instant response to a trigger. You can take one on your own turn or on someone else\'s. The Opportunity Attack is a Reaction every creature has.',
+      },
+      {
+        label: 'Limit',
+        text: 'Once you take a Reaction you cannot take another until the start of your next turn. Other combatants\' turns do not refresh it.',
+      },
+      {
+        label: 'Timing',
+        text: 'A Reaction happens right after its trigger, unless its description says otherwise. If it interrupts a turn, that creature carries on afterwards.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Reactions" (L623-629); glossary "Reaction" (L21417)' },
+    ],
+  },
+  dash: {
+    title: 'Dash',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'When you take the Dash action you gain extra movement for the rest of the turn, equal to your Speed after any modifiers.',
+      },
+      {
+        label: 'Example',
+        text: 'With a Speed of 30 feet you can move up to 60 feet this turn. If your Speed is reduced to 15 feet, you can move up to 30 feet.',
+      },
+      {
+        label: 'Special speeds',
+        text: 'With a Fly or Swim Speed you can use that speed instead each time you Dash.',
+      },
+      {
+        label: 'This app',
+        text: 'Dash uses your action and adds one Speed to the movement allowance. The tracker uses the Speed you give it; Speed penalties are not applied yet.',
+      },
+      { label: 'Source', text: 'PHB 2024 "Dash [Action]" (L20925-20931)' },
+    ],
+  },
+};
+
+/**
+ * Tooltip content for Initiative, Surprise, Action, Bonus Action, Reaction or
+ * Dash (short PHB-cited paraphrases). Returns null for an unknown key.
+ */
+export function resolveTurnRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(TURN_RULE_TOOLTIPS, key) ? TURN_RULE_TOOLTIPS[key as TurnRuleTooltipKey] : null;
+}

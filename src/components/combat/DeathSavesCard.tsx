@@ -23,6 +23,11 @@ import styles from './HitPoints.module.css';
 export interface DeathSavesCardProps {
   character: Character;
   onChange: (next: Character) => void;
+  /**
+   * Each time this number changes the roll prompt opens (if the character is
+   * making Death Saving Throws). Lets the A5c turn banner start the SAME flow.
+   */
+  rollRequest?: number;
 }
 
 const PIPS = [0, 1, 2];
@@ -72,14 +77,22 @@ function announce(roll: DeathSaveRoll, advance: DeathSaveAdvance): string {
  * follows the HP card's structure. Every rule lives in
  * logic/hit-points-state.ts (resolveDeathSave, stabilize).
  */
-export function DeathSavesCard({ character, onChange }: DeathSavesCardProps) {
+export function DeathSavesCard({ character, onChange, rollRequest = 0 }: DeathSavesCardProps) {
   const { mode } = useDiceEntryMode();
   const [rolling, setRolling] = useState(false);
   const [confirmStable, setConfirmStable] = useState(false);
   const [status, setStatus] = useState('');
+  const [seenRequest, setSeenRequest] = useState(rollRequest);
 
   const life = lifeStatus(character);
   const relevant = life === 'making-death-saves' || life === 'stable' || life === 'dead';
+
+  // A new external request opens the existing roll prompt (state adjusted
+  // during render, the React-endorsed pattern for reacting to a prop change).
+  if (rollRequest !== seenRequest) {
+    setSeenRequest(rollRequest);
+    if (life === 'making-death-saves') setRolling(true);
+  }
 
   const saves = effectiveDeathSaves(character);
   const exhaustionLevel = exhaustionLevelOf(character);
