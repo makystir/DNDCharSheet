@@ -1,0 +1,134 @@
+/* ConditionPicker styles - ported from PWACharSheet ConditionPicker.module.css.
+ * The source composed overlay from a shared styles module this app does not
+ * have, so the overlay rules are inlined (matching Picker.module.css) and
+ * re-themed to global.css tokens. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay);
+  z-index: 1100;
+  padding: 16px;
+}
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title {
+  color: var(--accent-gold);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.closeBtn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.conditionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  min-height: 44px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.conditionBtnActive {
+  background: rgba(140, 47, 47, 0.35);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-red);
+}
+.activeIndicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.infoBtn,
+.removeBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nameBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  font-weight: 600;
+}
+.infoBtn:focus-visible,
+.removeBtn:focus-visible,
+.nameBtn:focus-visible,
+.closeBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.tooltipSection {
+  margin-bottom: 6px;
+}
+.tooltipSectionLast {
+  margin-bottom: 0;
+}
+.tooltipLabel {
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+@media (max-width: 767px) {
+  .modal {
+    width: 95%;
+    max-width: none;
+    max-height: 80vh;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(calc(50% - 4px), 1fr));
+  }
+}

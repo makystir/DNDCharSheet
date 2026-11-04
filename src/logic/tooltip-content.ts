@@ -34,6 +34,7 @@ import {
   type ArmorCategory,
 } from '../data/armor';
 import { getEquipment, type EquipmentData } from '../data/equipment';
+import { EXHAUSTION, EXHAUSTION_TRACK, getCondition } from '../data/conditions';
 
 /** Structured content for a tooltip popover (same shape as the PWA source). */
 export interface TooltipContent {
@@ -234,4 +235,48 @@ export function resolveItemTooltip(item: InventoryItem): TooltipContent | null {
   const e: EquipmentData | undefined = getEquipment(item.catalogId);
   if (!e || !e.description) return null;
   return { title: item.name ?? e.name, sections: [{ label: 'Description', text: e.description }] };
+}
+
+/**
+ * Tooltip content for a PHB 2024 condition (Stage A4), from the conditions
+ * catalog. Takes a condition id (e.g. 'paralyzed'). Returns null for an unknown
+ * id. Ported from the PWA resolveConditionTooltip contract (title + labelled
+ * sections), retargeted at the D&D conditions.
+ */
+export function resolveConditionTooltip(conditionId: string): TooltipContent | null {
+  const c = getCondition(conditionId);
+  if (!c) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: 'Description', text: c.description },
+    { label: 'Effects', text: c.effects.join(' ') },
+  ];
+  if (c.endsWhen) sections.push({ label: 'Ends', text: c.endsWhen });
+  if (c.implies.length > 0) {
+    sections.push({
+      label: 'Also applies',
+      text: c.implies.map((id) => getCondition(id)?.name ?? id).join(', '),
+    });
+  }
+  return { title: c.name, sections };
+}
+
+/**
+ * Tooltip content for a single Exhaustion level (1..6). Returns null for a
+ * level outside the track. PHB 2024 "Exhaustion" (L21018-21028).
+ */
+export function resolveExhaustionLevelTooltip(level: number): TooltipContent | null {
+  const row = EXHAUSTION_TRACK.find((r) => r.level === level);
+  if (!row) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: 'D20 Tests', text: `Rolls are reduced by ${row.d20Penalty} (2 \u00d7 level ${row.level}).` },
+    { label: 'Speed', text: `Speed is reduced by ${row.speedPenaltyFt} feet (5 ft \u00d7 level ${row.level}).` },
+  ];
+  if (row.fatal) {
+    sections.push({ label: 'Death', text: `You die at Exhaustion level ${EXHAUSTION.deathLevel}.` });
+  }
+  sections.push({
+    label: 'Removal',
+    text: 'Finishing a Long Rest removes 1 level; the condition ends at level 0.',
+  });
+  return { title: `Exhaustion level ${row.level}`, sections };
 }

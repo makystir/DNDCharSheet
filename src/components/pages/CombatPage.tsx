@@ -10,6 +10,7 @@ import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
+import { ActiveConditions } from '../combat/ActiveConditions';
 import { Swords } from 'lucide-react';
 import { parseNumberInput } from './sheet-helpers';
 import styles from './CombatPage.module.css';
@@ -115,6 +116,10 @@ export function CombatPage({ character, onChange }: CombatPageProps) {
 
   return (
     <div className={styles.page}>
+      {/* Active Conditions sits at the top of the Combat view, as the PWA
+          CombatDashboard places its condition-badge row (Stage A4). */}
+      <ActiveConditions character={character} onChange={onChange} />
+
       <Card>
         <SectionHeader icon={Swords} title="Core Stats" />
         <div className={styles.derivedGrid}>

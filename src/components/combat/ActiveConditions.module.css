@@ -1,0 +1,120 @@
+/* Active Conditions section. Badge colours are applied inline from
+ * CONDITION_COLORS (ported from PWACharSheet's CombatDashboard condition row). */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.badgeLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 44px;
+}
+.badgeName {
+  color: inherit;
+}
+.removeBtn,
+.stepBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.stepBtn {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  font-size: 1.1rem;
+}
+.stepBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.removeBtn:focus-visible,
+.stepBtn:focus-visible,
+.endsInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.effectLine {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.effectValue {
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+}
+.fatal {
+  color: var(--accent-red);
+  font-weight: 700;
+}
+.implied {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+.endsLabel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.endsInput {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 36px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+@media (hover: none), (max-width: 767px) {
+  .endsInput {
+    min-height: 44px;
+  }
+}

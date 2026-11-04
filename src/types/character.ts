@@ -26,6 +26,7 @@ import type {
 // persisted shape and the catalog cannot drift (same pattern as SpeciesId).
 // See src/data/classes.ts for the source of truth.
 import type { ClassId, SubclassId } from '../data/classes';
+import type { ConditionId } from '../data/conditions';
 
 // Stage-8 spell catalog key, re-exported from the data catalog so the persisted
 // spellcasting state and the catalog cannot drift (same pattern as SpeciesId /
@@ -309,6 +310,19 @@ export interface InventoryItem {
 }
 
 /**
+ * One active condition on a character (Stage A4). `id` is a PHB condition id
+ * other than Exhaustion (Exhaustion uses `Character.exhaustionLevel`). `note`
+ * is a free-text source label; `ends` is a free-text note on how/when it ends
+ * (rounds, save-ends, until a rest). D&D durations are heterogeneous, so a
+ * richer duration model is deliberately deferred.
+ */
+export interface ActiveCondition {
+  id: Exclude<ConditionId, 'exhaustion'>;
+  note?: string;
+  ends?: string;
+}
+
+/**
  * Which inventory items a character currently has equipped (Stage A1).
  *
  * PHB 2024 "Armor: One at a Time" (Docs/PlayersHandbook.md L9638): a creature
@@ -424,6 +438,18 @@ export interface Character {
    * PHB 2024 "Coins" (Docs/PlayersHandbook.md L9247-9272).
    */
   coins?: CurrencyAmount;
+  /**
+   * Active non-Exhaustion conditions (Stage A4). Absent or empty = none, a
+   * valid state. Additive-optional: no CURRENT_VERSION bump, no migration.
+   * Exhaustion is tracked separately in `exhaustionLevel`. PHB 2024
+   * "Conditions" (Docs/PlayersHandbook.md L1197-1216).
+   */
+  conditions?: ActiveCondition[];
+  /**
+   * Exhaustion level, 0..6 (Stage A4). Absent or 0 = none. Additive-optional;
+   * no `_v` bump. PHB 2024 "Exhaustion" (Docs/PlayersHandbook.md L21018-21028).
+   */
+  exhaustionLevel?: number;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or
