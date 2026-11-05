@@ -2,19 +2,21 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, within } from '@testing-library/react';
 import { Navigation } from '../Navigation';
 import { CommandPaletteProvider } from '../../command-palette/CommandPaletteContext';
+import { AssistantProvider } from '../../assistant/AssistantContext';
 
 afterEach(() => {
   cleanup();
 });
 
 /**
- * Stage B6: Navigation now reads the command-palette context for its palette/
- * shortcuts affordances, so it must render inside a CommandPaletteProvider.
+ * Stage B6: Navigation reads the command-palette context for its palette/
+ * shortcuts affordances. Stage B8: it also reads the assistant context for the
+ * Character Assistant trigger, so it must render inside both providers.
  */
 function renderNav(ui: React.ReactElement) {
   return render(
     <CommandPaletteProvider navigate={vi.fn()} runAction={vi.fn()}>
-      {ui}
+      <AssistantProvider>{ui}</AssistantProvider>
     </CommandPaletteProvider>,
   );
 }

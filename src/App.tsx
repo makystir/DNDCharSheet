@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Character } from './types/character';
 import { saveCharacter } from './storage/character-store';
 import { notifyCharacterDataChange } from './storage/character-manager';
@@ -43,6 +43,17 @@ import { SettingsPage } from './components/pages/SettingsPage';
 import { isSpellcaster } from './logic/spellcasting';
 import { Toast } from './components/shared/Toast';
 import { useConcentrationAutoEnd } from './hooks/useConcentrationAutoEnd';
+import { AssistantProvider } from './components/assistant/AssistantContext';
+import { AssistantPanel } from './components/assistant/AssistantPanel';
+import { useAssistantActions } from './components/assistant/useAssistantActions';
+import type { AssistantRollSeed } from './components/assistant/useAssistantActions';
+import { dismissStore } from './components/assistant/dismissStore';
+import { getSuggestions } from './logic/assistant/engine';
+import { visibleSuggestions } from './logic/assistant/visible';
+import type { DismissState } from './logic/assistant/visible';
+import type { SuggestionContext } from './logic/assistant/types';
+import { getLastBackupAt } from './storage/backup-reminder';
+import type { D20Mode } from './logic/dice';
 import styles from './App.module.css';
 
 const THEME_KEY = 'dnd-theme';
@@ -253,6 +264,97 @@ function App() {
     clearRollHistory,
   );
 
+  // Stage B8: Character Assistant. The deterministic engine is PURE — the shell
+  // reads lastBackupAt + now ONCE here and threads them into SuggestionContext
+  // so the engine performs no storage read / Date.now() at eval time.
+  //
+  // A seeded roll opens the SAME B7 RollDialog, carrying only the serializable
+  // seed (label/dc/initialMode); the Exhaustion level is read off the active
+  // character when the dialog mounts (as the shell Roll button does). Resolved
+  // rolls flow into the same addRoll → event-log path. The dispatcher never
+  // mutates character state — it only navigates / seeds a roll / runs the B3
+  // export.
+  const [assistantRollSeed, setAssistantRollSeed] = useState<AssistantRollSeed | null>(null);
+  const [assistantNow, setAssistantNow] = useState(() => Date.now());
+  const [lastBackupAt, setLastBackupAt] = useState<number | null>(() => getLastBackupAt());
+  // A monotonically increasing version bumped whenever the persisted dismiss/
+  // snooze record changes (dismiss, snooze, or a prune that actually trimmed
+  // something). The visible-list memo reads the store fresh keyed by this
+  // version, so there is no duplicated dismiss state in React to keep in sync
+  // (and no setState inside the prune effect).
+  const [dismissVersion, setDismissVersion] = useState(0);
+
+  const openAssistantRoll = useCallback((seed: AssistantRollSeed) => {
+    setAssistantRollSeed(seed);
+  }, []);
+
+  // After a one-tap file backup, refresh the stale-nudge inputs so it clears.
+  const handleFileBackedUp = useCallback(() => {
+    setLastBackupAt(getLastBackupAt());
+    setAssistantNow(Date.now());
+  }, []);
+
+  const dispatchAssistantAction = useAssistantActions({
+    navigate: (p, subTab) => navigate(p, subTab ?? undefined),
+    openRoll: openAssistantRoll,
+    onFileBackedUp: handleFileBackedUp,
+  });
+
+  // The engine's raw output for the active character. inCombat is read from the
+  // single source of truth (character.combat?.inCombat).
+  const rawSuggestions = useMemo(() => {
+    const context: SuggestionContext = {
+      inCombat: readyCharacter?.combat?.inCombat ?? false,
+      lastBackupAt,
+      now: assistantNow,
+    };
+    return getSuggestions(readyCharacter ?? undefined, context);
+  }, [readyCharacter, lastBackupAt, assistantNow]);
+
+  // Prune dismissed/snoozed ids that are no longer emitted, so a suggestion
+  // reappears when its condition re-triggers. This is a STORAGE write only; it
+  // feeds no React state directly. When the prune actually trims the record it
+  // bumps `dismissVersion`, which re-keys the visible-list memo below so the
+  // reappearance is reflected. pruneDismissed is a no-op write when nothing
+  // changed, so the version only advances on a real change.
+  useEffect(() => {
+    const activeIds = new Set<string>(rawSuggestions.map((s) => s.id));
+    const before = dismissStore.read();
+    const pruned = dismissStore.pruneDismissed(activeIds);
+    if (
+      before.dismissed.length !== pruned.dismissed.length ||
+      Object.keys(before.snoozedUntil).length !== Object.keys(pruned.snoozedUntil).length
+    ) {
+      // Intentional setState-in-effect: reconciling React with the EXTERNAL
+      // localStorage dismiss store (the sanctioned use — same pattern as
+      // useMediaQuery.ts / Tooltip.tsx). The store was just trimmed of ids the
+      // engine no longer emits so a dismissed suggestion reappears when its
+      // condition re-triggers; bumping the version re-keys the visible-list
+      // memo to reflect the trimmed record. Guarded so it fires only on a real
+      // change (pruneDismissed is a no-op write otherwise), so it cannot loop.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDismissVersion((v) => v + 1);
+    }
+  }, [rawSuggestions]);
+
+  // The dismiss/snooze-filtered list the panel + badge both consume (one source
+  // ⇒ the count and the panel always agree). Reads the dismiss record fresh,
+  // re-keyed by `dismissVersion` so a dismiss/snooze/prune re-filters.
+  const visibleAssistantSuggestions = useMemo(() => {
+    void dismissVersion; // re-key on any dismiss/snooze/prune change
+    const dismiss: DismissState = dismissStore.read();
+    return visibleSuggestions(rawSuggestions, dismiss, assistantNow);
+  }, [rawSuggestions, assistantNow, dismissVersion]);
+
+  const dismissSuggestion = useCallback((id: string) => {
+    dismissStore.dismiss(id);
+    setDismissVersion((v) => v + 1);
+  }, []);
+  const snoozeSuggestion = useCallback((id: string) => {
+    dismissStore.snooze(id, Date.now());
+    setDismissVersion((v) => v + 1);
+  }, []);
+
   // A character produced by the WelcomeScreen (wizard / random / skip): adopt
   // it (persist + make active via the manager), close the management sheet if
   // it drove this creation, and route to the Character tab so the new sheet is
@@ -362,6 +464,7 @@ function App() {
         navigate={(p) => navigate(p)}
         runAction={runAction}
       >
+        <AssistantProvider>
         <div className={styles.app}>
           <a className="skip-link" href="#main-content">
             Skip to main content
@@ -373,6 +476,7 @@ function App() {
             character={character ?? undefined}
             onOpenCharacterManager={() => openManager(desktopTriggerRef)}
             characterManagerTriggerRef={desktopTriggerRef}
+            assistantCount={visibleAssistantSuggestions.length}
           />
 
           <PageContainer pageKey={page}>
@@ -532,7 +636,40 @@ function App() {
               Mounted inside the provider so the palette dispatches through the same
               navigation path the nav uses. */}
           <CommandPaletteHost />
+
+          {/* Stage B8: the dismissible Character Assistant drawer/sheet. The
+              badge-bearing trigger lives in Navigation; this is the panel it
+              opens. Suggestions route through the dispatcher to the existing
+              navigate / B7 RollDialog / B3 backup flows — never a direct
+              character mutation. */}
+          {status === 'ready' && !showWelcome && character && (
+            <AssistantPanel
+              suggestions={visibleAssistantSuggestions}
+              onAction={dispatchAssistantAction}
+              onDismiss={dismissSuggestion}
+              onSnooze={snoozeSuggestion}
+            />
+          )}
+
+          {/* A suggestion's seeded roll opens the same B7 RollDialog; the player
+              still rolls and logs it (resolved rolls flow into addRoll, the one
+              event-log path). Exhaustion is read off the active character. */}
+          {status === 'ready' && !showWelcome && character && assistantRollSeed && (
+            <RollDialog
+              label={assistantRollSeed.label}
+              exhaustionLevel={character.exhaustionLevel ?? 0}
+              dc={assistantRollSeed.dc}
+              initialMode={assistantRollSeed.initialMode as D20Mode | undefined}
+              hint="Seeded from a Character Assistant suggestion."
+              onRoll={(payload) => {
+                addRoll(payload);
+                setAssistantRollSeed(null);
+              }}
+              onClose={() => setAssistantRollSeed(null)}
+            />
+          )}
         </div>
+        </AssistantProvider>
       </CommandPaletteProvider>
     </SWUpdateProvider>
   );

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import { Navigation } from '../../layout/Navigation';
 import { CommandPaletteProvider } from '../CommandPaletteContext';
 import { useCommandPaletteContext } from '../commandPaletteContextValue';
+import { AssistantProvider } from '../../assistant/AssistantContext';
 
 afterEach(() => {
   cleanup();
@@ -25,7 +26,9 @@ describe('single number-key handler (no double-bind)', () => {
     const onPageChange = vi.fn();
     render(
       <CommandPaletteProvider navigate={vi.fn()} runAction={vi.fn()}>
-        <Navigation activePage="character" onPageChange={onPageChange} />
+        <AssistantProvider>
+          <Navigation activePage="character" onPageChange={onPageChange} />
+        </AssistantProvider>
       </CommandPaletteProvider>,
     );
     fireEvent.keyDown(document.body, { key: '2' });
@@ -37,7 +40,9 @@ describe('single number-key handler (no double-bind)', () => {
     const onPageChange = vi.fn();
     render(
       <CommandPaletteProvider navigate={vi.fn()} runAction={vi.fn()}>
-        <Navigation activePage="character" onPageChange={onPageChange} />
+        <AssistantProvider>
+          <Navigation activePage="character" onPageChange={onPageChange} />
+        </AssistantProvider>
         <OpenState />
       </CommandPaletteProvider>,
     );
@@ -52,7 +57,9 @@ describe('single number-key handler (no double-bind)', () => {
   it('renders the palette-open and shortcuts affordances', () => {
     render(
       <CommandPaletteProvider navigate={vi.fn()} runAction={vi.fn()}>
-        <Navigation activePage="character" onPageChange={vi.fn()} />
+        <AssistantProvider>
+          <Navigation activePage="character" onPageChange={vi.fn()} />
+        </AssistantProvider>
       </CommandPaletteProvider>,
     );
     expect(screen.getByRole('button', { name: 'Open command palette' })).toBeInTheDocument();

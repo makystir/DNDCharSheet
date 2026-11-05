@@ -12,6 +12,8 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { HelpPopover } from '../shared/HelpPopover';
 import { getHelpContent } from '../../logic/help-content';
 import { useCommandPaletteContext } from '../command-palette/commandPaletteContextValue';
+import { useAssistantContext } from '../assistant/assistantContextValue';
+import { AssistantTrigger } from '../assistant/AssistantTrigger';
 import { visibleNavItems } from './navItems';
 import type { PageSection } from './navItems';
 import type { Character } from '../../types/character';
@@ -35,6 +37,12 @@ interface NavigationProps {
   onOpenCharacterManager?: () => void;
   /** Ref to the desktop switcher button (focus-return target for the sheet). */
   characterManagerTriggerRef?: React.RefObject<HTMLButtonElement | null>;
+  /**
+   * Stage B8: number of visible Character Assistant suggestions. Drives the
+   * count badge on the Assistant trigger. The trigger opens the panel via the
+   * AssistantContext; it never navigates.
+   */
+  assistantCount?: number;
 }
 
 function getInitialCollapsed(): boolean {
@@ -56,10 +64,13 @@ export function Navigation({
   character,
   onOpenCharacterManager,
   characterManagerTriggerRef,
+  assistantCount = 0,
 }: NavigationProps) {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const isMobile = useMediaQuery('(max-width: 767px)');
   const activeItemRef = useRef<HTMLButtonElement>(null);
+  // Stage B8: opens the Character Assistant panel (badge-bearing trigger below).
+  const { open: openAssistant } = useAssistantContext();
   // Stage B6: palette-open + shortcuts-overlay affordances delegate to the
   // CommandPaletteContext (integration point 3). This renders buttons only; it
   // adds NO keyboard handler, so Navigation remains the sole owner of the
@@ -188,6 +199,14 @@ export function Navigation({
         </span>
         <span className={styles.mobileLabelRow}>Shortcuts</span>
       </button>
+
+      {/* Stage B8: Character Assistant trigger (mobile scroll row). */}
+      <AssistantTrigger
+        count={assistantCount}
+        open={openAssistant}
+        variant="mobile"
+        buttonClassName={styles.navItem}
+      />
     </div>
   );
 
@@ -313,6 +332,16 @@ export function Navigation({
           </span>
           {!collapsed && <span>Keyboard Shortcuts</span>}
         </button>
+      )}
+
+      {/* Stage B8: Character Assistant trigger (desktop sidebar). */}
+      {!isMobile && (
+        <AssistantTrigger
+          count={assistantCount}
+          open={openAssistant}
+          variant={collapsed ? 'collapsed' : 'desktop'}
+          buttonClassName={`${styles.navItem} ${collapsed ? styles.navItemCollapsed : ''}`}
+        />
       )}
 
       {/* Collapse toggle button (desktop only) */}
