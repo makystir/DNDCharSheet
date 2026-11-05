@@ -1,0 +1,176 @@
+/*
+ * Print-only character sheet styles (Stage B9).
+ *
+ * The on-screen app never shows this layout: the wrapper mounts it inside a
+ * `.print-only` container (global.css) that is display:none on screen and shown
+ * for print. These styles define the page sizing (@page), section boxes, and a
+ * clean black-on-white print appearance that ignores the dark app theme.
+ */
+
+/* A4 with a comfortable margin; US Letter is the alternative media size. */
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+.printWrapper {
+  color: #000;
+  background: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 10pt;
+  line-height: 1.35;
+}
+
+.page {
+  width: 100%;
+}
+
+.titleArea {
+  text-align: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.characterName {
+  font-size: 20pt;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 10pt;
+  color: #333;
+}
+
+/* A section box; avoid breaking a section across a page where possible. */
+.sectionBox {
+  border: 1px solid #000;
+  border-radius: 3px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.sectionTitle {
+  font-size: 11pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #000;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+
+.tbl th,
+.tbl td {
+  padding: 2px 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tbl thead th {
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #000;
+}
+
+.tbl tbody tr + tr td {
+  border-top: 1px solid #ccc;
+}
+
+.hdrCell {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hdrInline {
+  font-weight: 700;
+}
+
+.cell {
+  text-align: left;
+}
+
+.cellBold {
+  text-align: left;
+  font-weight: 700;
+}
+
+.cellSmall {
+  text-align: left;
+  font-size: 8pt;
+  color: #333;
+}
+
+.valCell {
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.valCellBold {
+  text-align: left;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.markerCell {
+  text-align: center;
+  width: 16px;
+}
+
+/* Core-stat strip: a row of boxed value/label cells. */
+.statRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.statCell {
+  flex: 1 1 90px;
+  border: 1px solid #000;
+  border-radius: 3px;
+  text-align: center;
+  padding: 4px 2px;
+}
+
+.statValue {
+  font-size: 14pt;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #333;
+}
+
+.textBlock {
+  font-size: 9.5pt;
+  margin: 2px 0;
+}
+
+.legend {
+  font-size: 8pt;
+  color: #333;
+  margin-top: 2px;
+}
+
+.pageFooter {
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 1px solid #000;
+  text-align: center;
+  font-size: 8pt;
+  color: #333;
+}

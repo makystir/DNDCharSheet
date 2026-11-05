@@ -105,3 +105,31 @@ h3 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Stage B9: print / screen-only visibility convention.
+ *
+ * `.print-only` wraps the PrintLayout: it is hidden on screen and shown only
+ * for print. `.screen-only` marks the whole live app shell so it is hidden when
+ * printing, letting `window.print()` capture just the print sheet. The @page
+ * sizing + the sheet styles live in PrintLayout.module.css.
+ */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Print on white regardless of the dark/light app theme. */
+  html,
+  body {
+    background: #fff;
+  }
+}

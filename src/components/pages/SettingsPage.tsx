@@ -1,4 +1,4 @@
-import { Dices, Download, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
+import { Dices, Download, Printer, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
 import { useInstallPrompt } from '../../hooks/useInstallPrompt';
@@ -149,6 +149,28 @@ export function SettingsPage({
           </div>
         </Card>
       )}
+
+      <Card>
+        <SectionHeader icon={Printer} title="Print" />
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>Print character sheet</span>
+            <span className={styles.settingHint}>
+              Opens your browser's print dialog with a clean, read-only one-page
+              sheet (abilities, skills, saves, attacks, spells if a caster,
+              inventory, and features). Save as PDF or print to paper.
+            </span>
+          </span>
+          <button
+            type="button"
+            className={styles.themeToggle}
+            onClick={() => window.print()}
+            aria-label="Print character sheet"
+          >
+            Print
+          </button>
+        </div>
+      </Card>
 
       <ExportImportCard character={character} onAdopt={onAdopt} />
 

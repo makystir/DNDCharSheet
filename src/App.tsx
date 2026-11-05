@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import type { Character } from './types/character';
 import { saveCharacter } from './storage/character-store';
 import { notifyCharacterDataChange } from './storage/character-manager';
@@ -25,7 +26,17 @@ import { useCommandPaletteContext } from './components/command-palette/commandPa
 import { useCommandPalette } from './components/command-palette/useCommandPalette';
 import { CommandPalette } from './components/command-palette/CommandPalette';
 import { ShortcutsHelp } from './components/shared/ShortcutsHelp';
+import { lazy } from 'react';
 import { CharacterPage } from './components/pages/CharacterPage';
+import { PageLoader } from './components/layout/PageLoader';
+import {
+  CombatSkeleton,
+  InventorySkeleton,
+  SpellsSkeleton,
+  AdvancementSkeleton,
+  SettingsSkeleton,
+} from './components/skeletons';
+import { PrintLayout } from './components/layout/PrintLayout';
 import { WelcomeScreen } from './components/creation/WelcomeScreen';
 import { RollDialog } from './components/shared/RollDialog';
 import { RollHistoryPanel } from './components/shared/RollHistoryPanel';
@@ -35,11 +46,26 @@ import { mirrorRoll } from './logic/event-log-mirrors';
 import { clearEventLog } from './logic/event-log';
 import type { RollEventPayload } from './types/character';
 import { Dices } from 'lucide-react';
-import { CombatPage } from './components/pages/CombatPage';
-import { InventoryPage } from './components/pages/InventoryPage';
-import { SpellsPage } from './components/pages/SpellsPage';
-import { AdvancementPage } from './components/pages/AdvancementPage';
-import { SettingsPage } from './components/pages/SettingsPage';
+// Stage B9: the heavy pages are code-split with React.lazy and wrapped in a
+// PageLoader (Suspense + a page-shaped skeleton fallback) at their render site.
+// CharacterPage stays an eager import — it is the default/landing page, so
+// lazy-loading it would only add a spinner on first paint. The named page
+// exports are mapped to a default export for React.lazy.
+const CombatPage = lazy(() =>
+  import('./components/pages/CombatPage').then((m) => ({ default: m.CombatPage })),
+);
+const InventoryPage = lazy(() =>
+  import('./components/pages/InventoryPage').then((m) => ({ default: m.InventoryPage })),
+);
+const SpellsPage = lazy(() =>
+  import('./components/pages/SpellsPage').then((m) => ({ default: m.SpellsPage })),
+);
+const AdvancementPage = lazy(() =>
+  import('./components/pages/AdvancementPage').then((m) => ({ default: m.AdvancementPage })),
+);
+const SettingsPage = lazy(() =>
+  import('./components/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+);
 import { isSpellcaster } from './logic/spellcasting';
 import { Toast } from './components/shared/Toast';
 import { useConcentrationAutoEnd } from './hooks/useConcentrationAutoEnd';
@@ -421,6 +447,28 @@ function App() {
     [],
   );
 
+  // Stage B9: mount the print-only sheet ONLY while the browser is in its print
+  // flow. The sheet must be in the DOM when the browser snapshots the page, so
+  // the `beforeprint` handler commits `printing=true` SYNCHRONOUSLY via
+  // flushSync — a plain setState here is batched/asynchronous and would not
+  // flush before `window.print()` (triggered from Settings) captures the page,
+  // printing a blank sheet. `beforeprint` fires synchronously before the print
+  // view is produced, so the flushSync commit lands the PrintLayout in the DOM
+  // in time; `afterprint` unmounts it. Keeping it out of the DOM the rest of the
+  // time means the live a11y tree and on-screen queries never see a second copy
+  // of every section.
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    const onBefore = () => flushSync(() => setPrinting(true));
+    const onAfter = () => setPrinting(false);
+    window.addEventListener('beforeprint', onBefore);
+    window.addEventListener('afterprint', onAfter);
+    return () => {
+      window.removeEventListener('beforeprint', onBefore);
+      window.removeEventListener('afterprint', onAfter);
+    };
+  }, []);
+
   // Stage B6: dispatch target for the command palette's "action" entries. Each
   // key maps to an existing shell handler/navigation path (no new behaviour).
   const runAction = useCallback(
@@ -465,7 +513,7 @@ function App() {
         runAction={runAction}
       >
         <AssistantProvider>
-        <div className={styles.app}>
+        <div className={`${styles.app} screen-only`}>
           <a className="skip-link" href="#main-content">
             Skip to main content
           </a>
@@ -521,34 +569,44 @@ function App() {
                   />
                 )}
                 {page === 'combat' && (
-                  <CombatPage character={character} onChange={undoableChange} onNotify={notify} />
+                  <PageLoader skeleton={<CombatSkeleton />}>
+                    <CombatPage character={character} onChange={undoableChange} onNotify={notify} />
+                  </PageLoader>
                 )}
                 {page === 'inventory' && (
-                  <InventoryPage character={character} onChange={undoableChange} />
+                  <PageLoader skeleton={<InventorySkeleton />}>
+                    <InventoryPage character={character} onChange={undoableChange} />
+                  </PageLoader>
                 )}
                 {/* Belt-and-braces with the route guard: only render Spells for a
                     spellcaster (the guard rewrites the hash, this gates the view). */}
                 {page === 'spells' && isSpellcaster(character) && (
-                  <SpellsPage
-                    character={character}
-                    onChange={undoableChange}
-                    onNotify={notify}
-                    subTab={subTab}
-                    onSubTabChange={(tab) => navigate('spells', tab)}
-                  />
+                  <PageLoader skeleton={<SpellsSkeleton />}>
+                    <SpellsPage
+                      character={character}
+                      onChange={undoableChange}
+                      onNotify={notify}
+                      subTab={subTab}
+                      onSubTabChange={(tab) => navigate('spells', tab)}
+                    />
+                  </PageLoader>
                 )}
                 {page === 'advancement' && (
-                  <AdvancementPage character={character} onChange={undoableChange} />
+                  <PageLoader skeleton={<AdvancementSkeleton />}>
+                    <AdvancementPage character={character} onChange={undoableChange} />
+                  </PageLoader>
                 )}
                 {page === 'settings' && (
-                  <SettingsPage
-                    theme={theme}
-                    onThemeToggle={toggleTheme}
-                    character={character}
-                    onChange={handleChange}
-                    onAdopt={adoptCharacter}
-                    onRestored={() => void reload()}
-                  />
+                  <PageLoader skeleton={<SettingsSkeleton />}>
+                    <SettingsPage
+                      theme={theme}
+                      onThemeToggle={toggleTheme}
+                      character={character}
+                      onChange={handleChange}
+                      onAdopt={adoptCharacter}
+                      onRestored={() => void reload()}
+                    />
+                  </PageLoader>
                 )}
               </>
             )}
@@ -669,6 +727,21 @@ function App() {
             />
           )}
         </div>
+
+        {/* Stage B9: the print-only character sheet. Mounted as a sibling of the
+            `.screen-only` shell and shown only for print by the `.print-only`
+            rule under `@media print`. It is mounted only while the browser is in
+            its print flow (`printing`, flipped SYNCHRONOUSLY by the flushSync
+            `beforeprint` handler above), so it is already committed to the DOM
+            when `window.print()` (triggered from Settings) captures the page and
+            is never snapshotted blank. Bound to the active character.
+            aria-hidden: the print sheet is a visual duplicate of the live sheet
+            for printing only, so it stays out of the a11y tree. */}
+        {printing && status === 'ready' && !showWelcome && character && (
+          <div className="print-only" aria-hidden="true">
+            <PrintLayout character={character} />
+          </div>
+        )}
         </AssistantProvider>
       </CommandPaletteProvider>
     </SWUpdateProvider>
