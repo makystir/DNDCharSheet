@@ -38,6 +38,34 @@ import { CLASS_CATALOG } from '../data/classes';
 const ACTIVE_ID_KEY = 'dnd-active-character-id';
 
 /**
+ * Character-change listener set (B3 auto-backup durability plumbing — no
+ * rulebook citation applies). Mirrors the WFRP character-manager change signal
+ * (lines 29-47) so the snapshot controller can throttle rolling auto-backups
+ * after a consistent save. A listener fault is contained per-listener so it can
+ * NEVER break the live save path.
+ */
+const changeListeners = new Set<() => void>();
+
+/** Subscribe to consistent character-data changes. Returns an unsubscribe fn. */
+export function onCharacterDataChange(fn: () => void): () => void {
+  changeListeners.add(fn);
+  return () => {
+    changeListeners.delete(fn);
+  };
+}
+
+/** Notify all subscribers of a character-data change (faults contained). */
+export function notifyCharacterDataChange(): void {
+  changeListeners.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      // A listener fault must never break a save.
+    }
+  });
+}
+
+/**
  * A lightweight, display-only summary of a stored character used by the
  * management sheet's card list. Derived from the full `Character` record; the
  * store remains the single source of truth (mirrors WFRP's `CharacterSummary`,
