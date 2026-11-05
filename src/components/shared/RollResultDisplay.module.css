@@ -1,0 +1,74 @@
+/* RollResultDisplay styles (Stage B7). Tokens from global.css. */
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.totalRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.total {
+  color: var(--accent-gold);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.die {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.modeTag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+
+.verdict {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pass {
+  color: var(--accent-green, #4caf50);
+}
+
+.fail {
+  color: var(--accent-red);
+}
+
+.crit {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-green, #4caf50);
+  text-transform: uppercase;
+}
+
+.fumble {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-red);
+  text-transform: uppercase;
+}

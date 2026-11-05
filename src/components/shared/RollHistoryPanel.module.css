@@ -1,0 +1,146 @@
+/* RollHistoryPanel styles (Stage B7). Collapsible panel; tokens from global.css. */
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--bg-tertiary);
+  border: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  cursor: pointer;
+}
+
+.header:focus-visible,
+.clearBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
+}
+
+.chevron,
+.chevronExpanded {
+  transition: transform 0.15s ease;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.chevronExpanded {
+  transform: rotate(180deg);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.emptyMessage {
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-size: 13px;
+}
+
+.rollName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.die {
+  flex: 0 0 auto;
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.total {
+  flex: 0 0 auto;
+  color: var(--accent-gold);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.modeTag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+}
+
+.outcome {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.passColor {
+  color: var(--accent-green, #4caf50);
+}
+
+.failColor {
+  color: var(--accent-red);
+}
+
+.crit {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green, #4caf50);
+  text-transform: uppercase;
+}
+
+.fumble {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-red);
+  text-transform: uppercase;
+}
+
+.clearBtn {
+  margin-top: 6px;
+  align-self: flex-end;
+  padding: 6px 12px;
+  min-height: 36px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+}

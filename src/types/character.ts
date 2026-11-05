@@ -48,6 +48,12 @@ import type { BackgroundId } from '../data/backgrounds';
 // dependency on this module, so this import introduces no cycle.
 import type { CurrencyAmount } from '../logic/currency';
 
+// Stage B7 roll-log mode. dice.ts has no dependency on this module, so this
+// type-only import introduces no cycle. The d20 resolution math lives in
+// dice.ts; this type is reused so the event-log roll payload cannot drift from
+// the dice engine's notion of Advantage / Disadvantage.
+import type { D20Mode } from '../logic/dice';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -495,6 +501,68 @@ export interface AdvancementState {
   log?: AdvancementLogEntry[];
 }
 
+// ── Stage B7: Unified event log + roll payload ───────────────────────────────
+//
+// The event log (`Character.eventLog`) is a per-character, append-only stream of
+// structured `LogEvent` records, stored oldest-first and bounded by a cap. It is
+// DISPLAY / AUDIT ONLY and is NEVER read to reconstruct mechanics (XP, HP,
+// advancement) — those remain owned by their own authoritative structures.
+// Ported near-verbatim from PWACharSheet's event log; only the category/type
+// VALUES are D&D-specific. Additive-optional: absent/malformed ⇒ `[]` (no
+// migration, no CURRENT_VERSION bump).
+
+/**
+ * Event categories surfaced in the unified log. `roll` is the only category
+ * emitted this stage (roll mirror); `combat` and `advancement` are reserved for
+ * the golden's filter cases and future mirrors. Extend additively.
+ */
+export type LogCategory = 'roll' | 'combat' | 'advancement';
+
+/**
+ * One structured event in the unified log. Stored oldest-first. `payload` is an
+ * opaque display/audit bag — the log is never read back to drive mechanics.
+ */
+export interface LogEvent {
+  /** Unique id (generateUUID). */
+  id: string;
+  /** Epoch milliseconds when the event was recorded. */
+  timestamp: number;
+  /** Top-level category used for filtering. */
+  category: LogCategory;
+  /** Finer-grained type string, e.g. 'roll.generic'. */
+  type: string;
+  /** Human-readable one-line summary for the timeline. */
+  summary: string;
+  /** Structured, display-only detail. */
+  payload: Record<string, unknown>;
+}
+
+/**
+ * The structured payload for a `category: 'roll'` event (d20-reshaped, NOT the
+ * WFRP roll/target/SL shape). Mirrors a resolved d20 roll: the kept natural die,
+ * the total (die + modifiers + exhaustion), the roll mode, an optional DC/AC,
+ * and the derived flags. Nat-20 crit / nat-1 fumble are judged on `natural`, and
+ * `passed` is `total >= dc` when a `dc` is given (PHB 2024 "D20 Tests").
+ */
+export interface RollEventPayload {
+  /** What was rolled, e.g. 'Stealth' or 'Longsword attack'. */
+  name: string;
+  /** The total (die + modifiers + exhaustion). */
+  total: number;
+  /** The raw kept d20 face; nat-20/nat-1 are judged on this. */
+  natural: number;
+  /** How the d20 was rolled. */
+  mode: D20Mode;
+  /** Optional DC (ability/save) or target AC (attack). */
+  dc?: number;
+  /** natural === 20. */
+  isCrit: boolean;
+  /** natural === 1. */
+  isFumble: boolean;
+  /** total >= dc when a dc is given; undefined for a flat roll. */
+  passed?: boolean;
+}
+
 /** The current persisted-schema version. Bumped only on breaking changes. */
 export const CURRENT_VERSION = 1;
 
@@ -746,6 +814,15 @@ export interface Character {
    * review. No mechanic; informational only. Absent = unrecorded.
    */
   abilityGenRecord?: { scores?: number[] };
+
+  /**
+   * Stage B7 unified event log (per-character, append-only, oldest-first,
+   * bounded). DISPLAY / AUDIT ONLY — never read to reconstruct mechanics. Absent
+   * or malformed persisted logs normalise to `[]` (see normaliseEventLog).
+   * Additive-optional; no CURRENT_VERSION bump and no migration (same convention
+   * as the other optional Stage-A/B fields above).
+   */
+  eventLog?: LogEvent[];
 
   /** Creation timestamp (epoch ms). */
   createdAt: number;

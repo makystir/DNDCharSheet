@@ -27,6 +27,14 @@ import { CommandPalette } from './components/command-palette/CommandPalette';
 import { ShortcutsHelp } from './components/shared/ShortcutsHelp';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { WelcomeScreen } from './components/creation/WelcomeScreen';
+import { RollDialog } from './components/shared/RollDialog';
+import { RollHistoryPanel } from './components/shared/RollHistoryPanel';
+import { useUndoStack } from './hooks/useUndoStack';
+import { useRollHistory } from './hooks/useRollHistory';
+import { mirrorRoll } from './logic/event-log-mirrors';
+import { clearEventLog } from './logic/event-log';
+import type { RollEventPayload } from './types/character';
+import { Dices } from 'lucide-react';
 import { CombatPage } from './components/pages/CombatPage';
 import { InventoryPage } from './components/pages/InventoryPage';
 import { SpellsPage } from './components/pages/SpellsPage';
@@ -191,6 +199,60 @@ function App() {
     [updateActiveCharacter],
   );
 
+  // Stage B7: the bounded undo stack of whole-character snapshots (cap 10) and
+  // the edit wrapper that records the PRE-edit character before applying a
+  // change. Page edit paths use `undoableChange`; the roll/undo paths below use
+  // `handleChange` directly so a roll-log append or an undo revert is not itself
+  // pushed onto the stack. The event log is DISPLAY/AUDIT ONLY — undo reverts via
+  // the snapshot, never by replaying the log.
+  const undoStack = useUndoStack(10);
+  const readyCharacter = status === 'ready' ? activeCharacter : null;
+  const undoableChange = useCallback(
+    (next: Character) => {
+      if (readyCharacter) {
+        undoStack.push(readyCharacter);
+      }
+      handleChange(next);
+    },
+    [readyCharacter, undoStack, handleChange],
+  );
+
+  // Clear the undo stack whenever the active character changes, so an undo never
+  // reverts one character with another's snapshot (mirrors the WFRP App).
+  const activeIdRef = useRef(activeId);
+  useEffect(() => {
+    if (activeIdRef.current !== activeId) {
+      activeIdRef.current = activeId;
+      undoStack.clear();
+    }
+  }, [activeId, undoStack]);
+
+  // Stage B7: roll dialog open-state. `null` = closed. Opened from the shell
+  // Roll button; its result flows into `addRoll`.
+  const [rollDialogOpen, setRollDialogOpen] = useState(false);
+
+  // Append a resolved roll to the active character's event log via the single
+  // roll-log path (mirrorRoll → appendEvent), persisting through handleChange.
+  const addRoll = useCallback(
+    (payload: RollEventPayload) => {
+      if (!readyCharacter) return;
+      handleChange(mirrorRoll(readyCharacter, payload));
+      setRollDialogOpen(false);
+    },
+    [readyCharacter, handleChange],
+  );
+
+  const clearRollHistory = useCallback(() => {
+    if (readyCharacter) {
+      handleChange(clearEventLog(readyCharacter));
+    }
+  }, [readyCharacter, handleChange]);
+
+  const { history: rollHistory } = useRollHistory(
+    readyCharacter ?? undefined,
+    clearRollHistory,
+  );
+
   // A character produced by the WelcomeScreen (wizard / random / skip): adopt
   // it (persist + make active via the manager), close the management sheet if
   // it drove this creation, and route to the Character tab so the new sheet is
@@ -220,6 +282,37 @@ function App() {
     handleChange,
     notify,
   );
+
+  // Stage B7: global Ctrl/⌘+Z → undo the last field edit. Skips when focus is in
+  // a text input/textarea/contenteditable so it never clobbers native text undo.
+  // Reverts via the recorded PRE-edit snapshot through `handleChange` (not
+  // `undoableChange`, so the revert itself is not pushed). Mirrors the WFRP App's
+  // keydown wiring. Undo-only: the undo stack stores whole-character snapshots of
+  // the PRE-edit state, which cannot reconstruct a post-edit "redo" target, so
+  // the Shift+Z redo keybind is intentionally not wired (the task permits
+  // undo-only; the stack's redo capability is still unit-pinned by the golden).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.key.toLowerCase() !== 'z') return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        target?.isContentEditable === true
+      ) {
+        return;
+      }
+      e.preventDefault();
+      const snapshot = undoStack.undo();
+      if (snapshot) {
+        handleChange(snapshot);
+        notify('Undo');
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [undoStack, handleChange, notify]);
 
   const toggleTheme = useCallback(
     () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
@@ -315,7 +408,7 @@ function App() {
                 {page === 'character' && (
                   <CharacterPage
                     character={character}
-                    onChange={handleChange}
+                    onChange={undoableChange}
                     subTab={subTab}
                     onSubTabChange={(tab) => navigate('character', tab)}
                     portraitURL={portraitURL}
@@ -324,24 +417,24 @@ function App() {
                   />
                 )}
                 {page === 'combat' && (
-                  <CombatPage character={character} onChange={handleChange} onNotify={notify} />
+                  <CombatPage character={character} onChange={undoableChange} onNotify={notify} />
                 )}
                 {page === 'inventory' && (
-                  <InventoryPage character={character} onChange={handleChange} />
+                  <InventoryPage character={character} onChange={undoableChange} />
                 )}
                 {/* Belt-and-braces with the route guard: only render Spells for a
                     spellcaster (the guard rewrites the hash, this gates the view). */}
                 {page === 'spells' && isSpellcaster(character) && (
                   <SpellsPage
                     character={character}
-                    onChange={handleChange}
+                    onChange={undoableChange}
                     onNotify={notify}
                     subTab={subTab}
                     onSubTabChange={(tab) => navigate('spells', tab)}
                   />
                 )}
                 {page === 'advancement' && (
-                  <AdvancementPage character={character} onChange={handleChange} />
+                  <AdvancementPage character={character} onChange={undoableChange} />
                 )}
                 {page === 'settings' && (
                   <SettingsPage
@@ -387,6 +480,40 @@ function App() {
               confirmed restore. It renders nothing unless a prompt is due. */}
           {managerSettled && !showWelcome && (
             <RestoreLaunchHost onRestored={() => void reload()} />
+          )}
+
+          {/* Stage B7: the shell dice-roller. A floating Roll button opens the
+              d20 RollDialog (adv/dis, optional DC, manual d20 entry, crit/fumble,
+              haptics); resolved rolls flow into addRoll → the per-character event
+              log. The RollHistoryPanel shows the newest-first roll log with a
+              Clear control. Surfaced at the shell so it is reachable on any page
+              and bound to the active character. */}
+          {status === 'ready' && !showWelcome && character && (
+            <>
+              <button
+                type="button"
+                className={styles.rollFab}
+                onClick={() => setRollDialogOpen(true)}
+                aria-label="Open dice roller"
+                title="Roll a d20"
+              >
+                <Dices size={20} aria-hidden="true" />
+              </button>
+              {rollHistory.length > 0 && (
+                <div className={styles.rollHistoryDock}>
+                  <RollHistoryPanel history={rollHistory} onClear={clearRollHistory} />
+                </div>
+              )}
+              {rollDialogOpen && (
+                <RollDialog
+                  label="d20 Roll"
+                  exhaustionLevel={character.exhaustionLevel ?? 0}
+                  hint="Pick Advantage/Disadvantage and an optional DC, then roll."
+                  onRoll={addRoll}
+                  onClose={() => setRollDialogOpen(false)}
+                />
+              )}
+            </>
           )}
 
           <Toast key={toast?.id ?? 0} message={toast?.text ?? null} duration={5000} />

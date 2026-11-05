@@ -1,0 +1,188 @@
+/* RollDialog styles (Stage B7). Structure mirrors RollPrompt.module.css;
+ * tokens from global.css. The overlay is local, as in ConfirmDialog. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay);
+  z-index: 1100;
+  padding: 16px;
+}
+
+.dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 90%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.modeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  color: var(--text-primary);
+  font-size: 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.modeLabel input {
+  accent-color: var(--accent-gold);
+}
+
+.manual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  min-height: 44px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 16px; /* >=16px avoids iOS zoom-on-focus */
+  text-align: center;
+}
+
+.input:focus-visible,
+.modeLabel:focus-within,
+.cancelBtn:focus-visible,
+.primaryBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.error {
+  color: var(--accent-red);
+  font-size: 13px;
+}
+
+.dice {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.die,
+.dieKept {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  min-height: 56px;
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.dieKept {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.caption {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  padding: 10px 16px;
+  min-height: 44px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.primaryBtn {
+  padding: 10px 16px;
+  min-height: 44px;
+  background: var(--accent-gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #000;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Mobile ergonomics: bottom sheet, full-width actions with the primary action
+   lowest, closest to the thumb. */
+@media (max-width: 767px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    max-width: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelBtn,
+  .primaryBtn {
+    width: 100%;
+  }
+}
