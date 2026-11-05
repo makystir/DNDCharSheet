@@ -29,7 +29,7 @@ import {
   isBackgroundAbilityAllocationValid,
   type BackgroundAbilityAllocation,
 } from '../../logic/backgrounds';
-import { resolveLanguages, LANGUAGES } from '../../logic/languages';
+import { resolveLanguages, LANGUAGES, CREATION_LANGUAGE_CHOICES } from '../../logic/languages';
 import {
   generateName,
   generateAppearance,
@@ -214,9 +214,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
 
   const toggleLanguage = (lang: string) => {
-    setChosenLanguages((prev) =>
-      prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang],
-    );
+    setChosenLanguages((prev) => {
+      if (prev.includes(lang)) return prev.filter((l) => l !== lang);
+      // PHB 2024 "Choose Languages" (L1627): Common + exactly two chosen. Never
+      // add beyond the cap (the UI also disables unchecked boxes at the cap).
+      if (prev.length >= CREATION_LANGUAGE_CHOICES) return prev;
+      return [...prev, lang];
+    });
   };
 
   // ─── Step 3 handlers ─────────────────────────────────────────────────────
@@ -491,22 +495,34 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       ))}
 
       <fieldset className={styles.fieldset}>
-        <legend className={styles.fieldLabel}>Languages (Common is always known)</legend>
+        <legend className={styles.fieldLabel}>
+          Languages (Common + choose {CREATION_LANGUAGE_CHOICES})
+        </legend>
         <p className={styles.hint}>
           Known: {resolveLanguages(chosenLanguages).map(formatLanguage).join(', ')}
+          {' — '}
+          {chosenLanguages.length} of {CREATION_LANGUAGE_CHOICES} chosen
         </p>
         <div className={styles.langGrid}>
-          {LANGUAGES.map((lang) => (
-            <label key={lang} className={styles.checkRow}>
-              <input
-                type="checkbox"
-                checked={chosenLanguages.includes(lang)}
-                aria-label={formatLanguage(lang)}
-                onChange={() => toggleLanguage(lang)}
-              />
-              {formatLanguage(lang)}
-            </label>
-          ))}
+          {LANGUAGES.map((lang) => {
+            const selected = chosenLanguages.includes(lang);
+            // PHB 2024 "Choose Languages" (L1627): Common + exactly two chosen.
+            // Once the cap is reached, the remaining options are disabled so the
+            // player cannot pick a third (the toggle handler enforces this too).
+            const atCap = chosenLanguages.length >= CREATION_LANGUAGE_CHOICES;
+            return (
+              <label key={lang} className={styles.checkRow}>
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  disabled={!selected && atCap}
+                  aria-label={formatLanguage(lang)}
+                  onChange={() => toggleLanguage(lang)}
+                />
+                {formatLanguage(lang)}
+              </label>
+            );
+          })}
         </div>
       </fieldset>
     </div>

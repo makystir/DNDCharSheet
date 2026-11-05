@@ -15,6 +15,34 @@ import type { Character } from '../types/character';
 export const COMMON_LANGUAGE = 'common';
 
 /**
+ * How many additional languages a character CHOOSES at creation beyond Common.
+ *
+ * PHB 2024 "Choose Languages" (Docs/PlayersHandbook.md L1627): "Your character
+ * knows at least three languages: Common plus two languages you roll or choose
+ * from the Standard Languages table." So creation grants Common + exactly TWO
+ * chosen standard languages. ("Your class and other features might also give
+ * you languages" — those are feature-driven grants applied elsewhere, NOT free
+ * picks in the creation wizard, so the wizard caps the player's choice at this
+ * number.)
+ */
+export const CREATION_LANGUAGE_CHOICES = 2;
+
+/**
+ * Whether a set of chosen (non-Common) creation languages is valid: no more than
+ * CREATION_LANGUAGE_CHOICES, none of them Common (Common is implicit), and no
+ * duplicates. Pure. PHB 2024 "Choose Languages" (L1627).
+ */
+export function isLanguageSelectionValid(
+  chosen: string[],
+  max: number = CREATION_LANGUAGE_CHOICES,
+): boolean {
+  const keys = chosen.map((l) => l.trim().toLowerCase()).filter((k) => k.length > 0);
+  if (keys.length > max) return false;
+  if (keys.some((k) => k === COMMON_LANGUAGE)) return false;
+  return new Set(keys).size === keys.length;
+}
+
+/**
  * The standard-language option list the creation UI offers (PHB 2024 "Languages"
  * table). Common is implicit (always known) and is intentionally NOT repeated
  * here as a choosable option. Values are lowercase ids; the UI title-cases them.

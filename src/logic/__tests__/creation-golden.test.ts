@@ -25,7 +25,7 @@ import {
   type BackgroundAbilityAllocation,
 } from '../backgrounds';
 import { effectiveAbilityScores, characterFeats } from '../feats';
-import { resolveLanguages } from '../languages';
+import { resolveLanguages, isLanguageSelectionValid } from '../languages';
 import {
   generateName,
   generateAppearance,
@@ -50,6 +50,7 @@ import {
   BACKGROUND_ABILITY_CASES,
   BACKGROUND_CATALOG_ORACLE,
   LANGUAGE_CASES,
+  LANGUAGE_SELECTION_CASES,
   GENERATOR_CONTRACT,
 } from './creation-golden';
 
@@ -247,6 +248,12 @@ describe('LANGUAGE_CASES (resolveLanguages)', () => {
     // Common is always present and never duplicated.
     expect(resolved.filter((l) => l === 'common')).toHaveLength(1);
     expect(resolved).toContain('common');
+  });
+});
+
+describe('LANGUAGE_SELECTION_CASES (isLanguageSelectionValid — creation cap)', () => {
+  it.each(LANGUAGE_SELECTION_CASES.map((c) => [c.name, c] as const))('%s', (_name, tc) => {
+    expect(isLanguageSelectionValid(tc.chosen)).toBe(tc.valid);
   });
 });
 

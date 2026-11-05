@@ -325,6 +325,30 @@ export const LANGUAGE_CASES: LanguageCase[] = [
   },
 ];
 
+// ─── Creation language CHOICE CAP (isLanguageSelectionValid) ─────────────────
+// PHB 2024 "Choose Languages" (Docs/PlayersHandbook.md L1627): a character knows
+// "Common plus two languages you roll or choose from the Standard Languages
+// table." So the creation wizard lets the player choose EXACTLY TWO additional
+// languages beyond Common — not an unlimited set. Class/other features may grant
+// MORE languages, but those are feature-driven, not a free pick in the wizard.
+// A selection is valid when it has at most 2 entries, none of them Common
+// (Common is implicit), and no duplicates.
+export interface LanguageSelectionCase {
+  name: string;
+  cite: string;
+  chosen: string[];
+  valid: boolean;
+}
+
+export const LANGUAGE_SELECTION_CASES: LanguageSelectionCase[] = [
+  { name: 'Zero chosen → valid (under the cap)', cite: 'Common + up to two', chosen: [], valid: true },
+  { name: 'One chosen → valid', cite: 'Common + up to two', chosen: ['elvish'], valid: true },
+  { name: 'Exactly two chosen → valid (the RAW count)', cite: 'Common + exactly two (L1627)', chosen: ['elvish', 'dwarvish'], valid: true },
+  { name: 'Three chosen → INVALID (exceeds the two-language cap)', cite: 'Common + exactly two (L1627)', chosen: ['elvish', 'dwarvish', 'giant'], valid: false },
+  { name: 'Common among the chosen → invalid (Common is implicit, not a pick)', cite: 'Common is always known, not chosen', chosen: ['common', 'elvish'], valid: false },
+  { name: 'Duplicate chosen → invalid', cite: 'no duplicates', chosen: ['elvish', 'elvish'], valid: false },
+];
+
 // ─── Random-generator mechanism contract (flavor generators) ─────────────────
 // The name/appearance generators are FLAVOR (non-RAW): they are judged on data
 // COVERAGE, not a single correct answer, so they are not pinned value-by-value.
