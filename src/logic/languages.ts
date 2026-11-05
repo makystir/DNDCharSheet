@@ -10,6 +10,8 @@
  */
 
 import type { Character } from '../types/character';
+import { resolveClass } from './classes';
+import type { ClassFeature } from '../data/classes';
 
 /** The always-known base language (stored/compared lowercase). PHB 2024 L1294. */
 export const COMMON_LANGUAGE = 'common';
@@ -80,10 +82,94 @@ export function resolveLanguages(chosen: string[], granted?: string[]): string[]
 }
 
 /**
- * The languages a character knows: Common plus their chosen languages (PHB 2024
- * "Choose Languages", L1294). Reads the additive-optional `languages.chosen`
- * field; absent = just Common.
+ * The fixed, auto-granted language id for a base-class feature, keyed by the
+ * feature's printed name, plus how many languages that feature lets the player
+ * choose. Anchored to the actual feature ROWS in src/data/classes.ts (matched
+ * by name + gated on the feature's level there) — this is a small mapping from
+ * "this feature grants a language" to the mechanical effect, because the effect
+ * text in classes.ts is prose, NOT a parallel table of which classes/levels
+ * grant languages (classes.ts stays the source of truth for that).
+ *
+ *  - Rogue L1 "Thieves' Cant" (PHB 2024 "Rogue: Thieves' Cant"): "You know
+ *    Thieves' Cant plus one other language of your choice." → fixed
+ *    'thieves-cant' + choose 1.
+ *  - Ranger L2 "Deft Explorer" (PHB 2024 "Ranger: Deft Explorer"): "...learn
+ *    two languages of your choice." → no fixed grant + choose 2.
+ *
+ * 'thieves-cant' is intentionally NOT in LANGUAGES: it is an auto-grant, never a
+ * creation or feature "choose" option.
+ */
+const FEATURE_LANGUAGE_GRANTS: Record<string, { fixed: string[]; chooseCount: number }> = {
+  // PHB 2024 "Rogue: Thieves' Cant"
+  "Thieves' Cant": { fixed: ['thieves-cant'], chooseCount: 1 },
+  // PHB 2024 "Ranger: Deft Explorer"
+  'Deft Explorer': { fixed: [], chooseCount: 2 },
+};
+
+/**
+ * The feature-driven language grant for a single-class character at its current
+ * level: the FIXED auto-granted ids and how many languages the player CHOOSES
+ * from features. Derived by scanning the character's base-class feature rows in
+ * src/data/classes.ts for a language-granting feature the character has REACHED
+ * (feature.level <= character level), so classes.ts stays the source of truth
+ * for which class/level grants what. Multiclassing is out of scope (single
+ * class). A class/level with no reached language feature yields
+ * { fixed: [], chooseCount: 0 }. PHB 2024 (Rogue L1 "Thieves' Cant"; Ranger L2
+ * "Deft Explorer").
+ */
+export function featureLanguageGrants(
+  character: Character,
+): { fixed: string[]; chooseCount: number } {
+  const cls = resolveClass(character);
+  if (!cls) return { fixed: [], chooseCount: 0 };
+  const fixed: string[] = [];
+  let chooseCount = 0;
+  for (const feature of cls.features as ClassFeature[]) {
+    const grant = FEATURE_LANGUAGE_GRANTS[feature.name];
+    // Gate on the character having REACHED the feature's level (classes.ts row).
+    if (!grant || feature.level > character.level) continue;
+    for (const id of grant.fixed) {
+      if (!fixed.includes(id)) fixed.push(id);
+    }
+    chooseCount += grant.chooseCount;
+  }
+  return { fixed, chooseCount };
+}
+
+/**
+ * Whether a set of feature "choose N" language picks is valid for the
+ * character's class/level: at most `chooseCount` picks, none Common, none a
+ * fixed auto-grant id (those are automatic, not a pick), and no duplicates. A
+ * class/level whose chooseCount is 0 (no reached language feature) rejects any
+ * pick. Pure. PHB 2024 (Rogue L1 "Thieves' Cant"; Ranger L2 "Deft Explorer").
+ */
+export function isFeatureLanguageSelectionValid(
+  character: Character,
+  granted: string[],
+): boolean {
+  const { fixed, chooseCount } = featureLanguageGrants(character);
+  const keys = granted.map((l) => l.trim().toLowerCase()).filter((k) => k.length > 0);
+  if (keys.length > chooseCount) return false;
+  if (keys.some((k) => k === COMMON_LANGUAGE)) return false;
+  const fixedKeys = new Set(fixed.map((f) => f.trim().toLowerCase()));
+  if (keys.some((k) => fixedKeys.has(k))) return false;
+  return new Set(keys).size === keys.length;
+}
+
+/**
+ * The languages a character knows: Common (always first, never duplicated) plus
+ * the creation `chosen` languages, the stored feature `granted` picks, and the
+ * fixed auto-grants from the character's base-class features — unioned and
+ * de-duplicated (PHB 2024 "Choose Languages", L1294; Rogue L1 "Thieves' Cant";
+ * Ranger L2 "Deft Explorer"). Reads the additive-optional `languages.chosen`
+ * and `languages.granted` fields; absent = just Common. A grant below its
+ * feature level does not apply: if the feature is not reached (chooseCount 0)
+ * the stored `granted` picks are ignored, and granted picks are capped at
+ * chooseCount so a stale over-long list cannot leak extra languages.
  */
 export function knownLanguages(character: Character): string[] {
-  return resolveLanguages(character.languages?.chosen ?? []);
+  const chosen = character.languages?.chosen ?? [];
+  const { fixed, chooseCount } = featureLanguageGrants(character);
+  const grantedPicks = (character.languages?.granted ?? []).slice(0, chooseCount);
+  return resolveLanguages(chosen, [...grantedPicks, ...fixed]);
 }

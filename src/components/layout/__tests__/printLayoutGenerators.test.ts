@@ -93,6 +93,21 @@ describe('printLayoutGenerators — data completeness', () => {
     expect(data.inventory.items.map((i) => i.name)).toContain('Longsword');
     expect(data.inventory.currency.map((c) => c.label)).toEqual(['PP', 'GP', 'EP', 'SP', 'CP']);
   });
+
+  it('surfaces base-class feature-granted languages (Rogue Thieves\u2019 Cant + choice)', () => {
+    // Rogue L1 "Thieves' Cant" (PHB 2024): fixed Thieves' Cant + 1 chosen; here
+    // the player chose Goblin and separately chose Elvish at creation.
+    const rogue = makeFighter({
+      id: 'rogue-1',
+      class: { id: 'rogue', level: 1 },
+      languages: { chosen: ['elvish'], granted: ['goblin'] },
+    });
+    const langs = buildPrintSheetData(rogue).identity.languages.toLowerCase();
+    expect(langs).toContain('common');
+    expect(langs).toContain('elvish');
+    expect(langs).toContain('goblin');
+    expect(langs).toContain('thieves');
+  });
 });
 
 describe('printLayoutGenerators — numbers match the derived totals', () => {

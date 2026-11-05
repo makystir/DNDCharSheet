@@ -29,7 +29,12 @@ import {
   isBackgroundAbilityAllocationValid,
   type BackgroundAbilityAllocation,
 } from '../../logic/backgrounds';
-import { resolveLanguages, LANGUAGES, CREATION_LANGUAGE_CHOICES } from '../../logic/languages';
+import {
+  knownLanguages,
+  featureLanguageGrants,
+  LANGUAGES,
+  CREATION_LANGUAGE_CHOICES,
+} from '../../logic/languages';
 import {
   generateName,
   generateAppearance,
@@ -103,6 +108,11 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const [speciesId, setSpeciesId] = useState<SpeciesId | ''>('');
   const [speciesChoices, setSpeciesChoices] = useState<Record<string, string>>({});
   const [chosenLanguages, setChosenLanguages] = useState<string[]>([]);
+  // Feature "choose N" language picks (Rogue L1 Thieves' Cant → 1; Ranger L2
+  // Deft Explorer → 2 — PHB 2024). Stored separately from the creation two and
+  // written into languages.granted. The fixed auto-grant (Thieves' Cant) is
+  // derived from the class, not picked here.
+  const [grantedLanguages, setGrantedLanguages] = useState<string[]>([]);
   const [toolProficiency, setToolProficiency] = useState('');
 
   // Step 3: Ability scores.
@@ -223,6 +233,29 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     });
   };
 
+  // The feature-driven language grant for the chosen class at level 1 (the
+  // wizard always creates a level-1 character). Derived from classes.ts via
+  // featureLanguageGrants so the wizard stays consistent with the sheet.
+  const featureGrant = useMemo(
+    () =>
+      classId === ''
+        ? { fixed: [] as string[], chooseCount: 0 }
+        : featureLanguageGrants({
+            class: { id: classId as ClassId, level: 1 },
+            level: 1,
+          } as Character),
+    [classId],
+  );
+
+  const toggleGrantedLanguage = (lang: string) => {
+    setGrantedLanguages((prev) => {
+      if (prev.includes(lang)) return prev.filter((l) => l !== lang);
+      // Cap the feature picks at chooseCount, mirroring the creation-language cap.
+      if (prev.length >= featureGrant.chooseCount) return prev;
+      return [...prev, lang];
+    });
+  };
+
   // ─── Step 3 handlers ─────────────────────────────────────────────────────
 
   const assignScore = (
@@ -314,9 +347,18 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       ...(details.personality ? { personality: details.personality } : {}),
     };
 
-    // Languages (Common is implicit; store only the chosen extras).
-    if (chosenLanguages.length > 0) {
-      character = { ...character, languages: { chosen: [...chosenLanguages] } };
+    // Languages (Common is implicit; store only the chosen extras). Feature
+    // "choose N" picks (Rogue L1 Thieves' Cant +1, Ranger L2 Deft Explorer +2 —
+    // PHB 2024) are stored separately in `granted`; the fixed auto-grant is
+    // derived from the class and never persisted here.
+    if (chosenLanguages.length > 0 || grantedLanguages.length > 0) {
+      character = {
+        ...character,
+        languages: {
+          chosen: [...chosenLanguages],
+          ...(grantedLanguages.length > 0 ? { granted: [...grantedLanguages] } : {}),
+        },
+      };
     }
 
     // Background via the audited A6b path. For a category tool the player's
@@ -372,7 +414,12 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         className={styles.select}
         value={classId}
         aria-label="Class"
-        onChange={(e) => setClassId(e.target.value as ClassId | '')}
+        onChange={(e) => {
+          setClassId(e.target.value as ClassId | '');
+          // Feature-language picks belong to the chosen class; reset them when
+          // the class changes so stale/over-cap picks cannot leak across.
+          setGrantedLanguages([]);
+        }}
       >
         <option value="">— Select a Class —</option>
         {CLASS_LIST.map((c) => (
@@ -499,7 +546,14 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           Languages (Common + choose {CREATION_LANGUAGE_CHOICES})
         </legend>
         <p className={styles.hint}>
-          Known: {resolveLanguages(chosenLanguages).map(formatLanguage).join(', ')}
+          Known:{' '}
+          {knownLanguages({
+            class: classId === '' ? undefined : { id: classId as ClassId, level: 1 },
+            level: 1,
+            languages: { chosen: chosenLanguages, granted: grantedLanguages },
+          } as Character)
+            .map(formatLanguage)
+            .join(', ')}
           {' — '}
           {chosenLanguages.length} of {CREATION_LANGUAGE_CHOICES} chosen
         </p>
@@ -525,6 +579,51 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           })}
         </div>
       </fieldset>
+
+      {/* Base-class feature languages (PHB 2024): Rogue L1 "Thieves' Cant"
+          auto-grants Thieves' Cant + 1 choice; Ranger L2 "Deft Explorer" grants
+          2 choices. Surfaced once a class is chosen. The fixed auto-grant is
+          read-only; the "choose N" picks write into languages.granted. */}
+      {classId !== '' && (featureGrant.fixed.length > 0 || featureGrant.chooseCount > 0) && (
+        <fieldset className={styles.fieldset}>
+          <legend className={styles.fieldLabel}>
+            {CLASS_LIST.find((c) => c.id === classId)?.name ?? 'Class'} feature languages
+            {featureGrant.chooseCount > 0 && <> — choose {featureGrant.chooseCount}</>}
+          </legend>
+          {featureGrant.fixed.length > 0 && (
+            <p className={styles.hint}>
+              Known automatically: {featureGrant.fixed.map(formatLanguage).join(', ')}
+            </p>
+          )}
+          {featureGrant.chooseCount > 0 && (
+            <>
+              <p className={styles.hint}>
+                {grantedLanguages.length} of {featureGrant.chooseCount} chosen
+              </p>
+              <div className={styles.langGrid}>
+                {LANGUAGES.filter(
+                  (lang) => !featureGrant.fixed.includes(lang),
+                ).map((lang) => {
+                  const selected = grantedLanguages.includes(lang);
+                  const atCap = grantedLanguages.length >= featureGrant.chooseCount;
+                  return (
+                    <label key={lang} className={styles.checkRow}>
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        disabled={!selected && atCap}
+                        aria-label={`${formatLanguage(lang)} (feature)`}
+                        onChange={() => toggleGrantedLanguage(lang)}
+                      />
+                      {formatLanguage(lang)}
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </fieldset>
+      )}
     </div>
   );
 

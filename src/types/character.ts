@@ -797,8 +797,16 @@ export interface Character {
    * Chosen additional languages. Common is always known implicitly and is never
    * stored here (resolveLanguages prepends it). 2024 species grant no fixed
    * languages (PHB 2024 "Choose Languages", L1294). Absent = only Common.
+   *
+   * `granted` holds the player's "choose N" picks from base-class features that
+   * grant languages (Rogue L1 "Thieves' Cant" → choose 1; Ranger L2 "Deft
+   * Explorer" → choose 2 — PHB 2024). These are ADDITIONAL to the creation
+   * `chosen` two and are stored separately so the creation cap and the feature
+   * cap stay independent. Fixed auto-grants (e.g. Thieves' Cant itself) are NOT
+   * stored here — they are derived from the class (see featureLanguageGrants).
+   * Additive-optional; no CURRENT_VERSION bump — absent = today's behaviour.
    */
-  languages?: { chosen: string[] };
+  languages?: { chosen: string[]; granted?: string[] };
   /**
    * Gender used to drive name/appearance generation (the free-text `sex` field
    * above stays for display). Absent = unset. No mechanic (rules-compliance).

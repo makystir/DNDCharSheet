@@ -37,7 +37,7 @@ import {
   reconcileSpellcastingForLevel,
   shouldResetSpellcasting,
 } from '../../logic/spellcasting';
-import { resolveLanguages } from '../../logic/languages';
+import { knownLanguages } from '../../logic/languages';
 import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
 import { getBackground } from '../../data/backgrounds';
@@ -257,12 +257,13 @@ export function CharacterPage({
   };
 
   const selectedSpecies: SpeciesData | undefined = resolveSpecies(character);
-  // Languages: Common is always known (prepended by resolveLanguages) plus the
-  // player's chosen additional languages. 2024 species grant no fixed languages
-  // (PHB 2024 "Choose Languages", L1294), so there are no species-granted
-  // languages to union in here. The stored ids are lowercase; title-case them
-  // for display.
-  const knownLangs = resolveLanguages(character.languages?.chosen ?? []);
+  // Languages: Common is always known (prepended by resolveLanguages, via
+  // knownLanguages) plus the player's chosen additional languages AND any
+  // base-class feature grants (Rogue L1 Thieves' Cant + 1 choice, Ranger L2
+  // Deft Explorer + 2 choices — PHB 2024). 2024 species grant no fixed
+  // languages (PHB 2024 "Choose Languages", L1294). The stored ids are
+  // lowercase; title-case them for display.
+  const knownLangs = knownLanguages(character);
   const selectedBackground = getBackground(character.backgroundSelection?.id);
   const speedBd = speedBreakdown(character);
   const darkvisionBd = darkvisionBreakdown(character);

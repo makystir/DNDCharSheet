@@ -131,4 +131,69 @@ describe('CreationWizard', () => {
     const modTrigger = screen.getByRole('button', { name: /Strength Modifier:/ });
     expect(within(modTrigger).queryByText).not.toBeNull();
   });
+
+  it('shows a Rogue a 1-language feature picker and Thieves\u2019 Cant as a read-only known language', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'rogue' } });
+    fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Shadow' } });
+    next();
+    // The feature fieldset announces "choose 1" and the auto-granted Thieves' Cant.
+    expect(screen.getByText(/Rogue feature languages/)).toBeInTheDocument();
+    expect(screen.getByText(/choose 1/)).toBeInTheDocument();
+    expect(screen.getByText(/Known automatically: .*Thieves/)).toBeInTheDocument();
+    // Thieves' Cant is NOT a pickable feature checkbox (it is a fixed auto-grant).
+    expect(screen.queryByLabelText(/Thieves.*\(feature\)/)).toBeNull();
+    // Picking one feature language disables the rest (cap of 1).
+    fireEvent.click(screen.getByLabelText('Goblin (feature)'));
+    expect(screen.getByLabelText('Giant (feature)')).toBeDisabled();
+  });
+
+  it('shows a Ranger no feature-language picker at creation (Deft Explorer is a level-2 feature)', () => {
+    // The wizard always creates a LEVEL-1 character. Ranger's Deft Explorer
+    // grant is gained at level 2 (PHB 2024), so it is not yet reached at
+    // creation and no feature picker is shown — matching the golden's gating
+    // (Ranger level 1 → chooseCount 0). The 2-language picker surfaces on the
+    // sheet once the Ranger reaches level 2.
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'ranger' } });
+    fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Scout' } });
+    next();
+    expect(screen.queryByText(/feature languages/)).toBeNull();
+  });
+
+  it('shows a Fighter no feature-language picker', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
+    fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Aldric' } });
+    next();
+    expect(screen.queryByText(/feature languages/)).toBeNull();
+  });
+
+  it('persists the Rogue feature pick into languages.granted on completion', () => {
+    const onComplete = vi.fn();
+    render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'rogue' } });
+    fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Shadow' } });
+    next();
+    // Background + ability allocation + species (reuse acolyte +2 Int/+1 Wis).
+    fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
+    fireEvent.change(screen.getByLabelText('Intelligence background increase'), {
+      target: { value: '2' },
+    });
+    fireEvent.change(screen.getByLabelText('Wisdom background increase'), {
+      target: { value: '1' },
+    });
+    fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
+    fireEvent.click(screen.getByLabelText('Goblin (feature)'));
+    next(); // -> step 3
+    completeStep3StandardArray();
+    next(); // -> step 4
+    next(); // -> step 5
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
+
+    const character = onComplete.mock.calls[0][0];
+    expect(character.languages?.granted).toEqual(['goblin']);
+    // Thieves' Cant is derived, not stored in granted.
+    expect(character.languages?.granted).not.toContain('thieves-cant');
+  });
 });
