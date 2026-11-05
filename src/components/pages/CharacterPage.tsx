@@ -37,8 +37,10 @@ import {
   reconcileSpellcastingForLevel,
   shouldResetSpellcasting,
 } from '../../logic/spellcasting';
+import { resolveLanguages } from '../../logic/languages';
 import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
+import { getBackground } from '../../data/backgrounds';
 import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
 import type { ClassSelection, SpeciesSelection } from '../../types/character';
@@ -50,7 +52,7 @@ import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
-import { SIZE_LABELS, choiceOptions, srdBadge } from './sheet-helpers';
+import { SIZE_LABELS, choiceOptions, formatLanguage, srdBadge } from './sheet-helpers';
 import styles from './CharacterPage.module.css';
 
 export interface CharacterPageProps {
@@ -255,6 +257,13 @@ export function CharacterPage({
   };
 
   const selectedSpecies: SpeciesData | undefined = resolveSpecies(character);
+  // Languages: Common is always known (prepended by resolveLanguages) plus the
+  // player's chosen additional languages. 2024 species grant no fixed languages
+  // (PHB 2024 "Choose Languages", L1294), so there are no species-granted
+  // languages to union in here. The stored ids are lowercase; title-case them
+  // for display.
+  const knownLangs = resolveLanguages(character.languages?.chosen ?? []);
+  const selectedBackground = getBackground(character.backgroundSelection?.id);
   const speedBd = speedBreakdown(character);
   const darkvisionBd = darkvisionBreakdown(character);
   const size = resolveSize(character);
@@ -471,10 +480,31 @@ export function CharacterPage({
             <div className={styles.speciesField}>
               <span className={styles.fieldLabel}>Languages</span>
               <span className={styles.speciesText}>
-                Common + 2 chosen
-                <span className={styles.speciesNote}> (from character creation)</span>
+                {knownLangs.map(formatLanguage).join(', ')}
+                {knownLangs.length === 1 && (
+                  <span className={styles.speciesNote}>
+                    {' '}
+                    (choose more in character creation)
+                  </span>
+                )}
               </span>
             </div>
+
+            {selectedBackground && (
+              <div className={styles.speciesField}>
+                <span className={styles.fieldLabel}>Background</span>
+                <span className={styles.speciesText}>
+                  {selectedBackground.name}
+                  <span
+                    className={styles.srdBadge}
+                    title={srdBadge(selectedBackground.srd).title}
+                  >
+                    {' '}
+                    {srdBadge(selectedBackground.srd).text}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles.derivedGrid}>

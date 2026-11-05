@@ -38,6 +38,11 @@ import type { SpellId } from '../data/spells';
 // ClassId). See src/data/feats.ts for the source of truth.
 import type { FeatId } from '../data/feats';
 
+// Stage A7 background catalog key, re-exported from the data catalog so the
+// persisted background selection and the catalog cannot drift (same pattern as
+// SpeciesId / ClassId / FeatId). See src/data/backgrounds.ts for the source.
+import type { BackgroundId } from '../data/backgrounds';
+
 // Stage A2/A3 coin-purse shape, re-exported from the currency logic so the
 // persisted purse and the currency math cannot drift. currency.ts has no
 // dependency on this module, so this import introduces no cycle.
@@ -695,6 +700,52 @@ export interface Character {
   background?: string;
   /** Free-text personality notes, rendered as a multiline textarea. */
   personality?: string;
+
+  // ── Stage A7: Character Creation (background / languages / generation) ─────
+  // Additive-optional, no CURRENT_VERSION bump: absent = a valid prior state
+  // (same convention as the Stage-3 `species` / Stage-4 `class` fields). The
+  // free-text `background?: string` above stays for display/notes; the
+  // STRUCTURED selection below uses a DIFFERENT field name so there is no
+  // breaking type change. PHB 2024 "Parts of a Background" / "Choose Languages".
+
+  /**
+   * Structured 2024 background selection (distinct from the free-text
+   * `background` above). Records the chosen ability allocation (applied through
+   * the A6b effective-score layer as a FeatSelection, so base `abilities` is
+   * never mutated), the resolved tool proficiency, and the equipment choice.
+   * PHB 2024 "Parts of a Background" (L7806-7820). Absent = no structured
+   * background chosen.
+   */
+  backgroundSelection?: {
+    id: BackgroundId;
+    /** The chosen +2/+1 or +1/+1/+1 split across the background's three abilities. */
+    abilities?: { ability: Ability; amount: number }[];
+    /** The resolved tool proficiency (a specific tool id after any category choice). */
+    toolProficiency?: string;
+    /** Equipment option: 'A' = the package, 'B' = 50 GP. PHB 2024 L7820. */
+    equipmentChoice?: 'A' | 'B';
+  };
+  /**
+   * Chosen additional languages. Common is always known implicitly and is never
+   * stored here (resolveLanguages prepends it). 2024 species grant no fixed
+   * languages (PHB 2024 "Choose Languages", L1294). Absent = only Common.
+   */
+  languages?: { chosen: string[] };
+  /**
+   * Gender used to drive name/appearance generation (the free-text `sex` field
+   * above stays for display). Absent = unset. No mechanic (rules-compliance).
+   */
+  gender?: 'male' | 'female' | 'neutral';
+  /**
+   * Which ability-score generation method was used (optional audit of creation;
+   * PHB 2024 "Step 3: Determine Ability Scores" L1666-1726). Absent = unrecorded.
+   */
+  abilityGenMethod?: 'standard-array' | 'point-buy' | 'roll';
+  /**
+   * Optional audit of the generation inputs — the rolled/assigned scores, for
+   * review. No mechanic; informational only. Absent = unrecorded.
+   */
+  abilityGenRecord?: { scores?: number[] };
 
   /** Creation timestamp (epoch ms). */
   createdAt: number;

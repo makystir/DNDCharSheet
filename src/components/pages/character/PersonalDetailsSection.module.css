@@ -58,6 +58,50 @@
   min-width: 0;
 }
 
+.personalityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* A field + its 🎲 roll button sit on one row; the field flexes, the button
+   stays a compact fixed target. */
+.fieldWithRoll {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rollBtn {
+  flex: 0 0 auto;
+  min-height: 28px;
+  min-width: 32px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.rollBtn:hover:not(:disabled) {
+  border-color: var(--accent-gold);
+}
+
+.rollBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rollBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
 .textarea {
   width: 100%;
   resize: vertical;
@@ -94,5 +138,10 @@
 
   .textarea {
     font-size: 16px;
+  }
+
+  .rollBtn {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

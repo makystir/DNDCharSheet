@@ -27,6 +27,18 @@ export function choiceOptions(spec: SpeciesChoiceSpec): SpeciesChoiceOption[] {
  * 'non-srd' entry reads 'non-SRD'; anything else ('uncertain') reads 'SRD
  * status unconfirmed'.
  */
+/**
+ * Title-cases a stored language id for display, e.g. `common-sign-language` ->
+ * `Common Sign Language`, `elvish` -> `Elvish`. Stored language ids are
+ * lowercase, hyphen-separated (src/logic/languages.ts).
+ */
+export function formatLanguage(id: string): string {
+  return id
+    .split('-')
+    .map((part) => (part.length > 0 ? part[0].toUpperCase() + part.slice(1) : part))
+    .join(' ');
+}
+
 export function srdBadge(srd: string): { text: string; title: string } {
   return srd === 'non-srd'
     ? {

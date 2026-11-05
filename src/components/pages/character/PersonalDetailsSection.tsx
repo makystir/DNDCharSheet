@@ -6,6 +6,13 @@ import { SectionHeader } from '../../shared/SectionHeader';
 import { EditableField } from '../../shared/EditableField';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { User } from 'lucide-react';
+import type { NameGender } from '../../../data/name-tables';
+import {
+  generateName,
+  generateAppearance,
+  generatePersonality,
+} from '../../../logic/personal-details-generation';
+import { createDefaultRng } from '../../../logic/random';
 import styles from './PersonalDetailsSection.module.css';
 
 interface PersonalDetailsSectionProps {
@@ -27,6 +34,11 @@ interface PersonalDetailsSectionProps {
  * game rule, no derived value, so nothing here needs a CalculatedValue
  * breakdown tooltip. The single `name` field is bound to `character.name` (the
  * one source of truth); there is no duplicate name control on Overview.
+ *
+ * Stage A7 PART 3 adds a gender selector and per-field "roll" (🎲) buttons that
+ * fill a field from the FEAT-001 flavor generators, honoring the character's
+ * current species + gender. The generated values are NON-RAW flavor and stay
+ * fully editable; rolling is non-destructive (it only fills the one field).
  */
 export function PersonalDetailsSection({
   character,
@@ -37,10 +49,37 @@ export function PersonalDetailsSection({
 }: PersonalDetailsSectionProps) {
   const headerId = useId();
   const alignmentId = useId();
+  const genderId = useId();
   const personalityId = useId();
 
   const setField = (field: keyof Character, value: string) =>
     onChange({ ...character, [field]: value });
+
+  // The generators need a concrete species + gender. Species gates the roll
+  // buttons (the pools are per-species); gender defaults to 'neutral' until set.
+  const speciesId = character.species?.id;
+  const gender: NameGender = character.gender ?? 'neutral';
+  const canGenerate = speciesId !== undefined;
+
+  const rollName = () => {
+    if (!speciesId) return;
+    onChange({ ...character, name: generateName(speciesId, gender, createDefaultRng()) });
+  };
+  const rollField = (field: keyof Character, value: string) =>
+    onChange({ ...character, [field]: value });
+  // Roll a single appearance field (eyes/hair/skin/height/weight) from the
+  // species+gender pools without disturbing the others (non-destructive).
+  const rollAppearanceField = (field: 'eyes' | 'hair' | 'skin' | 'height' | 'weight') => {
+    if (!speciesId) return;
+    const a = generateAppearance(speciesId, gender, createDefaultRng());
+    onChange({ ...character, [field]: a[field] });
+  };
+  const rollPersonality = () =>
+    onChange({ ...character, personality: generatePersonality(createDefaultRng()) });
+  const rollAlignment = () => {
+    const next = ALIGNMENTS[Math.floor(createDefaultRng()() * ALIGNMENTS.length)];
+    onChange({ ...character, alignment: next });
+  };
 
   return (
     <section aria-labelledby={headerId} className={styles.section}>
@@ -56,40 +95,87 @@ export function PersonalDetailsSection({
           <div className={styles.gridAutoFill}>
             {/* Keep the accessible name "Character name" — it is the single
                 source of truth on character.name (no duplicate name field). */}
-            <EditableField
-              label="Character name"
-              value={character.name}
-              type="text"
-              mode="tap-to-edit"
-              onSave={(v) => onChange({ ...character, name: String(v) })}
-            />
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Character name"
+                value={character.name}
+                type="text"
+                mode="tap-to-edit"
+                onSave={(v) => onChange({ ...character, name: String(v) })}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={rollName}
+                disabled={!canGenerate}
+                aria-label="Roll name"
+                title={canGenerate ? 'Roll a name for the current species + gender' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
+
+            <div className={styles.selectWrapper}>
+              <label className={styles.selectLabel} htmlFor={genderId}>
+                Gender
+              </label>
+              <select
+                id={genderId}
+                className={styles.select}
+                value={character.gender ?? ''}
+                aria-label="Gender"
+                onChange={(e) => {
+                  const next = { ...character };
+                  if (e.target.value === '') delete next.gender;
+                  else next.gender = e.target.value as Character['gender'];
+                  onChange(next);
+                }}
+              >
+                <option value="">— Unset —</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="neutral">Neutral</option>
+              </select>
+            </div>
 
             <div className={styles.selectWrapper}>
               <label className={styles.selectLabel} htmlFor={alignmentId}>
                 Alignment
               </label>
-              <select
-                id={alignmentId}
-                className={styles.select}
-                value={character.alignment ?? ''}
-                aria-label="Alignment"
-                onChange={(e) => {
-                  const next = { ...character };
-                  if (e.target.value === '') {
-                    delete next.alignment;
-                  } else {
-                    next.alignment = e.target.value as Character['alignment'];
-                  }
-                  onChange(next);
-                }}
-              >
-                <option value="">— None —</option>
-                {ALIGNMENTS.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
+              <div className={styles.fieldWithRoll}>
+                <select
+                  id={alignmentId}
+                  className={styles.select}
+                  value={character.alignment ?? ''}
+                  aria-label="Alignment"
+                  onChange={(e) => {
+                    const next = { ...character };
+                    if (e.target.value === '') {
+                      delete next.alignment;
+                    } else {
+                      next.alignment = e.target.value as Character['alignment'];
+                    }
+                    onChange(next);
+                  }}
+                >
+                  <option value="">— None —</option>
+                  {ALIGNMENTS.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className={styles.rollBtn}
+                  onClick={rollAlignment}
+                  aria-label="Roll alignment"
+                  title="Roll alignment"
+                >
+                  🎲
+                </button>
+              </div>
             </div>
 
             <EditableField
@@ -97,41 +183,118 @@ export function PersonalDetailsSection({
               value={character.faith ?? ''}
               onSave={(v) => setField('faith', String(v))}
             />
-            <EditableField
-              label="Sex"
-              value={character.sex ?? ''}
-              onSave={(v) => setField('sex', String(v))}
-            />
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Sex"
+                value={character.sex ?? ''}
+                onSave={(v) => setField('sex', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollField('sex', gender)}
+                aria-label="Roll sex"
+                title="Fill sex from the selected gender"
+              >
+                🎲
+              </button>
+            </div>
             <EditableField
               label="Age"
               value={character.age ?? ''}
               onSave={(v) => setField('age', String(v))}
             />
-            <EditableField
-              label="Height"
-              value={character.height ?? ''}
-              onSave={(v) => setField('height', String(v))}
-            />
-            <EditableField
-              label="Weight"
-              value={character.weight ?? ''}
-              onSave={(v) => setField('weight', String(v))}
-            />
-            <EditableField
-              label="Eyes"
-              value={character.eyes ?? ''}
-              onSave={(v) => setField('eyes', String(v))}
-            />
-            <EditableField
-              label="Hair"
-              value={character.hair ?? ''}
-              onSave={(v) => setField('hair', String(v))}
-            />
-            <EditableField
-              label="Skin"
-              value={character.skin ?? ''}
-              onSave={(v) => setField('skin', String(v))}
-            />
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Height"
+                value={character.height ?? ''}
+                onSave={(v) => setField('height', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollAppearanceField('height')}
+                disabled={!canGenerate}
+                aria-label="Roll height"
+                title={canGenerate ? 'Roll height for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Weight"
+                value={character.weight ?? ''}
+                onSave={(v) => setField('weight', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollAppearanceField('weight')}
+                disabled={!canGenerate}
+                aria-label="Roll weight"
+                title={canGenerate ? 'Roll weight for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Eyes"
+                value={character.eyes ?? ''}
+                onSave={(v) => setField('eyes', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollAppearanceField('eyes')}
+                disabled={!canGenerate}
+                aria-label="Roll eyes"
+                title={canGenerate ? 'Roll eye colour for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Hair"
+                value={character.hair ?? ''}
+                onSave={(v) => setField('hair', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollAppearanceField('hair')}
+                disabled={!canGenerate}
+                aria-label="Roll hair"
+                title={canGenerate ? 'Roll hair for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Skin"
+                value={character.skin ?? ''}
+                onSave={(v) => setField('skin', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={() => rollAppearanceField('skin')}
+                disabled={!canGenerate}
+                aria-label="Roll skin"
+                title={canGenerate ? 'Roll skin for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
             {/* Free text only this stage. The 2024 Background MECHANICS
                 (ability increases, skill/tool proficiencies, origin feat —
                 PHB 2024 "Backgrounds") are a LATER stage, deliberately NOT here. */}
@@ -143,9 +306,20 @@ export function PersonalDetailsSection({
           </div>
 
           <div className={styles.personalityField}>
-            <label className={styles.selectLabel} htmlFor={personalityId}>
-              Personality
-            </label>
+            <div className={styles.personalityHeader}>
+              <label className={styles.selectLabel} htmlFor={personalityId}>
+                Personality
+              </label>
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={rollPersonality}
+                aria-label="Roll personality"
+                title="Roll a personality trait"
+              >
+                🎲
+              </button>
+            </div>
             <textarea
               id={personalityId}
               className={styles.textarea}

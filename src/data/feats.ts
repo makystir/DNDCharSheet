@@ -155,6 +155,100 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     source: 'PHB 2024 "Tough" (L8550)',
   },
 
+  // ── Origin feats the 16 backgrounds reference (Stage A7 backfill) ─────────
+  // Magic Initiate is ONE repeatable Origin feat (PHB 2024 "Magic Initiate"
+  // L8506) whose spell list is chosen when taken; a different list each time it
+  // is repeated. The three backgrounds that grant it fix the list (Cleric for
+  // Acolyte, Druid for Guide, Wizard for Sage), so the catalog carries one id
+  // per list — each non-repeatable on its own id (repeating means choosing a
+  // DIFFERENT list), each granting two cantrips + one level-1 spell from that
+  // list, no ability increase.
+  'magic-initiate-cleric': {
+    id: 'magic-initiate-cleric',
+    name: 'Magic Initiate (Cleric)',
+    category: 'origin',
+    grants: { note: 'Two Cleric cantrips and one level-1 Cleric spell (Int/Wis/Cha spellcasting ability).' },
+    // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
+    effect:
+      'Learn two cantrips and one level-1 spell from the Cleric spell list (the level-1 spell can be cast once per Long Rest without a slot).',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Magic Initiate" (L8506)',
+  },
+  'magic-initiate-druid': {
+    id: 'magic-initiate-druid',
+    name: 'Magic Initiate (Druid)',
+    category: 'origin',
+    grants: { note: 'Two Druid cantrips and one level-1 Druid spell (Int/Wis/Cha spellcasting ability).' },
+    // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
+    effect:
+      'Learn two cantrips and one level-1 spell from the Druid spell list (the level-1 spell can be cast once per Long Rest without a slot).',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Magic Initiate" (L8506)',
+  },
+  'magic-initiate-wizard': {
+    id: 'magic-initiate-wizard',
+    name: 'Magic Initiate (Wizard)',
+    category: 'origin',
+    grants: { note: 'Two Wizard cantrips and one level-1 Wizard spell (Int/Wis/Cha spellcasting ability).' },
+    // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
+    effect:
+      'Learn two cantrips and one level-1 spell from the Wizard spell list (the level-1 spell can be cast once per Long Rest without a slot).',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Magic Initiate" (L8506)',
+  },
+  crafter: {
+    id: 'crafter',
+    name: 'Crafter',
+    category: 'origin',
+    // PHB 2024 L8468: proficiency with three Artisan's Tools; 20% buy discount; Fast Crafting.
+    grants: { tools: 3, note: "Three Artisan's Tools of your choice from the Fast Crafting table." },
+    effect:
+      "Gain proficiency with three Artisan's Tools; get a 20% discount on nonmagical purchases; craft one piece of gear on a Long Rest (Fast Crafting).",
+    srd: 'uncertain',
+    source: 'PHB 2024 "Crafter" (L8468)',
+  },
+  musician: {
+    id: 'musician',
+    name: 'Musician',
+    category: 'origin',
+    // PHB 2024 L8520: proficiency with three Musical Instruments; Encouraging Song on a rest.
+    grants: { tools: 3, note: 'Three Musical Instruments of your choice.' },
+    effect:
+      'Gain proficiency with three Musical Instruments; on a Short or Long Rest, grant Heroic Inspiration to allies (up to your Proficiency Bonus) who hear your song.',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Musician" (L8520)',
+  },
+  healer: {
+    id: 'healer',
+    name: 'Healer',
+    category: 'origin',
+    // PHB 2024 L8488: Battle Medic (Healer's Kit heal via Hit Dice + PB); reroll healing 1s.
+    effect:
+      "Use a Healer's Kit to let a creature spend a Hit Die and heal (roll + your Proficiency Bonus); reroll any 1 when rolling healing dice.",
+    srd: 'uncertain',
+    source: 'PHB 2024 "Healer" (L8488)',
+  },
+  lucky: {
+    id: 'lucky',
+    name: 'Lucky',
+    category: 'origin',
+    // PHB 2024 L8496: Luck Points equal to PB; spend for Advantage on a d20 Test or impose Disadvantage.
+    effect:
+      'You have Luck Points equal to your Proficiency Bonus; spend one for Advantage on a D20 Test, or to impose Disadvantage on an attack against you. Regained on a Long Rest.',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Lucky" (L8496)',
+  },
+  'tavern-brawler': {
+    id: 'tavern-brawler',
+    name: 'Tavern Brawler',
+    category: 'origin',
+    // PHB 2024 L8538: enhanced Unarmed Strike (1d4 + Str); reroll 1s; improvised weapons; Push.
+    effect:
+      'Deal 1d4 + Strength modifier Bludgeoning damage with an Unarmed Strike; reroll a 1 on its damage die; gain improvised-weapon proficiency and a once-per-turn 5-ft Push.',
+    srd: 'uncertain',
+    source: 'PHB 2024 "Tavern Brawler" (L8538)',
+  },
+
   // ── General feats with a clean Ability Score Increase ────────────────────
   actor: {
     id: 'actor',

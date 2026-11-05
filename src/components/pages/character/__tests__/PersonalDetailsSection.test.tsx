@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { PersonalDetailsSection } from '../PersonalDetailsSection';
 import { createCharacter } from '../../../../storage/character-store';
 
@@ -74,5 +74,58 @@ describe('PersonalDetailsSection', () => {
     fireEvent.change(input, { target: { value: 'New' } });
     fireEvent.blur(input);
     expect(onChange.mock.calls.at(-1)?.[0].name).toBe('New');
+  });
+
+  // ── Stage A7: gender selector + per-field roll buttons ─────────────────────
+
+  it('renders a gender selector that emits the chosen gender', () => {
+    const { onChange } = renderSection();
+    const select = screen.getByRole('combobox', { name: 'Gender' });
+    expect(select).toBeInTheDocument();
+    fireEvent.change(select, { target: { value: 'female' } });
+    expect(onChange.mock.calls.at(-1)?.[0].gender).toBe('female');
+  });
+
+  it('name/appearance roll buttons are disabled until a species is chosen', () => {
+    renderSection();
+    expect(screen.getByRole('button', { name: 'Roll name' })).toBeDisabled();
+    for (const field of ['height', 'weight', 'eyes', 'hair', 'skin']) {
+      expect(screen.getByRole('button', { name: `Roll ${field}` })).toBeDisabled();
+    }
+  });
+
+  it('rolling a name fills character.name from the species+gender pools', () => {
+    const { onChange } = renderSection({ species: { id: 'dwarf' }, gender: 'male' });
+    fireEvent.click(screen.getByRole('button', { name: 'Roll name' }));
+    const rolled = onChange.mock.calls.at(-1)?.[0].name;
+    expect(typeof rolled).toBe('string');
+    expect(rolled.length).toBeGreaterThan(0);
+  });
+
+  it('per-field appearance roll buttons fill their own field honoring species', () => {
+    for (const field of ['eyes', 'hair', 'skin', 'height', 'weight'] as const) {
+      const { onChange } = renderSection({ species: { id: 'elf' }, gender: 'neutral' });
+      fireEvent.click(screen.getByRole('button', { name: `Roll ${field}` }));
+      expect(onChange.mock.calls.at(-1)?.[0][field]).toBeTruthy();
+      cleanup();
+    }
+  });
+
+  it('rolling personality fills the personality field', () => {
+    const { onChange } = renderSection();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll personality' }));
+    expect(onChange.mock.calls.at(-1)?.[0].personality).toBeTruthy();
+  });
+
+  it('rolling alignment sets a valid alignment', () => {
+    const { onChange } = renderSection();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll alignment' }));
+    expect(onChange.mock.calls.at(-1)?.[0].alignment).toBeTruthy();
+  });
+
+  it('rolling sex fills from the selected gender', () => {
+    const { onChange } = renderSection({ gender: 'female' });
+    fireEvent.click(screen.getByRole('button', { name: 'Roll sex' }));
+    expect(onChange.mock.calls.at(-1)?.[0].sex).toBe('female');
   });
 });

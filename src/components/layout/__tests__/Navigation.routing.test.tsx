@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor, act } from '@testing-library/react';
 import App from '../../../App';
-import { _resetDbForTests, createCharacter } from '../../../storage/character-store';
+import {
+  _resetDbForTests,
+  createCharacter,
+  listCharacters,
+  saveCharacter,
+} from '../../../storage/character-store';
 import { indexedDB } from 'fake-indexeddb';
 import type { Character } from '../../../types/character';
 import { useConditionalRouteGuard } from '../../../hooks/useConditionalRouteGuard';
@@ -29,8 +34,20 @@ afterEach(() => {
   history.replaceState(null, '', '#');
 });
 
-/** Waits for the async character load to settle on the Character tab. */
+/**
+ * Waits for the async character load to settle on the Character tab.
+ *
+ * Stage A7 changed the empty-DB behaviour: App now shows the WelcomeScreen
+ * rather than silently creating a blank character. These routing tests exercise
+ * the returning-user path, so we ensure a single class-less character exists
+ * (seeding one if a prior resetCharacterDb() emptied the store) before
+ * rendering, which lands App straight on the sheet.
+ */
 async function renderApp() {
+  const existing = await listCharacters();
+  if (existing.length === 0) {
+    await saveCharacter(createCharacter('Router'));
+  }
   render(<App />);
   // The Character tab renders the Ability Scores heading once loaded.
   await screen.findByText('Ability Scores');

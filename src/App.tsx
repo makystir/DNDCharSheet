@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Character } from './types/character';
 import {
   listCharacters,
-  createCharacter,
   saveCharacter,
 } from './storage/character-store';
 import { useHashRoute } from './hooks/useHashRoute';
@@ -13,6 +12,7 @@ import { PageContainer } from './components/layout/PageContainer';
 import { NAV_ITEMS } from './components/layout/navItems';
 import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
 import { CharacterPage } from './components/pages/CharacterPage';
+import { WelcomeScreen } from './components/creation/WelcomeScreen';
 import { CombatPage } from './components/pages/CombatPage';
 import { InventoryPage } from './components/pages/InventoryPage';
 import { SpellsPage } from './components/pages/SpellsPage';
@@ -27,6 +27,7 @@ const THEME_KEY = 'dnd-theme';
 
 type LoadState =
   | { status: 'loading' }
+  | { status: 'welcome' }
   | { status: 'ready'; character: Character }
   | { status: 'error'; message: string };
 
@@ -57,11 +58,13 @@ function App() {
         const existing = await listCharacters();
         if (cancelled) return;
         if (existing.length > 0) {
+          // Returning user: load the most recently updated character.
           setState({ status: 'ready', character: existing[0] });
         } else {
-          const fresh = await saveCharacter(createCharacter());
-          if (cancelled) return;
-          setState({ status: 'ready', character: fresh });
+          // First run: let the player choose how to create their character
+          // (guided wizard / fully random / skip to a blank sheet) instead of
+          // silently creating a blank one (Stage A7 PART 3).
+          setState({ status: 'welcome' });
         }
       } catch (err) {
         if (cancelled) return;
@@ -106,6 +109,20 @@ function App() {
     });
   }, []);
 
+  // A character produced by the WelcomeScreen (wizard / random / skip): persist
+  // it, then load it into the sheet. Route back to the Character tab so the new
+  // sheet is shown from the top.
+  const handleCharacterReady = useCallback(
+    (next: Character) => {
+      setState({ status: 'ready', character: next });
+      navigate('character');
+      void saveCharacter(next).catch((err) => {
+        console.error('Failed to save character:', err);
+      });
+    },
+    [navigate],
+  );
+
   // Stage A5b: Concentration and rest results surface as a Toast. A fresh `id`
   // remounts the Toast so an identical message still shows again.
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
@@ -140,6 +157,9 @@ function App() {
 
       <PageContainer pageKey={page}>
         {state.status === 'loading' && <p className={styles.status}>Loading…</p>}
+        {state.status === 'welcome' && (
+          <WelcomeScreen onCharacterReady={handleCharacterReady} />
+        )}
         {state.status === 'error' && (
           <p className={styles.status} role="alert">
             {state.message}

@@ -1,0 +1,256 @@
+/**
+ * Personal-details & random-character generation (D&D 5.5e / 2024),
+ * Stage A7 PART 2 — PURE logic with an injected RNG.
+ *
+ * Mirrors the WFRP usePersonalDetailsGeneration + random-character framework
+ * (d:/Git/PWACharSheet): a set of per-field flavor generators plus a whole
+ * `generateRandomCharacter` that assembles a COMPLETE, valid Character. Every
+ * function takes an injected RNG (src/logic/random.ts) and is DETERMINISTIC
+ * under a fixed sequence — no function calls Math.random.
+ *
+ * RULES-COMPLIANCE: the name/appearance/personality tables are NON-RAW flavor
+ * (src/data/name-tables.ts) and carry no mechanic. The mechanical pieces reuse
+ * audited logic: ability scores via standardArray (PHB 2024 "Step 3", L1674),
+ * the background via applyBackground (PHB 2024 "Parts of a Background"), and
+ * equipment via the equipment-resolver. Alignment is a descriptive label only
+ * (PHB 2024 "Alignment"; no mechanic — rules-compliance rule 1).
+ */
+
+import type { Ability, Character } from '../types/character';
+import { ABILITIES, ALIGNMENTS, type Alignment } from '../types/character';
+import { createCharacter } from '../storage/character-store';
+import { SPECIES_LIST, getSpecies, type SpeciesId } from '../data/species';
+import { CLASS_LIST, type ClassId } from '../data/classes';
+import { BACKGROUND_LIST, type BackgroundId } from '../data/backgrounds';
+import { SKILLS, type SkillId } from '../types/character';
+import {
+  firstNamesFor,
+  eyeColorsFor,
+  hairColorsFor,
+  skinsFor,
+  heightRangeFor,
+  weightRangeFor,
+  type NameGender,
+} from '../data/name-tables';
+import { standardArray } from './ability-score-generation';
+import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
+import { pick, type RNG } from './random';
+
+/** Generated appearance fields (all NON-RAW flavor). */
+export interface GeneratedAppearance {
+  eyes: string;
+  hair: string;
+  skin: string;
+  /** Height as a human-readable string, e.g. `5'10"`. */
+  height: string;
+  /** Weight as a human-readable string, e.g. `180 lb`. */
+  weight: string;
+}
+
+/** Pick an integer in [min, max] (inclusive) from the RNG. */
+function pickInt(rng: RNG, min: number, max: number): number {
+  return min + Math.floor(rng() * (max - min + 1));
+}
+
+/** Format inches as feet-and-inches, e.g. 70 -> `5'10"`. */
+function formatHeight(totalInches: number): string {
+  const feet = Math.floor(totalInches / 12);
+  const inches = totalInches % 12;
+  return `${feet}'${inches}"`;
+}
+
+/**
+ * Generate a first name for a (species, gender) from the NON-RAW pools. Falls
+ * back to the neutral pool only if a specific pool is somehow empty (the pools
+ * guarantee this never happens for a supported species).
+ */
+export function generateName(species: SpeciesId, gender: NameGender, rng: RNG): string {
+  const pool = firstNamesFor(species, gender);
+  const names = pool.length > 0 ? pool : firstNamesFor(species, 'neutral');
+  return pick(rng, names);
+}
+
+/**
+ * Generate an appearance (eyes/hair/skin from the species pools, height/weight
+ * drawn from the species ranges). NON-RAW flavor.
+ */
+export function generateAppearance(
+  species: SpeciesId,
+  _gender: NameGender,
+  rng: RNG,
+): GeneratedAppearance {
+  const eyes = pick(rng, eyeColorsFor(species));
+  const hair = pick(rng, hairColorsFor(species));
+  const skin = pick(rng, skinsFor(species));
+  const h = heightRangeFor(species);
+  const w = weightRangeFor(species);
+  const height = formatHeight(pickInt(rng, h.min, h.max));
+  const weight = `${pickInt(rng, w.min, w.max)} lb`;
+  return { eyes, hair, skin, height, weight };
+}
+
+/**
+ * Pick an alignment label (PHB 2024 "Alignment"). Descriptive only; no mechanic
+ * (rules-compliance rule 1). Mutable copy so `pick`'s array type is satisfied.
+ */
+export function generateAlignment(rng: RNG): Alignment {
+  return pick(rng, [...ALIGNMENTS]);
+}
+
+/**
+ * A short NON-RAW personality seed (flavor only, no mechanic). The player edits
+ * freely; this just offers a starting trait + ideal + bond + flaw sketch.
+ */
+const PERSONALITY_TRAITS: string[] = [
+  'Blunt to the point of rudeness, but always honest.',
+  'Quick with a joke to cut the tension.',
+  'Collects trinkets from every place visited.',
+  'Judges others by their deeds, not their words.',
+  'Deeply loyal to a cause only they fully understand.',
+  'Speaks in proverbs and half-remembered sayings.',
+  'Suspicious of strangers until proven wrong.',
+  'Endlessly curious about how things work.',
+  'Masks fear with reckless bravado.',
+  'Patient, methodical, and slow to anger.',
+  'Haunted by a mistake they can never undo.',
+  'Treats every meal like it might be the last.',
+  'Keeps a careful ledger of debts owed and owing.',
+  'Finds comfort in routine and ritual.',
+  'Drawn to lost causes and underdogs.',
+  'Never backs down from a dare.',
+];
+
+/** Generate a short NON-RAW personality note (flavor only). */
+export function generatePersonality(rng: RNG): string {
+  return pick(rng, PERSONALITY_TRAITS);
+}
+
+/** Options to steer random-character generation. */
+export interface RandomCharacterOptions {
+  /** Force a species; otherwise random from SPECIES_LIST. */
+  speciesId?: SpeciesId;
+  /** Force a class; otherwise random from CLASS_LIST. */
+  classId?: ClassId;
+  /** Force a background; otherwise random from BACKGROUND_LIST. */
+  backgroundId?: BackgroundId;
+  /** Force a gender; otherwise random from male/female/neutral. */
+  gender?: NameGender;
+  /** Character name; otherwise generated from species + gender. */
+  name?: string;
+}
+
+const GENDERS: NameGender[] = ['male', 'female', 'neutral'];
+
+/** Fill any required species sub-choices with a legal value (first option). */
+function applySpeciesSubChoices(
+  speciesId: SpeciesId,
+  rng: RNG,
+): Character['species'] {
+  const species = getSpecies(speciesId);
+  const selection: NonNullable<Character['species']> = { id: speciesId };
+  if (!species?.choices) return selection;
+
+  for (const choice of species.choices) {
+    if (choice.field === 'skillfulSkill') {
+      // Human Skillful: the options list is empty in the catalog (filled by the
+      // UI from SKILLS); pick any skill here so the generated character is valid.
+      selection.skillfulSkill = pick(rng, SKILLS.map((s) => s.id)) as SkillId;
+      continue;
+    }
+    if (choice.options.length === 0) continue;
+    const chosen = pick(rng, [...choice.options]).id;
+    // Write to the named field; the union is wide enough for every choice kind.
+    (selection as unknown as Record<string, unknown>)[choice.field] = chosen;
+  }
+  return selection;
+}
+
+/**
+ * Standard-array scores assigned to the six abilities in a class-aware order:
+ * the class's primary ability(ies) first, then the rest, highest-first.
+ * PHB 2024 "Standard Array" (L1674) + "Standard Array by Class" guidance.
+ */
+function assignStandardArray(classId: ClassId): Record<Ability, number> {
+  const array = standardArray(); // [15,14,13,12,10,8], highest-first
+  const cls = CLASS_LIST.find((c) => c.id === classId);
+  const primaries = cls?.primaryAbilities ?? [];
+  const order: Ability[] = [
+    ...primaries,
+    ...ABILITIES.filter((a) => !primaries.includes(a)),
+  ];
+  const scores = {} as Record<Ability, number>;
+  order.forEach((ability, i) => {
+    scores[ability] = array[i] ?? 10;
+  });
+  return scores;
+}
+
+/**
+ * Produce a COMPLETE, valid Character deterministically from the injected RNG.
+ * Assembles: class, species (+ required sub-choices), gender, ability scores
+ * (standard array, class-aware), a background applied via `applyBackground`
+ * with a legal +2/+1 allocation on its first two abilities, equipment resolved
+ * randomly from the background package, alignment, personality, and
+ * name/appearance. Mirrors the WFRP random-character framework.
+ */
+export function generateRandomCharacter(
+  rng: RNG,
+  options: RandomCharacterOptions = {},
+): Character {
+  const speciesId = options.speciesId ?? pick(rng, [...SPECIES_LIST]).id;
+  const classId = options.classId ?? pick(rng, [...CLASS_LIST]).id;
+  const backgroundId = options.backgroundId ?? pick(rng, [...BACKGROUND_LIST]).id;
+  const gender = options.gender ?? pick(rng, GENDERS);
+
+  const name = options.name ?? generateName(speciesId, gender, rng);
+  let character = createCharacter(name);
+
+  // Class (single-class at level 1).
+  character = {
+    ...character,
+    level: 1,
+    class: { id: classId, level: 1, skillChoices: [] },
+  };
+
+  // Species + required sub-choices.
+  character = { ...character, species: applySpeciesSubChoices(speciesId, rng) };
+
+  // Ability scores via the Standard Array, class-aware assignment.
+  character = { ...character, abilities: assignStandardArray(classId) };
+
+  // Gender + alignment + personality (flavor).
+  character = {
+    ...character,
+    gender,
+    alignment: generateAlignment(rng),
+    personality: generatePersonality(rng),
+  };
+
+  // Appearance (flavor).
+  const appearance = generateAppearance(speciesId, gender, rng);
+  character = {
+    ...character,
+    eyes: appearance.eyes,
+    hair: appearance.hair,
+    skin: appearance.skin,
+    height: appearance.height,
+    weight: appearance.weight,
+  };
+
+  // Background via the audited A6b path, with a legal +2/+1 allocation on the
+  // background's first two listed abilities and equipment resolved randomly.
+  const bg = BACKGROUND_LIST.find((b) => b.id === backgroundId)!;
+  const abilityAllocation: BackgroundAbilityAllocation[] = [
+    { ability: bg.abilities[0], amount: 2 },
+    { ability: bg.abilities[1], amount: 1 },
+  ];
+  const toolProficiency = bg.tool.id; // undefined for a category choice (resolved later)
+  character = applyBackground(
+    character,
+    backgroundId,
+    { abilityAllocation, toolProficiency, equipmentChoice: 'A', rng },
+    character.createdAt,
+  );
+
+  return { ...character, abilityGenMethod: 'standard-array' };
+}

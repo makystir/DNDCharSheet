@@ -1,0 +1,114 @@
+import { useEffect, useRef, useState } from 'react';
+import type { Character } from '../../types/character';
+import { createCharacter } from '../../storage/character-store';
+import { generateRandomCharacter } from '../../logic/personal-details-generation';
+import { createDefaultRng } from '../../logic/random';
+import { CreationWizard } from './CreationWizard';
+import styles from './WelcomeScreen.module.css';
+
+export interface WelcomeScreenProps {
+  /** Called with a finished character from any of the three creation modes. */
+  onCharacterReady: (character: Character) => void;
+}
+
+type Mode = 'initial' | 'wizard' | 'skip';
+
+/**
+ * The entry chooser shown when no character exists (Stage A7 PART 3). Offers the
+ * THREE creation modes mandated by the user request, mirroring the WFRP
+ * WelcomeScreen, re-themed to D&D:
+ *   1. Guided Wizard — mounts CreationWizard.
+ *   2. Fully Random — generateRandomCharacter(createDefaultRng()).
+ *   3. Skip the Wizard — a named blank character straight to the sheet.
+ *
+ * Accessible: the primary action is focused on mount, and the skip-mode name
+ * input is focused when it opens.
+ */
+export function WelcomeScreen({ onCharacterReady }: WelcomeScreenProps) {
+  const [mode, setMode] = useState<Mode>('initial');
+  const [name, setName] = useState('');
+  const wizardBtnRef = useRef<HTMLButtonElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (mode === 'initial') wizardBtnRef.current?.focus();
+    if (mode === 'skip') nameInputRef.current?.focus();
+  }, [mode]);
+
+  if (mode === 'wizard') {
+    return (
+      <CreationWizard
+        onComplete={onCharacterReady}
+        onCancel={() => setMode('initial')}
+      />
+    );
+  }
+
+  if (mode === 'skip') {
+    const trimmed = name.trim();
+    const valid = trimmed.length > 0;
+    const submit = () => {
+      if (valid) onCharacterReady(createCharacter(trimmed));
+    };
+    return (
+      <div className={styles.center}>
+        <div className={styles.panel}>
+          <h2 className={styles.headingSmall}>Name Your Character</h2>
+          <input
+            ref={nameInputRef}
+            className={styles.nameInput}
+            type="text"
+            placeholder="Character name"
+            aria-label="Character name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') submit();
+            }}
+          />
+          <button
+            type="button"
+            className={valid ? styles.primaryBtn : styles.primaryBtnDisabled}
+            onClick={submit}
+            disabled={!valid}
+          >
+            Create Character
+          </button>
+          <button type="button" className={styles.secondaryBtn} onClick={() => setMode('initial')}>
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.center}>
+      <div className={styles.panel}>
+        <h1 className={styles.heading}>D&amp;D Character Sheet</h1>
+        <p className={styles.subtitle}>
+          Build a character with the guided wizard, roll one at random, or skip
+          ahead and fill in the sheet yourself.
+        </p>
+        <button
+          ref={wizardBtnRef}
+          type="button"
+          className={styles.primaryBtn}
+          onClick={() => setMode('wizard')}
+        >
+          Guided Wizard
+        </button>
+        <button
+          type="button"
+          className={styles.secondaryBtn}
+          onClick={() => onCharacterReady(generateRandomCharacter(createDefaultRng()))}
+        >
+          Roll a Random Character
+        </button>
+        <button type="button" className={styles.secondaryBtn} onClick={() => setMode('skip')}>
+          Skip the Wizard
+        </button>
+      </div>
+    </div>
+  );
+}

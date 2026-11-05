@@ -1,12 +1,31 @@
 import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import App from '../../../App';
+import { _resetDbForTests, createCharacter, saveCharacter } from '../../../storage/character-store';
+import { indexedDB } from 'fake-indexeddb';
 
 /**
  * The Advancement tab (Stage A6a) is an UNCONDITIONAL top-level tab keyed '6'.
  * These exercise that it appears for every character, routes on click, and
  * responds to its number-key shortcut.
  */
+
+/**
+ * Seed a single blank character so App loads straight into the sheet (the
+ * returning-user path). Stage A7 changed the empty-DB behaviour to show the
+ * WelcomeScreen rather than silently creating a blank character, so these
+ * routing tests must provide a character to land on the sheet.
+ */
+async function seedCharacter() {
+  _resetDbForTests();
+  await new Promise<void>((resolve) => {
+    const req = indexedDB.deleteDatabase('dnd-char-sheet');
+    req.onsuccess = () => resolve();
+    req.onerror = () => resolve();
+    req.onblocked = () => resolve();
+  });
+  await saveCharacter(createCharacter('Router'));
+}
 
 beforeEach(() => {
   history.replaceState(null, '', '#');
@@ -18,6 +37,7 @@ afterEach(() => {
 });
 
 async function renderApp() {
+  await seedCharacter();
   render(<App />);
   await screen.findByText('Ability Scores');
 }
@@ -50,6 +70,7 @@ describe('Advancement tab routing', () => {
   });
 
   it('deep-links #advancement directly', async () => {
+    await seedCharacter();
     history.replaceState(null, '', '#advancement');
     render(<App />);
     await screen.findByRole('heading', { name: /Level & Experience/ });
