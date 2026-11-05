@@ -36,6 +36,59 @@
   line-height: 1.4;
 }
 
+/* Character switcher (Stage B1): active-character chip above the nav items. */
+.characterSwitcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 8px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  width: calc(100% - 16px);
+  min-height: 44px;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.characterSwitcher:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.characterSwitcher:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.characterSwitcherCollapsed {
+  justify-content: center;
+  padding: 10px 0;
+  gap: 0;
+  width: 44px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.characterSwitcherName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.characterSwitcherCaret {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
 .navItem {
   display: flex;
   align-items: center;

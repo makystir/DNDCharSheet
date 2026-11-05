@@ -9,6 +9,15 @@ import styles from './WelcomeScreen.module.css';
 export interface WelcomeScreenProps {
   /** Called with a finished character from any of the three creation modes. */
   onCharacterReady: (character: Character) => void;
+  /**
+   * Abort the creation flow entirely, returning to the caller's prior view.
+   * Supplied only when creation was launched over existing characters (from the
+   * management sheet's "New Character"), so a user who changes their mind can
+   * get back to their active character. Omitted on first run (empty store),
+   * where there is nothing to return to. Mirrors the WFRP source, whose
+   * NewCharacterChoice stayed dismissible with an explicit Cancel.
+   */
+  onCancel?: () => void;
 }
 
 type Mode = 'initial' | 'wizard' | 'skip';
@@ -24,7 +33,7 @@ type Mode = 'initial' | 'wizard' | 'skip';
  * Accessible: the primary action is focused on mount, and the skip-mode name
  * input is focused when it opens.
  */
-export function WelcomeScreen({ onCharacterReady }: WelcomeScreenProps) {
+export function WelcomeScreen({ onCharacterReady, onCancel }: WelcomeScreenProps) {
   const [mode, setMode] = useState<Mode>('initial');
   const [name, setName] = useState('');
   const wizardBtnRef = useRef<HTMLButtonElement>(null);
@@ -108,6 +117,13 @@ export function WelcomeScreen({ onCharacterReady }: WelcomeScreenProps) {
         <button type="button" className={styles.secondaryBtn} onClick={() => setMode('skip')}>
           Skip the Wizard
         </button>
+        {/* Abort the whole flow back to the active character. Only rendered when
+            creation was launched over existing characters (onCancel supplied). */}
+        {onCancel && (
+          <button type="button" className={styles.secondaryBtn} onClick={onCancel}>
+            Cancel
+          </button>
+        )}
       </div>
     </div>
   );

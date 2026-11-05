@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { PanelLeftClose, PanelLeftOpen, ChevronRight } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, ChevronRight, ChevronDown, Users } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { visibleNavItems } from './navItems';
 import type { PageSection } from './navItems';
@@ -15,6 +15,15 @@ interface NavigationProps {
    * shown until a character is available.
    */
   character?: Character;
+  /**
+   * Opens the multi-character management sheet (Stage B1). When provided, the
+   * sidebar renders a character switcher showing the active character. The
+   * forwarded ref is wired to the switcher button so focus can return to it
+   * when the sheet closes.
+   */
+  onOpenCharacterManager?: () => void;
+  /** Ref to the desktop switcher button (focus-return target for the sheet). */
+  characterManagerTriggerRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 function getInitialCollapsed(): boolean {
@@ -30,7 +39,13 @@ function getInitialCollapsed(): boolean {
  * scrollable tab bar on mobile. Rendered from the single NAV_ITEMS source of
  * truth; number-key shortcuts and aria-current all derive from it.
  */
-export function Navigation({ activePage, onPageChange, character }: NavigationProps) {
+export function Navigation({
+  activePage,
+  onPageChange,
+  character,
+  onOpenCharacterManager,
+  characterManagerTriggerRef,
+}: NavigationProps) {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const isMobile = useMediaQuery('(max-width: 767px)');
   const activeItemRef = useRef<HTMLButtonElement>(null);
@@ -169,6 +184,37 @@ export function Navigation({ activePage, onPageChange, character }: NavigationPr
     >
       {!isMobile && !collapsed && (
         <div className={styles.appTitle}>⚔ D&amp;D 5.5e Character Assistant</div>
+      )}
+
+      {/* Character switcher (Stage B1): shows the active character and opens the
+          management sheet. Desktop-only — on mobile the CharacterNameHeader
+          hosts the switcher. Rendered only once a character is active. */}
+      {!isMobile && onOpenCharacterManager && character && (
+        <button
+          ref={characterManagerTriggerRef}
+          type="button"
+          className={`${styles.characterSwitcher} ${collapsed ? styles.characterSwitcherCollapsed : ''}`}
+          onClick={onOpenCharacterManager}
+          aria-haspopup="dialog"
+          aria-label={
+            collapsed
+              ? `Manage characters (active: ${character.name.trim() === '' ? 'Unnamed Character' : character.name})`
+              : 'Manage characters'
+          }
+          title={collapsed ? 'Manage characters' : undefined}
+        >
+          <span className={styles.iconWrapper}>
+            <Users size={18} />
+          </span>
+          {!collapsed && (
+            <>
+              <span className={styles.characterSwitcherName}>
+                {character.name.trim() === '' ? 'Unnamed Character' : character.name}
+              </span>
+              <ChevronDown size={14} className={styles.characterSwitcherCaret} aria-hidden="true" />
+            </>
+          )}
+        </button>
       )}
 
       {isMobile ? renderMobileNav() : renderDesktopNav()}

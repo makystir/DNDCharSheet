@@ -1,0 +1,49 @@
+/*
+ * CharacterNameHeader styles (Stage B1). Mobile-only active-character header,
+ * ported from the WFRP source and re-themed to this app's tokens. Hidden at the
+ * desktop breakpoint, where the sidebar hosts the switcher.
+ */
+
+.header {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  width: 100%;
+  gap: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 16px;
+}
+
+.header:hover {
+  background: var(--bg-tertiary);
+}
+
+.header:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 30ch;
+}
+
+.chevron {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .header {
+    display: none;
+  }
+}

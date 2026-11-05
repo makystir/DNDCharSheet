@@ -49,4 +49,20 @@ describe('WelcomeScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Skip the Wizard' }));
     expect(screen.getByRole('button', { name: 'Create Character' })).toBeDisabled();
   });
+
+  it('shows no Cancel on first run (no onCancel supplied)', () => {
+    render(<WelcomeScreen onCharacterReady={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+  });
+
+  it('offers a Cancel that aborts creation when launched over existing characters', () => {
+    const onCancel = vi.fn();
+    const onReady = vi.fn();
+    render(<WelcomeScreen onCharacterReady={onReady} onCancel={onCancel} />);
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    fireEvent.click(cancel);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    // Cancelling must not fabricate a character.
+    expect(onReady).not.toHaveBeenCalled();
+  });
 });
