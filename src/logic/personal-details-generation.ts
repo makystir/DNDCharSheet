@@ -30,6 +30,7 @@ import {
   skinsFor,
   heightRangeFor,
   weightRangeFor,
+  ageRangeFor,
   type NameGender,
 } from '../data/name-tables';
 import { standardArray } from './ability-score-generation';
@@ -87,6 +88,17 @@ export function generateAppearance(
   const height = formatHeight(pickInt(rng, h.min, h.max));
   const weight = `${pickInt(rng, w.min, w.max)} lb`;
   return { eyes, hair, skin, height, weight };
+}
+
+/**
+ * Generate an age (in years) for a species from the NON-RAW age band. The PHB
+ * 2024 has no age table, so the band is invented flavor (src/data/name-tables.ts)
+ * that merely respects the species' lifespan. Returns a value inside that
+ * species' inclusive [min, max] band as a human-readable string, e.g. `34`.
+ */
+export function generateAge(species: SpeciesId, rng: RNG): string {
+  const range = ageRangeFor(species);
+  return String(pickInt(rng, range.min, range.max));
 }
 
 /**
@@ -226,10 +238,12 @@ export function generateRandomCharacter(
     personality: generatePersonality(rng),
   };
 
-  // Appearance (flavor).
+  // Appearance + age (flavor).
   const appearance = generateAppearance(speciesId, gender, rng);
+  const age = generateAge(speciesId, rng);
   character = {
     ...character,
+    age,
     eyes: appearance.eyes,
     hair: appearance.hair,
     skin: appearance.skin,

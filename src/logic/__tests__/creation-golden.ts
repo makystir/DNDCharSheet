@@ -350,10 +350,14 @@ export interface GeneratorContract {
 }
 
 export const GENERATOR_CONTRACT: GeneratorContract = {
-  // "A vast array of potential names for each race/gender combination" — set a
-  // firm floor so a thin stub cannot pass. The implementer may exceed it.
-  minNamesPerSpeciesGender: 30,
-  speciesVaryingFields: ['name', 'eyes', 'hair', 'skin', 'height', 'weight'],
+  // "A vast array of potential names for each race/gender combination" — the
+  // user set a firm floor of MORE THAN 200 distinct names per (species, gender).
+  // The oracle asserts strictly greater than this value, so the implementer must
+  // ship at least 201 per combo. May be exceeded.
+  minNamesPerSpeciesGender: 200,
+  // Age is a NON-RAW flavor generator (no PHB age table): a species-appropriate
+  // range, clearly labeled not-from-the-rulebook, so age varies by species too.
+  speciesVaryingFields: ['name', 'eyes', 'hair', 'skin', 'height', 'weight', 'age'],
   genderVaryingFields: ['name'],
   genders: ['male', 'female', 'neutral'],
 };

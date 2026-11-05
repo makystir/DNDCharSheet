@@ -10,6 +10,7 @@ import type { NameGender } from '../../../data/name-tables';
 import {
   generateName,
   generateAppearance,
+  generateAge,
   generatePersonality,
 } from '../../../logic/personal-details-generation';
 import { createDefaultRng } from '../../../logic/random';
@@ -73,6 +74,11 @@ export function PersonalDetailsSection({
     if (!speciesId) return;
     const a = generateAppearance(speciesId, gender, createDefaultRng());
     onChange({ ...character, [field]: a[field] });
+  };
+  // Roll an age for the current species from its NON-RAW age band.
+  const rollAge = () => {
+    if (!speciesId) return;
+    onChange({ ...character, age: generateAge(speciesId, createDefaultRng()) });
   };
   const rollPersonality = () =>
     onChange({ ...character, personality: generatePersonality(createDefaultRng()) });
@@ -200,11 +206,24 @@ export function PersonalDetailsSection({
                 🎲
               </button>
             </div>
-            <EditableField
-              label="Age"
-              value={character.age ?? ''}
-              onSave={(v) => setField('age', String(v))}
-            />
+            <div className={styles.fieldWithRoll}>
+              <EditableField
+                label="Age"
+                value={character.age ?? ''}
+                onSave={(v) => setField('age', String(v))}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className={styles.rollBtn}
+                onClick={rollAge}
+                disabled={!canGenerate}
+                aria-label="Roll age"
+                title={canGenerate ? 'Roll an age for the current species' : 'Choose a species first'}
+              >
+                🎲
+              </button>
+            </div>
             <div className={styles.fieldWithRoll}>
               <EditableField
                 label="Height"

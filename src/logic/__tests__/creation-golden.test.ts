@@ -29,8 +29,10 @@ import { resolveLanguages } from '../languages';
 import {
   generateName,
   generateAppearance,
+  generateAge,
   generateRandomCharacter,
 } from '../personal-details-generation';
+import { ageRangeFor } from '../../data/name-tables';
 import {
   BACKGROUND_CATALOG,
   getBackground,
@@ -267,7 +269,9 @@ describe('GENERATOR_CONTRACT (flavor generators)', () => {
       for (let i = 0; i < 4000; i++) {
         seen.add(generateName(sp, g, stream));
       }
-      expect(seen.size).toBeGreaterThanOrEqual(GENERATOR_CONTRACT.minNamesPerSpeciesGender);
+      // User requirement "> 200": the pool must be STRICTLY greater than the
+      // contract floor (i.e. at least 201 distinct names per species × gender).
+      expect(seen.size).toBeGreaterThan(GENERATOR_CONTRACT.minNamesPerSpeciesGender);
 
       // Every generated field is non-empty for this combo.
       const rng = seededRng(42);
@@ -275,6 +279,19 @@ describe('GENERATOR_CONTRACT (flavor generators)', () => {
       const app = generateAppearance(sp, g, rng);
       for (const field of [app.eyes, app.hair, app.skin, app.height, app.weight]) {
         expect(field.length).toBeGreaterThan(0);
+      }
+
+      // Age generator: non-empty and within the species' NON-RAW band. Sample
+      // many draws so the in-range invariant is exercised, not just one value.
+      const range = ageRangeFor(sp);
+      const ageStream = seededRng(99);
+      for (let i = 0; i < 2000; i++) {
+        const ageStr = generateAge(sp, ageStream);
+        expect(ageStr.length).toBeGreaterThan(0);
+        const age = Number(ageStr);
+        expect(Number.isInteger(age)).toBe(true);
+        expect(age).toBeGreaterThanOrEqual(range.min);
+        expect(age).toBeLessThanOrEqual(range.max);
       }
     },
   );
@@ -286,6 +303,7 @@ describe('GENERATOR_CONTRACT (flavor generators)', () => {
     expect(generateAppearance(sp, g, seededRng(9))).toEqual(
       generateAppearance(sp, g, seededRng(9)),
     );
+    expect(generateAge(sp, seededRng(11))).toBe(generateAge(sp, seededRng(11)));
     // Full character: compare the deterministic content (id/timestamps vary).
     const stripVolatile = (c: ReturnType<typeof generateRandomCharacter>) => {
       const items = c as unknown as Record<string, unknown>;
@@ -322,6 +340,7 @@ describe('GENERATOR_CONTRACT (flavor generators)', () => {
         if (field === 'name') return firstPool(sp, 'neutral');
         if (field === 'height') return heightSample(sp);
         if (field === 'weight') return weightSample(sp);
+        if (field === 'age') return ageSample(sp);
         return appearancePool(sp, field as 'eyes' | 'hair' | 'skin');
       });
       const distinct = new Set(samples.map((s) => JSON.stringify(s)));
@@ -363,6 +382,12 @@ describe('GENERATOR_CONTRACT (flavor generators)', () => {
     const seen = new Set<string>();
     const stream = seededRng(1);
     for (let i = 0; i < 2000; i++) seen.add(generateAppearance(sp, 'neutral', stream).weight);
+    return [...seen].sort();
+  }
+  function ageSample(sp: SpeciesId): string[] {
+    const seen = new Set<string>();
+    const stream = seededRng(1);
+    for (let i = 0; i < 2000; i++) seen.add(generateAge(sp, stream));
     return [...seen].sort();
   }
 });
