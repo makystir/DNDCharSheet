@@ -148,6 +148,24 @@ describe('restoreCharacters — fresh-id adoption (never overwrites)', () => {
     expect(summary.duplicateNames).toEqual(['Original']);
   });
 
+  it('restores MULTIPLE characters as distinct records (no collapse onto one id)', async () => {
+    const summary = await restoreCharacters([
+      makeEntry('Alpha'),
+      makeEntry('Bravo'),
+      makeEntry('Charlie'),
+    ]);
+    expect(summary.imported).toBe(3);
+
+    const all = await listSummaries();
+    expect(all).toHaveLength(3);
+    expect(all.map((c) => c.name).sort()).toEqual(['Alpha', 'Bravo', 'Charlie']);
+
+    // Every persisted record has a distinct, non-empty id.
+    const ids = all.map((c) => c.id);
+    expect(ids.every((id) => id !== '')).toBe(true);
+    expect(new Set(ids).size).toBe(3);
+  });
+
   it('skips an entry missing required fields (name/level/abilities)', async () => {
     const bad: BackupCharacterEntry = {
       id: 'x',

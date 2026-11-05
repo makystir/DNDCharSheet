@@ -8,9 +8,9 @@
  *   - `detectDuplicates` compares against `listSummaries()` (async manager).
  *   - `restoreCharacters` validates the DND core keys (name/level/abilities,
  *     NOT WFRP's name/species/chars), runs each record through `runMigration`
- *     (B2), then `adoptCharacter` — which mints a FRESH id so a restore NEVER
- *     overwrites an existing character — and restores the portrait under the
- *     new id.
+ *     (B2), mints a FRESH id (the store put()s under the supplied key and does
+ *     NOT mint one) so a restore NEVER overwrites an existing character, then
+ *     `adoptCharacter` persists it and restores the portrait under the new id.
  *
  * B3 durability infra, no game mechanics — no rulebook citation applies.
  */
@@ -23,6 +23,7 @@ import type {
   RestoreSummary,
 } from './backup-types';
 import { adoptCharacter, listSummaries } from './character-manager';
+import { newCharacterId } from './character-store';
 import { getPortraitStore } from './portrait-store';
 import { base64ToBlob, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
@@ -147,7 +148,7 @@ function isQuotaError(err: unknown): boolean {
  * Yields to the event loop between characters to avoid blocking the UI.
  * Stops on quota errors, retaining already-restored characters.
  *
- * Every restored character is ADOPTED (manager mints a fresh id) so an existing
+ * Every restored character is adopted under a FRESH minted id so an existing
  * character is NEVER overwritten, and is first run through `runMigration` so a
  * stale/legacy record is upgraded (skipped if migration fails).
  *
@@ -209,13 +210,16 @@ export async function restoreCharacters(
     }
 
     try {
-      // Adopt as a NEW character — the manager mints a fresh id + timestamps, so
-      // a restore can never overwrite an existing character. Reset identity so
-      // the backup's own id/timestamps never leak through.
+      // Adopt as a NEW character — mint a FRESH id here so a restore can never
+      // overwrite an existing character. The underlying store put()s under the
+      // provided key (keyPath:'id', no autoIncrement) and does NOT mint an id,
+      // so a blank id would make every restored record collapse onto key ''.
+      // Reset timestamps too so the backup's own identity never leaks through;
+      // saveCharacter stamps a fresh updatedAt.
       const saved = await adoptCharacter({
         ...migration.character,
-        id: '',
-        createdAt: 0,
+        id: newCharacterId(),
+        createdAt: Date.now(),
         updatedAt: 0,
       });
 
