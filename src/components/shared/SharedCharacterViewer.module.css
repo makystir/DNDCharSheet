@@ -1,0 +1,133 @@
+.viewer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.statusBox,
+.errorBox {
+  margin: 48px auto;
+  max-width: 480px;
+  padding: 24px;
+  text-align: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.errorTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.backButton {
+  font: inherit;
+  padding: 6px 12px;
+  background: var(--bg-tertiary, var(--bg-secondary));
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background: var(--bg-secondary);
+}
+
+.backButton:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.card {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.identityMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.characterName {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.identitySub {
+  color: var(--text-secondary);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.table td {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}

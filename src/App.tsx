@@ -9,6 +9,8 @@ import { RestoreLaunchHost } from './components/shared/RestoreLaunchHost';
 import { CharacterManagementSheet } from './components/shared/CharacterManagementSheet';
 import { CharacterNameHeader } from './components/shared/CharacterNameHeader';
 import { useHashRoute } from './hooks/useHashRoute';
+import { useViewRoute } from './hooks/useViewRoute';
+import { SharedCharacterViewer } from './components/shared/SharedCharacterViewer';
 import { useConditionalRouteGuard } from './hooks/useConditionalRouteGuard';
 import { usePortrait } from './hooks/usePortrait';
 import { Navigation } from './components/layout/Navigation';
@@ -60,6 +62,15 @@ function App() {
     }
   });
   const { page, subTab, navigate } = useHashRoute();
+
+  // Stage B5: read-only GM "view" route. When the hash is `#view/<payload>`,
+  // render ONLY the SharedCharacterViewer — no Navigation, WelcomeScreen, or
+  // normal shell — and do so even when the local character DB is empty. Read
+  // here (unconditionally, with the other hooks) so the early return below can
+  // precede the welcome/ready/loading branches (mirrors the WFRP App's
+  // useViewRoute precedence). The payload is UNTRUSTED and decoded/validated
+  // inside the viewer; this only decides whether the viewer takes over.
+  const viewPayload = useViewRoute();
 
   // Portrait object-URL lifecycle is owned at the shell, keyed by the active
   // character id so it survives sub-tab navigation (which mounts/unmounts the
@@ -198,6 +209,14 @@ function App() {
   // management sheet's "New character" action is invoked while characters exist.
   const showWelcome = status === 'welcome' || creating;
   const character = status === 'ready' ? activeCharacter : null;
+
+  // Stage B5: the view-route early return. Placed AFTER every hook call (Rules
+  // of Hooks) but BEFORE the normal shell so a `#view/…` link renders only the
+  // read-only viewer, independent of the manager status — it works with an
+  // empty DB and shows no Navigation/WelcomeScreen/management sheet.
+  if (viewPayload !== null) {
+    return <SharedCharacterViewer encoded={viewPayload} />;
+  }
 
   return (
     <SWUpdateProvider>

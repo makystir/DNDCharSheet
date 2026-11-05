@@ -6,6 +6,7 @@ import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { InstallPromptControl } from '../shared/InstallPromptControl';
 import { ExportImportCard } from '../settings/ExportImportCard';
+import { ShareLinkCard } from '../settings/ShareLinkCard';
 import { AutoBackupCard } from '../settings/AutoBackupCard';
 import styles from './SettingsPage.module.css';
 
@@ -150,6 +151,8 @@ export function SettingsPage({
       )}
 
       <ExportImportCard character={character} onAdopt={onAdopt} />
+
+      <ShareLinkCard character={character} />
 
       <AutoBackupCard onRestored={onRestored} />
     </div>
