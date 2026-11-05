@@ -11,7 +11,15 @@ afterEach(() => {
 function renderSettings() {
   const character = createCharacter('Tester');
   const onChange = vi.fn();
-  render(<SettingsPage theme="dark" onThemeToggle={vi.fn()} character={character} onChange={onChange} />);
+  render(
+    <SettingsPage
+      theme="dark"
+      onThemeToggle={vi.fn()}
+      character={character}
+      onChange={onChange}
+      onAdopt={vi.fn(async (c) => c)}
+    />,
+  );
   return { onChange };
 }
 

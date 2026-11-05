@@ -3,6 +3,7 @@ import type { Character } from '../../types/character';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
+import { ExportImportCard } from '../settings/ExportImportCard';
 import styles from './SettingsPage.module.css';
 
 export interface SettingsPageProps {
@@ -10,6 +11,13 @@ export interface SettingsPageProps {
   onThemeToggle: () => void;
   character: Character;
   onChange: (next: Character) => void;
+  /**
+   * Adopt an imported character as a NEW character (manager mints a fresh id +
+   * makes it active). Threaded from App, where `useCharacterManager` lives, so
+   * the Export/Import card can add an imported character without the page
+   * reaching into the manager directly (matches App's prop-drilling style).
+   */
+  onAdopt: (next: Character) => Promise<Character>;
 }
 
 /**
@@ -19,7 +27,7 @@ export interface SettingsPageProps {
  * character and is updated via onChange (same pattern as CombatPage's rolledHp
  * toggle).
  */
-export function SettingsPage({ theme, onThemeToggle, character, onChange }: SettingsPageProps) {
+export function SettingsPage({ theme, onThemeToggle, character, onChange, onAdopt }: SettingsPageProps) {
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   // App-wide dice-entry preference (localStorage), not a character house rule.
   const { mode: diceMode, setMode: setDiceMode } = useDiceEntryMode();
@@ -98,6 +106,8 @@ export function SettingsPage({ theme, onThemeToggle, character, onChange }: Sett
           </label>
         </div>
       </Card>
+
+      <ExportImportCard character={character} onAdopt={onAdopt} />
     </div>
   );
 }

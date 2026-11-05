@@ -238,6 +238,7 @@ function App() {
                 onThemeToggle={toggleTheme}
                 character={character}
                 onChange={handleChange}
+                onAdopt={adoptCharacter}
               />
             )}
           </>

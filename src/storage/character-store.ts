@@ -9,6 +9,7 @@
 
 import type { Character } from '../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../types/character';
+import { migrateCharacter } from './migration';
 
 const DB_NAME = 'dnd-char-sheet';
 const DB_VERSION = 1;
@@ -99,18 +100,30 @@ export function createCharacter(name = ''): Character {
   };
 }
 
-/** Returns all stored characters, most recently updated first. */
+/**
+ * Returns all stored characters, most recently updated first.
+ *
+ * Every record is run through the versioned `migrateCharacter` pipeline on the
+ * way out (Stage B2) so callers only ever see a CURRENT_VERSION character — a
+ * stale-version or legacy (no `_v`) record is upgraded before the app uses it.
+ * At v1 this is an identity no-op; it becomes meaningful when a future breaking
+ * change bumps CURRENT_VERSION.
+ */
 export async function listCharacters(): Promise<Character[]> {
   const db = await openDb();
   const all = await promisifyRequest(tx(db, 'readonly').getAll() as IDBRequest<Character[]>);
-  return all.sort((a, b) => b.updatedAt - a.updatedAt);
+  return all.map(migrateCharacter).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-/** Loads a single character by id, or null if not found. */
+/**
+ * Loads a single character by id, or null if not found. The record is run
+ * through the versioned `migrateCharacter` pipeline on read (Stage B2) so the
+ * caller always receives a CURRENT_VERSION character (identity no-op at v1).
+ */
 export async function getCharacter(id: string): Promise<Character | null> {
   const db = await openDb();
   const result = await promisifyRequest(tx(db, 'readonly').get(id) as IDBRequest<Character | undefined>);
-  return result ?? null;
+  return result ? migrateCharacter(result) : null;
 }
 
 /**
