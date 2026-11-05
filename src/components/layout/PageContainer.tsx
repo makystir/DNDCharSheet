@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronUp } from 'lucide-react';
 import { PageTransition } from '../shared/PageTransition';
+import { OfflineIndicator } from '../shared/OfflineIndicator';
 import styles from './PageContainer.module.css';
 
 interface PageContainerProps {
@@ -45,6 +46,9 @@ export function PageContainer({ children, pageKey }: PageContainerProps) {
 
   return (
     <main ref={ref} id="main-content" tabIndex={-1} className={styles.container}>
+      <div className={styles.offlineWrapper}>
+        <OfflineIndicator />
+      </div>
       <PageTransition pageKey={pageKey}>{children}</PageTransition>
       {showScroll && (
         <button

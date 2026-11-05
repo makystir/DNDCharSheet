@@ -1,8 +1,10 @@
-import { Dices, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
+import { Dices, Download, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
+import { useInstallPrompt } from '../../hooks/useInstallPrompt';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
+import { InstallPromptControl } from '../shared/InstallPromptControl';
 import { ExportImportCard } from '../settings/ExportImportCard';
 import { AutoBackupCard } from '../settings/AutoBackupCard';
 import styles from './SettingsPage.module.css';
@@ -46,6 +48,14 @@ export function SettingsPage({
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   // App-wide dice-entry preference (localStorage), not a character house rule.
   const { mode: diceMode, setMode: setDiceMode } = useDiceEntryMode();
+
+  // PWA install affordance: only surface the "Install" card when the browser
+  // signals the app is installable (and not already installed), so Settings
+  // never shows a dead control. This is the SINGLE useInstallPrompt instance for
+  // the Settings surface; the values are passed down to InstallPromptControl so
+  // it does not register a second set of beforeinstallprompt/appinstalled
+  // listeners for the same control.
+  const { canInstall, promptInstall } = useInstallPrompt();
 
   const variantEncumbrance = character.houseRules?.variantEncumbrance ?? false;
   const setVariantEncumbrance = (on: boolean) =>
@@ -121,6 +131,23 @@ export function SettingsPage({
           </label>
         </div>
       </Card>
+
+      {canInstall && (
+        <Card>
+          <SectionHeader icon={Download} title="Install App" />
+          <div className={styles.settingRow}>
+            <span className={styles.settingLabel}>
+              <span className={styles.settingName}>Install on this device</span>
+              <span className={styles.settingHint}>
+                Add the app to your device for quick, offline access. Shown only
+                when your browser supports installation and the app is not
+                already installed.
+              </span>
+            </span>
+            <InstallPromptControl canInstall={canInstall} promptInstall={promptInstall} />
+          </div>
+        </Card>
+      )}
 
       <ExportImportCard character={character} onAdopt={onAdopt} />
 

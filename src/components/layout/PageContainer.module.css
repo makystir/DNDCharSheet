@@ -15,6 +15,13 @@
   outline: none;
 }
 
+.offlineWrapper {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 100;
+}
+
 @media (min-width: 1400px) {
   .container {
     max-width: 1200px;
@@ -51,5 +58,10 @@
 
   .scrollBtn {
     bottom: calc(var(--nav-height-mobile, 60px) + 8px + env(safe-area-inset-bottom));
+  }
+
+  .offlineWrapper {
+    top: 8px;
+    right: 8px;
   }
 }

@@ -9,7 +9,6 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import './styles/global.css';
 import App from './App';
-import { registerServiceWorker } from './sw-register';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -29,5 +28,7 @@ if (splash) {
   const fallbackTimeout = setTimeout(removeSplash, 2000);
 }
 
-// Register the service worker for offline/PWA support.
-registerServiceWorker(import.meta.env.BASE_URL);
+// Service worker registration is handled by SWUpdateProvider (in useSWUpdate.ts,
+// which calls registerServiceWorker from sw-register.ts). Do NOT register
+// separately here — a duplicate registration races with the SWUpdateProvider
+// and can cause update notifications to be missed.

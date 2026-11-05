@@ -15,6 +15,9 @@ import { Navigation } from './components/layout/Navigation';
 import { PageContainer } from './components/layout/PageContainer';
 import { NAV_ITEMS } from './components/layout/navItems';
 import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
+import { SWUpdateProvider } from './hooks/useSWUpdate';
+import { UpdateBanner } from './components/shared/UpdateBanner';
+import { InstallHintBanner } from './components/shared/InstallPromptControl';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { WelcomeScreen } from './components/creation/WelcomeScreen';
 import { CombatPage } from './components/pages/CombatPage';
@@ -197,10 +200,11 @@ function App() {
   const character = status === 'ready' ? activeCharacter : null;
 
   return (
-    <div className={styles.app}>
-      <a className="skip-link" href="#main-content">
-        Skip to main content
-      </a>
+    <SWUpdateProvider>
+      <div className={styles.app}>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
 
       <Navigation
         activePage={page}
@@ -321,7 +325,15 @@ function App() {
 
       {/* Announces the active page label to assistive tech on route change. */}
       <AriaLiveAnnouncer message={activeLabel} />
-    </div>
+
+      {/* Stage B4: PWA update + install affordances. The UpdateBanner reflects
+          the single SWUpdateProvider handle (shown only when an update is
+          waiting); the InstallHintBanner is a one-time, dismissible install
+          hint. Both read context from the surrounding SWUpdateProvider. */}
+      <UpdateBanner />
+      <InstallHintBanner />
+      </div>
+    </SWUpdateProvider>
   );
 }
 
