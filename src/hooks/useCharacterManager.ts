@@ -35,6 +35,12 @@ export interface UseCharacterManagerResult {
   duplicateCharacter: (id: string) => Promise<void>;
   renameCharacter: (id: string, name: string) => Promise<void>;
   deleteCharacter: (id: string) => Promise<void>;
+  /**
+   * Re-run the initial resolve (active character + summary list) and re-settle
+   * the status machine. Used after a bulk restore (B3), which adopts new
+   * records straight into the store/manager outside this hook's own actions.
+   */
+  reload: () => Promise<void>;
 }
 
 /**
@@ -51,37 +57,51 @@ export function useCharacterManager(): UseCharacterManagerResult {
   const [activeId, setActiveId] = useState<string>('');
   const [activeCharacter, setActiveCharacter] = useState<Character | null>(null);
 
-  // Initial load: resolve the active character (persisted id → most recent →
-  // none) and the summary list, then settle into welcome/ready/error.
+  // Shared load body: resolve the active character (persisted id → most recent
+  // → none) and the summary list, then settle into welcome/ready/error. Called
+  // by both the mount effect and `reload()`. The optional cancellation guard
+  // lets the mount effect drop a stale in-flight resolve on unmount.
+  const runLoad = useCallback(async (isCancelled?: () => boolean) => {
+    try {
+      const active = await resolveActiveCharacter();
+      const summaries = await listSummaries();
+      if (isCancelled?.()) return;
+      setCharacters(summaries);
+      if (active) {
+        setActiveCharacter(active);
+        setActiveId(active.id);
+        setStatus('ready');
+      } else {
+        setActiveCharacter(null);
+        setActiveId('');
+        setStatus('welcome');
+      }
+    } catch (err) {
+      if (isCancelled?.()) return;
+      setErrorMessage(
+        err instanceof Error ? err.message : 'Failed to load character data.',
+      );
+      setStatus('error');
+    }
+  }, []);
+
+  // Initial load on mount. The shared body is invoked inside an async IIFE so
+  // every setState it performs happens only AFTER an awaited resolve, never
+  // synchronously in the effect body (satisfies react-hooks/set-state-in-effect).
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const active = await resolveActiveCharacter();
-        const summaries = await listSummaries();
-        if (cancelled) return;
-        setCharacters(summaries);
-        if (active) {
-          setActiveCharacter(active);
-          setActiveId(active.id);
-          setStatus('ready');
-        } else {
-          setActiveCharacter(null);
-          setActiveId('');
-          setStatus('welcome');
-        }
-      } catch (err) {
-        if (cancelled) return;
-        setErrorMessage(
-          err instanceof Error ? err.message : 'Failed to load character data.',
-        );
-        setStatus('error');
-      }
+    void (async () => {
+      await runLoad(() => cancelled);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [runLoad]);
+
+  // Re-run the resolve after an out-of-band change (e.g. a bulk restore).
+  const reload = useCallback(async () => {
+    await runLoad();
+  }, [runLoad]);
 
   // Local edit to the active character: update in-memory state immediately
   // (the caller already persists via the store), and refresh this character's
@@ -172,5 +192,6 @@ export function useCharacterManager(): UseCharacterManagerResult {
     duplicateCharacter,
     renameCharacter,
     deleteCharacter,
+    reload,
   };
 }

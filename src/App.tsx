@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Character } from './types/character';
 import { saveCharacter } from './storage/character-store';
+import { notifyCharacterDataChange } from './storage/character-manager';
+import { getSnapshotStore } from './storage/snapshot-store';
+import { startSnapshotController } from './storage/snapshot-service';
 import { useCharacterManager } from './hooks/useCharacterManager';
+import { RestoreLaunchHost } from './components/shared/RestoreLaunchHost';
 import { CharacterManagementSheet } from './components/shared/CharacterManagementSheet';
 import { CharacterNameHeader } from './components/shared/CharacterNameHeader';
 import { useHashRoute } from './hooks/useHashRoute';
@@ -42,6 +46,7 @@ function App() {
     duplicateCharacter,
     renameCharacter,
     deleteCharacter,
+    reload,
   } = useCharacterManager();
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -91,6 +96,33 @@ function App() {
     }
   }, [theme]);
 
+  // Stage B3: once the manager settles (status 'ready' or 'welcome'), init the
+  // isolated snapshot store and start the throttle/flush controller that writes
+  // rolling auto-backups on the live change signal. Started once and torn down
+  // on unmount. Isolated and non-fatal: a degraded snapshot store never throws
+  // and never blocks a live save. Gated to run after the first settle so the
+  // controller's `notifyCharacterDataChange` listener is live before any edit.
+  const managerSettled = status === 'ready' || status === 'welcome';
+  useEffect(() => {
+    if (!managerSettled) return;
+    let stopped = false;
+    let controller: { stop(): void } | null = null;
+    void (async () => {
+      try {
+        const store = getSnapshotStore();
+        await store.init();
+        if (stopped) return;
+        controller = startSnapshotController(store);
+      } catch (err) {
+        console.warn('Auto-backup controller failed to start (non-fatal):', err);
+      }
+    })();
+    return () => {
+      stopped = true;
+      controller?.stop();
+    };
+  }, [managerSettled]);
+
   // Route guard: if the active route points at a conditional tab the current
   // character can no longer see (e.g. #spells after switching to a non-caster
   // class or dropping below the subclass casting level), redirect to Character.
@@ -108,9 +140,16 @@ function App() {
       // (name/level/updatedAt) immediately, then persist via the store. The
       // store is the single persistence layer; the manager tracks the index.
       updateActiveCharacter(next);
-      void saveCharacter(next).catch((err) => {
-        console.error('Failed to save character:', err);
-      });
+      void saveCharacter(next)
+        .then(() => {
+          // Stage B3: tell the snapshot controller a consistent save happened so
+          // it can schedule a throttled rolling backup. Fire only after the
+          // store write resolves so a snapshot never captures an unsaved edit.
+          notifyCharacterDataChange();
+        })
+        .catch((err) => {
+          console.error('Failed to save character:', err);
+        });
     },
     [updateActiveCharacter],
   );
@@ -239,6 +278,7 @@ function App() {
                 character={character}
                 onChange={handleChange}
                 onAdopt={adoptCharacter}
+                onRestored={() => void reload()}
               />
             )}
           </>
@@ -268,6 +308,14 @@ function App() {
         onDeleteCharacter={(id) => void deleteCharacter(id)}
         triggerRef={activeTriggerRef}
       />
+
+      {/* Stage B3: restore-on-launch host. Mounted once the manager has settled
+          and we are not mid-creation, so its run-once discrepancy check can
+          prompt (ONLY on a genuine discrepancy) and refresh the manager after a
+          confirmed restore. It renders nothing unless a prompt is due. */}
+      {managerSettled && !showWelcome && (
+        <RestoreLaunchHost onRestored={() => void reload()} />
+      )}
 
       <Toast key={toast?.id ?? 0} message={toast?.text ?? null} duration={5000} />
 

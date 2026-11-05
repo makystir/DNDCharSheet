@@ -22,6 +22,7 @@ function renderStateful(overrides: Partial<Character> = {}) {
           setCharacter(next);
         }}
         onAdopt={vi.fn(async (c: Character) => c)}
+        onRestored={vi.fn()}
       />
     );
   }

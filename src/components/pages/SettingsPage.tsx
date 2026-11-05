@@ -4,6 +4,7 @@ import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { ExportImportCard } from '../settings/ExportImportCard';
+import { AutoBackupCard } from '../settings/AutoBackupCard';
 import styles from './SettingsPage.module.css';
 
 export interface SettingsPageProps {
@@ -18,6 +19,13 @@ export interface SettingsPageProps {
    * reaching into the manager directly (matches App's prop-drilling style).
    */
   onAdopt: (next: Character) => Promise<Character>;
+  /**
+   * Refresh the manager's roster + active character after a restore (B3). The
+   * auto-backup card restores characters as NEW records (adopt-as-new, never
+   * overwrite) via the snapshot service; this lets the shell pick up the new
+   * list without a reload.
+   */
+  onRestored: () => void;
 }
 
 /**
@@ -27,7 +35,14 @@ export interface SettingsPageProps {
  * character and is updated via onChange (same pattern as CombatPage's rolledHp
  * toggle).
  */
-export function SettingsPage({ theme, onThemeToggle, character, onChange, onAdopt }: SettingsPageProps) {
+export function SettingsPage({
+  theme,
+  onThemeToggle,
+  character,
+  onChange,
+  onAdopt,
+  onRestored,
+}: SettingsPageProps) {
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   // App-wide dice-entry preference (localStorage), not a character house rule.
   const { mode: diceMode, setMode: setDiceMode } = useDiceEntryMode();
@@ -108,6 +123,8 @@ export function SettingsPage({ theme, onThemeToggle, character, onChange, onAdop
       </Card>
 
       <ExportImportCard character={character} onAdopt={onAdopt} />
+
+      <AutoBackupCard onRestored={onRestored} />
     </div>
   );
 }

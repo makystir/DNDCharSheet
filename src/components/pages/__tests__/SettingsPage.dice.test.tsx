@@ -18,6 +18,7 @@ function renderSettings() {
       character={character}
       onChange={onChange}
       onAdopt={vi.fn(async (c) => c)}
+      onRestored={vi.fn()}
     />,
   );
   return { onChange };
