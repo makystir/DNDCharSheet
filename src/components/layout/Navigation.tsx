@@ -1,6 +1,17 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { PanelLeftClose, PanelLeftOpen, ChevronRight, ChevronDown, Users } from 'lucide-react';
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronRight,
+  ChevronDown,
+  Users,
+  Search,
+  Keyboard,
+} from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { HelpPopover } from '../shared/HelpPopover';
+import { getHelpContent } from '../../logic/help-content';
+import { useCommandPaletteContext } from '../command-palette/commandPaletteContextValue';
 import { visibleNavItems } from './navItems';
 import type { PageSection } from './navItems';
 import type { Character } from '../../types/character';
@@ -49,6 +60,11 @@ export function Navigation({
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const isMobile = useMediaQuery('(max-width: 767px)');
   const activeItemRef = useRef<HTMLButtonElement>(null);
+  // Stage B6: palette-open + shortcuts-overlay affordances delegate to the
+  // CommandPaletteContext (integration point 3). This renders buttons only; it
+  // adds NO keyboard handler, so Navigation remains the sole owner of the
+  // number-key page shortcuts (integration point 2, approach (a)).
+  const { open: openPalette, openShortcuts } = useCommandPaletteContext();
 
   // Items visible for the active character: the conditional Spells tab is
   // filtered out for a non-caster (or a sub-caster below its casting level).
@@ -136,6 +152,42 @@ export function Navigation({
           </button>
         );
       })}
+
+      {/* Stage B6: command-palette open affordance (mobile scroll row). */}
+      <button
+        type="button"
+        className={styles.navItem}
+        onClick={() => openPalette()}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          openPalette();
+        }}
+        aria-label="Open command palette"
+        data-section="search"
+      >
+        <span className={styles.iconWrapper}>
+          <Search size={18} />
+        </span>
+        <span className={styles.mobileLabelRow}>Search</span>
+      </button>
+
+      {/* Stage B6: keyboard-shortcuts overlay affordance (mobile scroll row). */}
+      <button
+        type="button"
+        className={styles.navItem}
+        onClick={() => openShortcuts()}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          openShortcuts();
+        }}
+        aria-label="Keyboard shortcuts"
+        data-section="shortcuts"
+      >
+        <span className={styles.iconWrapper}>
+          <Keyboard size={18} />
+        </span>
+        <span className={styles.mobileLabelRow}>Shortcuts</span>
+      </button>
     </div>
   );
 
@@ -218,6 +270,50 @@ export function Navigation({
       )}
 
       {isMobile ? renderMobileNav() : renderDesktopNav()}
+
+      {/* Stage B6: command-palette open affordance (desktop sidebar). When the
+          sidebar is expanded, a dismissible contextual HelpPopover (the
+          'command-palette' concept) sits beside it to introduce the palette and
+          its Ctrl/⌘+K shortcut on first use. */}
+      {!isMobile && (
+        <div className={styles.searchAffordance}>
+          <button
+            type="button"
+            className={`${styles.navItem} ${collapsed ? styles.navItemCollapsed : ''}`}
+            onClick={() => openPalette()}
+            aria-label="Open command palette"
+            title={collapsed ? 'Search' : undefined}
+            data-section="search"
+          >
+            <span className={styles.iconWrapper}>
+              <Search size={18} />
+            </span>
+            {!collapsed && <span>Search</span>}
+          </button>
+          {!collapsed && (
+            <HelpPopover concept="command-palette">
+              {getHelpContent('command-palette')}
+            </HelpPopover>
+          )}
+        </div>
+      )}
+
+      {/* Stage B6: keyboard-shortcuts overlay affordance (desktop sidebar). */}
+      {!isMobile && (
+        <button
+          type="button"
+          className={`${styles.navItem} ${collapsed ? styles.navItemCollapsed : ''}`}
+          onClick={() => openShortcuts()}
+          aria-label="Keyboard shortcuts"
+          title={collapsed ? 'Keyboard shortcuts' : undefined}
+          data-section="shortcuts"
+        >
+          <span className={styles.iconWrapper}>
+            <Keyboard size={18} />
+          </span>
+          {!collapsed && <span>Keyboard Shortcuts</span>}
+        </button>
+      )}
 
       {/* Collapse toggle button (desktop only) */}
       {!isMobile && (

@@ -1,14 +1,27 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, within } from '@testing-library/react';
 import { Navigation } from '../Navigation';
+import { CommandPaletteProvider } from '../../command-palette/CommandPaletteContext';
 
 afterEach(() => {
   cleanup();
 });
 
+/**
+ * Stage B6: Navigation now reads the command-palette context for its palette/
+ * shortcuts affordances, so it must render inside a CommandPaletteProvider.
+ */
+function renderNav(ui: React.ReactElement) {
+  return render(
+    <CommandPaletteProvider navigate={vi.fn()} runAction={vi.fn()}>
+      {ui}
+    </CommandPaletteProvider>,
+  );
+}
+
 describe('Navigation subTabHint affordance (desktop expanded)', () => {
   it('renders the Character sub-tab hint as its own hint line', () => {
-    render(<Navigation activePage="character" onPageChange={vi.fn()} />);
+    renderNav(<Navigation activePage="character" onPageChange={vi.fn()} />);
     const character = screen.getByRole('button', { name: 'Character' });
     expect(
       within(character).getByText('Overview · Skills & Saves · Species · Class & Features'),
@@ -16,7 +29,7 @@ describe('Navigation subTabHint affordance (desktop expanded)', () => {
   });
 
   it('renders a caret icon (aria-hidden) for the hinted item', () => {
-    const { container } = render(
+    const { container } = renderNav(
       <Navigation activePage="character" onPageChange={vi.fn()} />,
     );
     const character = screen.getByRole('button', { name: 'Character' });
@@ -28,7 +41,7 @@ describe('Navigation subTabHint affordance (desktop expanded)', () => {
   });
 
   it('does not render a hint for Combat or Settings', () => {
-    render(<Navigation activePage="character" onPageChange={vi.fn()} />);
+    renderNav(<Navigation activePage="character" onPageChange={vi.fn()} />);
     const combat = screen.getByRole('button', { name: 'Combat' });
     const settings = screen.getByRole('button', { name: 'Settings' });
     expect(within(combat).queryByText(/·/)).toBeNull();

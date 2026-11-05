@@ -1,0 +1,72 @@
+/* HelpPopover component styles. Ported from PWACharSheet's
+ * HelpPopover.module.css; --text-muted -> --text-secondary. */
+
+.container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  color: var(--accent-gold);
+}
+
+.trigger:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-gold);
+}
+
+.popover {
+  /* Rendered in a portal on document.body and positioned via inline top/left
+     computed from the trigger's rect, so it is never clipped by an ancestor's
+     overflow (e.g. a collapsible section). */
+  position: fixed;
+  z-index: 1100;
+  min-width: 240px;
+  max-width: 320px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px var(--shadow);
+  padding: 12px;
+  animation: fadeIn 0.15s ease;
+}
+
+@media (max-width: 767px) {
+  .popover {
+    max-width: calc(100vw - 16px);
+  }
+}
+
+.content {
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

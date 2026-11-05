@@ -20,6 +20,11 @@ import { AriaLiveAnnouncer } from './components/shared/AriaLiveAnnouncer';
 import { SWUpdateProvider } from './hooks/useSWUpdate';
 import { UpdateBanner } from './components/shared/UpdateBanner';
 import { InstallHintBanner } from './components/shared/InstallPromptControl';
+import { CommandPaletteProvider } from './components/command-palette/CommandPaletteContext';
+import { useCommandPaletteContext } from './components/command-palette/commandPaletteContextValue';
+import { useCommandPalette } from './components/command-palette/useCommandPalette';
+import { CommandPalette } from './components/command-palette/CommandPalette';
+import { ShortcutsHelp } from './components/shared/ShortcutsHelp';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { WelcomeScreen } from './components/creation/WelcomeScreen';
 import { CombatPage } from './components/pages/CombatPage';
@@ -33,6 +38,24 @@ import { useConcentrationAutoEnd } from './hooks/useConcentrationAutoEnd';
 import styles from './App.module.css';
 
 const THEME_KEY = 'dnd-theme';
+
+/**
+ * Stage B6: registers the global Ctrl/⌘+K palette-open shortcut (a NEW binding
+ * that does not conflict with Navigation's number-key handler) and mounts the
+ * palette + the shortcuts overlay. Rendered inside the CommandPaletteProvider so
+ * it can read the context. The shortcuts overlay is shown only when opened via
+ * the palette footer or the Navigation Shortcuts affordance.
+ */
+function CommandPaletteHost() {
+  useCommandPalette();
+  const { shortcutsOpen, closeShortcuts } = useCommandPaletteContext();
+  return (
+    <>
+      <CommandPalette />
+      {shortcutsOpen && <ShortcutsHelp onClose={closeShortcuts} />}
+    </>
+  );
+}
 
 function App() {
   // Stage B1: the multi-character manager owns the active character + list and
@@ -203,6 +226,27 @@ function App() {
     [],
   );
 
+  // Stage B6: dispatch target for the command palette's "action" entries. Each
+  // key maps to an existing shell handler/navigation path (no new behaviour).
+  const runAction = useCallback(
+    (action: string) => {
+      switch (action) {
+        case 'toggle-theme':
+          toggleTheme();
+          break;
+        case 'manage-characters':
+          openManager(desktopTriggerRef);
+          break;
+        case 'open-settings':
+          navigate('settings');
+          break;
+        default:
+          break;
+      }
+    },
+    [toggleTheme, openManager, navigate],
+  );
+
   const activeLabel = NAV_ITEMS.find((i) => i.id === page)?.label ?? '';
 
   // The welcome/creation flow runs on first run (no characters) OR when the
@@ -220,138 +264,149 @@ function App() {
 
   return (
     <SWUpdateProvider>
-      <div className={styles.app}>
-        <a className="skip-link" href="#main-content">
-          Skip to main content
-        </a>
-
-      <Navigation
-        activePage={page}
-        onPageChange={navigate}
+      <CommandPaletteProvider
         character={character ?? undefined}
-        onOpenCharacterManager={() => openManager(desktopTriggerRef)}
-        characterManagerTriggerRef={desktopTriggerRef}
-      />
+        navigate={(p) => navigate(p)}
+        runAction={runAction}
+      >
+        <div className={styles.app}>
+          <a className="skip-link" href="#main-content">
+            Skip to main content
+          </a>
 
-      <PageContainer pageKey={page}>
-        {/* Mobile active-character header + switcher (desktop hosts it in the
-            sidebar). Shown only when a character is active and not mid-creation. */}
-        {character && !showWelcome && (
-          <CharacterNameHeader
-            ref={mobileTriggerRef}
-            characterName={character.name}
-            onOpen={() => openManager(mobileTriggerRef)}
+          <Navigation
+            activePage={page}
+            onPageChange={navigate}
+            character={character ?? undefined}
+            onOpenCharacterManager={() => openManager(desktopTriggerRef)}
+            characterManagerTriggerRef={desktopTriggerRef}
           />
-        )}
 
-        {status === 'loading' && <p className={styles.status}>Loading…</p>}
-        {status === 'error' && (
-          <p className={styles.status} role="alert">
-            {errorMessage}
-          </p>
-        )}
-        {showWelcome && (
-          <WelcomeScreen
-            onCharacterReady={handleCharacterReady}
-            // Only offer an abort path when creation was launched from the
-            // management sheet over an existing active character (`creating`).
-            // On true first run (status:'welcome', empty store) there is nothing
-            // to return to, so no Cancel is shown. Cancelling clears `creating`,
-            // restoring the status:'ready' view of the active character.
-            onCancel={creating ? () => setCreating(false) : undefined}
+          <PageContainer pageKey={page}>
+            {/* Mobile active-character header + switcher (desktop hosts it in the
+                sidebar). Shown only when a character is active and not mid-creation. */}
+            {character && !showWelcome && (
+              <CharacterNameHeader
+                ref={mobileTriggerRef}
+                characterName={character.name}
+                onOpen={() => openManager(mobileTriggerRef)}
+              />
+            )}
+
+            {status === 'loading' && <p className={styles.status}>Loading…</p>}
+            {status === 'error' && (
+              <p className={styles.status} role="alert">
+                {errorMessage}
+              </p>
+            )}
+            {showWelcome && (
+              <WelcomeScreen
+                onCharacterReady={handleCharacterReady}
+                // Only offer an abort path when creation was launched from the
+                // management sheet over an existing active character (`creating`).
+                // On true first run (status:'welcome', empty store) there is nothing
+                // to return to, so no Cancel is shown. Cancelling clears `creating`,
+                // restoring the status:'ready' view of the active character.
+                onCancel={creating ? () => setCreating(false) : undefined}
+              />
+            )}
+            {status === 'ready' && !showWelcome && character && (
+              <>
+                {page === 'character' && (
+                  <CharacterPage
+                    character={character}
+                    onChange={handleChange}
+                    subTab={subTab}
+                    onSubTabChange={(tab) => navigate('character', tab)}
+                    portraitURL={portraitURL}
+                    onPortraitUpload={uploadPortrait}
+                    onPortraitRemove={removePortrait}
+                  />
+                )}
+                {page === 'combat' && (
+                  <CombatPage character={character} onChange={handleChange} onNotify={notify} />
+                )}
+                {page === 'inventory' && (
+                  <InventoryPage character={character} onChange={handleChange} />
+                )}
+                {/* Belt-and-braces with the route guard: only render Spells for a
+                    spellcaster (the guard rewrites the hash, this gates the view). */}
+                {page === 'spells' && isSpellcaster(character) && (
+                  <SpellsPage
+                    character={character}
+                    onChange={handleChange}
+                    onNotify={notify}
+                    subTab={subTab}
+                    onSubTabChange={(tab) => navigate('spells', tab)}
+                  />
+                )}
+                {page === 'advancement' && (
+                  <AdvancementPage character={character} onChange={handleChange} />
+                )}
+                {page === 'settings' && (
+                  <SettingsPage
+                    theme={theme}
+                    onThemeToggle={toggleTheme}
+                    character={character}
+                    onChange={handleChange}
+                    onAdopt={adoptCharacter}
+                    onRestored={() => void reload()}
+                  />
+                )}
+              </>
+            )}
+          </PageContainer>
+
+          {/* Stage B1: the multi-character management sheet. Mounted whenever the
+              app is past loading so it can open from either switcher. */}
+          <CharacterManagementSheet
+            isOpen={managerOpen}
+            onClose={() => setManagerOpen(false)}
+            characters={characters}
+            activeId={activeId}
+            onSwitchCharacter={(id) => {
+              void switchCharacter(id);
+              navigate('character');
+            }}
+            onCreateCharacter={() => {
+              // Route through the WelcomeScreen creation flow; closing the sheet
+              // and flipping `creating` shows it without touching existing
+              // characters (adopt only adds on completion).
+              setManagerOpen(false);
+              setCreating(true);
+            }}
+            onRenameCharacter={(id, name) => void renameCharacter(id, name)}
+            onDuplicateCharacter={(id) => void duplicateCharacter(id)}
+            onDeleteCharacter={(id) => void deleteCharacter(id)}
+            triggerRef={activeTriggerRef}
           />
-        )}
-        {status === 'ready' && !showWelcome && character && (
-          <>
-            {page === 'character' && (
-              <CharacterPage
-                character={character}
-                onChange={handleChange}
-                subTab={subTab}
-                onSubTabChange={(tab) => navigate('character', tab)}
-                portraitURL={portraitURL}
-                onPortraitUpload={uploadPortrait}
-                onPortraitRemove={removePortrait}
-              />
-            )}
-            {page === 'combat' && (
-              <CombatPage character={character} onChange={handleChange} onNotify={notify} />
-            )}
-            {page === 'inventory' && (
-              <InventoryPage character={character} onChange={handleChange} />
-            )}
-            {/* Belt-and-braces with the route guard: only render Spells for a
-                spellcaster (the guard rewrites the hash, this gates the view). */}
-            {page === 'spells' && isSpellcaster(character) && (
-              <SpellsPage
-                character={character}
-                onChange={handleChange}
-                onNotify={notify}
-                subTab={subTab}
-                onSubTabChange={(tab) => navigate('spells', tab)}
-              />
-            )}
-            {page === 'advancement' && (
-              <AdvancementPage character={character} onChange={handleChange} />
-            )}
-            {page === 'settings' && (
-              <SettingsPage
-                theme={theme}
-                onThemeToggle={toggleTheme}
-                character={character}
-                onChange={handleChange}
-                onAdopt={adoptCharacter}
-                onRestored={() => void reload()}
-              />
-            )}
-          </>
-        )}
-      </PageContainer>
 
-      {/* Stage B1: the multi-character management sheet. Mounted whenever the
-          app is past loading so it can open from either switcher. */}
-      <CharacterManagementSheet
-        isOpen={managerOpen}
-        onClose={() => setManagerOpen(false)}
-        characters={characters}
-        activeId={activeId}
-        onSwitchCharacter={(id) => {
-          void switchCharacter(id);
-          navigate('character');
-        }}
-        onCreateCharacter={() => {
-          // Route through the WelcomeScreen creation flow; closing the sheet
-          // and flipping `creating` shows it without touching existing
-          // characters (adopt only adds on completion).
-          setManagerOpen(false);
-          setCreating(true);
-        }}
-        onRenameCharacter={(id, name) => void renameCharacter(id, name)}
-        onDuplicateCharacter={(id) => void duplicateCharacter(id)}
-        onDeleteCharacter={(id) => void deleteCharacter(id)}
-        triggerRef={activeTriggerRef}
-      />
+          {/* Stage B3: restore-on-launch host. Mounted once the manager has settled
+              and we are not mid-creation, so its run-once discrepancy check can
+              prompt (ONLY on a genuine discrepancy) and refresh the manager after a
+              confirmed restore. It renders nothing unless a prompt is due. */}
+          {managerSettled && !showWelcome && (
+            <RestoreLaunchHost onRestored={() => void reload()} />
+          )}
 
-      {/* Stage B3: restore-on-launch host. Mounted once the manager has settled
-          and we are not mid-creation, so its run-once discrepancy check can
-          prompt (ONLY on a genuine discrepancy) and refresh the manager after a
-          confirmed restore. It renders nothing unless a prompt is due. */}
-      {managerSettled && !showWelcome && (
-        <RestoreLaunchHost onRestored={() => void reload()} />
-      )}
+          <Toast key={toast?.id ?? 0} message={toast?.text ?? null} duration={5000} />
 
-      <Toast key={toast?.id ?? 0} message={toast?.text ?? null} duration={5000} />
+          {/* Announces the active page label to assistive tech on route change. */}
+          <AriaLiveAnnouncer message={activeLabel} />
 
-      {/* Announces the active page label to assistive tech on route change. */}
-      <AriaLiveAnnouncer message={activeLabel} />
+          {/* Stage B4: PWA update + install affordances. The UpdateBanner reflects
+              the single SWUpdateProvider handle (shown only when an update is
+              waiting); the InstallHintBanner is a one-time, dismissible install
+              hint. Both read context from the surrounding SWUpdateProvider. */}
+          <UpdateBanner />
+          <InstallHintBanner />
 
-      {/* Stage B4: PWA update + install affordances. The UpdateBanner reflects
-          the single SWUpdateProvider handle (shown only when an update is
-          waiting); the InstallHintBanner is a one-time, dismissible install
-          hint. Both read context from the surrounding SWUpdateProvider. */}
-      <UpdateBanner />
-      <InstallHintBanner />
-      </div>
+          {/* Stage B6: command palette (Ctrl/⌘+K) + keyboard-shortcuts overlay.
+              Mounted inside the provider so the palette dispatches through the same
+              navigation path the nav uses. */}
+          <CommandPaletteHost />
+        </div>
+      </CommandPaletteProvider>
     </SWUpdateProvider>
   );
 }
