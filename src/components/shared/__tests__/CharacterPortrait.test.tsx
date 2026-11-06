@@ -23,6 +23,49 @@ function renderPortrait(portrait = '') {
   return { onUpload, onRemove };
 }
 
+describe('CharacterPortrait - generate prompt trigger', () => {
+  it('renders the trigger directly below the Upload Portrait button and fires the callback', () => {
+    const onGeneratePrompt = vi.fn();
+    render(
+      <CharacterPortrait
+        portrait=""
+        characterName="Tester"
+        onUpload={vi.fn()}
+        onRemove={vi.fn()}
+        onGeneratePrompt={onGeneratePrompt}
+      />,
+    );
+    const upload = screen.getByRole('button', { name: /upload portrait/i });
+    const generate = screen.getByRole('button', { name: /generate portrait prompt/i });
+    // Immediately follows Upload in the same controls column.
+    expect(upload.nextElementSibling).toBe(generate);
+    fireEvent.click(generate);
+    expect(onGeneratePrompt).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the trigger between Upload and Remove when a portrait exists', () => {
+    render(
+      <CharacterPortrait
+        portrait="blob:x"
+        characterName="Tester"
+        onUpload={vi.fn()}
+        onRemove={vi.fn()}
+        onGeneratePrompt={vi.fn()}
+      />,
+    );
+    const generate = screen.getByRole('button', { name: /generate portrait prompt/i });
+    expect(generate.previousElementSibling).toBe(
+      screen.getByRole('button', { name: /upload portrait/i }),
+    );
+    expect(generate.nextElementSibling).toBe(screen.getByRole('button', { name: /remove/i }));
+  });
+
+  it('renders no trigger when onGeneratePrompt is not provided', () => {
+    renderPortrait('');
+    expect(screen.queryByRole('button', { name: /generate portrait prompt/i })).toBeNull();
+  });
+});
+
 describe('CharacterPortrait', () => {
   it('shows the placeholder when no portrait is set', () => {
     renderPortrait('');

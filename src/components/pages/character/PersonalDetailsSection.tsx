@@ -10,7 +10,7 @@ import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
 import { getBackground } from '../../../data/backgrounds';
 import { srdBadge } from '../sheet-helpers';
-import { User, Sparkles } from 'lucide-react';
+import { User } from 'lucide-react';
 import { PortraitPromptDialog } from '../../shared/PortraitPromptDialog';
 import type { NameGender } from '../../../data/name-tables';
 import {
@@ -128,6 +128,7 @@ export function PersonalDetailsSection({
           characterName={character.name}
           onUpload={onPortraitUpload}
           onRemove={onPortraitRemove}
+          onGeneratePrompt={() => setShowPromptDialog(true)}
         />
         <Card style={{ flex: 1, minWidth: 0 }}>
           <SectionHeader icon={User} title="Personal Details" titleId={headerId} />
@@ -418,16 +419,6 @@ export function PersonalDetailsSection({
               rows={4}
               onChange={(e) => setField('personality', e.target.value)}
             />
-          </div>
-          <div className={styles.promptRow}>
-            <button
-              type="button"
-              className={styles.promptBtn}
-              onClick={() => setShowPromptDialog(true)}
-            >
-              <Sparkles size={14} aria-hidden="true" />
-              Generate portrait prompt
-            </button>
           </div>
         </Card>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { Upload, Trash2, ImageOff, X } from 'lucide-react';
+import { Upload, Trash2, ImageOff, X, Sparkles } from 'lucide-react';
 import { validatePortraitFile } from '../../logic/portrait';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import styles from './CharacterPortrait.module.css';
@@ -12,12 +12,18 @@ interface CharacterPortraitProps {
   characterName: string;
   onUpload: (file: File) => void;
   onRemove: () => void;
+  /**
+   * When provided, a "Generate portrait prompt" button is rendered directly
+   * below the Upload Portrait button. The owner opens the dialog (it needs the
+   * full character); this component only surfaces the trigger.
+   */
+  onGeneratePrompt?: () => void;
 }
 
 /**
  * Character portrait: a framed image with upload / remove controls and an
- * enlarge-on-click dialog. Ported and re-themed from the WFRP app, minus its
- * optional "Generate Portrait Prompt" button (out of scope this stage).
+ * enlarge-on-click dialog. Ported and re-themed from the WFRP app, including
+ * its optional "Generate portrait prompt" button (placed under Upload).
  *
  * `handleFileChange` validates the file for the immediate aria-live message and
  * to skip a doomed store round-trip, but the authoritative validate-before-
@@ -29,6 +35,7 @@ export function CharacterPortrait({
   characterName,
   onUpload,
   onRemove,
+  onGeneratePrompt,
 }: CharacterPortraitProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
@@ -113,6 +120,13 @@ export function CharacterPortrait({
           <Upload size={14} />
           Upload Portrait
         </button>
+
+        {onGeneratePrompt && (
+          <button type="button" className={styles.btn} onClick={onGeneratePrompt}>
+            <Sparkles size={14} aria-hidden="true" />
+            Generate portrait prompt
+          </button>
+        )}
 
         {portrait && (
           <button type="button" className={styles.removeBtn} onClick={onRemove}>
