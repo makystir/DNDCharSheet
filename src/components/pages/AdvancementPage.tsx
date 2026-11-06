@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, Heart, ArrowUpCircle, ListChecks, ScrollText, Trash2 } from 'lucide-react';
+import { TrendingUp, Heart, ArrowUpCircle, ListChecks, ScrollText, Trash2, Layers } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -16,11 +16,15 @@ import {
   proficiencyBonusBreakdown,
   MAX_LEVEL,
 } from '../../logic/abilities';
-import { resolveClass, resolveSubclass } from '../../logic/classes';
+import { resolveClass, resolveSubclass, resolveClasses } from '../../logic/classes';
 import { effectiveAbilityScores } from '../../logic/feats';
+import { multiclassOptions, type MulticlassOption } from '../../logic/multiclass';
+import { getClass, type ClassId } from '../../data/classes';
+import { HouseRuleIndicator } from '../combat/HouseRuleIndicator';
 import {
   advancementLog,
   applyLevelUp,
+  applyMulticlassLevel,
   canLevelUp,
   characterXp,
   featSlotLevels,
@@ -74,6 +78,13 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // we track which one so the resolver never has to re-derive it from mayLevelUp
   // (which is ambiguous in milestone mode, where a level-up is always permitted).
   const [hpRoll, setHpRoll] = useState<null | 'level-up' | 'record-current'>(null);
+  // The class selected in the add-a-class control, and the target class for a
+  // multiclass roll-HP dialog (a new or existing class gaining the level).
+  const [selectedNewClass, setSelectedNewClass] = useState<ClassId | ''>('');
+  // Which HELD class the main Level-up action advances. Only meaningful when the
+  // character has two or more classes; a single-class character always advances
+  // its one class (classes[0]). Empty = fall back to the primary class.
+  const [levelUpClass, setLevelUpClass] = useState<ClassId | ''>('');
 
   const { xpAwardAmount, setXpAwardAmount, xpAwardReason, setXpAwardReason, canAward, handleAwardXp } =
     useXpAward((mutator) => onChange(mutator(character)), now);
@@ -90,6 +101,32 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const permittedLevel = xpToLevel(xp);
   const mayLevelUp = canLevelUp(character);
   const preview = nextLevelPreview(character);
+
+  // ── Multiclass: the classes the character could take a NEW level in, each with
+  //    its RAW prereq status and the toggle-aware UI decision (logic/multiclass).
+  //    A class that fails the prereq is DISABLED when the toggle is off and
+  //    SELECTABLE-WITH-WARNING when it is on (option.decision.proceed/warning).
+  const mcOptions: MulticlassOption[] = multiclassOptions(character);
+  const selectedOption = mcOptions.find((o) => o.classId === selectedNewClass);
+  // The current multiclass build label, e.g. "Fighter 5 / Wizard 1".
+  const heldClasses = resolveClasses(character);
+  const currentBuild = heldClasses
+    .map(({ entry, data }) => `${data.name} ${entry.level}`)
+    .join(' / ');
+  // A character with two or more class entries is a multiclass character.
+  const isMulticlass = heldClasses.length >= 2;
+  // The HELD class the main Level-up action targets (the picked one, or the
+  // primary when none is picked / only one class exists). The level-up records
+  // HP against THIS class's Hit Die.
+  const levelUpTargetId: ClassId | undefined =
+    (levelUpClass || heldClasses[0]?.data.id) as ClassId | undefined;
+  const levelUpTargetDie = levelUpTargetId ? getClass(levelUpTargetId)?.hitDie : cls?.hitDie;
+  // Rolled HP has no effect on a MULTICLASS Hit Point maximum yet: the multiclass
+  // HP-max path is fixed-only until the per-class rolled-HP model lands (M5). So
+  // the roll-HP action is offered for single-class characters only; a multiclass
+  // character takes the fixed value (a note explains why). PHB 2024
+  // "Multiclassing: Hit Points".
+  const rolledHpAvailable = !isMulticlass;
 
   // ── Authoritative level control (logic setLevel: clamp + spellcasting reconcile).
   const setLevel = (raw: string) => {
@@ -120,23 +157,49 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
     });
   };
 
-  // ── Level up with a fixed HP choice (applyLevelUp gates on canLevelUp).
+  // ── Level up with the given HP choice, advancing the TARGET held class. For a
+  //    single-class character this is applyLevelUp (unchanged behaviour: advance
+  //    classes[0]); for a multiclass character it routes through
+  //    applyMulticlassLevel so the user can advance ANY held class (not just the
+  //    primary), recording HP against that class's Hit Die. Both gate on
+  //    canLevelUp and maintain the total === Σ entry-levels invariant.
+  const applyHeldLevelUp = (choice: HpChoice): Character | null => {
+    if (isMulticlass && levelUpTargetId) {
+      return applyMulticlassLevel(character, levelUpTargetId, choice, now());
+    }
+    return applyLevelUp(character, choice, now());
+  };
+
+  // ── Level up with a fixed HP choice (gates on canLevelUp).
   const handleFixedLevelUp = () => {
-    const next = applyLevelUp(character, { mode: 'fixed' }, now());
+    const next = applyHeldLevelUp({ mode: 'fixed' });
     if (next) onChange(next);
   };
 
   // ── Level up with a rolled HP choice: the dialog captures the raw Hit Die face,
-  //    then applyLevelUp records it. The HP math (Con rider, min-1) is in the logic.
+  //    then the level-up records it. The HP math (Con rider, min-1) is in the logic.
   const handleRolledLevelUp = (choice: HpChoice) => {
     setHpRoll(null);
-    const next = applyLevelUp(character, choice, now());
+    const next = applyHeldLevelUp(choice);
     if (next) onChange(next);
   };
 
   // ── Re-record the HP choice for the CURRENT level (a correction, not a level-up).
   const handleRecordCurrentHp = (choice: HpChoice) => {
     onChange(setLevelHp(character, level, choice, now()));
+  };
+
+  // ── Add a level in a chosen class (new or existing) — the multiclass level-up.
+  //    applyMulticlassLevel maintains the invariant (total === Σ entry levels) and
+  //    records the HP choice against the LEVELED class's Hit Die. The prereq /
+  //    house-rule gate is enforced by the control below (disabled options), so a
+  //    class reaching this handler has already been decided to proceed.
+  const handleMulticlassLevel = (classId: ClassId, choice: HpChoice) => {
+    const next = applyMulticlassLevel(character, classId, choice, now());
+    if (next) {
+      onChange(next);
+      setSelectedNewClass('');
+    }
   };
 
   const clearLog = () => {
@@ -374,14 +437,22 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                   >
                     Take fixed value
                   </button>
-                  <button
-                    type="button"
-                    className={styles.secondaryBtn}
-                    onClick={() => setHpRoll('record-current')}
-                  >
-                    Roll the Hit Die
-                  </button>
+                  {rolledHpAvailable && (
+                    <button
+                      type="button"
+                      className={styles.secondaryBtn}
+                      onClick={() => setHpRoll('record-current')}
+                    >
+                      Roll the Hit Die
+                    </button>
+                  )}
                 </div>
+                {!rolledHpAvailable && (
+                  <p className={styles.hint}>
+                    Multiclass Hit Point maxima use the fixed per-level value; rolling
+                    is available once per-class rolled HP is supported.
+                  </p>
+                )}
               </div>
             )}
           </>
@@ -430,13 +501,40 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 preview.proficiencyBonusChangesTo === undefined && <li>No new features</li>}
             </ul>
 
+            {/* Which held class gains the level. Shown only for a multiclass
+                character (a single-class character always advances its one
+                class). PHB 2024 "Multiclassing": a level may be taken in any
+                class you already have. */}
+            {isMulticlass && (
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="adv-levelup-class">
+                  Class to advance
+                </label>
+                <select
+                  id="adv-levelup-class"
+                  className={styles.classSelect}
+                  aria-label="Class to advance"
+                  value={levelUpTargetId ?? ''}
+                  onChange={(e) => setLevelUpClass(e.target.value as ClassId | '')}
+                >
+                  {heldClasses.map(({ entry, data }) => (
+                    <option key={data.id} value={data.id}>
+                      {data.name} {entry.level} → {entry.level + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className={styles.levelUpRow}>
               <span className={styles.hint}>
                 {mode === 'xp' && !mayLevelUp
                   ? `Not enough XP: level ${preview.nextLevel} needs ${xpForLevel(preview.nextLevel)} XP total.`
                   : cls === undefined
                     ? 'Fixed HP only until a class is chosen.'
-                    : 'Choose how to gain Hit Points this level:'}
+                    : isMulticlass
+                      ? `Advancing ${getClass(levelUpTargetId ?? '')?.name ?? 'your class'} (d${levelUpTargetDie}). Multiclass HP uses the fixed per-level value.`
+                      : 'Choose how to gain Hit Points this level:'}
               </span>
               <div className={styles.hpChoiceButtons}>
                 <button
@@ -447,16 +545,119 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 >
                   Level up (fixed HP)
                 </button>
-                <button
-                  type="button"
-                  className={styles.primaryBtn}
-                  disabled={!mayLevelUp || cls === undefined}
-                  onClick={() => setHpRoll('level-up')}
-                >
-                  Level up (roll HP)
-                </button>
+                {rolledHpAvailable && (
+                  <button
+                    type="button"
+                    className={styles.primaryBtn}
+                    disabled={!mayLevelUp || cls === undefined}
+                    onClick={() => setHpRoll('level-up')}
+                  >
+                    Level up (roll HP)
+                  </button>
+                )}
               </div>
             </div>
+          </>
+        )}
+      </Card>
+
+      {/* ── Multiclass: add a level in a new (or existing) class ────────────── */}
+      <Card>
+        <SectionHeader icon={Layers} title="Multiclass" />
+        {cls === undefined ? (
+          <p className={styles.placeholder}>
+            No class selected. Choose a class on the Character tab before adding a
+            second class.
+          </p>
+        ) : (
+          <>
+            {currentBuild && (
+              <p className={styles.multiclassPreview} data-testid="mc-current-build">
+                {currentBuild}
+              </p>
+            )}
+            <p className={styles.hint}>
+              Add a level in a new class (PHB 2024 "Multiclassing"). You need 13+ in
+              the primary ability of the new class and of every class you already
+              have. The sheet, spells, and print surfaces still show your primary
+              class until the multiclass display update; this page shows the full
+              build above.
+            </p>
+            {/* The warning banner only renders when the house rule is active. */}
+            <HouseRuleIndicator houseRules={character.houseRules} />
+            <div className={styles.multiclassRow}>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="adv-new-class">
+                  New class
+                </label>
+                <select
+                  id="adv-new-class"
+                  className={styles.classSelect}
+                  aria-label="New class to add a level in"
+                  value={selectedNewClass}
+                  disabled={!mayLevelUp}
+                  onChange={(e) => setSelectedNewClass(e.target.value as ClassId | '')}
+                >
+                  <option value="">Choose a class…</option>
+                  {mcOptions.map((option) => {
+                    const failing =
+                      option.status.reason === 'prereq'
+                        ? ` — needs ${(option.status.failing ?? [])
+                            .map((a) => a.toUpperCase())
+                            .join(option.classId === 'fighter' ? ' or ' : ' and ')} 13+`
+                        : '';
+                    // Disabled only when the UI decision says it cannot proceed
+                    // (prereq fails AND the toggle is off). With the toggle on a
+                    // failing option is selectable (and warns on apply).
+                    return (
+                      <option
+                        key={option.classId}
+                        value={option.classId}
+                        disabled={!option.decision.proceed}
+                      >
+                        {option.className}
+                        {failing}
+                        {option.decision.warning ? ' (house rule)' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <button
+                type="button"
+                className={styles.primaryBtn}
+                disabled={!mayLevelUp || selectedOption === undefined || !selectedOption.decision.proceed}
+                onClick={() => {
+                  if (selectedOption) handleMulticlassLevel(selectedOption.classId, { mode: 'fixed' });
+                }}
+              >
+                Add level (fixed HP)
+              </button>
+            </div>
+            {/* Adding a class makes the character multiclass, whose HP maximum is
+                fixed-only until per-class rolled HP lands (M5) — so only the fixed
+                value is offered here, and the HP-max breakdown stays consistent
+                with what is recorded. PHB 2024 "Multiclassing: Hit Points". */}
+            <p className={styles.hint}>
+              A new class adds the fixed per-level Hit Points. Rolling Hit Points for
+              a multiclass level is not yet supported.
+            </p>
+            {selectedOption?.decision.warning && (
+              <p className={styles.warnText} role="note">
+                {selectedOption.className} does not meet the multiclass prerequisite.
+                The Allow Illegal Multiclass house rule permits it with this warning.
+              </p>
+            )}
+            {selectedOption && (
+              <p className={styles.multiclassPreview} data-testid="mc-result-build">
+                After adding: {buildAfterAdding(character, selectedOption.classId)}
+              </p>
+            )}
+            {mode === 'xp' && !mayLevelUp && (
+              <p className={styles.hint}>
+                Not enough XP to add a level (XP mode permits one level at a time).
+              </p>
+            )}
           </>
         )}
       </Card>
@@ -558,4 +759,25 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       )}
     </div>
   );
+}
+
+/**
+ * The multiclass build label after adding one level in `classId` (PHB 2024
+ * "Multiclassing"), e.g. "Fighter 5 / Wizard 1". Display-only preview: it does
+ * not apply the level. An EXISTING class increments; a NEW class is appended at
+ * level 1 — mirroring applyMulticlassLevel so the confirmation shows the real
+ * resulting build.
+ */
+function buildAfterAdding(character: Character, classId: ClassId): string {
+  const existing = resolveClasses(character).map(({ entry, data }) => ({
+    name: data.name,
+    level: entry.level,
+  }));
+  const index = (character.classes ?? []).findIndex((e) => e.id === classId);
+  if (index === -1) {
+    existing.push({ name: getClass(classId)?.name ?? classId, level: 1 });
+  } else {
+    existing[index] = { ...existing[index], level: existing[index].level + 1 };
+  }
+  return existing.map((c) => `${c.name} ${c.level}`).join(' / ');
 }

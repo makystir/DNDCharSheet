@@ -26,8 +26,9 @@
  * return a Breakdown (calculated-totals steering).
  */
 
-import type { Character } from '../types/character';
+import type { Character, ClassEntry } from '../types/character';
 import type { ClassFeature, HitDie } from '../data/classes';
+import { getClass } from '../data/classes';
 import type { Breakdown } from './breakdown';
 import { abilityModifier, clampLevel, proficiencyBonus, MAX_LEVEL, MIN_LEVEL } from './abilities';
 import { classFeaturesByLevel, resolveClass, resolveClasses } from './classes';
@@ -324,10 +325,17 @@ export function setLevelHp(
   level: number,
   choice: HpChoice,
   timestamp: number,
+  /**
+   * The Hit Die the HP gain is rolled/fixed against (PHB 2024 "Gaining a Level"
+   * — the die is the LEVELED class's, which for a multiclass level is NOT the
+   * primary class's). Defaults to the primary class's die, so single-class
+   * behaviour is unchanged.
+   */
+  hitDieOverride?: HitDie,
 ): Character {
   const targetLevel = clampLevel(level);
   const cls = resolveClass(character);
-  const hitDie = cls?.hitDie;
+  const hitDie = hitDieOverride ?? cls?.hitDie;
   const conMod = abilityModifier(effectiveAbilityScores(character).con);
 
   // The per-level HP value recorded is the Hit-Dice portion ONLY (no Con rider),
@@ -471,6 +479,72 @@ export function applyLevelUp(
     level: nextLevel,
     detail: `Advanced to level ${nextLevel}`,
   });
+  return next;
+}
+
+/**
+ * Add ONE level in `targetClassId` — either an EXISTING class (increment its
+ * entry) or a NEW class (append a `{ id, level: 1 }` entry) — the authoritative
+ * MULTICLASS level-up (PHB 2024 "Multiclassing", Stage M4). Returns null when a
+ * level-up is not permitted right now (canLevelUp is false).
+ *
+ * The per-class invariant is maintained: the targeted entry's level increments
+ * by 1 (a new class starts at 1), and the stored TOTAL `character.level` becomes
+ * the sum of the entry levels. The per-level HP choice is recorded against the
+ * LEVELED class's Hit Die (PHB 2024 "Gaining a Level": the die is that class's),
+ * NOT the primary class's. Spellcasting is reconciled (M3). An advancement-log
+ * entry notes the class.
+ *
+ * This does NOT enforce the multiclass PREREQUISITE — the prereq / house-rule
+ * gate is the UI's decision (logic/multiclass.ts mayMulticlass); this applies a
+ * level the caller has already decided is permitted. Adding a level in the sole
+ * existing class is equivalent to {@link applyLevelUp}.
+ */
+export function applyMulticlassLevel(
+  character: Character,
+  targetClassId: string,
+  choice: HpChoice,
+  timestamp: number,
+): Character | null {
+  if (!canLevelUp(character)) return null;
+
+  const existing = character.classes ?? [];
+  const index = existing.findIndex((entry) => entry.id === targetClassId);
+  const isNewClass = index === -1;
+
+  // Build the updated classes[] array (append a new entry, or increment one).
+  let classes: ClassEntry[];
+  if (isNewClass) {
+    // PHB 2024 "Multiclassing": a new class is appended at level 1 (its reduced
+    // multiclass proficiencies apply because it is non-initial — M2).
+    classes = [...existing, { id: targetClassId as ClassEntry['id'], level: 1 }];
+  } else {
+    classes = existing.map((entry, i) =>
+      i === index ? { ...entry, level: entry.level + 1 } : entry,
+    );
+  }
+
+  // The stored TOTAL = Σ entry levels (invariant). Clamped to the level cap.
+  const total = clampLevel(classes.reduce((sum, entry) => sum + entry.level, 0));
+
+  let next: Character = { ...character, classes, level: total };
+
+  if (next.spellcasting) {
+    const reconciled = reconcileSpellcastingForLevel(next);
+    if (reconciled) next.spellcasting = reconciled;
+    else delete next.spellcasting;
+  }
+
+  // The HP gain uses the LEVELED class's Hit Die (PHB 2024 "Gaining a Level").
+  const leveledDie = getClass(targetClassId)?.hitDie;
+  next = setLevelHp(next, total, choice, timestamp, leveledDie);
+
+  // The level-up log entry names the class that gained the level.
+  const className = getClass(targetClassId)?.name ?? targetClassId;
+  const detail = isNewClass
+    ? `Multiclassed into ${className} (${className} 1); now level ${total}`
+    : `Advanced ${className} to level ${classes[index].level}; now level ${total}`;
+  next = appendLogEntry(next, { timestamp, kind: 'level-up', level: total, detail });
   return next;
 }
 

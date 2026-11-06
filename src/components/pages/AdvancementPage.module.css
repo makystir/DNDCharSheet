@@ -192,6 +192,40 @@
   font-size: 0.85rem;
 }
 
+.multiclassRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+
+.classSelect {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  min-height: 40px;
+  min-width: 220px;
+}
+
+.classSelect:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.multiclassPreview {
+  margin: 12px 0 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.warnText {
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+}
+
 .placeholder {
   margin: 0;
   color: var(--text-secondary);

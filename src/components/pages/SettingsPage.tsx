@@ -64,6 +64,13 @@ export function SettingsPage({
       ...character,
       houseRules: { ...character.houseRules, variantEncumbrance: on },
     });
+
+  const allowIllegalMulticlass = character.houseRules?.allowIllegalMulticlass ?? false;
+  const setAllowIllegalMulticlass = (on: boolean) =>
+    onChange({
+      ...character,
+      houseRules: { ...character.houseRules, allowIllegalMulticlass: on },
+    });
   return (
     <div className={styles.page}>
       <Card>
@@ -129,6 +136,28 @@ export function SettingsPage({
               onChange={(e) => setVariantEncumbrance(e.target.checked)}
             />
             <span>{variantEncumbrance ? 'On' : 'Off'}</span>
+          </label>
+        </div>
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>Allow Illegal Multiclass</span>
+            <span className={styles.settingHint}>
+              Permits taking a level in a new class even when you do not meet the
+              ability-score prerequisite (13+ in each class's primary ability),
+              with a warning. NOT a 2024 rule — this is an opt-in house rule; off
+              by default (rules-as-written enforces the prerequisite). Never
+              overrides the rule against multiclassing into a class you already
+              have.
+            </span>
+          </span>
+          <label className={styles.toggleControl}>
+            <input
+              type="checkbox"
+              checked={allowIllegalMulticlass}
+              aria-label="Allow illegal multiclass (house rule)"
+              onChange={(e) => setAllowIllegalMulticlass(e.target.checked)}
+            />
+            <span>{allowIllegalMulticlass ? 'On' : 'Off'}</span>
           </label>
         </div>
       </Card>

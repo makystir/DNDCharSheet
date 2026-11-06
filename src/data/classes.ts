@@ -132,6 +132,16 @@ export interface ClassData {
   hitDie: HitDie;
   /** Primary ability(ies) (PHB 2024 Core <Class> Traits: Primary Ability). */
   primaryAbilities: Ability[];
+  /**
+   * The multiclass PREREQUISITE ability shape (PHB 2024 "Multiclassing:
+   * Prerequisites" — you need a score of at least 13 in the primary ability of
+   * each class). Encoded EXPLICITLY per class (NOT inferred from
+   * `primaryAbilities`, whose AND/OR semantics are ambiguous): `all` = every
+   * listed ability must be >= 13; `any` = at least one must be. Exactly one of
+   * `all`/`any` is present per class. Single-primary classes use `all:[x]`;
+   * Fighter is the only `any` (Str OR Dex); Monk/Paladin/Ranger are multi-`all`.
+   */
+  multiclassPrereq: { all?: Ability[]; any?: Ability[] };
   /** The two save proficiencies (PHB 2024 Core <Class> Traits). */
   savingThrows: [Ability, Ability];
   /** Starting skill choice: how many, and from which list ('any' = all skills). */
@@ -182,6 +192,7 @@ export const CLASS_CATALOG = {
     name: 'Barbarian',
     hitDie: 12, // PHB 2024 "Core Barbarian Traits": Hit Point Die D12 (line ~2385).
     primaryAbilities: ['str'], // PHB 2024 "Core Barbarian Traits": Primary Ability Strength (line ~2385).
+    multiclassPrereq: { all: ['str'] }, // PHB 2024 "Multiclassing: Prerequisites" + Barbarian primary Str (line ~2385).
     savingThrows: ['str', 'con'], // PHB 2024 "Core Barbarian Traits": Str & Con saves (line ~2385).
     // PHB 2024 "Core Barbarian Traits": Choose 2 skills (line ~2385).
     skillChoices: {
@@ -369,6 +380,7 @@ export const CLASS_CATALOG = {
     name: 'Bard',
     hitDie: 8, // PHB 2024 "Core Bard Traits": Hit Point Die D8 (line ~2691).
     primaryAbilities: ['cha'], // PHB 2024 "Core Bard Traits": Primary Ability Charisma (line ~2691).
+    multiclassPrereq: { all: ['cha'] }, // PHB 2024 "Multiclassing: Prerequisites" + Bard primary Cha (line ~2691).
     savingThrows: ['dex', 'cha'], // PHB 2024 "Core Bard Traits": Dex & Cha saves (line ~2691).
     skillChoices: { count: 3, from: 'any' }, // PHB 2024 "Core Bard Traits": Choose any 3 skills (line ~2691).
     armorTraining: ['Light armor'], // PHB 2024 "Core Bard Traits" (line ~2691).
@@ -505,6 +517,7 @@ export const CLASS_CATALOG = {
     name: 'Cleric',
     hitDie: 8, // PHB 2024 "Core Cleric Traits": Hit Point Die D8 (line ~3122).
     primaryAbilities: ['wis'], // PHB 2024 "Core Cleric Traits": Primary Ability Wisdom (line ~3122).
+    multiclassPrereq: { all: ['wis'] }, // PHB 2024 "Multiclassing: Prerequisites" + Cleric primary Wis (line ~3122).
     savingThrows: ['wis', 'cha'], // PHB 2024 "Core Cleric Traits": Wis & Cha saves (line ~3122).
     // PHB 2024 "Core Cleric Traits": Choose 2 skills (line ~3122).
     skillChoices: {
@@ -632,6 +645,7 @@ export const CLASS_CATALOG = {
     name: 'Druid',
     hitDie: 8, // PHB 2024 "Core Druid Traits": Hit Point Die D8 (line ~3587).
     primaryAbilities: ['wis'], // PHB 2024 "Core Druid Traits": Primary Ability Wisdom (line ~3587).
+    multiclassPrereq: { all: ['wis'] }, // PHB 2024 "Multiclassing: Prerequisites" + Druid primary Wis (line ~3587).
     savingThrows: ['int', 'wis'], // PHB 2024 "Core Druid Traits": Int & Wis saves (line ~3587).
     // PHB 2024 "Core Druid Traits": Choose 2 skills (line ~3586).
     skillChoices: {
@@ -772,6 +786,7 @@ export const CLASS_CATALOG = {
     name: 'Fighter',
     hitDie: 10, // PHB 2024 "Core Fighter Traits": Hit Point Die D10 (line ~4089).
     primaryAbilities: ['str', 'dex'], // PHB 2024 "Core Fighter Traits": Str or Dex (line ~4089).
+    multiclassPrereq: { any: ['str', 'dex'] }, // PHB 2024 "Multiclassing: Prerequisites" + Fighter primary Str OR Dex (line ~4089).
     savingThrows: ['str', 'con'], // PHB 2024 "Core Fighter Traits": Str & Con saves (line ~4089).
     // PHB 2024 "Core Fighter Traits": Choose 2 skills (line ~4089).
     skillChoices: {
@@ -962,6 +977,7 @@ export const CLASS_CATALOG = {
     name: 'Monk',
     hitDie: 8, // PHB 2024 "Core Monk Traits": Hit Point Die D8 (line ~4481).
     primaryAbilities: ['dex', 'wis'], // PHB 2024 "Core Monk Traits": Dex & Wis (line ~4481).
+    multiclassPrereq: { all: ['dex', 'wis'] }, // PHB 2024 "Multiclassing: Prerequisites" + Monk primary Dex AND Wis (line ~4481).
     savingThrows: ['str', 'dex'], // PHB 2024 "Core Monk Traits": Str & Dex saves (line ~4481).
     // PHB 2024 "Core Monk Traits": Choose 2 skills (line ~4481).
     skillChoices: {
@@ -1158,6 +1174,7 @@ export const CLASS_CATALOG = {
     name: 'Paladin',
     hitDie: 10, // PHB 2024 "Core Paladin Traits": Hit Point Die D10 (line ~4820).
     primaryAbilities: ['str', 'cha'], // PHB 2024 "Core Paladin Traits": Str & Cha (line ~4820).
+    multiclassPrereq: { all: ['str', 'cha'] }, // PHB 2024 "Multiclassing: Prerequisites" + Paladin primary Str AND Cha (line ~4820).
     savingThrows: ['wis', 'cha'], // PHB 2024 "Core Paladin Traits": Wis & Cha saves (line ~4820).
     // PHB 2024 "Core Paladin Traits": Choose 2 skills (line ~4820).
     skillChoices: {
@@ -1325,6 +1342,7 @@ export const CLASS_CATALOG = {
     name: 'Ranger',
     hitDie: 10, // PHB 2024 "Core Ranger Traits": Hit Point Die D10 (line ~5319).
     primaryAbilities: ['dex', 'wis'], // PHB 2024 "Core Ranger Traits": Dex & Wis (line ~5319).
+    multiclassPrereq: { all: ['dex', 'wis'] }, // PHB 2024 "Multiclassing: Prerequisites" + Ranger primary Dex AND Wis (line ~5319).
     savingThrows: ['str', 'dex'], // PHB 2024 "Core Ranger Traits": Str & Dex saves (line ~5319).
     // PHB 2024 "Core Ranger Traits": Choose 3 skills (line ~5331).
     skillChoices: {
@@ -1492,6 +1510,7 @@ export const CLASS_CATALOG = {
     name: 'Rogue',
     hitDie: 8, // PHB 2024 "Core Rogue Traits": Hit Point Die D8 (line ~5874).
     primaryAbilities: ['dex'], // PHB 2024 "Core Rogue Traits": Primary Ability Dexterity (line ~5874).
+    multiclassPrereq: { all: ['dex'] }, // PHB 2024 "Multiclassing: Prerequisites" + Rogue primary Dex (line ~5874).
     savingThrows: ['dex', 'int'], // PHB 2024 "Core Rogue Traits": Dex & Int saves (line ~5874).
     // PHB 2024 "Core Rogue Traits": Choose 4 skills (line ~5874).
     skillChoices: {
@@ -1674,6 +1693,7 @@ export const CLASS_CATALOG = {
     name: 'Sorcerer',
     hitDie: 6, // PHB 2024 "Core Sorcerer Traits": Hit Point Die D6 (line ~6232).
     primaryAbilities: ['cha'], // PHB 2024 "Core Sorcerer Traits": Primary Ability Charisma (line ~6232).
+    multiclassPrereq: { all: ['cha'] }, // PHB 2024 "Multiclassing: Prerequisites" + Sorcerer primary Cha (line ~6232).
     savingThrows: ['con', 'cha'], // PHB 2024 "Core Sorcerer Traits": Con & Cha saves (line ~6232).
     // PHB 2024 "Core Sorcerer Traits": Choose 2 skills (line ~6232).
     skillChoices: {
@@ -1810,6 +1830,7 @@ export const CLASS_CATALOG = {
     name: 'Warlock',
     hitDie: 8, // PHB 2024 "Core Warlock Traits": Hit Point Die D8 (line ~6775).
     primaryAbilities: ['cha'], // PHB 2024 "Core Warlock Traits": Primary Ability Charisma (line ~6775).
+    multiclassPrereq: { all: ['cha'] }, // PHB 2024 "Multiclassing: Prerequisites" + Warlock primary Cha (line ~6775).
     savingThrows: ['wis', 'cha'], // PHB 2024 "Core Warlock Traits": Wis & Cha saves (line ~6775).
     // PHB 2024 "Core Warlock Traits": Choose 2 skills (line ~6784).
     skillChoices: {
@@ -1946,6 +1967,7 @@ export const CLASS_CATALOG = {
     name: 'Wizard',
     hitDie: 6, // PHB 2024 "Core Wizard Traits": Hit Point Die D6 (line ~7320).
     primaryAbilities: ['int'], // PHB 2024 "Core Wizard Traits": Primary Ability Intelligence (line ~7320).
+    multiclassPrereq: { all: ['int'] }, // PHB 2024 "Multiclassing: Prerequisites" + Wizard primary Int (line ~7320).
     savingThrows: ['int', 'wis'], // PHB 2024 "Core Wizard Traits": Int & Wis saves (line ~7320).
     // PHB 2024 "Core Wizard Traits": Choose 2 skills (line ~7320).
     skillChoices: {

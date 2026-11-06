@@ -38,6 +38,12 @@ function collectActiveRules(hr: HouseRules | undefined): ActiveRule[] {
       detail: 'Encumbered / Heavily Encumbered Speed penalties apply',
     });
   }
+  if (hr?.allowIllegalMulticlass) {
+    active.push({
+      label: 'Allow Illegal Multiclass',
+      detail: 'Multiclassing is permitted even without the ability-score prerequisite',
+    });
+  }
   return active;
 }
 

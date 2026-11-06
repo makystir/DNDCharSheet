@@ -35,7 +35,9 @@ describe('SettingsPage — variant encumbrance house-rule toggle', () => {
     renderStateful();
     const toggle = screen.getByLabelText('Enable variant encumbrance (house rule)');
     expect(toggle).not.toBeChecked();
-    expect(screen.getByText('Off')).toBeInTheDocument();
+    // The toggle's own on/off label (scoped to its <label>, since several
+    // house-rule toggles now each render an "Off" span).
+    expect(toggle.closest('label')).toHaveTextContent('Off');
   });
 
   it('enabling the toggle persists houseRules.variantEncumbrance = true', () => {

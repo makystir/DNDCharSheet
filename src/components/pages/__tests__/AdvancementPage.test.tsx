@@ -208,3 +208,108 @@ describe('AdvancementPage — audit log', () => {
     expect(get().advancement?.log).toBeUndefined();
   });
 });
+
+describe('AdvancementPage — multiclass add-a-class (M4)', () => {
+  /** A level-4 Fighter with Dex 14 (so a Dex-based class prereq is met). */
+  function fighterDex(): Partial<Character> {
+    return {
+      level: 4,
+      classes: [{ id: 'fighter', level: 4 }],
+      abilities: { str: 10, dex: 14, con: 14, int: 10, wis: 10, cha: 10 },
+    };
+  }
+
+  it('renders the add-a-class control with the current build', () => {
+    renderStateful(fighterDex());
+    expect(screen.getByLabelText('New class to add a level in')).toBeInTheDocument();
+    expect(screen.getByTestId('mc-current-build')).toHaveTextContent('Fighter 4');
+  });
+
+  it('disables a prereq-failing class when the house rule is off', () => {
+    renderStateful(fighterDex());
+    const select = screen.getByLabelText('New class to add a level in');
+    // Wizard needs Int 13; the Fighter has Int 10, so it fails and is disabled.
+    const wizardOption = within(select).getByRole('option', { name: /Wizard/ }) as HTMLOptionElement;
+    expect(wizardOption.disabled).toBe(true);
+    // Rogue needs Dex 13; Dex 14 meets it, so it is NOT disabled.
+    const rogueOption = within(select).getByRole('option', { name: /Rogue/ }) as HTMLOptionElement;
+    expect(rogueOption.disabled).toBe(false);
+  });
+
+  it('makes a prereq-failing class selectable-with-warning when the house rule is on', () => {
+    const { get } = renderStateful({
+      ...fighterDex(),
+      houseRules: { allowIllegalMulticlass: true },
+    });
+    const select = screen.getByLabelText('New class to add a level in');
+    const wizardOption = within(select).getByRole('option', { name: /Wizard/ }) as HTMLOptionElement;
+    // Now selectable, and labelled as a house-rule option.
+    expect(wizardOption.disabled).toBe(false);
+    expect(wizardOption.textContent).toMatch(/house rule/);
+    // Selecting it surfaces the warning note and a preview of the resulting build.
+    fireEvent.change(select, { target: { value: 'wizard' } });
+    expect(screen.getByText(/does not meet the multiclass prerequisite/)).toBeInTheDocument();
+    expect(screen.getByTestId('mc-result-build')).toHaveTextContent('Fighter 4 / Wizard 1');
+    // Apply the level: the new class is appended at level 1 and the total rises.
+    fireEvent.click(screen.getByRole('button', { name: 'Add level (fixed HP)' }));
+    expect(get().classes).toEqual([
+      { id: 'fighter', level: 4 },
+      { id: 'wizard', level: 1 },
+    ]);
+    expect(get().level).toBe(5);
+  });
+
+  it('adds a level in a prereq-met NEW class and appends it at level 1', () => {
+    const { get } = renderStateful(fighterDex(), () => 4000);
+    const select = screen.getByLabelText('New class to add a level in');
+    // Rogue (Dex 14 meets the prereq) is selectable.
+    fireEvent.change(select, { target: { value: 'rogue' } });
+    expect(screen.getByTestId('mc-result-build')).toHaveTextContent('Fighter 4 / Rogue 1');
+    fireEvent.click(screen.getByRole('button', { name: 'Add level (fixed HP)' }));
+    expect(get().classes).toEqual([
+      { id: 'fighter', level: 4 },
+      { id: 'rogue', level: 1 },
+    ]);
+    expect(get().level).toBe(5);
+    // A level-up log entry names the multiclass.
+    const log = get().advancement?.log ?? [];
+    expect(log.some((e) => e.kind === 'level-up' && /Rogue/.test(e.detail))).toBe(true);
+  });
+
+  /** A Fighter 5 / Wizard 1 multiclass build (d10 / d6), Dex & Int 14. */
+  function fighterWizard(): Partial<Character> {
+    return {
+      level: 6,
+      classes: [
+        { id: 'fighter', level: 5 },
+        { id: 'wizard', level: 1 },
+      ],
+      abilities: { str: 10, dex: 14, con: 14, int: 14, wis: 10, cha: 10 },
+    };
+  }
+
+  it('offers a class-to-advance picker for a multiclass character and advances the chosen held class', () => {
+    const { get } = renderStateful(fighterWizard(), () => 5000);
+    // The picker lists both held classes; the main Level-up button advances the
+    // one selected, NOT always the primary.
+    const picker = screen.getByLabelText('Class to advance');
+    fireEvent.change(picker, { target: { value: 'wizard' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    expect(get().classes).toEqual([
+      { id: 'fighter', level: 5 },
+      { id: 'wizard', level: 2 }, // the SECONDARY class gained the level
+    ]);
+    expect(get().level).toBe(7);
+    const log = get().advancement?.log ?? [];
+    expect(log.some((e) => e.kind === 'level-up' && /Wizard/.test(e.detail))).toBe(true);
+  });
+
+  it('offers fixed HP only for a multiclass level-up (no roll-HP button)', () => {
+    renderStateful(fighterWizard());
+    // Multiclass HP max is fixed-only until M5, so no roll-HP button is shown for
+    // the level-up action or the add-a-class control.
+    expect(screen.getByRole('button', { name: 'Level up (fixed HP)' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Level up (roll HP)' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add level (roll HP)' })).not.toBeInTheDocument();
+  });
+});
