@@ -7,13 +7,13 @@ import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
 /**
- * The CombatPage renders the Armor Class in two places (the Combat Stats card
- * and the Defend-mode "Defenses & Movement" readout). These helpers scope the
- * AC trigger to the Combat Stats card so the integration assertions stay
- * unambiguous. Both readouts share the same breakdown, so either is correct.
+ * P2: the CombatPage renders the Armor Class exactly once, in the consolidated
+ * "Defenses & Combat Stats" panel (the former Combat Stats card and the
+ * Defenses & Movement readout are merged). These helpers scope the AC trigger
+ * to that one panel so the integration assertions stay unambiguous.
  */
 function coreStatsCard(): HTMLElement {
-  return screen.getByRole('heading', { name: 'Combat Stats' }).closest('div')!
+  return screen.getByRole('heading', { name: 'Defenses & Combat Stats' }).closest('div')!
     .parentElement as HTMLElement;
 }
 function coreStatsAc(): HTMLElement {

@@ -1,19 +1,13 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Character } from '../../types/character';
-import { formatSigned } from '../../logic/breakdown';
 import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
 import { effectiveAbilityScores } from '../../logic/feats';
 import { getArmor } from '../../data/armor';
-import { hitPointMaxBreakdown } from '../../logic/hit-points';
-import { resolveSpecies } from '../../logic/species';
 import { resolveClass, hitDiceTotal } from '../../logic/classes';
-import { initiativeBreakdown } from '../../logic/initiative';
-import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
-import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { SectionHeader } from '../shared/SectionHeader';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { ActiveConditions } from '../combat/ActiveConditions';
@@ -75,10 +69,12 @@ const MODE_ID_BASE = 'combat-mode';
  * Panel → mode mapping (blueprint 5.3):
  *  - Attack: Weapon cards, Attack Flow trigger, Unarmed Strike, Ammunition,
  *    Weapon Mastery chooser.
- *  - Defend: HP card (damage/heal/temp HP via TakeDamagePanel), Armor Class +
- *    Speed + movement (DefenseReadout), Dodge / Opportunity notes.
+ *  - Defend: HP card (damage/heal/temp HP via TakeDamagePanel), the
+ *    consolidated Defenses & Combat Stats panel (AC + Speed + HP + Initiative +
+ *    Passive Perception + movement + Dodge / OA notes, with the Adjust editors)
+ *    (DefenseReadout, P2).
  *  - Status: Active Conditions (incl. Exhaustion), Death Saves, Concentration,
- *    Rests, read-only Spell-slot summary, Core Stats and Hit Dice.
+ *    Rests, read-only Spell-slot summary, and Hit Dice.
  *
  * No rule is computed in this component: AC, Speed, HP, initiative, passive
  * perception and the slot counts all come from the logic layer. The AC display
@@ -106,26 +102,18 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
   const isCompact = useMediaQuery('(max-width: 1024px)');
   const inCombat = character.combat?.inCombat ?? false;
 
-  const setAcOverride = (raw: string) =>
-    onChange({ ...character, acOverride: parseNumberInput(raw, true) });
-
-  const setInitiativeBonus = (raw: string) =>
-    onChange({ ...character, initiativeBonus: parseNumberInput(raw, false) });
-
   const setHitDiceSpent = (raw: string, total: number) => {
     const parsed = parseNumberInput(raw, true);
     const clamped = parsed === undefined ? undefined : Math.min(parsed, total);
     onChange({ ...character, hitDiceSpent: clamped });
   };
 
-  const selectedSpecies = resolveSpecies(character);
-  const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
-    ?.mechanics?.hpPerLevel;
-
   // Resolve the equipped armor/shield (A1 equipped state → inventory item →
-  // ArmorData catalog) so the EXISTING AC display reflects worn armour. A
-  // custom armor with no catalogId has no catalog stats, so it does not change
-  // the computed AC (unarmored); that is surfaced as no armor contribution.
+  // ArmorData catalog) so the compact AC strip reflects worn armour. A custom
+  // armor with no catalogId has no catalog stats, so it does not change the
+  // computed AC (unarmored); that is surfaced as no armor contribution. The
+  // consolidated DefenseReadout resolves AC the same way for its own display
+  // (P2); this breakdown is still needed here for the mobile CombatCompactBar.
   const inventory = character.inventory ?? [];
   const equipped = character.equipped;
   const resolveEquippedArmor = (id: string | undefined) => {
@@ -148,31 +136,17 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
       ? (wornArmorItem.name ?? 'Custom armor')
       : undefined;
 
-  // A6b: every ability-derived combat total reads the EFFECTIVE scores (base +
-  // feat/ASI increases) so a feat that raises Dex/Con flows to AC, Initiative
-  // and HP (effectiveAbilityScores; base abilities are never mutated).
+  // A6b: the AC reads the EFFECTIVE scores (base + feat/ASI increases) so a feat
+  // that raises Dex/Con flows to AC (effectiveAbilityScores; base abilities are
+  // never mutated). A5e: the AC passes the class-derived Unarmored Defense so
+  // the number reflects it (Barbarian → Con-based AC; Monk loses it with a
+  // Shield). Used by the mobile CombatCompactBar below.
   const effectiveScores = effectiveAbilityScores(character);
-  // A5e: the AC display now passes the class-derived Unarmored Defense so the
-  // number reflects it (Barbarian → Con-based AC; Monk loses it with a Shield).
   const acBreakdown = armorClassBreakdown(effectiveScores, character.acOverride, {
     armor: equippedArmor,
     shield: equippedShield,
     wornArmorIgnoredName,
     unarmoredDefense: unarmoredDefenseFor(character),
-  });
-  const initBreakdown = initiativeBreakdown(
-    effectiveScores,
-    character.initiativeBonus,
-  );
-  const ppBreakdown = passivePerceptionBreakdown(character);
-  const hpBreakdown = hitPointMaxBreakdown({
-    scores: effectiveScores,
-    level: character.level,
-    hitDie: resolveClass(character)?.hitDie,
-    hpMax: character.hpMax,
-    hpPerLevel,
-    rolledHp: character.houseRules?.rolledHp,
-    rolledHpTotal: character.rolledHpTotal,
   });
 
   const selectedClass = resolveClass(character);
@@ -188,92 +162,13 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
   // ── Panel groups (rendered as functions so they can be placed in either the
   // flat out-of-combat stack or the in-combat tabpanels without duplication). ──
 
-  // Combat Stats card (P1/P6): the read-only combat values at a glance (AC,
-  // Initiative, Passive Perception, HP maximum), each a CalculatedValue so the
-  // breakdown tooltip is preserved. HP maximum is now read-only here — it is
-  // authoritative on the Advancement tab (removes the duplicate HP editor). The
-  // remaining single-source setup editors (AC override, Initiative bonus) are
-  // tucked behind a collapsible "Adjust" affordance so they stay editable
-  // without cluttering the in-combat glance.
-  const coreStatsCard = (
-    <Card>
-      <SectionHeader icon={Swords} title="Combat Stats" />
-      <div className={styles.derivedGrid}>
-        <div className={styles.derivedCard}>
-          <span className={styles.fieldLabel}>Armor Class</span>
-          <span className={styles.derivedValue}>
-            <CalculatedValue label="Armor Class" breakdown={acBreakdown} />
-          </span>
-        </div>
-
-        <div className={styles.derivedCard}>
-          <span className={styles.fieldLabel}>Initiative</span>
-          <span className={styles.derivedValue}>
-            <CalculatedValue label="Initiative" breakdown={initBreakdown}>
-              {formatSigned(initBreakdown.total)}
-            </CalculatedValue>
-          </span>
-        </div>
-
-        <div className={styles.derivedCard}>
-          <span className={styles.fieldLabel}>Passive Perception</span>
-          <span className={styles.derivedValue}>
-            <CalculatedValue label="Passive Perception" breakdown={ppBreakdown} />
-          </span>
-        </div>
-
-        <div className={styles.derivedCard}>
-          <span className={styles.fieldLabel}>Hit Point Maximum</span>
-          <span className={styles.derivedValue}>
-            <CalculatedValue label="Hit Point Maximum" breakdown={hpBreakdown} />
-          </span>
-          <span className={styles.speciesNote}>Set on the Advancement tab</span>
-        </div>
-      </div>
-
-      {/* The single-source setup editors (AC override, Initiative bonus) sit
-          behind a collapsible affordance so the combat glance stays read-only.
-          Both remain editable; they are just tucked away. */}
-      <CollapsibleSection
-        title="Adjust"
-        storageKey="dnd-collapse-combat-adjust"
-        defaultExpanded={false}
-      >
-        <div className={styles.adjustGrid}>
-          <div className={styles.adjustField}>
-            <label className={styles.derivedInputLabel} htmlFor="ac-override">
-              Armor Class override
-            </label>
-            <input
-              id="ac-override"
-              className={styles.derivedInput}
-              type="number"
-              min={0}
-              value={character.acOverride ?? ''}
-              placeholder="auto"
-              aria-label="Armor Class override"
-              onChange={(e) => setAcOverride(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.adjustField}>
-            <label className={styles.derivedInputLabel} htmlFor="init-bonus">
-              Initiative bonus
-            </label>
-            <input
-              id="init-bonus"
-              className={styles.derivedInput}
-              type="number"
-              value={character.initiativeBonus ?? ''}
-              placeholder="0"
-              aria-label="Initiative bonus"
-              onChange={(e) => setInitiativeBonus(e.target.value)}
-            />
-          </div>
-        </div>
-      </CollapsibleSection>
-    </Card>
-  );
+  // P2: the former "Combat Stats" card and the "Defenses & Movement" readout are
+  // merged into ONE panel (DefenseReadout). It now shows AC, Speed, HP maximum
+  // (read-only), Initiative, and Passive Perception together, with movement and
+  // the Dodge / OA notes, and it owns the "Adjust" collapsible (AC override,
+  // Initiative bonus). Armor Class is therefore shown exactly once. Passing
+  // `onChange` makes the Adjust editors available; every displayed total stays a
+  // read-only CalculatedValue sourced from the logic layer.
 
   const hitDiceCard = (
     <Card>
@@ -332,19 +227,20 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
     <>
       <HitPointsCard character={character} onChange={onChange} />
       <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
-      <DefenseReadout character={character} />
+      <DefenseReadout character={character} onChange={onChange} />
     </>
   );
 
   // Status-mode panels: Active Conditions (incl. Exhaustion), Death Saves,
-  // Concentration, Core Stats, Hit Dice + Rests, read-only Spell slots.
+  // Concentration, Rests, read-only Spell slots, Hit Dice. The consolidated
+  // defense panel (AC / Speed / HP / Initiative / Passive Perception) lives in
+  // Defend mode (P2), so it is NOT duplicated here.
   const statusPanels = (
     <>
       <ActiveConditions character={character} onChange={onChange} />
       <DeathSavesCard character={character} onChange={onChange} rollRequest={deathSaveRequest} />
       <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
       <SpellSlotSummary character={character} />
-      {coreStatsCard}
       {hitDiceCard}
     </>
   );
@@ -443,8 +339,7 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
               before Conditions, matching the in-combat Defend emphasis. */}
           <HitPointsCard character={character} onChange={onChange} />
           <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
-          <DefenseReadout character={character} />
-          {coreStatsCard}
+          <DefenseReadout character={character} onChange={onChange} />
           <DeathSavesCard character={character} onChange={onChange} rollRequest={deathSaveRequest} />
           <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
           <ActiveConditions character={character} onChange={onChange} />

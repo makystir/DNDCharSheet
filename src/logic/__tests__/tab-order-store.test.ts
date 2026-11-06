@@ -67,52 +67,75 @@ describe('tab-order-store — load/save/remove', () => {
 });
 
 describe('tab-order-store — reconcileTabOrder', () => {
-  const defaults = ['overview', 'skills', 'species', 'class'];
+  // P3: the Character page's three-tab default set.
+  const defaults = ['identity', 'abilities', 'build'];
 
   it('is identity when the stored order equals defaults', () => {
     expect(reconcileTabOrder(defaults, defaults)).toEqual(defaults);
   });
 
   it('preserves a valid custom order', () => {
-    expect(reconcileTabOrder(['class', 'overview', 'species', 'skills'], defaults)).toEqual([
-      'class',
-      'overview',
-      'species',
-      'skills',
+    expect(reconcileTabOrder(['build', 'identity', 'abilities'], defaults)).toEqual([
+      'build',
+      'identity',
+      'abilities',
     ]);
   });
 
   it('drops an unknown stored ID', () => {
-    expect(reconcileTabOrder(['overview', 'ghost', 'skills', 'species', 'class'], defaults)).toEqual([
-      'overview',
-      'skills',
-      'species',
-      'class',
+    expect(reconcileTabOrder(['identity', 'ghost', 'abilities', 'build'], defaults)).toEqual([
+      'identity',
+      'abilities',
+      'build',
     ]);
   });
 
   it('appends a newly-added default in default relative order', () => {
-    expect(reconcileTabOrder(['skills', 'overview', 'species'], defaults)).toEqual([
-      'skills',
-      'overview',
-      'species',
-      'class',
+    expect(reconcileTabOrder(['abilities', 'identity'], defaults)).toEqual([
+      'abilities',
+      'identity',
+      'build',
     ]);
   });
 
   it('dedupes a doubled ID, keeping the first occurrence', () => {
-    expect(reconcileTabOrder(['overview', 'overview', 'skills', 'species', 'class'], defaults)).toEqual([
-      'overview',
-      'skills',
-      'species',
-      'class',
+    expect(reconcileTabOrder(['identity', 'identity', 'abilities', 'build'], defaults)).toEqual([
+      'identity',
+      'abilities',
+      'build',
     ]);
+  });
+
+  it('P3 migration: a stored order of the OLD four ids reconciles to the new default order', () => {
+    // A tabOrder:character saved before P3 holds {overview,skills,species,class}.
+    // All four are unknown to the new defaults, so they are dropped and the new
+    // defaults are appended — yielding the new default order, not an empty bar.
+    expect(
+      reconcileTabOrder(['overview', 'skills', 'species', 'class'], defaults),
+    ).toEqual(['identity', 'abilities', 'build']);
+  });
+
+  it('P3 migration: a mix of old and new ids keeps the new ids in their stored order', () => {
+    expect(
+      reconcileTabOrder(['skills', 'build', 'overview', 'identity'], defaults),
+    ).toEqual(['build', 'identity', 'abilities']);
   });
 
   it('property: result is always a permutation whose set equals defaults', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.constantFrom('overview', 'skills', 'species', 'class', 'ghost', 'extra')),
+        fc.array(
+          fc.constantFrom(
+            'identity',
+            'abilities',
+            'build',
+            'overview',
+            'skills',
+            'species',
+            'class',
+            'ghost',
+          ),
+        ),
         (stored) => {
           const result = reconcileTabOrder(stored, defaults);
           // Exactly every default, each once, nothing extra.

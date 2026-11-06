@@ -25,7 +25,7 @@ export type ValidPage = (typeof VALID_PAGES)[number];
  * page itself owns the actual resolution, so this map is advisory.
  */
 export const PAGE_DEFAULT_SUBTABS: Partial<Record<ValidPage, string>> = {
-  character: 'overview',
+  character: 'identity',
   spells: 'summary',
 };
 

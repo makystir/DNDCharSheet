@@ -51,7 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Character',
     icon: User,
     shortcut: '1',
-    subTabHint: 'Overview · Skills & Saves · Species · Class & Features',
+    subTabHint: 'Identity · Abilities & Skills · Build',
   },
   { id: 'combat', label: 'Combat', icon: Swords, shortcut: '2' },
   // Inventory: an UNCONDITIONAL top-level tab (every character has gear, so no

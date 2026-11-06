@@ -43,26 +43,47 @@ function renderStatefulPage(overrides = {}) {
   return { onChange };
 }
 
-/** The Combat Stats card hosts the labelled AC / Initiative / PP / HP triggers. */
-function coreStatsCard() {
-  return screen.getByRole('heading', { name: 'Combat Stats' }).closest('div')!
+/**
+ * P2: the consolidated "Defenses & Combat Stats" panel (DefenseReadout) hosts
+ * the labelled AC / Speed / HP / Initiative / Passive Perception triggers and
+ * the Adjust editors — the former separate "Combat Stats" card and
+ * "Defenses & Movement" readout are merged into this one panel.
+ */
+function defensePanel() {
+  return screen.getByRole('heading', { name: 'Defenses & Combat Stats' }).closest('div')!
     .parentElement as HTMLElement;
 }
 
 describe('CombatPage — out of combat (flat stack)', () => {
   it('renders the derived combat stats through CalculatedValue triggers', () => {
     renderPage();
-    const core = within(coreStatsCard());
-    expect(core.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
-    expect(core.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
-    expect(core.getByRole('button', { name: /Passive Perception/ })).toBeInTheDocument();
-    expect(core.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
+    const panel = within(defensePanel());
+    expect(panel.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /^Speed:/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /Passive Perception/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Hit Dice total/ })).toBeInTheDocument();
+  });
+
+  it('merges AC, Speed and HP into a SINGLE panel (no duplicate AC card)', () => {
+    // The old split showed AC twice (Combat Stats + Defenses & Movement). After
+    // P2 there is exactly one "Defenses & Combat Stats" panel, one Armor Class
+    // trigger, and no standalone "Combat Stats" heading.
+    renderPage();
+    expect(screen.queryByRole('heading', { name: 'Combat Stats' })).toBeNull();
+    expect(
+      screen.getAllByRole('heading', { name: 'Defenses & Combat Stats' }),
+    ).toHaveLength(1);
+    const panel = within(defensePanel());
+    expect(panel.getAllByRole('button', { name: /Armor Class/ })).toHaveLength(1);
+    expect(panel.getByRole('button', { name: /^Speed:/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
   });
 
   it('shows base AC 12 for Dex 14 and no override', () => {
     renderPage({ abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 } });
-    const ac = within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });
+    const ac = within(defensePanel()).getByRole('button', { name: /Armor Class/ });
     expect(ac).toHaveTextContent('12');
   });
 
@@ -79,8 +100,8 @@ describe('CombatPage — out of combat (flat stack)', () => {
     // P1: HP max is authoritative on the Advancement tab; Combat shows only the
     // read-only CalculatedValue, so the editable #hp-max input is gone.
     renderPage();
-    const core = within(coreStatsCard());
-    expect(core.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
+    const panel = within(defensePanel());
+    expect(panel.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
     expect(screen.queryByLabelText('Hit Point maximum')).toBeNull();
   });
 
@@ -103,13 +124,13 @@ describe('CombatPage — out of combat (flat stack)', () => {
     const hitDice = screen.getByRole('button', { name: /Hit Dice total/ });
     expect(hitDice).toHaveTextContent('3');
     // HP max: L1 6+2=8, then 2 levels of (4+2)=6 => 8+12 = 20.
-    const hp = within(coreStatsCard()).getByRole('button', { name: /Hit Point Maximum/ });
+    const hp = within(defensePanel()).getByRole('button', { name: /Hit Point Maximum/ });
     expect(hp.getAttribute('aria-label')).toContain('= 20');
   });
 
   it('surfaces Dwarven Toughness in the HP breakdown when hpMax is set', () => {
     renderPage({ species: { id: 'dwarf' }, level: 3, hpMax: 30 });
-    const hp = within(coreStatsCard()).getByRole('button', { name: /Hit Point Maximum/ });
+    const hp = within(defensePanel()).getByRole('button', { name: /Hit Point Maximum/ });
     expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
   });
 
@@ -124,11 +145,13 @@ describe('CombatPage — out of combat (flat stack)', () => {
       abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
       classes: [{ id: 'fighter', level: 1 }],
     });
-    // HP card, Take Damage, Defenses & Movement, Death Saves, Concentration,
-    // Active Conditions, Combat Stats, Hit Dice, Weapons, Unarmed Strike.
+    // HP card, Take Damage, the consolidated Defenses & Combat Stats panel (P2),
+    // Death Saves, Concentration, Active Conditions, Hit Dice, Weapons,
+    // Unarmed Strike.
     expect(screen.getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Defenses & Movement' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Combat Stats' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Defenses & Combat Stats' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
     // The Initiative tracker (starts combat) is reachable with a Start Combat button.
     expect(screen.getByRole('button', { name: 'Start Combat' })).toBeInTheDocument();
@@ -162,11 +185,17 @@ describe('CombatPage — in combat (segmented control)', () => {
     const defendPanel = document.getElementById('combat-mode-panel-defend')!;
     expect(defendPanel).not.toHaveAttribute('hidden');
     expect(attackPanel).toHaveAttribute('hidden');
-    // The Defend panel hosts the HP card and the Defenses & Movement readout.
+    // The Defend panel hosts the HP card and the consolidated Defenses & Combat
+    // Stats panel (AC + Speed + HP together, P2).
     expect(within(defendPanel).getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
-    expect(
-      within(defendPanel).getByRole('heading', { name: 'Defenses & Movement' }),
-    ).toBeInTheDocument();
+    const consolidated = within(defendPanel).getByRole('heading', {
+      name: 'Defenses & Combat Stats',
+    });
+    expect(consolidated).toBeInTheDocument();
+    const panel = within(consolidated.closest('div')!.parentElement as HTMLElement);
+    expect(panel.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /^Speed:/ })).toBeInTheDocument();
+    expect(panel.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
   });
 
   it('ArrowRight on the tablist moves selection to the next tab (roving tabindex)', () => {
@@ -180,12 +209,16 @@ describe('CombatPage — in combat (segmented control)', () => {
     expect(screen.getByRole('tab', { name: 'Attack' })).toHaveAttribute('tabindex', '-1');
   });
 
-  it('Status mode hosts Active Conditions, Death Saves and Combat Stats', () => {
+  it('Status mode hosts Active Conditions, Death Saves and Hit Dice', () => {
     renderInCombat();
     fireEvent.click(screen.getByRole('tab', { name: 'Status' }));
     const statusPanel = document.getElementById('combat-mode-panel-status')!;
-    expect(within(statusPanel).getByRole('heading', { name: 'Combat Stats' })).toBeInTheDocument();
     expect(within(statusPanel).getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
+    // P2: the consolidated defense panel (with AC) lives in Defend mode, so it is
+    // NOT duplicated in Status — no AC here.
+    expect(
+      within(statusPanel).queryByRole('heading', { name: 'Defenses & Combat Stats' }),
+    ).toBeNull();
   });
 });
 
@@ -197,7 +230,7 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
       abilities: { str: 10, dex: 14, con: 16, int: 10, wis: 10, cha: 10 },
       classes: [{ id: 'barbarian', level: 1 }],
     });
-    const ac = within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });
+    const ac = within(defensePanel()).getByRole('button', { name: /Armor Class/ });
     expect(ac).toHaveTextContent('15');
     expect(ac.getAttribute('aria-label')).toMatch(/Unarmored Defense/);
   });
@@ -218,7 +251,7 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
       inventory: [shieldItem],
       equipped: { shieldItemId: 'shield-1' },
     });
-    const ac = within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });
+    const ac = within(defensePanel()).getByRole('button', { name: /Armor Class/ });
     expect(ac).toHaveTextContent('14');
   });
 
@@ -237,9 +270,9 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
       inventory: [plateItem],
       equipped: { armorItemId: 'plate-1' },
     });
-    // The Defenses & Movement readout's Speed trigger carries the penalty in its
+    // The consolidated panel's Speed trigger carries the penalty in its
     // breakdown. Human base speed 30 − 10 (Str requirement) = 20 ft.
-    const movement = screen.getByRole('heading', { name: 'Defenses & Movement' })
+    const movement = screen.getByRole('heading', { name: 'Defenses & Combat Stats' })
       .closest('div')!.parentElement as HTMLElement;
     const speed = within(movement).getByRole('button', { name: /^Speed:/ });
     expect(speed).toHaveTextContent('20 ft');

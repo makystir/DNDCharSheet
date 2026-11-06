@@ -26,7 +26,7 @@ describe('Navigation subTabHint affordance (desktop expanded)', () => {
     renderNav(<Navigation activePage="character" onPageChange={vi.fn()} />);
     const character = screen.getByRole('button', { name: 'Character' });
     expect(
-      within(character).getByText('Overview · Skills & Saves · Species · Class & Features'),
+      within(character).getByText('Identity · Abilities & Skills · Build'),
     ).toBeInTheDocument();
   });
 

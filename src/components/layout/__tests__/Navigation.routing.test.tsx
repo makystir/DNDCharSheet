@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { describe, it, expect, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, cleanup, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor, act, within } from '@testing-library/react';
 import App from '../../../App';
 import {
   _resetDbForTests,
@@ -49,8 +49,10 @@ async function renderApp() {
     await saveCharacter(createCharacter('Router'));
   }
   render(<App />);
-  // The Character tab renders the Ability Scores heading once loaded.
-  await screen.findByText('Ability Scores');
+  // P3: the Character tab defaults to the Identity sub-tab, which renders the
+  // Personal Details heading once loaded (Ability Scores moved to Abilities &
+  // Skills).
+  await screen.findByRole('heading', { name: 'Personal Details' });
 }
 
 function navButton(label: string) {
@@ -58,11 +60,23 @@ function navButton(label: string) {
 }
 
 describe('Navigation routing (shell)', () => {
+  // Keep the Character sub-tab resolve chain deterministic: a few tests here set
+  // tabOrder:character / lastSubTab:character (incl. the P3 legacy-id migration
+  // checks); clear them around each test so stored state does not leak forward.
+  beforeEach(() => {
+    localStorage.removeItem('tabOrder:character');
+    localStorage.removeItem('lastSubTab:character');
+  });
+  afterEach(() => {
+    localStorage.removeItem('tabOrder:character');
+    localStorage.removeItem('lastSubTab:character');
+  });
+
   it('defaults to the Character tab with aria-current on its nav item', async () => {
     await renderApp();
     expect(navButton('Character')).toHaveAttribute('aria-current', 'page');
     expect(navButton('Combat')).not.toHaveAttribute('aria-current');
-    expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
   });
 
   it('routes to Combat on click, moving aria-current and the hash', async () => {
@@ -87,12 +101,14 @@ describe('Navigation routing (shell)', () => {
 
   it('ignores number-key shortcuts while a form field is focused', async () => {
     await renderApp();
-    const dexInput = screen.getByLabelText('Dexterity score');
+    // The Dexterity score input lives on the Abilities & Skills sub-tab (P3).
+    fireEvent.click(screen.getByRole('tab', { name: 'Abilities & Skills' }));
+    const dexInput = await screen.findByLabelText('Dexterity score');
     dexInput.focus();
     // '2' would normally switch to Combat; from within an input it must not.
     fireEvent.keyDown(dexInput, { key: '2' });
     expect(navButton('Character')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    expect(dexInput).toBeInTheDocument();
   });
 
   it('responds to an external hash change (deep link / back-forward)', async () => {
@@ -107,7 +123,7 @@ describe('Navigation routing (shell)', () => {
     history.replaceState(null, '', '#nonsense');
     await renderApp();
     expect(navButton('Character')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
   });
 
   it('moves focus to the main content region on route change', async () => {
@@ -140,27 +156,66 @@ describe('Character sub-tab routing', () => {
     expect(window.location.hash).toBe('#character/species');
   });
 
-  it('#character with no sub-tab lands on overview (Ability Scores)', async () => {
+  it('#character with no sub-tab lands on the default Identity tab', async () => {
     history.replaceState(null, '', '#character');
     render(<App />);
-    expect(await screen.findByText('Ability Scores')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Personal Details' }),
+    ).toBeInTheDocument();
   });
 
-  it('#character/bogus falls back to overview when no last-used is stored', async () => {
+  it('#character/bogus falls back to the default Identity tab when no last-used is stored', async () => {
     localStorage.removeItem('lastSubTab:character');
     history.replaceState(null, '', '#character/bogus');
     render(<App />);
-    expect(await screen.findByText('Ability Scores')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Personal Details' }),
+    ).toBeInTheDocument();
   });
 
   it('clicking a sub-tab updates the hash and persists last-used', async () => {
     history.replaceState(null, '', '#character');
     render(<App />);
-    await screen.findByText('Ability Scores');
-    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
+    // P3: the default Identity tab shows Personal Details (Ability Scores moved
+    // to the Abilities & Skills tab).
+    await screen.findByRole('heading', { name: 'Personal Details' });
+    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
     await screen.findByRole('combobox', { name: 'Class' });
-    expect(window.location.hash).toBe('#character/class');
-    expect(localStorage.getItem('lastSubTab:character')).toBe('class');
+    expect(window.location.hash).toBe('#character/build');
+    expect(localStorage.getItem('lastSubTab:character')).toBe('build');
+  });
+
+  it('a legacy deep link #character/class aliases to a working Build tab', async () => {
+    // P3 migration: an OLD sub-tab id in the hash must resolve to its new home
+    // (class → Build), not a blank/broken page.
+    history.replaceState(null, '', '#character/class');
+    render(<App />);
+    await screen.findByRole('combobox', { name: 'Class' });
+    // The Character page itself is active and functional.
+    expect(navButton('Character')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('a stored legacy tabOrder + lastSubTab (old ids) loads a working Character page', async () => {
+    // P3 migration guard: a stored order of the OLD four ids reconciles to the
+    // new three-tab default order (reconcileTabOrder drops unknowns, appends new
+    // defaults), and a stored legacy lastSubTab aliases to its new home — so the
+    // page loads on a real tab, never an empty bar or blank panel.
+    localStorage.setItem(
+      'tabOrder:character',
+      JSON.stringify(['overview', 'skills', 'species', 'class']),
+    );
+    localStorage.setItem('lastSubTab:character', 'overview');
+    history.replaceState(null, '', '#character');
+    render(<App />);
+    // overview → Identity: Personal Details renders, and the three new tabs show.
+    await screen.findByRole('heading', { name: 'Personal Details' });
+    const tablist = screen.getByRole('tablist');
+    const tabs = within(tablist).getAllByRole('tab');
+    expect(tabs.map((t) => t.textContent)).toEqual([
+      'Identity',
+      'Abilities & Skills',
+      'Build',
+    ]);
   });
 });
 
@@ -169,9 +224,9 @@ describe('Conditional, level-gated Spells tab', () => {
     // Fresh DB so each test starts from a class-less (non-caster) character;
     // otherwise a caster persisted by a previous test would leak in.
     await resetCharacterDb();
-    // selectClass() clicks the Class & Features sub-tab, which persists
-    // lastSubTab:character='class'; clear it so renderApp() resolves to the
-    // Overview sub-tab (Ability Scores) on a fresh render.
+    // selectClass() clicks the Build sub-tab, which persists
+    // lastSubTab:character='build'; clear it so renderApp() resolves to the
+    // default Identity sub-tab (Personal Details) on a fresh render.
     localStorage.removeItem('lastSubTab:character');
     localStorage.removeItem('lastSubTab:spells');
     localStorage.removeItem('tabOrder:character');
@@ -185,9 +240,9 @@ describe('Conditional, level-gated Spells tab', () => {
     localStorage.removeItem('tabOrder:spells');
   });
 
-  /** Picks a class via the Character page's Class & Features sub-tab. */
+  /** Picks a class via the Character page's Build sub-tab (P3). */
   async function selectClass(classId: string) {
-    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
     const select = await screen.findByRole('combobox', { name: 'Class' });
     fireEvent.change(select, { target: { value: classId } });
   }
@@ -225,7 +280,7 @@ describe('Conditional, level-gated Spells tab', () => {
     expect(screen.queryByRole('button', { name: 'Spells' })).not.toBeInTheDocument();
     // Choose Eldritch Knight (the subclass select appears at level 3).
     fireEvent.click(navButton('Character'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });
     expect(await screen.findByRole('button', { name: 'Spells' })).toBeInTheDocument();
@@ -235,7 +290,7 @@ describe('Conditional, level-gated Spells tab', () => {
     history.replaceState(null, '', '#spells');
     await renderApp();
     expect(navButton('Character')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     await waitFor(() => expect(window.location.hash).toBe('#character'));
   });
 
@@ -287,7 +342,7 @@ describe('Conditional, level-gated Spells tab', () => {
     await selectClass('fighter');
     await setLevelOnAdvancement(3);
     fireEvent.click(navButton('Character'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });
     const spellsTab = await screen.findByRole('button', { name: 'Spells' });

@@ -19,20 +19,21 @@ describe('derived totals survive the page split', () => {
   };
 
   it('CharacterPage exposes every expected CalculatedValue trigger across sub-tabs', () => {
-    // Overview: Proficiency Bonus + ability modifiers.
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="overview" />);
+    // P3 Identity: Proficiency Bonus.
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="identity" />);
     expect(
       screen.getByRole('button', { name: /Proficiency Bonus/ }),
     ).toBeInTheDocument();
+    cleanup();
+
+    // P3 Abilities & Skills: ability modifiers + every saving throw + every skill
+    // check (scores now sit WITH the saves/skills derived from them).
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="abilities" />);
     for (const ability of ABILITIES) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Modifier`) }),
       ).toBeInTheDocument();
     }
-    cleanup();
-
-    // Skills: every saving throw + every skill check.
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="skills" />);
     for (const ability of ABILITIES) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Save`) }),
@@ -45,8 +46,8 @@ describe('derived totals survive the page split', () => {
     }
     cleanup();
 
-    // Species: Speed + Darkvision.
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="species" />);
+    // P3 Build: Speed + Darkvision (species) on the merged Build tab.
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="build" />);
     expect(screen.getByRole('button', { name: /Speed/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Darkvision/ })).toBeInTheDocument();
   });
@@ -54,8 +55,8 @@ describe('derived totals survive the page split', () => {
   it('CombatPage exposes every expected CalculatedValue trigger', () => {
     render(<CombatPage character={character} onChange={vi.fn()} />);
 
-    // Stage A5e: AC now appears in both the Core Stats card and the Defend-mode
-    // "Defenses & Movement" readout, so there is more than one AC trigger.
+    // P2: AC, Initiative, Passive Perception and HP max now live together in the
+    // ONE consolidated Defenses & Combat Stats panel (DefenseReadout).
     expect(screen.getAllByRole('button', { name: /Armor Class/ }).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
     expect(

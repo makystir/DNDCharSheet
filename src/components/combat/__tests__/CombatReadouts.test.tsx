@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { DefenseReadout } from '../DefenseReadout';
 import { SpellSlotSummary } from '../SpellSlotSummary';
 import { HouseRuleIndicator } from '../HouseRuleIndicator';
@@ -43,6 +43,44 @@ describe('DefenseReadout', () => {
     render(<DefenseReadout character={char()} />);
     // With no combat state, movement used is "—" and remaining falls back to allowance.
     expect(screen.getByTestId('defend-movement-used')).toHaveTextContent('—');
+  });
+
+  it('P2: consolidates HP maximum, Initiative and Passive Perception into the one panel', () => {
+    render(
+      <DefenseReadout
+        character={char({
+          level: 3,
+          abilities: { str: 10, dex: 14, con: 14, int: 10, wis: 10, cha: 10 },
+          classes: [{ id: 'wizard', level: 3 }],
+        })}
+      />,
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Defenses & Combat Stats' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Passive Perception/ })).toBeInTheDocument();
+  });
+
+  it('P2: hides the Adjust editors when read-only (no onChange), shows them with onChange', () => {
+    const { rerender } = render(<DefenseReadout character={char()} />);
+    // Read-only: no AC override / Initiative bonus inputs.
+    expect(screen.queryByLabelText('Armor Class override')).toBeNull();
+    expect(screen.queryByLabelText('Initiative bonus')).toBeNull();
+
+    rerender(<DefenseReadout character={char()} onChange={() => {}} />);
+    expect(screen.getByLabelText('Armor Class override')).toBeInTheDocument();
+    expect(screen.getByLabelText('Initiative bonus')).toBeInTheDocument();
+  });
+
+  it('P2: editing the AC override emits acOverride through onChange', () => {
+    const onChange = vi.fn();
+    render(<DefenseReadout character={char()} onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Armor Class override'), {
+      target: { value: '17' },
+    });
+    expect(onChange.mock.calls.at(-1)?.[0].acOverride).toBe(17);
   });
 });
 

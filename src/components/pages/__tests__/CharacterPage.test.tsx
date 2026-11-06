@@ -5,9 +5,11 @@ import { CharacterPage } from '../CharacterPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
-type SubTab = 'overview' | 'skills' | 'species' | 'class';
+// P3 (Option B): the Character page now has THREE sub-tabs. `SubTab` accepts a
+// legacy id too, so the migration/alias tests can deep-link an OLD id.
+type SubTab = 'identity' | 'abilities' | 'build' | 'overview' | 'skills' | 'species' | 'class';
 
-function renderPage(overrides = {}, subTab: SubTab = 'overview') {
+function renderPage(overrides = {}, subTab: SubTab = 'identity') {
   const character = { ...createCharacter('Tester'), ...overrides };
   const onChange = vi.fn();
   render(<CharacterPage character={character} onChange={onChange} subTab={subTab} />);
@@ -19,7 +21,7 @@ function renderPage(overrides = {}, subTab: SubTab = 'overview') {
  * change), so a controlled field cleared to its unset value behaves as it does
  * in the app. A spy records every emitted character.
  */
-function renderStatefulPage(overrides = {}, subTab: SubTab = 'overview') {
+function renderStatefulPage(overrides = {}, subTab: SubTab = 'identity') {
   const onChange = vi.fn();
   function Harness() {
     const [character, setCharacter] = useState<Character>({
@@ -48,7 +50,7 @@ beforeEach(() => {
 
 describe('CharacterPage', () => {
   it('shows the derived modifier for a score of 10 as +0', () => {
-    renderPage();
+    renderPage({}, 'abilities');
     const strInput = screen.getByLabelText('Strength score') as HTMLInputElement;
     expect(strInput.value).toBe('10');
     const strMod = screen.getByRole('button', { name: /Strength Modifier/ });
@@ -56,7 +58,7 @@ describe('CharacterPage', () => {
   });
 
   it('reflects a score change by emitting an updated character', () => {
-    const { onChange } = renderPage();
+    const { onChange } = renderPage({}, 'abilities');
     const strInput = screen.getByLabelText('Strength score');
     fireEvent.change(strInput, { target: { value: '16' } });
     expect(onChange).toHaveBeenCalledWith(
@@ -73,13 +75,13 @@ describe('CharacterPage', () => {
   });
 
   it('exposes the modifier breakdown formula in the accessible label', () => {
-    renderPage({ abilities: { str: 16, dex: 10, con: 10, int: 10, wis: 10, cha: 10 } });
+    renderPage({ abilities: { str: 16, dex: 10, con: 10, int: 10, wis: 10, cha: 10 } }, 'abilities');
     const strMod = screen.getByRole('button', { name: /Strength Modifier/ });
     expect(strMod.getAttribute('aria-label')).toContain('Strength score 16');
   });
 
   it('clamps an out-of-range score to the legal maximum of 30', () => {
-    const { onChange } = renderPage();
+    const { onChange } = renderPage({}, 'abilities');
     const dexInput = screen.getByLabelText('Dexterity score');
     fireEvent.change(dexInput, { target: { value: '99' } });
     const call = onChange.mock.calls.at(-1)?.[0];
@@ -87,7 +89,7 @@ describe('CharacterPage', () => {
   });
 
   it('renders all six ability cards', () => {
-    renderPage();
+    renderPage({}, 'abilities');
     for (const abbr of ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']) {
       expect(screen.getByText(abbr)).toBeInTheDocument();
     }
@@ -103,7 +105,7 @@ describe('CharacterPage', () => {
       advancement: {
         feats: [{ featId: 'ability-score-improvement', level: 4, abilityIncreases: { str: 2 } }],
       },
-    });
+    }, 'abilities');
     // The base-score EDITOR still shows the creation value (10). Its accessible
     // name folds in the visible "Base" label when a feat has raised the score
     // (WCAG 2.5.3 Label in Name), so it reads "Strength base score" here.
@@ -185,8 +187,8 @@ describe('CharacterPage', () => {
     });
   });
 
-  describe('personal details (overview)', () => {
-    it('renders the Personal Details section with the portrait on overview', () => {
+  describe('personal details (identity)', () => {
+    it('renders the Personal Details section with the portrait on identity', () => {
       renderPage();
       expect(
         screen.getByRole('heading', { name: 'Personal Details' }),
@@ -196,13 +198,19 @@ describe('CharacterPage', () => {
       expect(screen.getByText('No portrait set')).toBeInTheDocument();
     });
 
-    it('Ability Scores still renders alongside Personal Details on overview', () => {
-      renderPage();
-      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
+    it('shows the read-only Level and Proficiency Bonus on identity', () => {
+      renderPage({ level: 3 });
+      expect(screen.getByText('Level')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Level up on Advancement' })).toBeInTheDocument();
     });
 
-    it('has exactly one Character name control on overview (consolidated)', () => {
+    it('Ability Scores is NOT on identity (it moved to Abilities & Skills)', () => {
+      renderPage();
+      expect(screen.queryByText('Ability Scores')).toBeNull();
+    });
+
+    it('has exactly one Character name control on identity (consolidated)', () => {
       renderPage();
       expect(screen.getAllByRole('button', { name: 'Character name' })).toHaveLength(1);
     });
@@ -371,50 +379,95 @@ describe('CharacterPage', () => {
   });
 
   describe('sub-tabs', () => {
-    it('renders the SubTabBar with the four default tabs', () => {
+    it('renders the SubTabBar with the three default tabs', () => {
       renderPage();
       const tablist = screen.getByRole('tablist');
       const tabs = within(tablist).getAllByRole('tab');
       expect(tabs.map((t) => t.textContent)).toEqual([
-        'Overview',
-        'Skills & Saves',
-        'Species',
-        'Class & Features',
+        'Identity',
+        'Abilities & Skills',
+        'Build',
       ]);
     });
 
-    it('defaults to overview (Personal Details + header + Ability Scores, no other sections)', () => {
+    it('defaults to identity (Personal Details + Level/Proficiency, no other sections)', () => {
       renderPage();
       expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
-      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
-      // Species / Class / Saving Throws / Skills section headings are gated away.
+      expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
+      // Ability Scores / Species / Class / Saving Throws are gated to other tabs.
+      expect(screen.queryByText('Ability Scores')).toBeNull();
       expect(screen.queryByRole('combobox', { name: 'Species' })).toBeNull();
       expect(screen.queryByRole('combobox', { name: 'Class' })).toBeNull();
       expect(screen.queryByLabelText('Dexterity save proficiency')).toBeNull();
     });
 
-    it('deep-links to #character/skills land on the skills sub-tab', () => {
-      renderPage({}, 'skills');
+    it('Abilities & Skills shows scores WITH the saves and skills derived from them', () => {
+      renderPage({}, 'abilities');
+      // Ability Scores sit together with Saving Throws and Skills (the P3 win).
+      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
       expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
-      // Overview-only content is gated away.
-      expect(screen.queryByText('Ability Scores')).toBeNull();
     });
 
-    it('deep-links to #character/species land on the species sub-tab', () => {
-      renderPage({}, 'species');
+    it('Build merges Species and Class & Features onto one tab', () => {
+      renderPage({}, 'build');
+      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
+    });
+
+    it('deep-links to #character/abilities land on the Abilities & Skills sub-tab', () => {
+      renderPage({}, 'abilities');
+      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
+    });
+
+    it('deep-links to #character/build land on the Build sub-tab', () => {
+      renderPage({}, 'build');
       expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
     });
 
-    it('deep-links to #character/class land on the class sub-tab', () => {
+    // ── P3 migration: legacy (old four-tab) ids must not break. ──
+    it('legacy deep link #character/overview aliases to Identity', () => {
+      renderPage({}, 'overview');
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
+      expect(screen.queryByText('Ability Scores')).toBeNull();
+    });
+
+    it('legacy deep link #character/skills aliases to Abilities & Skills', () => {
+      renderPage({}, 'skills');
+      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
+      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    });
+
+    it('legacy deep links #character/species and #character/class alias to Build', () => {
+      renderPage({}, 'species');
+      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      cleanup();
       renderPage({}, 'class');
       expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
-    it('an unknown sub-tab falls back to overview (no stored last-used)', () => {
+    it('a stored legacy lastSubTab (overview) resolves to Identity, not a blank page', () => {
+      localStorage.setItem('lastSubTab:character', 'overview');
+      render(
+        <CharacterPage character={createCharacter('Tester')} onChange={vi.fn()} subTab={null} />,
+      );
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
+    });
+
+    it('a stored legacy lastSubTab (class) resolves to Build', () => {
+      localStorage.setItem('lastSubTab:character', 'class');
+      render(
+        <CharacterPage character={createCharacter('Tester')} onChange={vi.fn()} subTab={null} />,
+      );
+      expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
+    });
+
+    it('an unknown sub-tab falls back to the default Identity tab (no stored last-used)', () => {
       localStorage.removeItem('lastSubTab:character');
       renderPage({}, 'bogus' as unknown as SubTab);
-      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     });
 
     it('selecting a sub-tab persists last-used and calls onSubTabChange', () => {
@@ -428,14 +481,14 @@ describe('CharacterPage', () => {
           onSubTabChange={onSubTabChange}
         />,
       );
-      fireEvent.click(screen.getByRole('tab', { name: 'Species' }));
-      expect(onSubTabChange).toHaveBeenCalledWith('species');
-      expect(localStorage.getItem('lastSubTab:character')).toBe('species');
+      fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+      expect(onSubTabChange).toHaveBeenCalledWith('build');
+      expect(localStorage.getItem('lastSubTab:character')).toBe('build');
       expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
     });
 
     it('a bare #character (null sub-tab) resolves to stored last-used when present', () => {
-      localStorage.setItem('lastSubTab:character', 'class');
+      localStorage.setItem('lastSubTab:character', 'build');
       render(
         <CharacterPage
           character={createCharacter('Tester')}
@@ -443,25 +496,25 @@ describe('CharacterPage', () => {
           subTab={null}
         />,
       );
-      // resolveInitialTab: no valid hash sub-tab → last-used 'class'.
+      // resolveInitialTab: no valid hash sub-tab → last-used 'build'.
       expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
     it('every CalculatedValue trigger renders in its sub-tab home', () => {
-      // Overview: Proficiency Bonus + ability modifiers.
-      renderPage({ level: 3 }, 'overview');
+      // Identity: Proficiency Bonus.
+      renderPage({ level: 3 }, 'identity');
       expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
 
       cleanup();
-      // Skills: saves + skill checks.
-      renderPage({ level: 3 }, 'skills');
+      // Abilities & Skills: ability modifiers + saves + skill checks.
+      renderPage({ level: 3 }, 'abilities');
+      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Dexterity Save/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
 
       cleanup();
-      // Species: Speed + Darkvision.
-      renderPage({ level: 3 }, 'species');
+      // Build: Speed + Darkvision.
+      renderPage({ level: 3 }, 'build');
       expect(screen.getByRole('button', { name: /Speed/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Darkvision/ })).toBeInTheDocument();
     });

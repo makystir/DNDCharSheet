@@ -67,23 +67,56 @@ export interface CharacterPageProps {
   onPortraitRemove?: () => void;
 }
 
-type CharSubTab = 'overview' | 'skills' | 'species' | 'class';
+// P3 (Option B): the Character page collapses to THREE sub-tabs — Identity,
+// Abilities & Skills, and Build. Ability scores now sit WITH the saves/skills
+// derived from them (the core findability win); Species and Class & Features
+// merge onto one "Build" tab.
+type CharSubTab = 'identity' | 'abilities' | 'build';
 
 // Stable identity (module scope) so it stays out of effect dependency arrays.
-const VALID_SUBTABS: CharSubTab[] = ['overview', 'skills', 'species', 'class'];
+const VALID_SUBTABS: CharSubTab[] = ['identity', 'abilities', 'build'];
 
 const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'skills', label: 'Skills & Saves' },
-  { id: 'species', label: 'Species' },
-  { id: 'class', label: 'Class & Features' },
+  { id: 'identity', label: 'Identity' },
+  { id: 'abilities', label: 'Abilities & Skills' },
+  { id: 'build', label: 'Build' },
 ];
 
 /**
- * The Character tab: identity, the six ability scores + derived modifiers, the
- * Proficiency Bonus, Species (incl. Speed/Darkvision), Class + features, Saving
- * Throws, and Skills. Section logic and every CalculatedValue call-site are
- * lifted verbatim from the former single-page CharacterSheet.
+ * P3 migration: the sub-tab ids changed from the old four-tab set
+ * {overview,skills,species,class} to the new three-tab set
+ * {identity,abilities,build}. A stored `lastSubTab:character` or a deep-link
+ * hash (#character/<old-id>) holding an OLD id is mapped to its NEW home so the
+ * page opens on the equivalent tab instead of a blank/broken state:
+ *   overview → identity   (personal details + level live on Identity)
+ *   skills   → abilities  (saves & skills live on Abilities & Skills)
+ *   species  → build      (species lives on Build)
+ *   class    → build      (class & features live on Build)
+ * Any id not in this map and not a current valid id falls back to the default
+ * (first) tab. The stored `tabOrder:character` of OLD ids is handled separately
+ * by reconcileTabOrder (tab-order-store.ts): it drops the unknown old ids and
+ * appends the new defaults, yielding the new default order rather than an empty
+ * bar.
+ */
+const OLD_SUBTAB_ALIASES: Record<string, CharSubTab> = {
+  overview: 'identity',
+  skills: 'abilities',
+  species: 'build',
+  class: 'build',
+};
+
+/** Map a stored/deep-linked id (current or legacy) to a current id, or null. */
+function aliasSubTab(value: string | null | undefined): CharSubTab | null {
+  if (value == null) return null;
+  if (VALID_SUBTABS.includes(value as CharSubTab)) return value as CharSubTab;
+  return OLD_SUBTAB_ALIASES[value] ?? null;
+}
+
+/**
+ * The Character tab: Identity (personal details + level/proficiency), Abilities
+ * & Skills (the six ability scores + derived modifiers WITH saving throws and
+ * skills), and Build (Species incl. Speed/Darkvision + Class & features). Every
+ * CalculatedValue call-site is preserved; the sections are only regrouped.
  */
 export function CharacterPage({
   character,
@@ -108,26 +141,34 @@ export function CharacterPage({
   const isValidSubTab = (value: string | null | undefined): value is CharSubTab =>
     value != null && VALID_SUBTABS.includes(value as CharSubTab);
 
-  // Resolve order (WFRP): valid hash sub-tab → last-used → first ordered → 'overview'.
+  // Resolve order (WFRP): hash sub-tab → last-used → first ordered → default.
+  // aliasSubTab accepts a current id OR a legacy id (overview/skills/species/
+  // class), so a deep link or stored value from the old four-tab set resolves to
+  // its new home (P3 migration) instead of a blank page; anything unknown falls
+  // through to the first ordered / default tab.
   const resolveInitialTab = (): CharSubTab => {
-    if (isValidSubTab(subTab)) return subTab;
-    const lastUsed = loadLastSubTab('character');
-    if (isValidSubTab(lastUsed)) return lastUsed;
+    const fromHash = aliasSubTab(subTab);
+    if (fromHash) return fromHash;
+    const fromLastUsed = aliasSubTab(loadLastSubTab('character'));
+    if (fromLastUsed) return fromLastUsed;
     const firstOrdered = orderedTabs[0]?.id;
     if (isValidSubTab(firstOrdered)) return firstOrdered;
-    return 'overview';
+    return VALID_SUBTABS[0];
   };
 
   const [activeSubTab, setActiveSubTabInternal] = useState<CharSubTab>(resolveInitialTab);
 
-  // Mirror a valid external hash sub-tab into local state (deep link / paste).
+  // Mirror an external hash sub-tab into local state (deep link / paste). A
+  // legacy id is aliased to its new home; an unknown id is ignored (keeps the
+  // current tab rather than blanking).
   useEffect(() => {
-    if (subTab && isValidSubTab(subTab)) {
+    const resolved = aliasSubTab(subTab);
+    if (resolved) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveSubTabInternal(subTab);
+      setActiveSubTabInternal(resolved);
     }
-    // Only the external hash prop should retrigger this mirror; isValidSubTab
-    // reads only module-scoped VALID_SUBTABS, so subTab is the sole dependency.
+    // Only the external hash prop should retrigger this mirror; aliasSubTab
+    // reads only module-scoped constants, so subTab is the sole dependency.
   }, [subTab]);
 
   const setActiveSubTab = (tab: CharSubTab) => {
@@ -330,7 +371,7 @@ export function CharacterPage({
         }}
       />
 
-      {activeSubTab === 'overview' && (
+      {activeSubTab === 'identity' && (
         <>
           <PersonalDetailsSection
             character={character}
@@ -362,7 +403,11 @@ export function CharacterPage({
           </div>
         </div>
       </Card>
+        </>
+      )}
 
+      {activeSubTab === 'abilities' && (
+        <>
       <Card>
         <h2 className={styles.fieldLabel}>Ability Scores</h2>
         <div className={styles.abilityGrid}>
@@ -423,10 +468,98 @@ export function CharacterPage({
           })}
         </div>
       </Card>
+
+      <Card>
+        <CollapsibleSection title="Saving Throws" storageKey="dnd-collapse-saves">
+          <ul className={styles.statList}>
+            {ABILITIES.map((ability) => {
+              const breakdown = saveBreakdowns[ability];
+              const proficient = character.saveProficiencies?.[ability] ?? false;
+              return (
+                <li key={ability} className={styles.statRow}>
+                  <span className={styles.statName}>{ABILITY_NAMES[ability]}</span>
+                  <label className={styles.checkboxCell}>
+                    <input
+                      type="checkbox"
+                      className={styles.checkbox}
+                      checked={proficient}
+                      aria-label={`${ABILITY_NAMES[ability]} save proficiency`}
+                      onChange={(e) => setSaveProficiency(ability, e.target.checked)}
+                    />
+                    <span className={styles.checkboxText}>Prof</span>
+                  </label>
+                  <span className={styles.statValue}>
+                    <CalculatedValue
+                      label={`${ABILITY_NAMES[ability]} Save`}
+                      breakdown={breakdown}
+                    >
+                      {formatSigned(breakdown.total)}
+                    </CalculatedValue>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </CollapsibleSection>
+      </Card>
+
+      <Card>
+        <CollapsibleSection title="Skills" storageKey="dnd-collapse-skills">
+          <ul className={styles.statList}>
+            {SKILLS.map((skill) => {
+              const breakdown = skillBreakdowns[skill.id];
+              const training = getSkillTraining(character, skill.id);
+              const proficient = training.proficient ?? false;
+              const expertise = training.expertise ?? false;
+              return (
+                <li key={skill.id} className={styles.statRow}>
+                  <span className={styles.statName}>
+                    {skill.name}{' '}
+                    <span className={styles.statAbility}>
+                      ({ABILITY_ABBR[skill.ability]})
+                    </span>
+                  </span>
+                  <label className={styles.checkboxCell}>
+                    <input
+                      type="checkbox"
+                      className={styles.checkbox}
+                      checked={proficient}
+                      aria-label={`${skill.name} proficiency`}
+                      onChange={(e) =>
+                        setSkill(skill.id, { proficient: e.target.checked })
+                      }
+                    />
+                    <span className={styles.checkboxText}>Prof</span>
+                  </label>
+                  <label className={styles.checkboxCell}>
+                    <input
+                      type="checkbox"
+                      className={styles.checkbox}
+                      checked={expertise}
+                      disabled={!proficient}
+                      aria-label={`${skill.name} expertise`}
+                      onChange={(e) =>
+                        setSkill(skill.id, { expertise: e.target.checked })
+                      }
+                    />
+                    <span className={styles.checkboxText}>Exp</span>
+                  </label>
+                  <span className={styles.statValue}>
+                    <CalculatedValue label={`${skill.name} Check`} breakdown={breakdown}>
+                      {formatSigned(breakdown.total)}
+                    </CalculatedValue>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </CollapsibleSection>
+      </Card>
         </>
       )}
 
-      {activeSubTab === 'species' && (
+      {activeSubTab === 'build' && (
+        <>
       <Card>
         <CollapsibleSection title="Species" storageKey="dnd-collapse-species">
           <div className={styles.speciesGrid}>
@@ -542,9 +675,7 @@ export function CharacterPage({
           )}
         </CollapsibleSection>
       </Card>
-      )}
 
-      {activeSubTab === 'class' && (
       <Card>
         <CollapsibleSection title="Class" storageKey="dnd-collapse-class">
           <div className={styles.classGrid}>
@@ -755,96 +886,6 @@ export function CharacterPage({
               proficiencies, and Hit Point maximum.
             </p>
           )}
-        </CollapsibleSection>
-      </Card>
-      )}
-
-      {activeSubTab === 'skills' && (
-        <>
-      <Card>
-        <CollapsibleSection title="Saving Throws" storageKey="dnd-collapse-saves">
-          <ul className={styles.statList}>
-            {ABILITIES.map((ability) => {
-              const breakdown = saveBreakdowns[ability];
-              const proficient = character.saveProficiencies?.[ability] ?? false;
-              return (
-                <li key={ability} className={styles.statRow}>
-                  <span className={styles.statName}>{ABILITY_NAMES[ability]}</span>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={proficient}
-                      aria-label={`${ABILITY_NAMES[ability]} save proficiency`}
-                      onChange={(e) => setSaveProficiency(ability, e.target.checked)}
-                    />
-                    <span className={styles.checkboxText}>Prof</span>
-                  </label>
-                  <span className={styles.statValue}>
-                    <CalculatedValue
-                      label={`${ABILITY_NAMES[ability]} Save`}
-                      breakdown={breakdown}
-                    >
-                      {formatSigned(breakdown.total)}
-                    </CalculatedValue>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </CollapsibleSection>
-      </Card>
-
-      <Card>
-        <CollapsibleSection title="Skills" storageKey="dnd-collapse-skills">
-          <ul className={styles.statList}>
-            {SKILLS.map((skill) => {
-              const breakdown = skillBreakdowns[skill.id];
-              const training = getSkillTraining(character, skill.id);
-              const proficient = training.proficient ?? false;
-              const expertise = training.expertise ?? false;
-              return (
-                <li key={skill.id} className={styles.statRow}>
-                  <span className={styles.statName}>
-                    {skill.name}{' '}
-                    <span className={styles.statAbility}>
-                      ({ABILITY_ABBR[skill.ability]})
-                    </span>
-                  </span>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={proficient}
-                      aria-label={`${skill.name} proficiency`}
-                      onChange={(e) =>
-                        setSkill(skill.id, { proficient: e.target.checked })
-                      }
-                    />
-                    <span className={styles.checkboxText}>Prof</span>
-                  </label>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={expertise}
-                      disabled={!proficient}
-                      aria-label={`${skill.name} expertise`}
-                      onChange={(e) =>
-                        setSkill(skill.id, { expertise: e.target.checked })
-                      }
-                    />
-                    <span className={styles.checkboxText}>Exp</span>
-                  </label>
-                  <span className={styles.statValue}>
-                    <CalculatedValue label={`${skill.name} Check`} breakdown={breakdown}>
-                      {formatSigned(breakdown.total)}
-                    </CalculatedValue>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
         </CollapsibleSection>
       </Card>
         </>

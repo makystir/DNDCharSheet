@@ -4,6 +4,12 @@ import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-clas
 import { effectiveAbilityScores } from '../../logic/feats';
 import { getArmor } from '../../data/armor';
 import { speedBreakdown } from '../../logic/species';
+import { hitPointMaxBreakdown } from '../../logic/hit-points';
+import { resolveClass } from '../../logic/classes';
+import { resolveSpecies } from '../../logic/species';
+import { initiativeBreakdown } from '../../logic/initiative';
+import { passivePerceptionBreakdown } from '../../logic/passive-checks';
+import { formatSigned } from '../../logic/breakdown';
 import {
   movementAllowanceBreakdown,
   remainingMovementBreakdown,
@@ -11,17 +17,30 @@ import {
 } from '../../logic/turn-economy';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
+import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { parseNumberInput } from '../pages/sheet-helpers';
 import styles from './DefenseReadout.module.css';
 
 export interface DefenseReadoutProps {
   character: Character;
+  /**
+   * P2: the consolidated panel owns the single-source setup editors (AC
+   * override, Initiative bonus), which live behind a collapsible "Adjust"
+   * affordance. When omitted the panel is purely read-only (the Adjust
+   * affordance is hidden), so it can still be rendered where no editor is
+   * wanted.
+   */
+  onChange?: (next: Character) => void;
 }
 
 /**
- * The Defend-mode readout (Stage A5e): Armor Class and Speed shown side by
- * side as CalculatedValues, plus the current turn's movement used / remaining
- * (A5c), and read-only Dodge / Opportunity Attack notes.
+ * The consolidated Defend-mode / combat-stats panel (P2: merges the former
+ * "Combat Stats" card and the "Defenses & Movement" readout into ONE panel so a
+ * defending player sees Armor Class, Speed, HP maximum, Initiative, and Passive
+ * Perception together, with the current turn's movement used / remaining and
+ * the read-only Dodge / Opportunity Attack notes. Armor Class is shown exactly
+ * once (the old duplication across the two cards is gone).
  *
  * Every number comes from a Part 1 / A5a–A5d logic function — no rule is
  * computed here:
@@ -29,13 +48,21 @@ export interface DefenseReadoutProps {
  *    (`unarmoredDefenseFor`) passed in, so a Barbarian with no armour shows the
  *    Con-based AC and a Monk loses it with a Shield (PHB 2024 Barbarian L2446 /
  *    Monk L4534).
- *  - Speed: `speedBreakdown(character)`, which now carries the worn-armour
- *    Strength-requirement -10 and the Exhaustion penalty (A5e).
+ *  - Speed: `speedBreakdown(character)`, which carries the worn-armour
+ *    Strength-requirement -10 and the Exhaustion penalty.
+ *  - HP maximum: `hitPointMaxBreakdown(...)` — READ-ONLY here; HP max is
+ *    authoritative on the Advancement tab (P1).
+ *  - Initiative: `initiativeBreakdown(...)`; Passive Perception:
+ *    `passivePerceptionBreakdown(...)`.
  *  - Movement used / remaining: the A5c turn-economy breakdowns.
+ *
+ * The single-source setup editors (AC override, Initiative bonus) stay editable
+ * behind the "Adjust" collapsible (P2/P6), so the glance stays read-only.
  */
-export function DefenseReadout({ character }: DefenseReadoutProps) {
+export function DefenseReadout({ character, onChange }: DefenseReadoutProps) {
   // Resolve equipped armour/shield (A1 equipped → inventory item → ArmorData),
-  // matching the CombatPage Core Stats resolution so the number is identical.
+  // matching the former CombatPage Core Stats resolution so the number is
+  // identical.
   const inventory = character.inventory ?? [];
   const equipped = character.equipped;
   const resolveEquippedArmor = (id: string | undefined) => {
@@ -53,7 +80,8 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
       ? (wornArmorItem.name ?? 'Custom armor')
       : undefined;
 
-  const acBreakdown = armorClassBreakdown(effectiveAbilityScores(character), character.acOverride, {
+  const effectiveScores = effectiveAbilityScores(character);
+  const acBreakdown = armorClassBreakdown(effectiveScores, character.acOverride, {
     armor: equippedArmor,
     shield: equippedShield,
     wornArmorIgnoredName,
@@ -61,6 +89,23 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
   });
 
   const speed = speedBreakdown(character);
+  const initBreakdown = initiativeBreakdown(effectiveScores, character.initiativeBonus);
+  const ppBreakdown = passivePerceptionBreakdown(character);
+
+  // HP maximum breakdown (read-only mirror; authoritative on Advancement).
+  const selectedSpecies = resolveSpecies(character);
+  const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
+    ?.mechanics?.hpPerLevel;
+  const hpBreakdown = hitPointMaxBreakdown({
+    scores: effectiveScores,
+    level: character.level,
+    hitDie: resolveClass(character)?.hitDie,
+    hpMax: character.hpMax,
+    hpPerLevel,
+    rolledHp: character.houseRules?.rolledHp,
+    rolledHpTotal: character.rolledHpTotal,
+  });
+
   const combat = character.combat;
   const turn = combat?.turn;
   const context = turnContextOf(character);
@@ -69,10 +114,15 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
     ? remainingMovementBreakdown(context.speed, turn)
     : undefined;
 
+  const setAcOverride = (raw: string) =>
+    onChange?.({ ...character, acOverride: parseNumberInput(raw, true) });
+  const setInitiativeBonus = (raw: string) =>
+    onChange?.({ ...character, initiativeBonus: parseNumberInput(raw, false) });
+
   return (
     <Card>
       <div className={styles.stack}>
-        <SectionHeader icon={Shield} title="Defenses & Movement" />
+        <SectionHeader icon={Shield} title="Defenses & Combat Stats" />
         <div className={styles.grid}>
           <div className={styles.stat}>
             <span className={styles.label}>Armor Class</span>
@@ -86,6 +136,27 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
               <CalculatedValue label="Speed" breakdown={speed}>
                 {speed.total} ft
               </CalculatedValue>
+            </span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.label}>Hit Point Maximum</span>
+            <span className={styles.value}>
+              <CalculatedValue label="Hit Point Maximum" breakdown={hpBreakdown} />
+            </span>
+            <span className={styles.note}>Set on the Advancement tab</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.label}>Initiative</span>
+            <span className={styles.value}>
+              <CalculatedValue label="Initiative" breakdown={initBreakdown}>
+                {formatSigned(initBreakdown.total)}
+              </CalculatedValue>
+            </span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.label}>Passive Perception</span>
+            <span className={styles.value}>
+              <CalculatedValue label="Passive Perception" breakdown={ppBreakdown} />
             </span>
           </div>
           <div className={styles.stat}>
@@ -124,6 +195,50 @@ export function DefenseReadout({ character }: DefenseReadoutProps) {
             </span>
           </div>
         </div>
+
+        {/* The single-source setup editors (AC override, Initiative bonus) sit
+            behind a collapsible affordance so the combat glance stays read-only
+            (P2/P6). Rendered only when the panel is given an onChange. */}
+        {onChange && (
+          <CollapsibleSection
+            title="Adjust"
+            storageKey="dnd-collapse-combat-adjust"
+            defaultExpanded={false}
+          >
+            <div className={styles.adjustGrid}>
+              <div className={styles.adjustField}>
+                <label className={styles.adjustLabel} htmlFor="ac-override">
+                  Armor Class override
+                </label>
+                <input
+                  id="ac-override"
+                  className={styles.adjustInput}
+                  type="number"
+                  min={0}
+                  value={character.acOverride ?? ''}
+                  placeholder="auto"
+                  aria-label="Armor Class override"
+                  onChange={(e) => setAcOverride(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.adjustField}>
+                <label className={styles.adjustLabel} htmlFor="init-bonus">
+                  Initiative bonus
+                </label>
+                <input
+                  id="init-bonus"
+                  className={styles.adjustInput}
+                  type="number"
+                  value={character.initiativeBonus ?? ''}
+                  placeholder="0"
+                  aria-label="Initiative bonus"
+                  onChange={(e) => setInitiativeBonus(e.target.value)}
+                />
+              </div>
+            </div>
+          </CollapsibleSection>
+        )}
 
         <div className={styles.notes}>
           {/* Text-only reminders (PHB 2024 "Dodge [Action]" / "Opportunity
