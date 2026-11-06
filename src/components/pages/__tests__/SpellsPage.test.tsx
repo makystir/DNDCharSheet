@@ -201,6 +201,104 @@ describe('SpellsPage — Bard Magical Secrets', () => {
   });
 });
 
+describe('SpellsPage — multiclass (Stage M5)', () => {
+  // Wizard 3 / Warlock 2: a Spellcasting class (Wizard, combined pool) AND a
+  // Pact Magic class (Warlock, separate pool). Two per-class DCs (Int, Cha).
+  const wizardWarlock: Partial<Character> = {
+    level: 5,
+    classes: [
+      { id: 'wizard', level: 3 },
+      { id: 'warlock', level: 2 },
+    ],
+    abilities: { str: 8, dex: 14, con: 13, int: 16, wis: 10, cha: 15 },
+  };
+
+  it('shows a per-class DC/attack block with two caster classes on Summary', () => {
+    renderStatefulPage(wizardWarlock);
+    fireEvent.click(screen.getByRole('tab', { name: 'Summary' }));
+    // Two per-class Save DC triggers, one per caster class.
+    expect(screen.getByRole('button', { name: /Wizard Spell Save DC/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Warlock Spell Save DC/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Wizard Spell Attack Bonus/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Warlock Spell Attack Bonus/ })).toBeInTheDocument();
+  });
+
+  it('shows the combined Spellcasting pool AND the separate Pact Magic pool on Slots', () => {
+    renderStatefulPage(wizardWarlock);
+    fireEvent.click(screen.getByRole('tab', { name: 'Slots' }));
+    // The combined (Wizard) pool has a level-1 available tracker.
+    expect(screen.getByRole('button', { name: /Level 1 available/ })).toBeInTheDocument();
+    // The separate Pact Magic pool is tracked alongside it.
+    expect(
+      screen.getByRole('button', { name: /Pact Magic \(level \d+\) available/ }),
+    ).toBeInTheDocument();
+  });
+
+  // Fighter 3 / Wizard 2: the PRIMARY class (classes[0]) is a non-caster, but
+  // the Wizard is an active caster — the Prepared tab must still offer the
+  // Wizard's own cantrip/prepared picker (per-class, not primary-only).
+  const fighterWizard: Partial<Character> = {
+    level: 5,
+    classes: [
+      { id: 'fighter', level: 3 },
+      { id: 'wizard', level: 2 },
+    ],
+    abilities: { str: 15, dex: 14, con: 13, int: 16, wis: 10, cha: 8 },
+  };
+
+  it('shows the Wizard prepared/cantrip pickers for a non-caster-primary multiclass', () => {
+    renderStatefulPage(fighterWizard);
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    // The Wizard section is labelled and its spellbook/cantrip pickers render
+    // (a Wizard scribes + prepares), not an empty primary-class picker.
+    expect(screen.getByText(/Wizard — Cantrips/)).toBeInTheDocument();
+    expect(screen.getByText(/Wizard — Prepared Spells/)).toBeInTheDocument();
+    expect(screen.getByText(/Wizard — Spellbook/)).toBeInTheDocument();
+    // A Wizard cantrip is offered for selection.
+    expect(screen.getByRole('checkbox', { name: /Fire Bolt/ })).toBeInTheDocument();
+  });
+
+  it('writes a per-class prepared edit under byClass[wizard]', () => {
+    const { onChange } = renderStatefulPage({
+      ...fighterWizard,
+      spellcasting: { byClass: { wizard: { spellbook: ['magic-missile'] } } },
+    });
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    // Magic Missile appears in both the prepared picker and the spellbook; scope
+    // to the Wizard Prepared Spells section.
+    const preparedSection = screen.getByText(/Wizard — Prepared Spells/).closest('div')!;
+    fireEvent.click(within(preparedSection).getByRole('checkbox', { name: /Magic Missile/ }));
+    const next = onChange.mock.calls.at(-1)![0] as Character;
+    expect(next.spellcasting?.byClass?.wizard?.prepared).toContain('magic-missile');
+  });
+
+  // The combined Spell Slots tracker must be sized by MAX capacity, not by
+  // unexpended availability: spending the top-level slot must NOT remove its
+  // tracker nor trigger the "No spell slots yet" empty state (loop-bound bug).
+  const wizardSorcerer: Partial<Character> = {
+    level: 4,
+    classes: [
+      { id: 'wizard', level: 2 },
+      { id: 'sorcerer', level: 2 },
+    ],
+    abilities: { str: 8, dex: 14, con: 13, int: 16, wis: 10, cha: 15 },
+  };
+
+  it('keeps the combined top-slot tracker visible after it is spent', () => {
+    // Combined caster level 4 → top slots are level 2. Pre-expend every level-2
+    // slot so availability-based sizing would hide the row.
+    renderStatefulPage({
+      ...wizardSorcerer,
+      spellcasting: { slotsExpended: { 2: 99 } },
+    });
+    fireEvent.click(screen.getByRole('tab', { name: 'Slots' }));
+    // The level-2 tracker still renders (sized by max capacity) ...
+    expect(screen.getByRole('button', { name: /Level 2 available/ })).toBeInTheDocument();
+    // ... and the pool does not collapse into the empty state.
+    expect(screen.queryByText('No spell slots yet')).not.toBeInTheDocument();
+  });
+});
+
 describe('SpellsPage — Browse filtering', () => {
   it('filters the class list by level and shows an effect summary', () => {
     renderStatefulPage(wizardLevel5);

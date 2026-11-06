@@ -20,6 +20,7 @@ import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats
 import { formatSigned } from '../../logic/breakdown';
 import {
   primaryClass,
+  allClasses,
   resolveClass,
   resolveSubclass,
   classProficiencies,
@@ -143,6 +144,15 @@ export function CharacterPage({
   const setLevel = (raw: string) => {
     const level = clampLevel(Number.parseInt(raw, 10));
     const next: Character = { ...character, level };
+    // Keep the single-class invariant level === sum(classes[].level): the Level
+    // control is single-class (multiclass level-up is the Advancement page's
+    // M4 path), so a lone class entry's level must mirror the character level.
+    // Without this the per-class level drifts from the total, and per-class
+    // resolvers (e.g. Eldritch Knight / Arcane Trickster casting gated at class
+    // level 3) would read a stale entry level (PHB 2024 "Multiclassing").
+    if (next.classes && next.classes.length === 1) {
+      next.classes = [{ ...next.classes[0], level }];
+    }
     // Reconcile spell selections to the new level: lowering a level can strand
     // cantrips over the cap or prepared/spellbook spells above the highest
     // castable level, which would otherwise stay hidden yet still count toward
@@ -297,6 +307,36 @@ export function CharacterPage({
         ? SKILLS.map((s) => s.id as SkillId)
         : selectedClass.skillChoices.from;
   const chosenClassSkills = primaryClass(character)?.skillChoices ?? [];
+
+  // Multiclass display (Stage M5): the character's class entries. When 2+
+  // classes exist, the Class & Features sub-tab renders one section per class
+  // ("<Class> <level>" + its subclass + its reached features, gated at THAT
+  // class's level — PHB 2024 "Multiclassing"). A single-class character has one
+  // entry, so the per-class section renders exactly as the single-class view
+  // did (identical output). classFeaturesByLevel is NOT re-gated here; each
+  // per-class block filters to features at or below that class's own level.
+  const classEntries = allClasses(character);
+  const isMulticlass = classEntries.length >= 2;
+
+  // Per-class feature groups for the multiclass display: each class's features
+  // whose level is at or below THAT class's level (PHB 2024 "Multiclassing"),
+  // grouped by level ascending. Reuses the same ClassFeature rows the
+  // single-class view renders, so each row's name/effect/source are unchanged.
+  const perClassSections = classEntries.flatMap((entry) => {
+    const data = getClass(entry.id);
+    if (!data) return [];
+    const subclass = entry.subclassId
+      ? data.subclasses.find((s) => s.id === entry.subclassId)
+      : undefined;
+    const byLevel = new Map<number, typeof data.features>();
+    for (const feature of [...data.features].sort((a, b) => a.level - b.level)) {
+      if (feature.level > entry.level) continue;
+      const bucket = byLevel.get(feature.level);
+      if (bucket) bucket.push(feature);
+      else byLevel.set(feature.level, [feature]);
+    }
+    return [{ entry, data, subclassName: subclass?.name, byLevel }];
+  });
 
   return (
     <div className={styles.page}>
@@ -658,7 +698,7 @@ export function CharacterPage({
             </div>
           )}
 
-          {featuresByLevel.size > 0 && (
+          {!isMulticlass && featuresByLevel.size > 0 && (
             <div className={styles.featureList} aria-label="Class Features">
               {[...featuresByLevel.entries()].map(([level, features]) => (
                 <div key={level} className={styles.featureLevelGroup}>
@@ -681,6 +721,42 @@ export function CharacterPage({
               ))}
             </div>
           )}
+
+          {/* Multiclass (Stage M5): one section per class — "<Class> <level>"
+              + its subclass + its reached features (gated at that class's own
+              level). Only rendered for 2+ classes; single-class is unchanged. */}
+          {isMulticlass &&
+            perClassSections.map(({ entry, data, subclassName, byLevel }) => (
+              <div
+                key={entry.id}
+                className={styles.featureList}
+                aria-label={`${data.name} Features`}
+              >
+                <h3 className={styles.featureLevelHeading}>
+                  {data.name} {entry.level}
+                  {subclassName ? ` — ${subclassName}` : ''}
+                </h3>
+                {[...byLevel.entries()].map(([level, features]) => (
+                  <div key={level} className={styles.featureLevelGroup}>
+                    <h3 className={styles.featureLevelHeading}>Level {level}</h3>
+                    {features.map((feature) => (
+                      <div key={feature.name} className={styles.featureRow}>
+                        <span className={styles.featureName}>
+                          {feature.name}
+                          {feature.kind === 'asi-marker' && (
+                            <span className={styles.featureTag}> — take ASI or feat</span>
+                          )}
+                        </span>
+                        <span className={styles.featureEffect}>{feature.effect}</span>
+                        <span className={styles.featureSource}>
+                          source: {feature.source}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
 
           {selectedClass && (
             <div className={styles.classProficiencies}>

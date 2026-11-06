@@ -247,4 +247,19 @@ describe('character-manager: toSummary', () => {
     const summary = toSummary(storeCreateCharacter('Classless'));
     expect(summary.className).toBe('');
   });
+
+  it('lists every class in the name for a multiclass character (Stage M5)', async () => {
+    const char = await adoptCharacter({
+      ...storeCreateCharacter('Dax'),
+      level: 5,
+      classes: [
+        { id: 'fighter', level: 3 },
+        { id: 'wizard', level: 2 },
+      ],
+    });
+    const summary = toSummary(char);
+    // PHB 2024 "Multiclassing": the display name lists each class with its level.
+    expect(summary.className).toBe('Fighter 3 / Wizard 2');
+    expect(summary.level).toBe(5);
+  });
 });

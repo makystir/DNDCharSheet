@@ -66,7 +66,7 @@ const AdvancementPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('./components/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
-import { isSpellcaster } from './logic/spellcasting';
+import { anySpellcaster } from './logic/spellcasting';
 import { Toast } from './components/shared/Toast';
 import { useConcentrationAutoEnd } from './hooks/useConcentrationAutoEnd';
 import { AssistantProvider } from './components/assistant/AssistantContext';
@@ -580,7 +580,7 @@ function App() {
                 )}
                 {/* Belt-and-braces with the route guard: only render Spells for a
                     spellcaster (the guard rewrites the hash, this gates the view). */}
-                {page === 'spells' && isSpellcaster(character) && (
+                {page === 'spells' && anySpellcaster(character) && (
                   <PageLoader skeleton={<SpellsSkeleton />}>
                     <SpellsPage
                       character={character}

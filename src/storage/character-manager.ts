@@ -34,7 +34,7 @@ import {
 } from './character-store';
 import { getPortraitStore } from './portrait-store';
 import { CLASS_CATALOG } from '../data/classes';
-import { primaryClass } from '../logic/classes';
+import { primaryClass, resolveClasses } from '../logic/classes';
 
 const ACTIVE_ID_KEY = 'dnd-active-character-id';
 
@@ -85,8 +85,18 @@ export interface CharacterSummary {
 
 /** Builds the display summary for a single character. */
 export function toSummary(character: Character): CharacterSummary {
-  const classId = primaryClass(character)?.id;
-  const className = classId ? (CLASS_CATALOG[classId]?.name ?? '') : '';
+  // Multiclass (Stage M5): the display name lists every class with its level,
+  // e.g. "Fighter 3 / Wizard 2" (PHB 2024 "Multiclassing"). A single-class
+  // character resolves to just its class name — identical to the pre-M5
+  // summary. Falls back to the primary-class name if no entry resolves.
+  const resolved = resolveClasses(character);
+  let className: string;
+  if (resolved.length >= 2) {
+    className = resolved.map(({ entry, data }) => `${data.name} ${entry.level}`).join(' / ');
+  } else {
+    const classId = primaryClass(character)?.id;
+    className = classId ? (CLASS_CATALOG[classId]?.name ?? '') : '';
+  }
   return {
     id: character.id,
     name: character.name,

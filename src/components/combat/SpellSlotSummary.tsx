@@ -1,10 +1,10 @@
 import { Sparkles } from 'lucide-react';
 import type { Character } from '../../types/character';
 import {
-  isSpellcaster,
-  pactMagicSlots,
+  anySpellcaster,
+  effectiveSpellSlots,
+  pactMagicSlotsForClass,
   spellSlotAvailableBreakdown,
-  spellSlots,
 } from '../../logic/spellcasting';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -27,10 +27,14 @@ export interface SpellSlotSummaryProps {
  * computed here. Renders nothing for a non-caster.
  */
 export function SpellSlotSummary({ character }: SpellSlotSummaryProps) {
-  if (!isSpellcaster(character)) return null;
+  if (!anySpellcaster(character)) return null;
 
-  const slots = spellSlots(character);
-  const pact = pactMagicSlots(character);
+  // Combined Spellcasting pool + separate Pact Magic pool (Stage M5). For a
+  // single-class caster effectiveSpellSlots === spellSlots and
+  // pactMagicSlotsForClass === pactMagicSlots, so the summary is unchanged; a
+  // combined caster may show BOTH a leveled pool and a pact pool.
+  const slots = effectiveSpellSlots(character);
+  const pact = pactMagicSlotsForClass(character);
   const expendedByLevel = character.spellcasting?.slotsExpended ?? {};
   const pactExpended = character.spellcasting?.pactSlotsExpended ?? 0;
 

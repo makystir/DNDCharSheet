@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { Character } from '../../../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../../../types/character';
@@ -63,6 +63,45 @@ describe('PrintLayout — conditional Spells section', () => {
     render(<PrintLayout character={makeWizard()} />);
     expect(screen.getByText('Spells')).toBeInTheDocument();
     expect(screen.getByText('Spell Save DC')).toBeInTheDocument();
+  });
+});
+
+describe('PrintLayout — multiclass (Stage M5)', () => {
+  // A Fighter 3 / Wizard 2 lists BOTH classes in the identity line, and a
+  // multiclass caster shows a per-class Save DC / Attack table (PHB 2024
+  // "Multiclassing").
+  function makeFighterWizard(): Character {
+    return {
+      ...structuredClone(BLANK_CHARACTER),
+      _v: CURRENT_VERSION,
+      id: 'fw-1',
+      name: 'Dax the Versatile',
+      level: 5,
+      abilities: { str: 14, dex: 14, con: 14, int: 16, wis: 10, cha: 10 },
+      classes: [
+        { id: 'fighter', level: 3 },
+        { id: 'wizard', level: 2 },
+      ],
+    };
+  }
+
+  it('lists every class as "<Class> <level>" in the identity line', () => {
+    render(<PrintLayout character={makeFighterWizard()} />);
+    // "Fighter 3 / Wizard 2" appears in both the subtitle and the Class & Level
+    // cell, so there are at least two matching nodes.
+    expect(screen.getAllByText(/Fighter 3 \/ Wizard 2/).length).toBeGreaterThan(0);
+  });
+
+  it('renders a per-class Save DC / Attack row for each caster class', () => {
+    render(<PrintLayout character={makeFighterWizard()} />);
+    // The Spells section renders for the non-caster-primary multiclass caster
+    // (gated on anySpellcaster, not the primary class).
+    const spells = screen.getByRole('region', { name: 'Spells' });
+    expect(spells).toBeInTheDocument();
+    // The per-class table lists the Wizard (the only active caster here) with
+    // its own Save DC column, distinct from the combined top line.
+    expect(within(spells).getByRole('columnheader', { name: 'Save DC' })).toBeInTheDocument();
+    expect(within(spells).getByText('Wizard')).toBeInTheDocument();
   });
 });
 

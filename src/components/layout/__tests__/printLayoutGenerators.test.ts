@@ -177,6 +177,47 @@ describe('printLayoutGenerators — conditional Spells visibility', () => {
   });
 });
 
+describe('printLayoutGenerators — multiclass (Stage M5)', () => {
+  it('identity lists every class as "<Class> <level> / <Class> <level>"', () => {
+    const multi = makeFighter({
+      id: 'multi-1',
+      level: 5,
+      classes: [
+        { id: 'fighter', level: 3 },
+        { id: 'wizard', level: 2 },
+      ],
+    });
+    const identity = buildPrintSheetData(multi).identity;
+    expect(identity.classAndLevel).toBe('Fighter 3 / Wizard 2');
+  });
+
+  it('single-class identity is unchanged (one "<Class> <level>")', () => {
+    expect(buildPrintSheetData(makeWizard()).identity.classAndLevel).toBe('Wizard 5');
+  });
+
+  it('spells section carries one per-class DC/attack row per caster class', () => {
+    // Wizard 3 / Warlock 2: two caster classes (Int + Cha).
+    const wizardWarlock = makeWizard({
+      id: 'ww-1',
+      level: 5,
+      classes: [
+        { id: 'wizard', level: 3 },
+        { id: 'warlock', level: 2 },
+      ],
+      abilities: { str: 8, dex: 14, con: 13, int: 16, wis: 10, cha: 15 },
+    });
+    const spells = buildSpells(wizardWarlock);
+    expect(spells?.perClass).toBeDefined();
+    const classNames = spells?.perClass?.map((r) => r.className) ?? [];
+    expect(classNames).toContain('Wizard');
+    expect(classNames).toContain('Warlock');
+  });
+
+  it('single-class spells section omits the per-class rows', () => {
+    expect(buildSpells(makeWizard())?.perClass).toBeUndefined();
+  });
+});
+
 describe('printLayoutGenerators — blank character never throws', () => {
   it('builds a complete data shape for the blank character', () => {
     const data = buildPrintSheetData(structuredClone(BLANK_CHARACTER));

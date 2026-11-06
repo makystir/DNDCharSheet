@@ -375,29 +375,47 @@ export function requiredCantrips(character: Character): SpellId[] {
  * column" rule is the per-class spellcasting text (PHB 2024 Bard p.57, Druid
  * p.83, Paladin p.109, Ranger p.119, Warlock p.153).
  */
+/**
+ * [spellId, grantedAtLevel] pairs per class for the always-prepared feature
+ * spells (see {@link alwaysPreparedSpells} for the per-feature citations).
+ */
+const ALWAYS_PREPARED_GRANTS: Record<string, Array<[SpellId, number]>> = {
+  druid: [['speak-with-animals', 1]],
+  paladin: [
+    ['divine-smite', 2],
+    ['find-steed', 5],
+  ],
+  ranger: [['hunter-s-mark', 1]],
+  warlock: [['contact-other-plane', 9]],
+  bard: [
+    ['power-word-heal', 20],
+    ['power-word-kill', 20],
+  ],
+};
+
 export function alwaysPreparedSpells(character: Character): SpellId[] {
   if (!isSpellcaster(character)) return [];
-  const cls = resolveClass(character);
-  if (!cls) return [];
-  const level = character.level;
-  // [spellId, grantedAtLevel] pairs per class.
-  const grants: Record<string, Array<[SpellId, number]>> = {
-    druid: [['speak-with-animals', 1]],
-    paladin: [
-      ['divine-smite', 2],
-      ['find-steed', 5],
-    ],
-    ranger: [['hunter-s-mark', 1]],
-    warlock: [['contact-other-plane', 9]],
-    bard: [
-      ['power-word-heal', 20],
-      ['power-word-kill', 20],
-    ],
-  };
-  const forClass = grants[cls.id] ?? [];
+  const primary = primaryClass(character);
+  if (!primary) return [];
+  // The primary class entry at the TOTAL character level — single-class keeps
+  // the pre-M5 behaviour exactly (entry.level === character.level).
+  return classAlwaysPreparedSpells({ ...primary, level: character.level });
+}
+
+/**
+ * Per-class analogue of {@link alwaysPreparedSpells}: the leveled spells a given
+ * class entry's features make ALWAYS prepared at ITS OWN class level, or [] when
+ * none. PHB 2024 "Multiclassing: Spellcasting" (L2119) — each class prepares as
+ * a single-classed member of itself, so its always-prepared grants are gated at
+ * its own class level. These do NOT count against that class's Prepared Spells
+ * number (per-class spellcasting text) and are rendered locked.
+ */
+export function classAlwaysPreparedSpells(entry: ClassEntry): SpellId[] {
+  if (!entryIsSpellcaster(entry)) return [];
+  const forClass = ALWAYS_PREPARED_GRANTS[entry.id] ?? [];
   const ids: SpellId[] = [];
   for (const [id, grantedAt] of forClass) {
-    if (level >= grantedAt && getSpell(id)) ids.push(id);
+    if (entry.level >= grantedAt && getSpell(id)) ids.push(id);
   }
   return ids;
 }
@@ -644,6 +662,20 @@ export function spellcastingClasses(character: Character): ClassEntry[] {
 }
 
 /**
+ * Whether ANY of the character's classes is an active caster — Spellcasting
+ * (full/half/third) OR Warlock Pact Magic (PHB 2024 "Multiclassing"). Unlike
+ * {@link isSpellcaster} (which gates on the PRIMARY class only), this is true
+ * for a multiclass build whose caster is a non-initial class (e.g. a Fighter
+ * 5 / Wizard 3), so the Spells surfaces render for every spellcasting
+ * multiclass. For a single-class / primary-caster character this returns the
+ * same value as {@link isSpellcaster} (identical gating), so single-class
+ * behaviour is unchanged.
+ */
+export function anySpellcaster(character: Character): boolean {
+  return allClasses(character).some((entry) => entryIsSpellcaster(entry));
+}
+
+/**
  * The combined spellcaster level used to index the Multiclass Spellcaster slot
  * table (PHB 2024 "Multiclassing: Spellcasting: Spell Slots", L2156-2163):
  *   + all levels in FULL casters (Bard/Cleric/Druid/Sorcerer/Wizard);
@@ -838,6 +870,75 @@ export function classPreparedCount(entry: ClassEntry): number {
 }
 
 /**
+ * Per-class analogue of {@link cantripsKnownBreakdown}: a breakdown for the
+ * cantrips-known cap of a given class entry at ITS OWN class level (a direct
+ * table lookup). Returns undefined when the entry is not an active caster. A
+ * zero total (Paladin/Ranger have no cantrips) still returns a breakdown so the
+ * cap can show a tooltip (calculated-totals steering).
+ */
+export function classCantripsKnownBreakdown(entry: ClassEntry): Breakdown | undefined {
+  if (!entryIsSpellcaster(entry)) return undefined;
+  const className = getClass(entry.id)?.name ?? entry.id;
+  const table = CANTRIPS_KNOWN[entry.id as keyof typeof CANTRIPS_KNOWN];
+  const total = table?.[entry.level] ?? 0;
+  return {
+    total,
+    components: [{ label: `${className} level ${entry.level} (Cantrips)`, value: total }],
+  };
+}
+
+/**
+ * Per-class analogue of {@link preparedCountBreakdown}: a breakdown for the
+ * prepared-spells cap of a given class entry at ITS OWN class level (a direct
+ * table lookup). Returns undefined when the entry is not an active caster or has
+ * no prepared spells at its level.
+ */
+export function classPreparedCountBreakdown(entry: ClassEntry): Breakdown | undefined {
+  if (!entryIsSpellcaster(entry)) return undefined;
+  const className = getClass(entry.id)?.name ?? entry.id;
+  const table = PREPARED_COUNT[entry.id as keyof typeof PREPARED_COUNT];
+  const total = table?.[entry.level] ?? 0;
+  if (total <= 0) return undefined;
+  return {
+    total,
+    components: [{ label: `${className} level ${entry.level} (Prepared Spells)`, value: total }],
+  };
+}
+
+/**
+ * Whether a given class entry prepares from a spellbook (Wizard only, PHB 2024
+ * "Wizard: Spellcasting"). Per-class analogue of the primary-class descriptor's
+ * `usesSpellbook`. Subclass casters (Eldritch Knight / Arcane Trickster) draw
+ * from the Wizard LIST but do not use a spellbook.
+ */
+export function classUsesSpellbook(entry: ClassEntry): boolean {
+  return descriptorForEntry(entry)?.usesSpellbook ?? false;
+}
+
+/**
+ * The focus option labels for a given class entry, or [] for a non-caster.
+ * Per-class analogue of {@link spellcastingFocusOptions}.
+ */
+export function classSpellcastingFocusOptions(entry: ClassEntry): string[] {
+  if (!entryIsSpellcaster(entry)) return [];
+  // PHB 2024: focus named in each class's Spellcasting focus text (same table
+  // as spellcastingFocusOptions, keyed per class).
+  const byClass: Record<string, string[]> = {
+    bard: ['Musical Instrument'],
+    cleric: ['Holy Symbol'],
+    druid: ['Druidic Focus'],
+    sorcerer: ['Arcane Focus'],
+    warlock: ['Arcane Focus'],
+    wizard: ['Arcane Focus', 'Spellbook'],
+    paladin: ['Holy Symbol'],
+    ranger: ['Druidic Focus'],
+    fighter: ['Arcane Focus'], // Eldritch Knight (PHB 2024 ~p.52).
+    rogue: ['Arcane Focus'], // Arcane Trickster (PHB 2024 ~p.123).
+  };
+  return byClass[entry.id] ?? [];
+}
+
+/**
  * The highest spell level a given class can PREPARE at its own class level
  * (1-9), or 0 when it cannot prepare leveled spells. PHB 2024 L2119: each class
  * prepares as a single-classed member of that class, so its prepared-spell level
@@ -1012,4 +1113,128 @@ export function perClassSpellcasting(character: Character): ClassSpellcastingSum
     });
   }
   return summaries;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// CROSS-POOL CASTING (Stage M5)
+//
+// PHB 2024 "Pact Magic" multiclass paragraph (Docs/PlayersHandbook.md L2168):
+//   "If you have the Pact Magic feature and the Spellcasting feature, you can
+//    use the spell slots you gain from Pact Magic to cast spells you have
+//    prepared from classes with the Spellcasting feature, and you can use the
+//    spell slots you gain from the Spellcasting feature to cast Warlock spells
+//    you have prepared."
+//
+// So when BOTH pools exist, they are INTERCHANGEABLE FOR CASTING: a prepared
+// spell of level L is castable iff EITHER pool has an UNEXPENDED slot of level
+// >= L. The pools are still tracked / recovered separately (Pact Magic on a
+// Short or Long Rest, Spellcasting on a Long Rest — M3); this rule is only
+// about which slots may cast which prepared spells. When the character has only
+// ONE of the two pools, casting uses that pool as normal (no cross-pool).
+// ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * The highest level with an AVAILABLE (unexpended) slot in an available-slot
+ * vector (1-indexed by spell level, index 0 unused), or 0 when none. Pure core
+ * of {@link highestCastableSpellLevel} for the Spellcasting pool.
+ */
+function highestAvailableLevel(available: SlotVector | undefined): number {
+  if (!available) return 0;
+  let max = 0;
+  for (let level = 1; level < available.length; level++) {
+    if ((available[level] ?? 0) > 0) max = level;
+  }
+  return max;
+}
+
+/**
+ * CROSS-POOL CORE (pure). The highest spell level castable given the two pools'
+ * AVAILABLE (unexpended) slots (PHB 2024 L2168): the Spellcasting pool as a
+ * per-level available-slot vector, and the Pact Magic pool as (level, count).
+ * The highest castable level is the max available slot level across BOTH pools.
+ * A pool contributes nothing when it is absent or fully expended. Exposed so
+ * the golden table can exercise it with abstract pool inputs.
+ */
+export function highestCastableLevelFromPools(
+  spellcastingAvailable: SlotVector | undefined,
+  pact: { slotLevel: number; available: number } | undefined,
+): number {
+  const fromSpellcasting = highestAvailableLevel(spellcastingAvailable);
+  const fromPact = pact && pact.available > 0 ? pact.slotLevel : 0;
+  return Math.max(fromSpellcasting, fromPact);
+}
+
+/**
+ * CROSS-POOL CORE (pure). Whether a prepared spell of `spellLevel` is castable
+ * given the two pools' available slots (PHB 2024 L2168). A cantrip (level 0) is
+ * always castable (no slot). A leveled spell is castable iff some unexpended
+ * slot of level >= `spellLevel` exists in EITHER pool. Exposed for the golden.
+ */
+export function canCastFromPools(
+  spellLevel: number,
+  spellcastingAvailable: SlotVector | undefined,
+  pact: { slotLevel: number; available: number } | undefined,
+): boolean {
+  if (spellLevel <= 0) return true; // Cantrips use no slot.
+  return highestCastableLevelFromPools(spellcastingAvailable, pact) >= spellLevel;
+}
+
+/**
+ * The character's AVAILABLE (unexpended) Spellcasting slots as a per-level
+ * vector: {@link effectiveSpellSlots} maxima minus the pooled `slotsExpended`.
+ * undefined for a non-Spellcasting character. The combined/single routing is
+ * M3's; this only subtracts expenditure.
+ */
+function availableSpellcastingSlots(character: Character): SlotVector | undefined {
+  const slots = effectiveSpellSlots(character);
+  if (!slots) return undefined;
+  const expended = character.spellcasting?.slotsExpended ?? {};
+  return slots.map((max, level) => Math.max(0, (max ?? 0) - (expended[level] ?? 0)));
+}
+
+/**
+ * The character's AVAILABLE Pact Magic pool as (slotLevel, available), or
+ * undefined when the character has no Warlock levels. Composes
+ * {@link pactMagicSlotsForClass} with the pooled `pactSlotsExpended`.
+ */
+function availablePactPool(
+  character: Character,
+): { slotLevel: number; available: number } | undefined {
+  const pact = pactMagicSlotsForClass(character);
+  if (!pact || pact.slots <= 0) return undefined;
+  const expended = character.spellcasting?.pactSlotsExpended ?? 0;
+  return { slotLevel: pact.slotLevel, available: Math.max(0, pact.slots - expended) };
+}
+
+/**
+ * The highest spell level the character can currently cast using EITHER pool
+ * (PHB 2024 L2168), 1-9, or 0 when no unexpended slot remains. When both the
+ * Spellcasting pool and the Pact Magic pool exist, it is the max available
+ * (unexpended) slot level ACROSS BOTH pools (cross-pool). With a single pool it
+ * is that pool's top available level; with neither it is 0.
+ *
+ * For a single-class (single-pool) caster this equals the sole pool's top
+ * available level — identical to the pre-M5 single-pool behaviour.
+ */
+export function highestCastableSpellLevel(character: Character): number {
+  return highestCastableLevelFromPools(
+    availableSpellcastingSlots(character),
+    availablePactPool(character),
+  );
+}
+
+/**
+ * Whether a prepared spell of `spellLevel` is castable RIGHT NOW (PHB 2024
+ * L2168). A cantrip (level 0) is always castable (it uses no slot). A leveled
+ * spell is castable iff some UNEXPENDED slot of level >= `spellLevel` exists in
+ * EITHER pool — when both pools exist a pact slot may cast a prepared
+ * Spellcasting spell and vice versa (cross-pool). With a single pool the check
+ * is against that pool only (no behaviour change for a single-class caster).
+ */
+export function canCastPreparedSpell(character: Character, spellLevel: number): boolean {
+  return canCastFromPools(
+    spellLevel,
+    availableSpellcastingSlots(character),
+    availablePactPool(character),
+  );
 }

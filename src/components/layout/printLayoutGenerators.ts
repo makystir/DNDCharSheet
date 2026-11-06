@@ -37,6 +37,7 @@ import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
 import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
 import {
   isSpellcaster,
+  anySpellcaster,
   spellSaveDcBreakdown,
   spellAttackBreakdown,
   spellcastingAbility,
@@ -44,8 +45,16 @@ import {
   pactMagicSlots,
   cantripsKnown,
   preparedCount,
+  effectiveSpellSlots,
+  pactMagicSlotsForClass,
+  perClassSpellcasting,
 } from '../../logic/spellcasting';
-import { primaryClass, resolveClass, classFeaturesByLevel } from '../../logic/classes';
+import {
+  primaryClass,
+  allClasses,
+  resolveClass,
+  resolveClasses,
+} from '../../logic/classes';
 import { knownLanguages } from '../../logic/languages';
 import { activeConditionIds, exhaustionLevelOf } from '../../logic/conditions';
 import { equippedWeapons, weaponAttackProfile, unarmedStrike } from '../../logic/attacks';
@@ -127,6 +136,14 @@ export interface SpellSlotRow {
   count: number;
 }
 
+/** One caster class's spell DC / attack for the multiclass print block. */
+export interface SpellClassRow {
+  className: string;
+  ability: string;
+  saveDc: number;
+  attackBonus: number;
+}
+
 export interface SpellsSection {
   saveDc: number | undefined;
   attackBonus: number | undefined;
@@ -136,6 +153,13 @@ export interface SpellsSection {
   slots: SpellSlotRow[];
   cantrips: string[];
   prepared: string[];
+  /**
+   * Per-class spell DC / attack, one row per ACTIVE caster class (Stage M5).
+   * Present (length >= 1) ONLY for a multiclass caster (2+ classes); undefined
+   * for a single-class caster, whose single DC/attack stay in saveDc/attackBonus
+   * — so the single-class print block is identical to the pre-M5 output.
+   */
+  perClass?: SpellClassRow[];
 }
 
 export interface InventoryRow {
@@ -181,9 +205,16 @@ export interface PrintSheetData {
 export function buildIdentity(character: Character): IdentitySection {
   const species = resolveSpecies(character);
   const cls = resolveClass(character);
-  const classAndLevel = cls
-    ? `${cls.name} ${primaryClass(character)?.level ?? character.level}`
-    : 'No class';
+  // Multiclass (Stage M5): list every class as "<Class> <level>" joined by
+  // " / " (e.g. "Fighter 3 / Wizard 2"). A single-class character yields one
+  // entry — "Fighter 5" — identical to the pre-M5 output. PHB 2024 "Multiclassing".
+  const resolved = resolveClasses(character);
+  const classAndLevel =
+    resolved.length > 0
+      ? resolved.map(({ entry, data }) => `${data.name} ${entry.level}`).join(' / ')
+      : cls
+        ? `${cls.name} ${primaryClass(character)?.level ?? character.level}`
+        : 'No class';
   // Resolve a structured (wizard-created) background to its display name the
   // same way CharacterPage does — getBackground(id)?.name — so the printed
   // sheet shows "Acolyte" rather than the lowercase "acolyte" id slug. Fall
@@ -307,47 +338,105 @@ export function buildAttacks(character: Character): AttackRow[] {
  * read of a spellcasting.ts total; nothing is recomputed here.
  */
 export function buildSpells(character: Character): SpellsSection | undefined {
-  if (!isSpellcaster(character)) return undefined;
+  // Visibility matches the app's Spells route guard (App.tsx) and the on-screen
+  // SpellSlotSummary: render for ANY active caster, not only a caster PRIMARY
+  // class — so a Fighter 3 / Wizard 2 (non-caster primary) still prints its
+  // Spells section (PHB 2024 "Multiclassing"). A single-class caster is
+  // unchanged (anySpellcaster === isSpellcaster when there is one class).
+  if (!anySpellcaster(character)) return undefined;
 
-  const ability = spellcastingAbility(character);
-  const dc = spellSaveDcBreakdown(character);
-  const atk = spellAttackBreakdown(character);
+  const isMulticlass = allClasses(character).length >= 2;
 
+  // Top-line DC / attack / ability. These are the PRIMARY class's values for a
+  // single-class caster (unchanged). For a multiclass whose primary class is a
+  // non-caster, the primary-based resolvers return undefined; fall back to the
+  // first ACTIVE caster class so the summary line is populated (the per-class
+  // table below still lists every caster class). PHB 2024 "Multiclassing".
+  const perClassSummaries = perClassSpellcasting(character);
+  const primaryIsCaster = isSpellcaster(character);
+  const ability = primaryIsCaster
+    ? spellcastingAbility(character)
+    : perClassSummaries[0]?.ability;
+  const dcTotal = primaryIsCaster
+    ? spellSaveDcBreakdown(character)?.total
+    : perClassSummaries[0]?.saveDc.total;
+  const atkTotal = primaryIsCaster
+    ? spellAttackBreakdown(character)?.total
+    : perClassSummaries[0]?.attack.total;
+
+  // Slots: the combined Spellcasting pool + the separate Pact Magic pool
+  // (Stage M5). For a single-class caster effectiveSpellSlots === spellSlots and
+  // pactMagicSlotsForClass === pactMagicSlots, so the output is unchanged; the
+  // multiclass-aware functions are used only for 2+ classes. A combined caster
+  // can have BOTH a leveled pool and a pact pool, so both are listed.
   const slots: SpellSlotRow[] = [];
-  const pact = pactMagicSlots(character);
-  if (pact) {
-    slots.push({ level: 0, label: `Pact Magic (level ${pact.slotLevel})`, count: pact.slots });
-  } else {
-    const vector = spellSlots(character);
-    if (vector) {
-      for (let level = 1; level < vector.length; level++) {
-        const count = vector[level] ?? 0;
-        if (count > 0) slots.push({ level, label: `Level ${level}`, count });
-      }
+  const vector = isMulticlass ? effectiveSpellSlots(character) : spellSlots(character);
+  const pact = isMulticlass ? pactMagicSlotsForClass(character) : pactMagicSlots(character);
+  if (vector) {
+    for (let level = 1; level < vector.length; level++) {
+      const count = vector[level] ?? 0;
+      if (count > 0) slots.push({ level, label: `Level ${level}`, count });
     }
   }
+  if (pact && pact.slots > 0) {
+    slots.push({ level: 0, label: `Pact Magic (level ${pact.slotLevel})`, count: pact.slots });
+  }
 
-  // Per-class selections now live under spellcasting.byClass[classId]. Display
-  // stays single-class this stage (design 9-E): read the PRIMARY class's bucket.
-  const primaryId = primaryClass(character)?.id;
-  const perClass = primaryId ? character.spellcasting?.byClass?.[primaryId] : undefined;
+  // Per-class DC / attack (Stage M5) — only for a multiclass caster; a
+  // single-class caster keeps its single DC/attack in saveDc/attackBonus.
+  const perClassRows: SpellClassRow[] | undefined = isMulticlass
+    ? perClassSummaries.map((s) => ({
+        className: s.className,
+        ability: ABILITY_NAMES[s.ability],
+        saveDc: s.saveDc.total,
+        attackBonus: s.attack.total,
+      }))
+    : undefined;
+
+  // Per-class selections live under spellcasting.byClass[classId]. A single-
+  // class caster reads the PRIMARY class's bucket (unchanged). A multiclass
+  // caster aggregates every active caster class's cantrips/prepared into the
+  // flat print lists (PHB 2024 "Multiclassing").
   const spellNames = (ids: readonly string[] | undefined): string[] =>
     (ids ?? []).flatMap((id) => {
       const name = getSpell(id)?.name;
       return name !== undefined ? [name as string] : [];
     });
-  const cantrips = spellNames(perClass?.cantrips);
-  const prepared = spellNames(perClass?.prepared);
+  let cantrips: string[];
+  let prepared: string[];
+  if (isMulticlass) {
+    const byClass = character.spellcasting?.byClass ?? {};
+    const casterIds = perClassSummaries.map((s) => s.classId);
+    cantrips = casterIds.flatMap((id) => spellNames(byClass[id]?.cantrips));
+    prepared = casterIds.flatMap((id) => spellNames(byClass[id]?.prepared));
+  } else {
+    const primaryId = primaryClass(character)?.id;
+    const perClass = primaryId ? character.spellcasting?.byClass?.[primaryId] : undefined;
+    cantrips = spellNames(perClass?.cantrips);
+    prepared = spellNames(perClass?.prepared);
+  }
+
+  // Cantrip / prepared COUNTS: the primary class's caps for a single-class
+  // caster (unchanged). For a multiclass each class prepares as a single-classed
+  // member of itself (PHB 2024 "Multiclassing: Spellcasting"), so sum each
+  // active caster's own cap from the M3 per-class summaries.
+  const cantripsKnownTotal = isMulticlass
+    ? perClassSummaries.reduce((sum, s) => sum + s.cantripsKnown, 0)
+    : cantripsKnown(character);
+  const preparedCountTotal = isMulticlass
+    ? perClassSummaries.reduce((sum, s) => sum + s.preparedCount, 0)
+    : preparedCount(character);
 
   return {
-    saveDc: dc?.total,
-    attackBonus: atk?.total,
+    saveDc: dcTotal,
+    attackBonus: atkTotal,
     ability: ability ? ABILITY_NAMES[ability] : undefined,
-    cantripsKnown: cantripsKnown(character),
-    preparedCount: preparedCount(character),
+    cantripsKnown: cantripsKnownTotal,
+    preparedCount: preparedCountTotal,
     slots,
     cantrips,
     prepared,
+    perClass: perClassRows,
   };
 }
 
@@ -374,14 +463,20 @@ export function buildInventory(character: Character): InventorySection {
 export function buildFeatures(character: Character): FeatureRow[] {
   const rows: FeatureRow[] = [];
 
-  const cls = resolveClass(character);
-  if (cls) {
-    const byLevel = classFeaturesByLevel(character);
-    const gained = [...byLevel.keys()].filter((lvl) => lvl <= character.level).sort((a, b) => a - b);
-    for (const lvl of gained) {
-      for (const feature of byLevel.get(lvl) ?? []) {
-        rows.push({ name: feature.name, source: `${cls.name} ${lvl}`, detail: feature.effect });
-      }
+  // Class features grouped BY CLASS (Stage M5), each gated at THAT class's own
+  // level (PHB 2024 "Multiclassing"). For a single-class character this is the
+  // one class's features gained up to its level, with source "<Class> <level>"
+  // — identical to the pre-M5 output. The feature VALUES are unchanged.
+  for (const { entry, data } of resolveClasses(character)) {
+    const gained = [...data.features]
+      .filter((f) => f.level <= entry.level)
+      .sort((a, b) => a.level - b.level);
+    for (const feature of gained) {
+      rows.push({
+        name: feature.name,
+        source: `${data.name} ${feature.level}`,
+        detail: feature.effect,
+      });
     }
   }
 

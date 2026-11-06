@@ -212,6 +212,31 @@ export function PrintLayout({ character }: PrintLayoutProps) {
               </tbody>
             </table>
 
+            {/* Per-class Save DC / Attack (Stage M5) — only for a multiclass
+                caster (PHB 2024 "Multiclassing: Spellcasting"). */}
+            {data.spells.perClass && data.spells.perClass.length > 0 && (
+              <table className={styles.tbl}>
+                <thead>
+                  <tr>
+                    <th className={styles.hdrCell}>Class</th>
+                    <th className={styles.hdrCell}>Ability</th>
+                    <th className={styles.hdrCell}>Save DC</th>
+                    <th className={styles.hdrCell}>Attack</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.spells.perClass.map((row) => (
+                    <tr key={row.className}>
+                      <td className={styles.cell}>{row.className}</td>
+                      <td className={styles.valCell}>{row.ability}</td>
+                      <td className={styles.valCellBold}>{row.saveDc}</td>
+                      <td className={styles.valCellBold}>{signed(row.attackBonus)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
             {data.spells.slots.length > 0 && (
               <table className={styles.tbl}>
                 <thead>

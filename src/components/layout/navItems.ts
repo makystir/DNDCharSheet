@@ -1,7 +1,7 @@
 import { User, Swords, Sparkles, Settings, Backpack, TrendingUp } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Character } from '../../types/character';
-import { isSpellcaster } from '../../logic/spellcasting';
+import { anySpellcaster } from '../../logic/spellcasting';
 
 /**
  * The routing key for a top-level page. This is the single source of truth for
@@ -77,7 +77,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Sparkles,
     shortcut: '4',
     subTabHint: 'Summary · Slots · Prepared · Browse',
-    predicate: isSpellcaster,
+    predicate: anySpellcaster,
   },
   // Advancement: an UNCONDITIONAL top-level tab (every character can level up, so
   // no predicate). Keyed '6' — the next free number key — so every existing tab

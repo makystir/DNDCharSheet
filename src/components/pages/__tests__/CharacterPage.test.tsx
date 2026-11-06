@@ -338,6 +338,36 @@ describe('CharacterPage', () => {
       fireEvent.click(screen.getByLabelText('Arcana class proficiency'));
       expect(onChange.mock.calls.at(-1)?.[0].classes[0].skillChoices).toEqual(['arcana']);
     });
+
+    // Stage M5: multiclass display — one feature section per class.
+    it('renders ONE class feature section for a single-class character', () => {
+      renderPage({ level: 5, classes: [{ id: 'fighter', level: 5 }] }, 'class');
+      // Single-class uses the untagged "Class Features" region; no per-class
+      // "<Class> Features" sections are rendered.
+      expect(screen.getByLabelText('Class Features')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Fighter Features')).toBeNull();
+      expect(screen.queryByLabelText('Wizard Features')).toBeNull();
+    });
+
+    it('renders a feature section per class for a Fighter/Wizard multiclass', () => {
+      renderPage(
+        {
+          level: 5,
+          classes: [
+            { id: 'fighter', level: 3 },
+            { id: 'wizard', level: 2 },
+          ],
+        },
+        'class',
+      );
+      // Two per-class sections, each headed "<Class> <level>".
+      const fighter = screen.getByLabelText('Fighter Features');
+      const wizard = screen.getByLabelText('Wizard Features');
+      expect(within(fighter).getByText('Fighter 3')).toBeInTheDocument();
+      expect(within(wizard).getByText('Wizard 2')).toBeInTheDocument();
+      // The single-class untagged region is NOT rendered for a multiclass.
+      expect(screen.queryByLabelText('Class Features')).toBeNull();
+    });
   });
 
   describe('sub-tabs', () => {
