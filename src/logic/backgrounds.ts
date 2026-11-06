@@ -144,9 +144,16 @@ export function applyBackground(
   }
   next = { ...next, skills };
 
-  // (c) Structured background selection record (tool + choices + equipment).
+  // (c) Structured background selection record (tool + choices + equipment),
+  // plus the free-text `background` label the Personal Details card shows. The
+  // structured `backgroundSelection` carries the mechanics; `background` is the
+  // human-readable name (editable notes). Only fill it when empty so a manual
+  // edit is never overwritten (on a fresh creation character it is always
+  // empty, so the chosen background's name shows up as the user expects).
+  const hasBackgroundNote = (next.background ?? '').trim().length > 0;
   next = {
     ...next,
+    ...(hasBackgroundNote ? {} : { background: bg.name }),
     backgroundSelection: {
       id: backgroundId,
       abilities: choices.abilityAllocation.map((a) => ({ ...a })),
