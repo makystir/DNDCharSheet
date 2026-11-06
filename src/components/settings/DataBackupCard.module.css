@@ -152,3 +152,25 @@
   font-size: 0.82rem;
   color: var(--danger, #c0392b);
 }
+
+.group {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.groupTitle {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.hint code {
+  font-family: monospace;
+  font-size: 0.78rem;
+}
+
+.fileInput {
+  display: none;
+}
+

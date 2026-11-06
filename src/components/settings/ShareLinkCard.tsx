@@ -8,7 +8,7 @@ import { encodeSharePayload } from '../../logic/share-codec';
 import { isGzipSupported } from '../../logic/gzip';
 import { trimForLink, classifyLinkLength } from '../../logic/share-portrait';
 import { formatViewHref } from '../../logic/view-route';
-import styles from './ExportImportCard.module.css';
+import styles from './DataBackupCard.module.css';
 
 export interface ShareLinkCardProps {
   /** The active character to share. */
@@ -105,7 +105,7 @@ export function ShareLinkCard({ character }: ShareLinkCardProps) {
       </div>
       {!gzipOk && (
         <p className={styles.ok} role="status">
-          Share links aren’t available in this browser. Use Export / Import to share a file instead.
+          Share links aren’t available in this browser. Use Data & Backup to share a file instead.
         </p>
       )}
       {status.kind !== 'idle' && (

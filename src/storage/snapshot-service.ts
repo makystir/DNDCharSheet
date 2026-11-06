@@ -31,8 +31,9 @@ import {
   type LiveState,
   type SnapshotSummary,
 } from './snapshot-logic';
-import { validateBackupFile, detectDuplicates, restoreCharacters } from './restore-service';
-import type { BackupCharacterEntry, RestoreSummary } from './backup-types';
+import { restoreCharacters } from './restore-service';
+import { buildRestorePlan, type RestorePlan } from './restore-plan';
+import type { RestoreSummary } from './backup-types';
 
 /**
  * Trailing throttle window for snapshot writes (design §2). Rapid successive
@@ -141,12 +142,8 @@ export function startSnapshotController(store: ISnapshotStore): SnapshotControll
 // --- Restore (design §4) ---
 
 /** Validated snapshot ready to confirm + restore. */
-export interface SnapshotRestorePlan {
+export interface SnapshotRestorePlan extends RestorePlan {
   seq: number;
-  characterCount: number;
-  characterNames: string[];
-  duplicateNames: string[];
-  characters: BackupCharacterEntry[];
 }
 
 export type RestoreOutcome =
@@ -173,27 +170,11 @@ export async function restoreFromSnapshot(
 
     // Treat the IDB record as untrusted: re-serialize, then validate.
     const json = JSON.stringify(got.value.payload);
-    const validation = validateBackupFile(json);
-    if (!validation.ok) {
-      return { ok: false, error: validation.error };
-    }
+    // Shared plan builder (also used by the backup-file restore).
+    const built = await buildRestorePlan(json);
+    if (!built.ok) return { ok: false, error: built.error };
 
-    const characters = validation.characters;
-    const duplicateNames = await detectDuplicates(characters);
-    const characterNames = characters
-      .map((c) => (typeof c.character.name === 'string' ? c.character.name : ''))
-      .filter((n) => n.length > 0);
-
-    return {
-      ok: true,
-      plan: {
-        seq,
-        characterCount: validation.metadata.characterCount,
-        characterNames,
-        duplicateNames,
-        characters,
-      },
-    };
+    return { ok: true, plan: { seq, ...built.plan } };
   } catch (err) {
     return {
       ok: false,
@@ -210,7 +191,7 @@ export async function restoreFromSnapshot(
  */
 export async function commitSnapshotRestore(
   store: ISnapshotStore,
-  plan: SnapshotRestorePlan,
+  plan: RestorePlan,
   onProgress?: (current: number, total: number) => void,
 ): Promise<RestoreSummary> {
   const summary = await restoreCharacters(plan.characters, onProgress);

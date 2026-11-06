@@ -5,9 +5,8 @@ import { useInstallPrompt } from '../../hooks/useInstallPrompt';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { InstallPromptControl } from '../shared/InstallPromptControl';
-import { ExportImportCard } from '../settings/ExportImportCard';
+import { DataBackupCard } from '../settings/DataBackupCard';
 import { ShareLinkCard } from '../settings/ShareLinkCard';
-import { AutoBackupCard } from '../settings/AutoBackupCard';
 import styles from './SettingsPage.module.css';
 
 export interface SettingsPageProps {
@@ -201,11 +200,9 @@ export function SettingsPage({
         </div>
       </Card>
 
-      <ExportImportCard character={character} onAdopt={onAdopt} />
+      <DataBackupCard character={character} onAdopt={onAdopt} onRestored={onRestored} />
 
       <ShareLinkCard character={character} />
-
-      <AutoBackupCard onRestored={onRestored} />
     </div>
   );
 }
