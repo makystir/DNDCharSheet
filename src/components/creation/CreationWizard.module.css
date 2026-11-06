@@ -172,6 +172,108 @@
   color: var(--text-primary);
 }
 
+/* ─── Class guidance (read-only advisor) ─────────────────────────────────── */
+
+.guidancePanel {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.guidanceTitle {
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.guidanceBlurb {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.guidanceFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.guidanceFacts li {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.5rem;
+}
+
+.guidanceCite {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Per-ability hint tags on the Ability Scores step. */
+.abilityTags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--border);
+}
+
+.tagPrimary {
+  background: color-mix(in srgb, var(--accent-gold) 25%, transparent);
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
+.tagSave {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.tagDump {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.recommendedNote {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.recommendBtn {
+  align-self: flex-start;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;

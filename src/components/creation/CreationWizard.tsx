@@ -43,6 +43,12 @@ import {
 import type { NameGender } from '../../data/name-tables';
 import { createDefaultRng } from '../../logic/random';
 import { formatSigned, type Breakdown } from '../../logic/breakdown';
+import {
+  classGuidance,
+  abilityHints,
+  recommendedArray,
+  suggestedBackgrounds,
+} from '../../logic/class-guidance';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { StepIndicator } from '../combat/StepIndicator';
@@ -142,6 +148,21 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   const background = getBackground(backgroundId || undefined);
   const species = getSpecies(speciesId || undefined);
+
+  // ─── Derived: deterministic, read-only class guidance (suggest, never apply)
+  // All values come from class data + transcribed PHB tables (class-guidance.ts).
+  const guidance = useMemo(
+    () => (classId === '' ? undefined : classGuidance(classId)),
+    [classId],
+  );
+  const hints = useMemo(
+    () => (classId === '' ? undefined : abilityHints(classId)),
+    [classId],
+  );
+  const suggestedBgIds = useMemo(
+    () => (classId === '' ? [] : suggestedBackgrounds(classId)),
+    [classId],
+  );
 
   // ─── Derived: resolved base ability scores for the current method ──────────
 
@@ -287,6 +308,29 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     setPointBuyScores((prev) => ({ ...prev, [ability]: clamped }));
   };
 
+  // SUGGEST-DON'T-AUTO-APPLY: the ONLY state change this feature makes. On an
+  // explicit tap it fills the six Standard-Array slots from the PHB "Standard
+  // Array by Class" placement (class-guidance.ts); every slot stays fully
+  // editable afterward, exactly like a manual Standard-Array assignment. The
+  // recommended array is a permutation of the standard array, so each pool
+  // index (STANDARD_ARRAY = 15/14/13/12/10/8) is consumed exactly once.
+  const useRecommendedArray = () => {
+    const recommended = recommendedArray(classId || undefined);
+    if (!recommended) return;
+    setAbilityMethod('standard-array');
+    const assignment: Partial<Record<Ability, number>> = {};
+    const takenIdx = new Set<number>();
+    for (const ability of ABILITIES) {
+      const target = recommended[ability];
+      const idx = STANDARD_ARRAY.findIndex((v, i) => v === target && !takenIdx.has(i));
+      if (idx !== -1) {
+        assignment[ability] = idx;
+        takenIdx.add(idx);
+      }
+    }
+    setArrayAssignment(assignment);
+  };
+
   // ─── Step 4 handlers (per-field flavor generators) ─────────────────────────
 
   const rng = useMemo(() => createDefaultRng(), []);
@@ -428,6 +472,35 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           </option>
         ))}
       </select>
+
+      {/* Read-only class overview (DETERMINISTIC advisor; suggest, never apply).
+          All facts are read from class data (PHB 2024 Core <Class> Traits) +
+          SPELLCASTING_DESCRIPTORS; the blurb is a brief paraphrase. Appears only
+          once a class is selected. */}
+      {guidance && (
+        <div className={styles.guidancePanel} role="note" aria-label="Class overview">
+          <h3 className={styles.guidanceTitle}>
+            About {CLASS_LIST.find((c) => c.id === classId)?.name}
+          </h3>
+          {guidance.blurb && <p className={styles.guidanceBlurb}>{guidance.blurb}</p>}
+          <ul className={styles.guidanceFacts}>
+            <li>
+              Primary ability:{' '}
+              {guidance.primaryAbilities
+                .map((a) => ABILITY_NAMES[a])
+                .join(guidance.primaryIsOr ? ' or ' : ' & ')}
+            </li>
+            <li>
+              Saving throws: {guidance.savingThrows.map((a) => ABILITY_NAMES[a]).join(' & ')}
+            </li>
+            <li>Hit die: d{guidance.hitDie}</li>
+            {guidance.spellcastingAbility && (
+              <li>Spellcasting: {ABILITY_NAMES[guidance.spellcastingAbility]}</li>
+            )}
+          </ul>
+          <p className={styles.guidanceCite}>Source: PHB 2024 Core Class Traits.</p>
+        </div>
+      )}
     </div>
   );
 
@@ -452,6 +525,22 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           </option>
         ))}
       </select>
+
+      {/* Background-fit hint (DETERMINISTIC advisor; a nudge only — does NOT
+          restrict the pick). Lists the backgrounds that boost the chosen class's
+          primary ability, from the PHB 2024 "Ability Scores and Backgrounds"
+          table (class-guidance.ts). Any background remains selectable. */}
+      {suggestedBgIds.length > 0 && (
+        <p className={styles.hint} role="note" aria-label="Backgrounds that suit this class">
+          Backgrounds that suit a{' '}
+          {CLASS_LIST.find((c) => c.id === classId)?.name ?? 'this'}:{' '}
+          {suggestedBgIds
+            .map((id) => getBackground(id)?.name ?? id)
+            .join(', ')}
+          . Any background works — this is just a suggestion (PHB 2024 "Ability
+          Scores and Backgrounds").
+        </p>
+      )}
 
       {background && (
         <fieldset className={styles.fieldset}>
@@ -643,9 +732,53 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         components: [{ label: 'From score', value: mod }],
         note: `Score ${score ?? 10}`,
       };
+      // Per-ability guidance tags + recommended value (DETERMINISTIC advisor;
+      // read-only). From abilityHints/recommendedArray (class-guidance.ts), the
+      // PHB "Standard Array by Class" placement + the class saves.
+      const isPrimary = hints?.primaryPlacement === ability;
+      const isDump = hints?.dumpPlacement === ability;
+      const isSave = hints?.saveAbilities.includes(ability) ?? false;
+      const recommendedScore = hints?.recommended[ability];
       return (
         <div key={ability} className={styles.allocRow}>
-          <span className={styles.allocName}>{ABILITY_NAMES[ability]}</span>
+          <span className={styles.allocName}>
+            {ABILITY_NAMES[ability]}
+            {hints && (
+              <span className={styles.abilityTags}>
+                {' '}
+                {isPrimary && (
+                  <span
+                    className={`${styles.tag} ${styles.tagPrimary}`}
+                    title="Your primary ability — put your highest score here"
+                  >
+                    Primary
+                  </span>
+                )}
+                {isSave && <span className={`${styles.tag} ${styles.tagSave}`}>Save</span>}
+                {isDump && !isPrimary && (
+                  <span
+                    className={`${styles.tag} ${styles.tagDump}`}
+                    title="Safe to dump — least important for this class"
+                  >
+                    Dump
+                  </span>
+                )}
+              </span>
+            )}
+          </span>
+          {recommendedScore !== undefined && (
+            <CalculatedValue
+              label={`${ABILITY_NAMES[ability]} — Recommended`}
+              className={styles.recommendedNote}
+              breakdown={{
+                total: recommendedScore,
+                components: [{ label: 'PHB Standard Array by Class', value: recommendedScore }],
+                note: 'A flat PHB suggestion — not an additive total.',
+              }}
+            >
+              Rec: {recommendedScore}
+            </CalculatedValue>
+          )}
           <select
             className={styles.selectSmall}
             value={idx ?? -1}
@@ -712,6 +845,24 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           value={abilityMethod}
           onChange={(v) => setAbilityMethod(v as AbilityMethod)}
         />
+
+        {/* Optional one-tap recommended-array fill (SUGGEST-DON'T-AUTO-APPLY:
+            the only state change this feature makes, on an explicit tap). Fills
+            the Standard-Array slots from the PHB "Standard Array by Class"
+            placement; fully editable afterward. Shown only when a class is
+            selected. */}
+        {classId !== '' && (
+          <div className={styles.methodBody}>
+            <button type="button" className={styles.recommendBtn} onClick={useRecommendedArray}>
+              Use recommended array
+            </button>
+            <p className={styles.hint}>
+              Fills the standard array with the PHB suggested placement for a{' '}
+              {CLASS_LIST.find((c) => c.id === classId)?.name}. It is only a
+              suggestion — every score stays editable.
+            </p>
+          </div>
+        )}
 
         {abilityMethod === 'standard-array' && (
           <div className={styles.methodBody}>

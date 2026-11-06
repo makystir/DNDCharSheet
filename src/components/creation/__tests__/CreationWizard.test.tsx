@@ -169,6 +169,71 @@ describe('CreationWizard', () => {
     expect(screen.queryByText(/feature languages/)).toBeNull();
   });
 
+  it('shows a class overview panel once a class is selected (and not before)', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    // Nothing before a class is chosen.
+    expect(screen.queryByRole('note', { name: 'Class overview' })).toBeNull();
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
+    const panel = screen.getByRole('note', { name: 'Class overview' });
+    expect(panel).toBeInTheDocument();
+    // Fighter facts, read from class data (Str or Dex; Str & Con saves; d10).
+    expect(within(panel).getByText(/Strength or Dexterity/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Strength & Constitution/)).toBeInTheDocument();
+    expect(within(panel).getByText(/d10/)).toBeInTheDocument();
+    // Fighter is a non-caster base class → no spellcasting line.
+    expect(within(panel).queryByText(/Spellcasting:/)).toBeNull();
+  });
+
+  it('nothing auto-fills the ability scores on class selection', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1();
+    completeStep2();
+    // On the Ability Scores step the standard-array slots are still unassigned
+    // (each select shows the placeholder "—"); only an explicit tap fills them.
+    const strSelect = screen.getByLabelText('Strength score assignment') as HTMLSelectElement;
+    expect(strSelect.value).toBe('-1');
+  });
+
+  it('shows per-ability hints on the Ability Scores step', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter
+    completeStep2();
+    // Fighter: primary Str, dump Int, saves Str & Con. Recommended values shown.
+    expect(screen.getByText('Primary')).toBeInTheDocument();
+    expect(screen.getByText('Dump')).toBeInTheDocument();
+    expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
+    // A "Rec: 15" CalculatedValue trigger appears for the primary ability.
+    expect(screen.getByRole('button', { name: /Strength — Recommended/ })).toBeInTheDocument();
+  });
+
+  it('fills the Fighter recommended array on an explicit tap (15/14/13/8/10/12)', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter
+    completeStep2();
+    fireEvent.click(screen.getByRole('button', { name: 'Use recommended array' }));
+    // Fighter PHB placement: Str15 Dex14 Con13 Int8 Wis10 Cha12.
+    const valueOf = (label: string) =>
+      (screen.getByLabelText(label) as HTMLSelectElement).value;
+    const pool = standardArray(); // [15,14,13,12,10,8]
+    expect(pool[Number(valueOf('Strength score assignment'))]).toBe(15);
+    expect(pool[Number(valueOf('Dexterity score assignment'))]).toBe(14);
+    expect(pool[Number(valueOf('Constitution score assignment'))]).toBe(13);
+    expect(pool[Number(valueOf('Intelligence score assignment'))]).toBe(8);
+    expect(pool[Number(valueOf('Wisdom score assignment'))]).toBe(10);
+    expect(pool[Number(valueOf('Charisma score assignment'))]).toBe(12);
+  });
+
+  it('shows the background-fit hint on the Origin step', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter (primary Str or Dex)
+    // Advance would need a valid origin; the hint shows as soon as step 2 renders.
+    const hint = screen.getByRole('note', { name: 'Backgrounds that suit this class' });
+    expect(hint).toBeInTheDocument();
+    // Fighter's Str∪Dex backgrounds include Soldier; the pick is not restricted.
+    expect(within(hint).getByText(/Soldier/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Background')).toBeEnabled();
+  });
+
   it('persists the Rogue feature pick into languages.granted on completion', () => {
     const onComplete = vi.fn();
     render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
