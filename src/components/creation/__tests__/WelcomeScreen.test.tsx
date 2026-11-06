@@ -17,7 +17,7 @@ describe('WelcomeScreen', () => {
     expect(onReady).toHaveBeenCalledTimes(1);
     const character = onReady.mock.calls[0][0];
     // A fully generated character has a class, species, and a background applied.
-    expect(character.class?.id).toBeTruthy();
+    expect(character.classes?.[0]?.id).toBeTruthy();
     expect(character.species?.id).toBeTruthy();
     expect(character.backgroundSelection?.id).toBeTruthy();
     expect(character.name.length).toBeGreaterThan(0);
@@ -40,7 +40,7 @@ describe('WelcomeScreen', () => {
     const character = onReady.mock.calls[0][0];
     expect(character.name).toBe('Grognard');
     // A blank sheet has no class/species/background chosen yet.
-    expect(character.class).toBeUndefined();
+    expect(character.classes).toBeUndefined();
     expect(character.backgroundSelection).toBeUndefined();
   });
 

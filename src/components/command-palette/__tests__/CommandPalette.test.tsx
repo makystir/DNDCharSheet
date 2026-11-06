@@ -22,7 +22,7 @@ function AutoOpen() {
 }
 
 function caster(): Character {
-  return { ...createCharacter(), level: 3, class: { id: 'wizard', level: 3 } };
+  return { ...createCharacter(), level: 3, classes: [{ id: 'wizard', level: 3 }] };
 }
 
 function renderPalette(opts?: {

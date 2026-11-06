@@ -98,7 +98,7 @@ describe('CharacterPage', () => {
     // EFFECTIVE Strength is 12 and drives the +1 modifier.
     renderPage({
       level: 4,
-      class: { id: 'fighter', level: 4 },
+      classes: [{ id: 'fighter', level: 4 }],
       abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
       advancement: {
         feats: [{ featId: 'ability-score-improvement', level: 4, abilityIncreases: { str: 2 } }],
@@ -281,10 +281,10 @@ describe('CharacterPage', () => {
       fireEvent.change(screen.getByRole('combobox', { name: 'Class' }), {
         target: { value: 'wizard' },
       });
-      expect(onChange.mock.calls.at(-1)?.[0].class).toEqual({
+      expect(onChange.mock.calls.at(-1)?.[0].classes).toEqual([{
         id: 'wizard',
         level: 1,
-      });
+      }]);
     });
 
     it('surfaces the class Hit Die', () => {
@@ -292,7 +292,7 @@ describe('CharacterPage', () => {
         {
           level: 3,
           abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
-          class: { id: 'wizard', level: 3 },
+          classes: [{ id: 'wizard', level: 3 }],
         },
         'class',
       );
@@ -300,17 +300,17 @@ describe('CharacterPage', () => {
     });
 
     it('gates the subclass control on the class subclassLevel', () => {
-      renderPage({ level: 2, class: { id: 'wizard', level: 2 } }, 'class');
+      renderPage({ level: 2, classes: [{ id: 'wizard', level: 2 }] }, 'class');
       expect(screen.queryByRole('combobox', { name: 'Subclass' })).toBeNull();
 
-      renderPage({ level: 3, class: { id: 'wizard', level: 3 } }, 'class');
+      renderPage({ level: 3, classes: [{ id: 'wizard', level: 3 }] }, 'class');
       expect(
         screen.getAllByRole('combobox', { name: 'Subclass' }).at(-1),
       ).toBeInTheDocument();
     });
 
     it('renders features grouped by level without truncation', () => {
-      renderPage({ level: 20, class: { id: 'wizard', level: 20 } }, 'class');
+      renderPage({ level: 20, classes: [{ id: 'wizard', level: 20 }] }, 'class');
       const features = screen.getByLabelText('Class Features');
       expect(within(features).getByText('Level 1')).toBeInTheDocument();
       expect(within(features).getByText('Spellcasting')).toBeInTheDocument();
@@ -323,7 +323,7 @@ describe('CharacterPage', () => {
     it('names the class as the source in save and skill tooltips', () => {
       renderPage(
         {
-          class: { id: 'wizard', level: 1, skillChoices: ['arcana'] },
+          classes: [{ id: 'wizard', level: 1, skillChoices: ['arcana'] }],
         },
         'skills',
       );
@@ -334,9 +334,9 @@ describe('CharacterPage', () => {
     });
 
     it('toggling a class skill choice emits the skillChoices list', () => {
-      const { onChange } = renderPage({ class: { id: 'wizard', level: 1 } }, 'class');
+      const { onChange } = renderPage({ classes: [{ id: 'wizard', level: 1 }] }, 'class');
       fireEvent.click(screen.getByLabelText('Arcana class proficiency'));
-      expect(onChange.mock.calls.at(-1)?.[0].class.skillChoices).toEqual(['arcana']);
+      expect(onChange.mock.calls.at(-1)?.[0].classes[0].skillChoices).toEqual(['arcana']);
     });
   });
 

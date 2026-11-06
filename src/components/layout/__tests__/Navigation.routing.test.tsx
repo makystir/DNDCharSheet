@@ -337,7 +337,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
         <button
           type="button"
           onClick={() =>
-            setCharacter((c) => ({ ...c, class: { id: 'barbarian', level: c.level } }))
+            setCharacter((c) => ({ ...c, classes: [{ id: 'barbarian', level: c.level }] }))
           }
         >
           make-noncaster
@@ -350,7 +350,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
     const wizard: Character = {
       ...createCharacter(),
       level: 3,
-      class: { id: 'wizard', level: 3 },
+      classes: [{ id: 'wizard', level: 3 }],
     };
     render(<Harness initial={wizard} />);
     // A Wizard is a caster, so the guard leaves the active #spells route intact.
@@ -367,7 +367,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
     const ek: Character = {
       ...createCharacter(),
       level: 3,
-      class: { id: 'fighter', level: 3, subclassId: 'eldritchKnight' },
+      classes: [{ id: 'fighter', level: 3, subclassId: 'eldritchKnight' }],
     };
     function LevelHarness() {
       const [character, setCharacter] = useState<Character>(ek);
@@ -379,7 +379,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
           <button
             type="button"
             onClick={() =>
-              setCharacter((c) => ({ ...c, level: 2, class: { ...c.class!, level: 2 } }))
+              setCharacter((c) => ({ ...c, level: 2, classes: [{ ...c.classes![0], level: 2 }] }))
             }
           >
             drop-level
@@ -403,7 +403,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
     const ek: Character = {
       ...createCharacter(),
       level: 3,
-      class: { id: 'fighter', level: 3, subclassId: 'eldritchKnight' },
+      classes: [{ id: 'fighter', level: 3, subclassId: 'eldritchKnight' }],
     };
     function SubclassHarness() {
       const [character, setCharacter] = useState<Character>(ek);
@@ -416,7 +416,7 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
             type="button"
             onClick={() =>
               // Only subclassId changes; level 3 and class id 'fighter' persist.
-              setCharacter((c) => ({ ...c, class: { ...c.class!, subclassId: 'champion' } }))
+              setCharacter((c) => ({ ...c, classes: [{ ...c.classes![0], subclassId: 'champion' }] }))
             }
           >
             swap-subclass

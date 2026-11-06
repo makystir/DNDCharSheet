@@ -31,7 +31,7 @@ describe('DefenseReadout', () => {
         character={char({
           level: 1,
           abilities: { str: 10, dex: 14, con: 16, int: 10, wis: 10, cha: 10 },
-          class: { id: 'barbarian', level: 1 },
+          classes: [{ id: 'barbarian', level: 1 }],
         })}
       />,
     );
@@ -48,14 +48,14 @@ describe('DefenseReadout', () => {
 
 describe('SpellSlotSummary', () => {
   it('renders nothing for a non-caster', () => {
-    const { container } = render(<SpellSlotSummary character={char({ class: { id: 'fighter', level: 1 } })} />);
+    const { container } = render(<SpellSlotSummary character={char({ classes: [{ id: 'fighter', level: 1 }] })} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('lists standard spell-slot levels for a caster with available / max', () => {
     render(
       <SpellSlotSummary
-        character={char({ level: 1, class: { id: 'wizard', level: 1 } })}
+        character={char({ level: 1, classes: [{ id: 'wizard', level: 1 }] })}
       />,
     );
     const list = screen.getByRole('list', { name: 'Spell slots' });

@@ -14,7 +14,7 @@ describe('derived totals survive the page split', () => {
   const character = {
     ...createCharacter('Tester'),
     level: 3,
-    class: { id: 'wizard' as const, level: 3 },
+    classes: [{ id: 'wizard' as const, level: 3 }],
     species: { id: 'elf' as const, elvenLineage: 'woodElf' as const },
   };
 

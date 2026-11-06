@@ -11,26 +11,58 @@
  * tests locks this in.
  */
 
-import type { Ability, Character, SkillId } from '../types/character';
+import type { Ability, Character, ClassEntry, SkillId } from '../types/character';
 import type { ClassData, ClassFeature, SubclassData } from '../data/classes';
 import { getClass } from '../data/classes';
 
+/**
+ * The PRIMARY class entry (the INITIAL class, `classes[0]`), or undefined when
+ * no class is chosen (PHB 2024 "Multiclassing": the first class is the initial
+ * class). Single-class characters have exactly one entry, so this is that class.
+ */
+export function primaryClass(character: Character): ClassEntry | undefined {
+  return character.classes?.[0];
+}
+
+/** Every class the character has levels in (PHB 2024 "Multiclassing"), or []. */
+export function allClasses(character: Character): ClassEntry[] {
+  return character.classes ?? [];
+}
+
+/**
+ * The total character level = the sum of the per-class entry levels (PHB 2024
+ * "Multiclassing": your character level is the total of your levels in all your
+ * classes). 0 when there are no classes. `Character.level` stores this total
+ * authoritatively; this helper derives it from the entries for the invariant
+ * check and is NOT a replacement for the stored value on hot paths.
+ */
+export function totalLevel(character: Character): number {
+  return allClasses(character).reduce((sum, entry) => sum + entry.level, 0);
+}
+
 /** Resolves the selected class data, or undefined when unset/unknown. */
 export function resolveClass(character: Character): ClassData | undefined {
-  return getClass(character.class?.id);
+  return getClass(primaryClass(character)?.id);
 }
 
 /**
  * Resolves the chosen subclass, or undefined when no class/subclass is chosen,
- * the id is unknown, or the character's level is below the class's
+ * the id is unknown, or the character's level in that class is below the class's
  * subclassLevel (PHB 2024: a subclass is gained at the class's subclass level).
+ *
+ * The gate uses the PRIMARY class ENTRY's own level, not `character.level` —
+ * for a single-class character the two coincide, so behaviour is unchanged, but
+ * encoding against the per-class level is the correct multiclass rule (a
+ * subclass is gained at that class's level) and fixes the latent single-class-
+ * coincidence bug (design decision 9-F).
  */
 export function resolveSubclass(character: Character): SubclassData | undefined {
   const cls = resolveClass(character);
   if (!cls) return undefined;
-  const subclassId = character.class?.subclassId;
+  const primary = primaryClass(character);
+  const subclassId = primary?.subclassId;
   if (subclassId === undefined) return undefined;
-  if (character.level < cls.subclassLevel) return undefined;
+  if ((primary?.level ?? 0) < cls.subclassLevel) return undefined;
   return cls.subclasses.find((s) => s.id === subclassId);
 }
 
@@ -65,7 +97,7 @@ export function classGrantedSkills(
   const result: Partial<Record<SkillId, string>> = {};
   if (!cls) return result;
   const label = `${cls.name} (class)`;
-  for (const skillId of character.class?.skillChoices ?? []) {
+  for (const skillId of primaryClass(character)?.skillChoices ?? []) {
     result[skillId] = label;
   }
   return result;

@@ -33,7 +33,7 @@ function renderStatefulPage(overrides: Partial<Character> = {}) {
 
 const wizardLevel5: Partial<Character> = {
   level: 5,
-  class: { id: 'wizard', level: 5 },
+  classes: [{ id: 'wizard', level: 5 }],
 };
 
 describe('SpellsPage — Summary tooltips', () => {
@@ -67,7 +67,7 @@ describe('SpellsPage — selection caps', () => {
     const { onChange } = renderStatefulPage({
       ...wizardLevel5,
       spellcasting: {
-        cantrips: ['fire-bolt', 'mage-hand', 'light', 'mending'],
+        byClass: { wizard: { cantrips: ['fire-bolt', 'mage-hand', 'light', 'mending'] } },
       },
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
@@ -86,7 +86,7 @@ describe('SpellsPage — Wizard spellbook gating', () => {
   it('prepares only from scribed spellbook spells', () => {
     renderStatefulPage({
       ...wizardLevel5,
-      spellcasting: { spellbook: ['magic-missile'] },
+      spellcasting: { byClass: { wizard: { spellbook: ['magic-missile'] } } },
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     const preparedSection = screen.getByText(/Prepared — choose/).closest('div')!;
@@ -100,15 +100,15 @@ describe('SpellsPage — Wizard spellbook gating', () => {
   it('unscribing a prepared spell also unprepares it', () => {
     const { onChange } = renderStatefulPage({
       ...wizardLevel5,
-      spellcasting: { spellbook: ['magic-missile'], prepared: ['magic-missile'] },
+      spellcasting: { byClass: { wizard: { spellbook: ['magic-missile'], prepared: ['magic-missile'] } } },
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     const spellbookSection = screen.getByText(/Scribed spells/).closest('div')!;
     const mm = within(spellbookSection).getByRole('checkbox', { name: /Magic Missile/ });
     fireEvent.click(mm); // unscribe
     const next = onChange.mock.calls.at(-1)![0] as Character;
-    expect(next.spellcasting?.spellbook ?? []).not.toContain('magic-missile');
-    expect(next.spellcasting?.prepared ?? []).not.toContain('magic-missile');
+    expect(next.spellcasting?.byClass?.wizard?.spellbook ?? []).not.toContain('magic-missile');
+    expect(next.spellcasting?.byClass?.wizard?.prepared ?? []).not.toContain('magic-missile');
   });
 });
 
@@ -116,7 +116,7 @@ describe('SpellsPage — Arcane Trickster Mage Hand', () => {
   it('shows Mage Hand as checked and locked (cannot be unchecked)', () => {
     renderStatefulPage({
       level: 3,
-      class: { id: 'rogue', level: 3, subclassId: 'arcaneTrickster' },
+      classes: [{ id: 'rogue', level: 3, subclassId: 'arcaneTrickster' }],
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     // Mage Hand is treated as chosen (counted against the cap) and locked.
@@ -131,14 +131,14 @@ describe('SpellsPage — Arcane Trickster Mage Hand', () => {
   it('persists Mage Hand once the user chooses another cantrip', () => {
     const { onChange } = renderStatefulPage({
       level: 3,
-      class: { id: 'rogue', level: 3, subclassId: 'arcaneTrickster' },
+      classes: [{ id: 'rogue', level: 3, subclassId: 'arcaneTrickster' }],
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     // Choosing a different cantrip writes the effective set (incl. Mage Hand).
     fireEvent.click(screen.getByRole('checkbox', { name: /Fire Bolt/ }));
     const next = onChange.mock.calls.at(-1)![0] as Character;
-    expect(next.spellcasting?.cantrips).toContain('mage-hand');
-    expect(next.spellcasting?.cantrips).toContain('fire-bolt');
+    expect(next.spellcasting?.byClass?.rogue?.cantrips).toContain('mage-hand');
+    expect(next.spellcasting?.byClass?.rogue?.cantrips).toContain('fire-bolt');
   });
 });
 
@@ -146,7 +146,7 @@ describe('SpellsPage — always-prepared feature spells', () => {
   it('renders a Ranger\'s Hunter\'s Mark as locked and outside the prepared cap', () => {
     const { onChange } = renderStatefulPage({
       level: 1,
-      class: { id: 'ranger', level: 1 },
+      classes: [{ id: 'ranger', level: 1 }],
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     // Hunter's Mark is checked, locked, and labelled "always prepared".
@@ -167,8 +167,8 @@ describe('SpellsPage — always-prepared feature spells', () => {
     // be treated as always-prepared (locked, uncounted), freeing the full cap.
     renderStatefulPage({
       level: 1,
-      class: { id: 'ranger', level: 1 },
-      spellcasting: { prepared: ['hunter-s-mark'] },
+      classes: [{ id: 'ranger', level: 1 }],
+      spellcasting: { byClass: { ranger: { prepared: ['hunter-s-mark'] } } },
     });
     fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
     // Still shows 0 discretionary prepared despite the stored entry.
@@ -188,14 +188,14 @@ describe('SpellsPage — Wizard focus options', () => {
 
 describe('SpellsPage — Bard Magical Secrets', () => {
   it('a level-10 Bard can browse Wizard-list spells (Magical Secrets)', () => {
-    renderStatefulPage({ level: 10, class: { id: 'bard', level: 10 } });
+    renderStatefulPage({ level: 10, classes: [{ id: 'bard', level: 10 }] });
     fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
     // Fireball is a Wizard spell not on the Bard list; Magical Secrets exposes it.
     expect(screen.getByText('Fireball')).toBeInTheDocument();
   });
 
   it('a level-9 Bard cannot see Wizard-only spells', () => {
-    renderStatefulPage({ level: 9, class: { id: 'bard', level: 9 } });
+    renderStatefulPage({ level: 9, classes: [{ id: 'bard', level: 9 }] });
     fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
     expect(screen.queryByText('Fireball')).not.toBeInTheDocument();
   });

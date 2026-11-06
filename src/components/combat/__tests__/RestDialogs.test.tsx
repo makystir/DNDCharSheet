@@ -35,7 +35,7 @@ function fighter(overrides: Partial<Character> = {}): Character {
   return {
     ...base,
     level: 3,
-    class: { id: 'fighter', level: 3 },
+    classes: [{ id: 'fighter', level: 3 }],
     abilities: { ...base.abilities, con: 14 },
     hpMax: 40,
     currentHp: 10,
@@ -197,7 +197,7 @@ describe('Short Rest dialog', () => {
   });
 
   it('with no class it explains and still lets the rest finish', () => {
-    renderPage({ class: undefined });
+    renderPage({ classes: undefined });
     const dialog = openShortRest();
     expect(within(dialog).getByTestId('short-rest-no-class')).toBeInTheDocument();
     expect(within(dialog).queryByRole('button', { name: 'Add Hit Die' })).toBeNull();

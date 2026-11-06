@@ -241,7 +241,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       classId === ''
         ? { fixed: [] as string[], chooseCount: 0 }
         : featureLanguageGrants({
-            class: { id: classId as ClassId, level: 1 },
+            classes: [{ id: classId as ClassId, level: 1 }],
             level: 1,
           } as Character),
     [classId],
@@ -319,7 +319,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     character = {
       ...character,
       level: 1,
-      class: { id: classId as ClassId, level: 1, skillChoices: [] },
+      classes: [{ id: classId as ClassId, level: 1, skillChoices: [] }],
     };
 
     // Species + required sub-choices.
@@ -548,7 +548,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         <p className={styles.hint}>
           Known:{' '}
           {knownLanguages({
-            class: classId === '' ? undefined : { id: classId as ClassId, level: 1 },
+            classes: classId === '' ? undefined : [{ id: classId as ClassId, level: 1 }],
             level: 1,
             languages: { chosen: chosenLanguages, granted: grantedLanguages },
           } as Character)

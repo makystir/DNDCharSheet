@@ -182,7 +182,7 @@ describe('class-granted/chosen skill proficiencies (test #16)', () => {
       ...createCharacter('B'),
       level: 1,
       // Barbarian's starting skill list includes Athletics (PHB 2024).
-      class: { id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] },
+      classes: [{ id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] }],
     };
     const all = allSkillBreakdowns(c);
     const prof = all.athletics.components.find((x) =>
@@ -211,11 +211,11 @@ describe('class-granted/chosen skill proficiencies (test #16)', () => {
       level: 1,
       // Elf Keen Senses grants Perception; Barbarian also chooses Perception.
       species: { id: 'elf' as const, keenSensesSkill: 'perception' as const },
-      class: {
+      classes: [{
         id: 'barbarian' as const,
         level: 1,
         skillChoices: ['perception' as const],
-      },
+      }],
     };
     const all = allSkillBreakdowns(c);
     const prof = all.perception.components.find((x) =>
@@ -235,7 +235,7 @@ describe('class-granted/chosen skill proficiencies (test #16)', () => {
     const c = {
       ...createCharacter('B'),
       level: 1,
-      class: { id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] },
+      classes: [{ id: 'barbarian' as const, level: 1, skillChoices: ['athletics' as const] }],
       // Mark expertise but NOT proficient: class grant makes it effective.
       skills: { athletics: { proficient: false, expertise: true } },
     };

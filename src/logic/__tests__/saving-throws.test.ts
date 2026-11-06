@@ -71,7 +71,7 @@ describe('class-granted save proficiencies (test #15)', () => {
     const c = {
       ...createCharacter('B'),
       level: 1,
-      class: { id: 'barbarian' as const, level: 1 },
+      classes: [{ id: 'barbarian' as const, level: 1 }],
     };
     const all = allSavingThrowBreakdowns(c);
     const conProf = all.con.components.find((comp) =>
@@ -85,7 +85,7 @@ describe('class-granted save proficiencies (test #15)', () => {
     const c = {
       ...createCharacter('B'),
       level: 1,
-      class: { id: 'barbarian' as const, level: 1 },
+      classes: [{ id: 'barbarian' as const, level: 1 }],
       saveProficiencies: { str: true },
     };
     const all = allSavingThrowBreakdowns(c);
@@ -102,7 +102,7 @@ describe('class-granted save proficiencies (test #15)', () => {
     const c = {
       ...createCharacter('B'),
       level: 1,
-      class: { id: 'barbarian' as const, level: 1 },
+      classes: [{ id: 'barbarian' as const, level: 1 }],
       saveProficiencies: { dex: true },
     };
     const all = allSavingThrowBreakdowns(c);

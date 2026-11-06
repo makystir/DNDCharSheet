@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Sparkles, BookOpen } from 'lucide-react';
-import type { Character, SpellcastingState } from '../../types/character';
+import type { Character, ClassSpellcasting, SpellcastingState } from '../../types/character';
 import { formatSigned } from '../../logic/breakdown';
-import { resolveClass } from '../../logic/classes';
+import { primaryClass, resolveClass } from '../../logic/classes';
 import {
   alwaysPreparedSpells,
   casterKind,
@@ -179,6 +179,11 @@ export function SpellsPage({
   const topSpellLevel = maxSpellLevel(character);
 
   const sc: SpellcastingState = character.spellcasting ?? {};
+  // Per-class selections (cantrips/prepared/spellbook) live under byClass[classId]
+  // now (PHB 2024 "Multiclassing"). Display/edit stays single-class this stage:
+  // read the PRIMARY class's bucket, and route per-class edits back under it.
+  const primaryId = primaryClass(character)?.id;
+  const perClass: ClassSpellcasting = (primaryId ? sc.byClass?.[primaryId] : undefined) ?? {};
 
   // Leveled spells a class/subclass feature makes ALWAYS prepared (Ranger's
   // Hunter's Mark, Paladin's Divine Smite/Find Steed, Druid's Speak with
@@ -190,8 +195,8 @@ export function SpellsPage({
   // are always-prepared (so a feature spell previously picked by hand no longer
   // eats a slot of the cap).
   const chosenPrepared = useMemo(
-    () => (sc.prepared ?? []).filter((id) => !alwaysPrepared.includes(id)),
-    [sc.prepared, alwaysPrepared],
+    () => (perClass.prepared ?? []).filter((id) => !alwaysPrepared.includes(id)),
+    [perClass.prepared, alwaysPrepared],
   );
 
   // Cantrips the character must know and cannot replace (Arcane Trickster's
@@ -200,10 +205,10 @@ export function SpellsPage({
   // before the user makes any selection — without forcing a write on mount.
   const required = useMemo(() => requiredCantrips(character), [character]);
   const chosenCantrips = useMemo(() => {
-    const stored = sc.cantrips ?? [];
+    const stored = perClass.cantrips ?? [];
     const missing = required.filter((id) => !stored.includes(id));
     return missing.length > 0 ? [...missing, ...stored] : stored;
-  }, [sc.cantrips, required]);
+  }, [perClass.cantrips, required]);
 
   // Merge the catalog spells of a set of class lists (deduped, level-sorted).
   const mergeLists = (ids: string[]): CatalogSpell[] => {
@@ -243,8 +248,24 @@ export function SpellsPage({
   );
 
   // ── State mutation helpers ────────────────────────────────────────────────
-  const patchSpellcasting = (patch: Partial<SpellcastingState>) => {
-    onChange({ ...character, spellcasting: { ...sc, ...patch } });
+  // A patch may carry per-class keys (cantrips/prepared/spellbook) and/or pooled
+  // keys (slotsExpended/pactSlotsExpended/mysticArcana*). Per-class keys are
+  // written UNDER byClass[primaryId]; pooled keys stay top-level. Keeps single-
+  // class behaviour identical to the pre-M1 flat shape (PHB 2024 "Multiclassing").
+  const patchSpellcasting = (
+    patch: Partial<ClassSpellcasting> & Omit<Partial<SpellcastingState>, 'byClass'>,
+  ) => {
+    const { cantrips, prepared, spellbook, ...pooled } = patch;
+    const next: SpellcastingState = { ...sc, ...pooled };
+    const hasPerClass = 'cantrips' in patch || 'prepared' in patch || 'spellbook' in patch;
+    if (hasPerClass && primaryId) {
+      const nextPerClass: ClassSpellcasting = { ...perClass };
+      if ('cantrips' in patch) nextPerClass.cantrips = cantrips;
+      if ('prepared' in patch) nextPerClass.prepared = prepared;
+      if ('spellbook' in patch) nextPerClass.spellbook = spellbook;
+      next.byClass = { ...sc.byClass, [primaryId]: nextPerClass };
+    }
+    onChange({ ...character, spellcasting: next });
   };
 
   const toggleCantrip = (id: SpellId, checked: boolean) => {
@@ -294,7 +315,7 @@ export function SpellsPage({
   };
 
   const toggleSpellbook = (id: SpellId, checked: boolean) => {
-    const book = sc.spellbook ?? [];
+    const book = perClass.spellbook ?? [];
     if (checked) {
       if (book.includes(id)) return;
       patchSpellcasting({ spellbook: [...book, id] });
@@ -380,9 +401,9 @@ export function SpellsPage({
   // finding: Wizard preparation must not bypass the spellbook).
   const preparableSpells = useMemo(() => {
     if (!usesSpellbook) return spellbookCandidates;
-    const book = new Set(sc.spellbook ?? []);
+    const book = new Set(perClass.spellbook ?? []);
     return spellbookCandidates.filter((s) => book.has(s.id));
-  }, [usesSpellbook, spellbookCandidates, sc.spellbook]);
+  }, [usesSpellbook, spellbookCandidates, perClass.spellbook]);
 
   // The leveled spells shown in the prepared picker: the preparable pool plus
   // any always-prepared feature spells not already in it (so locked entries
@@ -698,16 +719,16 @@ export function SpellsPage({
                   Scribed spells (
                   <CalculatedValue
                     label="Spellbook size"
-                    breakdown={countBreakdown('Scribed spells', (sc.spellbook ?? []).length)}
+                    breakdown={countBreakdown('Scribed spells', (perClass.spellbook ?? []).length)}
                   >
-                    {(sc.spellbook ?? []).length}
+                    {(perClass.spellbook ?? []).length}
                   </CalculatedValue>{' '}
                   in book). You prepare from your spellbook; full scribe/copy
                   mechanics arrive later.
                 </p>
                 <SpellPickList
                   spells={spellbookCandidates}
-                  selectedIds={sc.spellbook ?? []}
+                  selectedIds={perClass.spellbook ?? []}
                   atCap={false}
                   onToggle={toggleSpellbook}
                   showLevel

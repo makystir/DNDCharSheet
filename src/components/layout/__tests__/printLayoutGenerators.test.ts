@@ -27,7 +27,7 @@ function makeFighter(overrides: Partial<Character> = {}): Character {
     name: 'Aric the Bold',
     level: 5,
     abilities: { str: 16, dex: 14, con: 15, int: 10, wis: 12, cha: 8 },
-    class: { id: 'fighter', level: 5 },
+    classes: [{ id: 'fighter', level: 5 }],
     skills: {
       athletics: { proficient: true },
       perception: { proficient: true, expertise: true },
@@ -52,7 +52,7 @@ function makeWizard(overrides: Partial<Character> = {}): Character {
     name: 'Mira the Wise',
     level: 5,
     abilities: { str: 8, dex: 14, con: 13, int: 17, wis: 12, cha: 10 },
-    class: { id: 'wizard', level: 5 },
+    classes: [{ id: 'wizard', level: 5 }],
     ...overrides,
   };
 }
@@ -99,7 +99,7 @@ describe('printLayoutGenerators — data completeness', () => {
     // the player chose Goblin and separately chose Elvish at creation.
     const rogue = makeFighter({
       id: 'rogue-1',
-      class: { id: 'rogue', level: 1 },
+      classes: [{ id: 'rogue', level: 1 }],
       languages: { chosen: ['elvish'], granted: ['goblin'] },
     });
     const langs = buildPrintSheetData(rogue).identity.languages.toLowerCase();

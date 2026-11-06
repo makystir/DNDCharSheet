@@ -53,7 +53,7 @@ function charWith(classId: string, level: number): Character {
   const c = createCharacter('T');
   c.level = level;
   if (classId !== '') {
-    c.class = { id: classId as ClassId, level, skillChoices: [] };
+    c.classes = [{ id: classId as ClassId, level, skillChoices: [] }];
   }
   return c;
 }
@@ -145,7 +145,7 @@ describe('FIXED_HP_BY_CLASS golden harness', () => {
   it('the real class Hit Die matches the golden hitDie for every class', () => {
     for (const row of FIXED_HP_BY_CLASS) {
       const c = charWith(row.classId, 1);
-      expect(c.class).toBeDefined();
+      expect(c.classes).toBeDefined();
     }
     expect(FIXED_HP_BY_CLASS.length).toBe(12);
   });

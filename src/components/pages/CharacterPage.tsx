@@ -19,6 +19,7 @@ import {
 import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats';
 import { formatSigned } from '../../logic/breakdown';
 import {
+  primaryClass,
   resolveClass,
   resolveSubclass,
   classProficiencies,
@@ -43,7 +44,7 @@ import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
 import { getBackground } from '../../data/backgrounds';
 import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
-import type { ClassSelection, SpeciesSelection } from '../../types/character';
+import type { ClassEntry, SpeciesSelection } from '../../types/character';
 import { useEffect, useState } from 'react';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
@@ -181,42 +182,47 @@ export function CharacterPage({
   // choice from a previous class); the empty value clears the class entirely.
   // The class level mirrors the character level this stage (single-class).
   const setClass = (raw: string) => {
+    const prevEntry = primaryClass(character);
     if (raw === '' || getClass(raw) === undefined) {
       const next = { ...character };
       const nextClass = undefined;
-      delete next.class;
+      delete next.classes;
       // Drop spell selections tied to the old class's list (review finding:
       // spell state must not survive an incompatible class change).
-      if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
+      if (shouldResetSpellcasting(prevEntry, nextClass)) delete next.spellcasting;
       onChange(next);
       return;
     }
-    const nextClass: ClassSelection = { id: raw as ClassSelection['id'], level: character.level };
-    const next: Character = { ...character, class: nextClass };
-    if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
+    // Single-class this stage: classes[0] is the initial class, level mirrors
+    // the character level (PHB 2024 "Multiclassing"; multiclass UI is M4).
+    const nextClass: ClassEntry = { id: raw as ClassEntry['id'], level: character.level };
+    const next: Character = { ...character, classes: [nextClass] };
+    if (shouldResetSpellcasting(prevEntry, nextClass)) delete next.spellcasting;
     onChange(next);
   };
 
   const setSubclass = (raw: string) => {
-    if (character.class === undefined) return;
-    const nextClass: ClassSelection = { ...character.class };
+    const prevEntry = primaryClass(character);
+    if (prevEntry === undefined) return;
+    const nextClass: ClassEntry = { ...prevEntry };
     if (raw === '') {
       delete nextClass.subclassId;
     } else {
-      nextClass.subclassId = raw as ClassSelection['subclassId'];
+      nextClass.subclassId = raw as ClassEntry['subclassId'];
     }
-    const next: Character = { ...character, class: nextClass };
+    const next: Character = { ...character, classes: [nextClass] };
     // A subclass change on a subclass caster (Eldritch Knight / Arcane
     // Trickster) changes the spell source, so reconcile the spell state.
-    if (shouldResetSpellcasting(character.class, nextClass)) delete next.spellcasting;
+    if (shouldResetSpellcasting(prevEntry, nextClass)) delete next.spellcasting;
     onChange(next);
   };
 
   // Toggles a single class skill-choice proficiency, deduped and capped at the
   // class's allowed count (PHB 2024 Core <Class> Traits: Skill Proficiencies).
   const setClassSkill = (skillId: SkillId, checked: boolean, count: number) => {
-    if (character.class === undefined) return;
-    const current = character.class.skillChoices ?? [];
+    const prevEntry = primaryClass(character);
+    if (prevEntry === undefined) return;
+    const current = prevEntry.skillChoices ?? [];
     let next: SkillId[];
     if (checked) {
       if (current.includes(skillId)) return;
@@ -226,7 +232,7 @@ export function CharacterPage({
     }
     onChange({
       ...character,
-      class: { ...character.class, skillChoices: next },
+      classes: [{ ...prevEntry, skillChoices: next }],
     });
   };
 
@@ -290,7 +296,7 @@ export function CharacterPage({
       : selectedClass.skillChoices.from === 'any'
         ? SKILLS.map((s) => s.id as SkillId)
         : selectedClass.skillChoices.from;
-  const chosenClassSkills = character.class?.skillChoices ?? [];
+  const chosenClassSkills = primaryClass(character)?.skillChoices ?? [];
 
   return (
     <div className={styles.page}>
@@ -554,7 +560,7 @@ export function CharacterPage({
               <select
                 id="class-select"
                 className={styles.speciesSelect}
-                value={character.class?.id ?? ''}
+                value={primaryClass(character)?.id ?? ''}
                 aria-label="Class"
                 onChange={(e) => setClass(e.target.value)}
               >
@@ -583,7 +589,7 @@ export function CharacterPage({
                 <select
                   id="subclass-select"
                   className={styles.speciesSelect}
-                  value={character.class?.subclassId ?? ''}
+                  value={primaryClass(character)?.subclassId ?? ''}
                   aria-label="Subclass"
                   onChange={(e) => setSubclass(e.target.value)}
                 >

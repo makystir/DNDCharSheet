@@ -200,7 +200,7 @@ describe('feat-increase propagation (the rewire reaches every derived engine)', 
   function fighter(level = 5): Character {
     const c = createCharacter('T');
     c.level = level;
-    c.class = { id: 'fighter' as ClassId, level, skillChoices: [] };
+    c.classes = [{ id: 'fighter' as ClassId, level, skillChoices: [] }];
     c.abilities = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
     return c;
   }
@@ -237,7 +237,7 @@ describe('feat-increase propagation (the rewire reaches every derived engine)', 
   it('a feat that raises the spellcasting ability raises spell save DC and attack', () => {
     const wiz = createCharacter('T');
     wiz.level = 5;
-    wiz.class = { id: 'wizard' as ClassId, level: 5, skillChoices: [] };
+    wiz.classes = [{ id: 'wizard' as ClassId, level: 5, skillChoices: [] }];
     wiz.abilities = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
 
     const dcBefore = spellSaveDcBreakdown(wiz)!.total;
@@ -281,7 +281,7 @@ describe('applyFeat never mutates the base scores; removeFeat reverts the increa
   function fighter(): Character {
     const c = createCharacter('T');
     c.level = 5;
-    c.class = { id: 'fighter' as ClassId, level: 5, skillChoices: [] };
+    c.classes = [{ id: 'fighter' as ClassId, level: 5, skillChoices: [] }];
     c.abilities = { str: 12, dex: 14, con: 13, int: 8, wis: 10, cha: 10 };
     return c;
   }

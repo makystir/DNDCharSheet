@@ -39,7 +39,7 @@ function renderStateful(overrides: Partial<Character> = {}, now: () => number = 
 function fighter4(cha = 10): Partial<Character> {
   return {
     level: 4,
-    class: { id: 'fighter', level: 4 },
+    classes: [{ id: 'fighter', level: 4 }],
     abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha },
   };
 }
@@ -52,7 +52,7 @@ describe('FeatSlotsSection — slots & picker', () => {
   });
 
   it('shows no slots below the first asi-marker level', () => {
-    renderStateful({ level: 3, class: { id: 'fighter', level: 3 } });
+    renderStateful({ level: 3, classes: [{ id: 'fighter', level: 3 }] });
     expect(screen.queryByRole('button', { name: 'Choose a feat…' })).not.toBeInTheDocument();
     expect(screen.getByText(/No feat slots yet/)).toBeInTheDocument();
   });
@@ -153,7 +153,7 @@ describe('FeatSlotsSection — Epic Boon slot only at 19', () => {
   it('offers the Epic Boon slot and feat at level 19', () => {
     renderStateful({
       level: 19,
-      class: { id: 'fighter', level: 19 },
+      classes: [{ id: 'fighter', level: 19 }],
       abilities: { str: 18, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
     });
     // A level-19 slot exists (the Epic Boon slot).

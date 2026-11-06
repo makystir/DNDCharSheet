@@ -21,7 +21,7 @@ import {
   spellSaveDcBreakdown,
   spellAttackBreakdown,
 } from '../../logic/spellcasting';
-import { resolveClass } from '../../logic/classes';
+import { primaryClass, resolveClass } from '../../logic/classes';
 import { resolveSpecies } from '../../logic/species';
 import { CalculatedValue } from './CalculatedValue';
 import styles from './SharedCharacterViewer.module.css';
@@ -166,8 +166,9 @@ export function SharedCharacterViewer({ encoded }: SharedCharacterViewerProps) {
   const dcBreakdown = spellcaster ? spellSaveDcBreakdown(character) : undefined;
   const spellAtk = spellcaster ? spellAttackBreakdown(character) : undefined;
 
+  const primaryEntry = primaryClass(character);
   const classLabel = cls
-    ? `${cls.name}${character.class?.level ? ` ${character.class.level}` : ''}`
+    ? `${cls.name}${primaryEntry?.level ? ` ${primaryEntry.level}` : ''}`
     : 'No class';
 
   return (

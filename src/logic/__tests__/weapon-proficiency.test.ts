@@ -12,7 +12,7 @@ import {
 
 function withClass(classId: string | undefined, level = 5): Character {
   const base = { ...createCharacter('Tester'), level };
-  return classId === undefined ? base : { ...base, class: { id: classId as ClassId, level } };
+  return classId === undefined ? base : { ...base, classes: [{ id: classId as ClassId, level }] };
 }
 
 function weaponItem(catalogId: string, extra: Partial<InventoryItem> = {}): InventoryItem {
@@ -132,7 +132,7 @@ describe('weapon proficiency: own behaviour', () => {
   });
 
   it('does not mutate the character or the item', () => {
-    const character = Object.freeze({ ...withClass('monk'), class: Object.freeze({ id: 'monk' as ClassId, level: 5 }) });
+    const character: Character = Object.freeze({ ...withClass('monk'), classes: [Object.freeze({ id: 'monk' as ClassId, level: 5 })] });
     const item = Object.freeze(weaponItem('shortsword'));
     expect(() => weaponProficiency(character, item)).not.toThrow();
   });
@@ -155,7 +155,7 @@ describe('fail-closed: proficiency mutants are caught by the golden rows', () =>
   it('"Simple only, ignore Martial-with-property" fails the Monk and Rogue rows', () => {
     const mutant: ProficiencyFn = (character, item) => {
       const weapon = getWeapon(item.catalogId ?? '') as WeaponData;
-      const rule = getClass(character.class?.id)?.weaponProficiency;
+      const rule = getClass(character.classes?.[0]?.id)?.weaponProficiency;
       if (!rule) return false;
       return weapon.category === 'simple' ? rule.simple : rule.martial;
     };
@@ -167,10 +167,10 @@ describe('fail-closed: proficiency mutants are caught by the golden rows', () =>
   it('"Monk accepts Finesse as well as Light" fails the Monk Rapier row', () => {
     const mutant: ProficiencyFn = (character, item) => {
       const weapon = getWeapon(item.catalogId ?? '') as WeaponData;
-      const rule = getClass(character.class?.id)?.weaponProficiency;
+      const rule = getClass(character.classes?.[0]?.id)?.weaponProficiency;
       if (!rule) return false;
       const widened =
-        character.class?.id === 'monk' ? { ...rule, martialWithAnyOf: ['light', 'finesse'] as WeaponProperty[] } : rule;
+        character.classes?.[0]?.id === 'monk' ? { ...rule, martialWithAnyOf: ['light', 'finesse'] as WeaponProperty[] } : rule;
       return classProficientWithWeapon(widened, weapon);
     };
     expect(proficiencyMismatches(mutant)).toContain('monk/rapier');
@@ -178,7 +178,7 @@ describe('fail-closed: proficiency mutants are caught by the golden rows', () =>
 
   it('"Druid gets the 2014 Scimitar" fails the Druid Scimitar row', () => {
     const mutant: ProficiencyFn = (character, item) =>
-      character.class?.id === 'druid' && item.catalogId === 'scimitar' ? true : isProficient(character, item);
+      character.classes?.[0]?.id === 'druid' && item.catalogId === 'scimitar' ? true : isProficient(character, item);
     expect(proficiencyMismatches(mutant)).toContain('druid/scimitar');
   });
 

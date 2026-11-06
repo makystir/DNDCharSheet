@@ -35,7 +35,7 @@ const weaponOf = (id: string): WeaponData => {
 
 function withClass(classId: string | undefined, level: number, masteries?: string[]): Character {
   const base: Character = { ...createCharacter('Tester'), level };
-  const withClassSel = classId === undefined ? base : { ...base, class: { id: classId as ClassId, level } };
+  const withClassSel = classId === undefined ? base : { ...base, classes: [{ id: classId as ClassId, level }] };
   return masteries === undefined ? withClassSel : { ...withClassSel, weaponMasteries: masteries };
 }
 
@@ -219,7 +219,7 @@ describe('over-cap list is kept, never silently deleted', () => {
   it('a level-up raises the cap and the earlier choices stay', () => {
     const at3 = withClass('barbarian', 3, ['longsword', 'greataxe']);
     expect(masteryChoices(at3).slotsLeft).toBe(0);
-    const at4 = { ...at3, class: { id: 'barbarian' as ClassId, level: 4 }, level: 4 };
+    const at4 = { ...at3, classes: [{ id: 'barbarian' as ClassId, level: 4 }], level: 4 };
     expect(masteryChoices(at4)).toMatchObject({ cap: 3, slotsLeft: 1 });
     expect(chooseWeaponMastery(at4, 'glaive').ok).toBe(true);
   });

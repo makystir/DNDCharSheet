@@ -30,7 +30,7 @@
 import type { Character } from '../types/character';
 import type { TooltipContent } from './tooltip-content';
 import { clampLevel, proficiencyBonus, MAX_LEVEL } from './abilities';
-import { resolveClass } from './classes';
+import { primaryClass, resolveClass } from './classes';
 import { formatSigned } from './breakdown';
 import {
   canLevelUp,
@@ -173,7 +173,7 @@ export interface AdvisorSuggestion {
  * point a recorded id is exactly a resolvable subclass.
  */
 function hasSubclassRecorded(character: Character): boolean {
-  return character.class?.subclassId !== undefined;
+  return primaryClass(character)?.subclassId !== undefined;
 }
 
 /**

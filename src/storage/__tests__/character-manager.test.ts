@@ -146,14 +146,14 @@ describe('character-manager: duplicate', () => {
     const original = await adoptCharacter({
       ...storeCreateCharacter('Hero'),
       level: 5,
-      class: { id: 'fighter', level: 5 },
+      classes: [{ id: 'fighter', level: 5 }],
     });
     const copy = await duplicateCharacter(original.id);
     expect(copy).not.toBeNull();
     expect(copy!.id).not.toBe(original.id);
     expect(copy!.name).toBe('Hero (Copy)');
     expect(copy!.level).toBe(5);
-    expect(copy!.class?.id).toBe('fighter');
+    expect(copy!.classes?.[0]?.id).toBe('fighter');
     expect(getActiveCharacterId()).toBe(copy!.id);
     // Both characters exist independently.
     const summaries = await listSummaries();
@@ -234,7 +234,7 @@ describe('character-manager: toSummary', () => {
     const char = await adoptCharacter({
       ...storeCreateCharacter('Rogueish'),
       level: 4,
-      class: { id: 'rogue', level: 4 },
+      classes: [{ id: 'rogue', level: 4 }],
     });
     const summary = toSummary(char);
     expect(summary.name).toBe('Rogueish');

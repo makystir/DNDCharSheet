@@ -622,7 +622,7 @@ describe('weaponAttackProfile', () => {
   const fighter = (over: Partial<Character> = {}): Character => ({
     ...createCharacter('F'),
     level: 5,
-    class: { id: 'fighter' as ClassId, level: 5 },
+    classes: [{ id: 'fighter' as ClassId, level: 5 }],
     abilities: { str: 16, dex: 12, con: 10, int: 10, wis: 10, cha: 10 },
     ...over,
   });
@@ -644,7 +644,7 @@ describe('weaponAttackProfile', () => {
   });
 
   it('is not proficient with no class, and carries the Exhaustion level for the roll', () => {
-    const noClass: Character = { ...fighter(), class: undefined, exhaustionLevel: 2 };
+    const noClass: Character = { ...fighter(), classes: undefined, exhaustionLevel: 2 };
     const p = weaponAttackProfile(noClass, sword);
     expect(p?.proficiency).toMatchObject({ proficient: false, source: 'no-class' });
     expect(p?.attack.breakdown.total).toBe(3 + 0 + 1);

@@ -42,7 +42,11 @@ describe('runMigration: no-op at current version', () => {
 });
 
 describe('runMigration: legacy / missing _v', () => {
-  it('treats a record with no _v as legacy and stamps CURRENT_VERSION', () => {
+  // This app never shipped a v0 schema; its earliest persisted shape IS v1
+  // (single-class + flat spellcasting). So a record with no _v is treated as
+  // v1 (LEGACY_VERSION = 1) and STILL runs through MIGRATIONS[1] — it must be
+  // reshaped to v2, not merely stamped to current with its v1 shape intact.
+  it('treats a record with no _v as v1 and runs the v1→v2 reshape', () => {
     const legacy = makeChar();
     // Remove _v to simulate a legacy record.
     delete (legacy as Partial<Character>)._v;
@@ -50,17 +54,32 @@ describe('runMigration: legacy / missing _v', () => {
     expect(result.success).toBe(true);
     if (!result.success) return;
     expect(result.character._v).toBe(CURRENT_VERSION);
-    expect(result.from).toBe(0);
+    expect(result.from).toBe(1);
     // All other fields preserved.
     expect(result.character.name).toBe('Migratee');
   });
 
-  it('treats a non-numeric _v as legacy (version 0)', () => {
+  it('a no-_v record WITH a single class is reshaped to classes[] (not skipped)', () => {
+    const legacy = makeChar({
+      class: { id: 'cleric', level: 3 },
+      level: 3,
+    } as unknown as Partial<Character>);
+    delete (legacy as Partial<Character>)._v;
+    const result = runMigration(legacy);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const migrated = result.character as unknown as Record<string, unknown>;
+    expect(migrated._v).toBe(CURRENT_VERSION);
+    expect(migrated.classes).toEqual([{ id: 'cleric', level: 3 }]);
+    expect('class' in migrated).toBe(false);
+  });
+
+  it('treats a non-numeric _v as v1 and reshapes', () => {
     const weird = { ...makeChar(), _v: 'one' as unknown as number };
     const result = runMigration(weird);
     expect(result.success).toBe(true);
     if (!result.success) return;
-    expect(result.from).toBe(0);
+    expect(result.from).toBe(1);
     expect(result.character._v).toBe(CURRENT_VERSION);
   });
 });
@@ -115,6 +134,14 @@ describe('runMigration: idempotence', () => {
       })(),
       makeChar({ _v: CURRENT_VERSION + 2 }),
       { _v: 0, name: 'sparse', level: 1, abilities: {} },
+      // A v2-shaped record (classes[] + byClass spellcasting) must stay stable:
+      // at CURRENT_VERSION it is already current, so a second run is a no-op.
+      makeChar({
+        _v: 2,
+        level: 3,
+        classes: [{ id: 'wizard', level: 3 }],
+        spellcasting: { byClass: { wizard: { cantrips: ['fire-bolt'] } }, slotsExpended: { 1: 1 } },
+      }),
     ];
     for (const input of inputs) {
       const once = runMigration(input);
@@ -144,18 +171,19 @@ describe('migrateCharacter (read-path convenience)', () => {
 });
 
 describe('MIGRATIONS framework invariant', () => {
-  it('has a registered step for every version below CURRENT_VERSION', () => {
+  it('registers the first real step (v1 → v2) at CURRENT_VERSION 2', () => {
+    // Stage M1 ("Multiclassing") is the first breaking change: MIGRATIONS[1]
+    // upgrades a v1 record to v2 and must be a function.
+    expect(CURRENT_VERSION).toBeGreaterThanOrEqual(2);
+    expect(MIGRATIONS[1], 'missing migration step from v1').toBeTypeOf('function');
+  });
+
+  it('has a registered step for every intermediate version from v1 up', () => {
     // Guards against a future CURRENT_VERSION bump that forgets to add its step.
-    for (let v = 0; v < CURRENT_VERSION; v++) {
-      // v0 (legacy) only needs a step when CURRENT_VERSION > 1; at v1 there are
-      // no intermediate versions, so the map is legitimately empty.
-      if (CURRENT_VERSION > 1) {
-        expect(MIGRATIONS[v], `missing migration step from v${v}`).toBeTypeOf('function');
-      }
-    }
-    // At v1 the map is empty by design (no breaking changes yet).
-    if (CURRENT_VERSION === 1) {
-      expect(Object.keys(MIGRATIONS)).toHaveLength(0);
+    // v0 (pre-_v legacy) is the lowest version and is bridged by stamping, so a
+    // step is required only from v1 upward (the first versioned schema).
+    for (let v = 1; v < CURRENT_VERSION; v++) {
+      expect(MIGRATIONS[v], `missing migration step from v${v}`).toBeTypeOf('function');
     }
   });
 });

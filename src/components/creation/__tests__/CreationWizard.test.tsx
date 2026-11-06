@@ -108,7 +108,7 @@ describe('CreationWizard', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
     const character = onComplete.mock.calls[0][0];
     expect(character.name).toBe('Aldric');
-    expect(character.class?.id).toBe('fighter');
+    expect(character.classes?.[0]?.id).toBe('fighter');
     expect(character.species?.id).toBe('human');
     expect(character.backgroundSelection?.id).toBe('acolyte');
     // Standard array assigned highest-first: Str=15 (base, unmodified by bg).

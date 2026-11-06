@@ -26,7 +26,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 function fighter(overrides: Partial<Character> = {}): Character {
   return makeCharacter({
     level: 1,
-    class: { id: 'fighter', level: 1 },
+    classes: [{ id: 'fighter', level: 1 }],
     hpMax: 10,
     ...overrides,
   });
@@ -137,7 +137,7 @@ describe('getSuggestions — serializability (property)', () => {
     fc.assert(
       fc.property(arb, (a) => {
         const base = a.overloaded
-          ? { ...overloaded(), class: { id: 'fighter' as const, level: 1 }, hpMax: 10, currentHp: a.hp }
+          ? { ...overloaded(), classes: [{ id: 'fighter' as const, level: 1 }], hpMax: 10, currentHp: a.hp }
           : fighter({ currentHp: a.hp });
         const character: Character = {
           ...base,

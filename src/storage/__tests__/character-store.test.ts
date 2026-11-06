@@ -90,19 +90,19 @@ describe('character-store', () => {
     const withClass = {
       ...base,
       level: 3,
-      class: {
+      classes: [{
         id: 'wizard' as const,
         subclassId: 'evoker' as const,
         level: 3,
         skillChoices: ['arcana' as const, 'history' as const],
-      },
+      }],
       hitDiceSpent: 1,
       rolledHpTotal: 17,
       houseRules: { rolledHp: true },
     };
     const saved = await saveCharacter(withClass);
     const loaded = await getCharacter(saved.id);
-    expect(loaded?.class).toEqual(withClass.class);
+    expect(loaded?.classes).toEqual(withClass.classes);
     expect(loaded?.hitDiceSpent).toBe(1);
     expect(loaded?.rolledHpTotal).toBe(17);
     expect(loaded?.houseRules).toEqual({ rolledHp: true });
@@ -111,21 +111,21 @@ describe('character-store', () => {
   // Test 19: backward-compat — a pre-Stage-4 record (no class) loads unchanged.
   it('loads a pre-Stage-4 record without class fields unchanged', async () => {
     const legacy = createCharacter('OldTimer');
-    delete (legacy as { class?: unknown }).class;
+    delete (legacy as { classes?: unknown }).classes;
     delete (legacy as { hitDiceSpent?: unknown }).hitDiceSpent;
     delete (legacy as { rolledHpTotal?: unknown }).rolledHpTotal;
     delete (legacy as { houseRules?: unknown }).houseRules;
     const saved = await saveCharacter(legacy);
     const loaded = await getCharacter(saved.id);
     expect(loaded).not.toBeNull();
-    expect(loaded?.class).toBeUndefined();
+    expect(loaded?.classes).toBeUndefined();
     expect(loaded?.hitDiceSpent).toBeUndefined();
     expect(loaded?.houseRules).toBeUndefined();
   });
 
   it('createCharacter yields a valid class-less character', () => {
     const c = createCharacter('Fresh');
-    expect(c.class).toBeUndefined();
+    expect(c.classes).toBeUndefined();
     expect(c.houseRules).toBeUndefined();
   });
 
@@ -200,11 +200,15 @@ describe('character-store', () => {
     const withSpells = {
       ...base,
       level: 5,
-      class: { id: 'wizard' as const, level: 5 },
+      classes: [{ id: 'wizard' as const, level: 5 }],
       spellcasting: {
-        cantrips: ['fire-bolt' as const, 'mage-hand' as const, 'light' as const],
-        prepared: ['magic-missile' as const, 'shield' as const, 'fireball' as const],
-        spellbook: ['magic-missile' as const, 'shield' as const, 'fireball' as const, 'misty-step' as const],
+        byClass: {
+          wizard: {
+            cantrips: ['fire-bolt' as const, 'mage-hand' as const, 'light' as const],
+            prepared: ['magic-missile' as const, 'shield' as const, 'fireball' as const],
+            spellbook: ['magic-missile' as const, 'shield' as const, 'fireball' as const, 'misty-step' as const],
+          },
+        },
         slotsExpended: { 1: 2, 3: 1 },
       },
     };
@@ -218,7 +222,7 @@ describe('character-store', () => {
     const withPact = {
       ...base,
       level: 5,
-      class: { id: 'warlock' as const, level: 5 },
+      classes: [{ id: 'warlock' as const, level: 5 }],
       spellcasting: { pactSlotsExpended: 1 },
     };
     const saved = await saveCharacter(withPact);
@@ -233,7 +237,7 @@ describe('character-store', () => {
     const withArcana = {
       ...base,
       level: 17,
-      class: { id: 'warlock' as const, level: 17 },
+      classes: [{ id: 'warlock' as const, level: 17 }],
       spellcasting: {
         mysticArcana: {
           6: 'eyebite' as const,

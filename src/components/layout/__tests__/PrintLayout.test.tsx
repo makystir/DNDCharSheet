@@ -13,7 +13,7 @@ function makeFighter(overrides: Partial<Character> = {}): Character {
     name: 'Aric the Bold',
     level: 5,
     abilities: { str: 16, dex: 14, con: 15, int: 10, wis: 12, cha: 8 },
-    class: { id: 'fighter', level: 5 },
+    classes: [{ id: 'fighter', level: 5 }],
     skills: { perception: { proficient: true } },
     saveProficiencies: { str: true, con: true },
     inventory: [{ id: 'w1', kind: 'weapon', catalogId: 'longsword', quantity: 1 }],
@@ -30,7 +30,7 @@ function makeWizard(): Character {
     name: 'Mira the Wise',
     level: 5,
     abilities: { str: 8, dex: 14, con: 13, int: 17, wis: 12, cha: 10 },
-    class: { id: 'wizard', level: 5 },
+    classes: [{ id: 'wizard', level: 5 }],
   };
 }
 

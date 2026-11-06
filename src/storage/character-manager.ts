@@ -34,6 +34,7 @@ import {
 } from './character-store';
 import { getPortraitStore } from './portrait-store';
 import { CLASS_CATALOG } from '../data/classes';
+import { primaryClass } from '../logic/classes';
 
 const ACTIVE_ID_KEY = 'dnd-active-character-id';
 
@@ -84,7 +85,7 @@ export interface CharacterSummary {
 
 /** Builds the display summary for a single character. */
 export function toSummary(character: Character): CharacterSummary {
-  const classId = character.class?.id;
+  const classId = primaryClass(character)?.id;
   const className = classId ? (CLASS_CATALOG[classId]?.name ?? '') : '';
   return {
     id: character.id,

@@ -201,7 +201,7 @@ function charWithClass(classId: string): Character {
   const c = createCharacter('T');
   // The golden keys are all valid ClassIds; cast the plain string accordingly.
   // Unknown ids resolve to no class (unarmoredDefenseFor tolerates that).
-  c.class = { id: classId as ClassId, level: c.level, skillChoices: [] };
+  c.classes = [{ id: classId as ClassId, level: c.level, skillChoices: [] }];
   return c;
 }
 
@@ -294,7 +294,7 @@ describe('Unarmored Defense — edge cases', () => {
 
   it('a non-UD class in no armour → plain 10 + Dex (no ability mod added)', () => {
     const c = createCharacter('T');
-    c.class = { id: 'fighter' as ClassId, level: 1, skillChoices: [] };
+    c.classes = [{ id: 'fighter' as ClassId, level: 1, skillChoices: [] }];
     const bd = armorClassBreakdown(c.abilities, undefined, {
       unarmoredDefense: unarmoredDefenseFor(c),
     });

@@ -21,9 +21,10 @@
 
 import type { Ability, Character, SpellcastingState } from '../types/character';
 import { ABILITY_NAMES } from '../types/character';
+import type { ClassEntry } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
-import { resolveClass } from './classes';
+import { primaryClass, resolveClass } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
@@ -67,7 +68,7 @@ export function isSpellcaster(character: Character): boolean {
   if (!descriptor) return false;
   // Subclass-only caster: require the casting subclass AND the casting level.
   if (descriptor.subclassCastingLevel !== undefined) {
-    if (character.class?.subclassId !== descriptor.subclassId) return false;
+    if (primaryClass(character)?.subclassId !== descriptor.subclassId) return false;
     return character.level >= descriptor.subclassCastingLevel;
   }
   // Base-class caster: casts from level 1.
@@ -345,7 +346,7 @@ export function cantripListClassIds(character: Character): string[] {
  */
 export function requiredCantrips(character: Character): SpellId[] {
   if (!isSpellcaster(character)) return [];
-  if (character.class?.subclassId === 'arcaneTrickster' && getSpell('mage-hand')) {
+  if (primaryClass(character)?.subclassId === 'arcaneTrickster' && getSpell('mage-hand')) {
     return ['mage-hand'];
   }
   return [];
@@ -413,8 +414,8 @@ export function alwaysPreparedSpells(character: Character): SpellId[] {
  * `prev` to `next` class selection (either may be undefined for "no class").
  */
 export function shouldResetSpellcasting(
-  prev: Character['class'],
-  next: Character['class'],
+  prev: ClassEntry | undefined,
+  next: ClassEntry | undefined,
 ): boolean {
   // Class id changed (including to/from no class): different spell list.
   if (prev?.id !== next?.id) return true;
@@ -491,11 +492,21 @@ export function reconcileSpellcastingForLevel(
   const sc = character.spellcasting;
   if (!sc) return undefined;
 
+  // The per-class selections (cantrips/prepared/spellbook) now live under
+  // byClass[classId]. For a single-class character there is exactly one key —
+  // the primary class id — so reconcile reads/writes that one bucket, leaving
+  // the shared/pooled fields (slotsExpended/pactSlotsExpended/mysticArcana*)
+  // top-level. Behaviour is identical to the pre-M1 flat shape, nested one level.
+  const primaryId = primaryClass(character)?.id;
+  const perClass = primaryId ? sc.byClass?.[primaryId] : undefined;
+
   const topLevel = maxSpellLevel(character);
   const cantripCap = cantripsKnown(character);
   const preparedCap = preparedCount(character);
   const required = requiredCantrips(character);
   const next: SpellcastingState = { ...sc };
+  // The reconciled per-class selections for the primary class (rebuilt below).
+  const nextPerClass: { cantrips?: SpellId[]; prepared?: SpellId[]; spellbook?: SpellId[] } = {};
 
   // The spell lists currently legal for this character. Prepared/spellbook
   // spells must belong to one of them, and cantrips to the (narrower) cantrip
@@ -520,34 +531,44 @@ export function reconcileSpellcastingForLevel(
       onLists(id, lists)
     );
   };
-  if (sc.prepared) {
+  if (perClass?.prepared) {
     // Keep only level-legal, list-legal prepared spells, then clamp to the
     // current Prepared Spells cap (PHB 2024 class "Prepared Spells" column).
-    const pruned = sc.prepared.filter((id) => legalLeveled(id, preparedLists));
+    const pruned = perClass.prepared.filter((id) => legalLeveled(id, preparedLists));
     const capped = preparedCap > 0 ? pruned.slice(0, preparedCap) : [];
-    if (capped.length > 0) next.prepared = capped;
-    else delete next.prepared;
+    if (capped.length > 0) nextPerClass.prepared = capped;
   }
-  if (sc.spellbook) {
+  if (perClass?.spellbook) {
     // The spellbook is Wizard-only and uncapped this stage, but still must stay
     // within the castable level and on the (Wizard) list.
-    const pruned = sc.spellbook.filter((id) => legalLeveled(id, preparedLists));
-    if (pruned.length > 0) next.spellbook = pruned;
-    else delete next.spellbook;
+    const pruned = perClass.spellbook.filter((id) => legalLeveled(id, preparedLists));
+    if (pruned.length > 0) nextPerClass.spellbook = pruned;
   }
 
   // Trim cantrips to the current cap and legal cantrip list, keeping required
   // cantrips (Arcane Trickster's Mage Hand) first.
-  if (sc.cantrips) {
-    const legalCantrips = sc.cantrips.filter(
+  if (perClass?.cantrips) {
+    const legalCantrips = perClass.cantrips.filter(
       (id) => required.includes(id) || onLists(id, cantripLists),
     );
     const requiredKept = legalCantrips.filter((id) => required.includes(id));
     const optional = legalCantrips.filter((id) => !required.includes(id));
     const room = Math.max(0, cantripCap - requiredKept.length);
     const kept = [...requiredKept, ...optional.slice(0, room)];
-    if (kept.length > 0) next.cantrips = kept;
-    else delete next.cantrips;
+    if (kept.length > 0) nextPerClass.cantrips = kept;
+  }
+
+  // Write the reconciled per-class selections back under byClass[primaryId],
+  // preserving any OTHER classes' selections untouched (single-class: none).
+  if (primaryId) {
+    const nextByClass: NonNullable<SpellcastingState['byClass']> = { ...sc.byClass };
+    if (Object.keys(nextPerClass).length > 0) {
+      nextByClass[primaryId] = nextPerClass;
+    } else {
+      delete nextByClass[primaryId];
+    }
+    if (Object.keys(nextByClass).length > 0) next.byClass = nextByClass;
+    else delete next.byClass;
   }
 
   // Clamp expended standard slots to the new per-level maxima.

@@ -217,11 +217,11 @@ export function generateRandomCharacter(
   const name = options.name ?? generateName(speciesId, gender, rng);
   let character = createCharacter(name);
 
-  // Class (single-class at level 1).
+  // Class (single-class at level 1; classes[0] = initial class — PHB 2024).
   character = {
     ...character,
     level: 1,
-    class: { id: classId, level: 1, skillChoices: [] },
+    classes: [{ id: classId, level: 1, skillChoices: [] }],
   };
 
   // Species + required sub-choices.

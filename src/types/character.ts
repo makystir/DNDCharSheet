@@ -169,28 +169,39 @@ export interface SpeciesSelection {
 }
 
 /**
- * A character's class selection and the choices it requires. In 2024 a class
- * sets the Hit Die, save proficiencies, armor/weapon/tool proficiencies, a
+ * One class a character has levels in (PHB 2024 "Multiclassing"). In 2024 a
+ * class sets the Hit Die, save proficiencies, armor/weapon/tool proficiencies, a
  * starting skill choice, and level-by-level features (PHB 2024 Chapter 3).
  *
- * Additive-optional on Character (no CURRENT_VERSION bump): an absent `class`
- * means "no class chosen", a valid pre-Stage-4 state, so no migration is needed
- * (same convention as the Stage-3 optional `species` field above). Sub-choice
- * fields are optional so a class can be chosen before its subclass/skills are.
+ * This is the per-class entry stored in `Character.classes`. The first entry is
+ * the INITIAL class (it grants the full starting proficiencies; later entries
+ * grant only the reduced multiclass subset — PHB 2024 "Multiclassing:
+ * Proficiencies"). Sub-choice fields are optional so a class can be chosen
+ * before its subclass/skills are. Its fields are identical to the pre-Stage-M1
+ * single `ClassSelection`, which is now folded into the `classes[]` array.
  */
-export interface ClassSelection {
+export interface ClassEntry {
   /** Catalog key, e.g. 'wizard'. An unknown/invalid id is treated as no class. */
   id: ClassId;
   /** Chosen subclass id (valid from the class's subclassLevel). */
   subclassId?: SubclassId;
   /**
-   * Levels in this class. For a single-class character this equals the
-   * character level; multiclassing is a later stage (PHB 2024 "Multiclassing").
+   * Levels in THIS class (1..20). The sum across entries equals
+   * `Character.level` (PHB 2024 "Multiclassing": your character level is the
+   * total of your levels in all your classes). For a single-class character
+   * this equals the character level.
    */
   level: number;
   /** The starting skill proficiencies chosen for this class. */
   skillChoices?: SkillId[];
 }
+
+/**
+ * Temporary alias for the pre-Stage-M1 name. Behaviour-neutral M1 reshape: the
+ * single `Character.class` field is replaced by `Character.classes: ClassEntry[]`.
+ * This alias eases incremental migration of imports; prefer `ClassEntry`.
+ */
+export type ClassSelection = ClassEntry;
 
 /**
  * A character's spellcasting selections and slot tracking (Stage 8).
@@ -202,10 +213,16 @@ export interface ClassSelection {
  * cantrips + a changeable prepared set (PHB 2024 Chapter 7 "Spellcasting"),
  * so there is no separate "known" collection.
  */
-export interface SpellcastingState {
-  /** Cantrip spell ids the character knows (always available, never use slots). */
+/**
+ * One class's spell selections (PHB 2024 "Multiclassing: Spells Prepared"). The
+ * cantrips/prepared lists are determined per class as a single-classed member
+ * of that class; a Wizard entry also carries its spellbook. Shared/pooled slot
+ * tracking lives on `SpellcastingState` (slots are a combined pool).
+ */
+export interface ClassSpellcasting {
+  /** Cantrip spell ids this class knows (always available, never use slots). */
   cantrips?: SpellId[];
-  /** Leveled spell ids currently prepared (the changeable prepared list). */
+  /** Leveled spell ids currently prepared for this class (the changeable list). */
   prepared?: SpellId[];
   /**
    * Wizard only: the superset of leveled spells scribed in the spellbook, from
@@ -213,6 +230,16 @@ export interface SpellcastingState {
    * minimal field this stage; full scribe/copy mechanics are a later stage.
    */
   spellbook?: SpellId[];
+}
+
+export interface SpellcastingState {
+  /**
+   * Per-class spell selections, keyed by ClassId (PHB 2024 "Multiclassing:
+   * Spells Prepared" — each class's cantrips/prepared/spellbook are tracked as a
+   * single-classed member of that class). For a single-class character there is
+   * exactly one key. Absent = no selections yet.
+   */
+  byClass?: Partial<Record<ClassId, ClassSpellcasting>>;
   /**
    * Standard spell slots expended, keyed by spell level, e.g. { 1: 2, 3: 1 }.
    * Absent = none spent (PHB 2024: slots recover on a Long Rest).
@@ -263,6 +290,17 @@ export interface HouseRules {
    * encumbrance.ts and are explicitly marked as not-2024-RAW there. Absent = off.
    */
   variantEncumbrance?: boolean;
+  /**
+   * When true, a multiclass that FAILS the ability-score prerequisite (PHB 2024
+   * "Multiclassing: Prerequisites" — a score of at least 13 in the primary
+   * ability of each class) is PERMITTED with a warning instead of being blocked.
+   *
+   * RULES-COMPLIANCE NOTE (rule 1 / rule 4): this is NOT a 2024 RAW rule — it is
+   * an OPT-IN house rule that is OFF by default, so default behaviour is RAW (the
+   * prerequisite is enforced). Declared now for the multiclass prerequisite stage
+   * (M4); NO behaviour is wired to it this stage. Absent = off (RAW).
+   */
+  allowIllegalMulticlass?: boolean;
 }
 
 /**
@@ -563,8 +601,15 @@ export interface RollEventPayload {
   passed?: boolean;
 }
 
-/** The current persisted-schema version. Bumped only on breaking changes. */
-export const CURRENT_VERSION = 1;
+/**
+ * The current persisted-schema version. Bumped only on breaking changes.
+ *
+ * v2 (Stage M1 "Multiclassing"): the single `Character.class?: ClassSelection`
+ * became `Character.classes?: ClassEntry[]`, and `SpellcastingState` moved the
+ * flat per-class selections (cantrips/prepared/spellbook) under `byClass`.
+ * `MIGRATIONS[1]` upgrades v1 records transparently (src/storage/migration.ts).
+ */
+export const CURRENT_VERSION = 2;
 
 /**
  * A single character sheet.
@@ -614,11 +659,17 @@ export interface Character {
    */
   species?: SpeciesSelection;
   /**
-   * Selected class and its required choices. Absent = no class chosen (a valid
-   * state). Additive-optional: pre-Stage-4 records without this field load
-   * unchanged (PHB 2024 Chapter 3 "Character Classes").
+   * Classes the character has levels in (PHB 2024 "Multiclassing"). The first
+   * entry (`classes[0]`) is the INITIAL class — it grants the full starting
+   * proficiencies; later entries grant only the reduced multiclass subset. Order
+   * is meaningful. Absent/empty = no class chosen (a valid state).
+   *
+   * `Character.level` stays the authoritative TOTAL character level; the sum of
+   * the entry levels equals it. For a single-class character there is exactly
+   * one entry whose level equals `Character.level`. Migrated from the
+   * pre-Stage-M1 single `class?: ClassSelection` field (schema v1 → v2).
    */
-  class?: ClassSelection;
+  classes?: ClassEntry[];
   /**
    * Spellcasting selections & slot tracking. Absent = none (a valid state for
    * non-casters and un-chosen casters). Additive-optional: pre-Stage-8 records

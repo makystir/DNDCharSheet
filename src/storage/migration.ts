@@ -9,11 +9,11 @@
  * Ported STRUCTURE from the WFRP app's migration approach (an ordered,
  * version-keyed upgrade pipeline), re-themed onto this app's `Character` shape.
  * Through Stage A7 + B1 every DND `Character` field was additive-optional with
- * NO `_v` bump, so `CURRENT_VERSION` is still 1 and there are NO real steps yet.
- * The runner is therefore a correct, well-tested FRAMEWORK that is an identity
- * no-op at v1 but is ready to carry steps the moment a future breaking change
- * bumps `CURRENT_VERSION`: add a `MIGRATIONS[n]` entry that upgrades a v`n`
- * record to v`n+1`.
+ * NO `_v` bump. Stage M1 ("Multiclassing") is the FIRST genuinely breaking
+ * change: `CURRENT_VERSION` is now 2 and `MIGRATIONS[1]` upgrades a v1 record
+ * (single `class`, flat spellcasting) to v2 (`classes[]`, `byClass`). The runner
+ * walks from the record's `_v` up to `CURRENT_VERSION`, applying each
+ * `MIGRATIONS[n]` (which upgrades a v`n` record to v`n+1`) in turn.
  *
  * Contract (mirrors the WFRP best-effort posture — PURE and TOTAL):
  *  - Never throws on a malformed record. A non-object input yields a typed
@@ -38,19 +38,74 @@ export type MigrationStep = (record: Record<string, unknown>) => Record<string, 
 /**
  * Ordered migration steps, keyed by the FROM version.
  *
- * EMPTY at v1: there have been no breaking schema changes, so no step is needed
- * to reach `CURRENT_VERSION` (1). When a future change bumps CURRENT_VERSION to
- * 2, add a `MIGRATIONS[1]` step that applies the v1→v2 transform and sets
- * `_v: 2` (and so on for later bumps).
+ * `MIGRATIONS[1]` (v1 → v2) is the first real step (Stage M1 "Multiclassing").
+ * When a future change bumps CURRENT_VERSION again, add the next `MIGRATIONS[n]`
+ * step that applies the v`n`→v`n+1` transform and sets `_v: n+1`.
  * The runner walks from the record's version up to CURRENT_VERSION, applying
  * each `MIGRATIONS[v]` in turn, so steps compose automatically.
  */
 export const MIGRATIONS: Record<number, MigrationStep> = {
-  // (no steps yet — identity through v1)
+  // v1 → v2 (Stage M1 "Multiclassing", design §6). The single-class shape
+  // { class: {id, level, subclassId?, skillChoices?} } becomes
+  // { classes: [ that same entry ] } (classes[0] = the INITIAL class), and the
+  // FLAT SpellcastingState { cantrips, prepared, spellbook, ...pooled } moves the
+  // per-class selections under byClass[classId]; the shared/pooled fields
+  // (slotsExpended, pactSlotsExpended, mysticArcana, mysticArcanaExpended) stay
+  // top-level. PHB 2024 "Multiclassing". Pure, total (never throws), idempotent
+  // (the runner only applies this to records at _v < 2).
+  1: (record) => {
+    const out: Record<string, unknown> = { ...record };
+
+    // class → classes[]. A non-null object becomes a one-element array (order =
+    // initial class). No class = class-less record survives with no `classes`.
+    const cls = record.class;
+    if (cls && typeof cls === 'object' && !Array.isArray(cls)) {
+      out.classes = [cls];
+    }
+    delete out.class;
+
+    // Flat spellcasting → byClass[classId] for the per-class selections, keeping
+    // the pooled fields top-level. Only fold when a class id is known; omit any
+    // selection key that was absent on the source so the shape round-trips (a
+    // non-caster class with no spellcasting is left untouched below).
+    const sc = record.spellcasting;
+    const classId =
+      cls && typeof cls === 'object' && !Array.isArray(cls)
+        ? (cls as Record<string, unknown>).id
+        : undefined;
+    if (sc && typeof sc === 'object' && !Array.isArray(sc) && typeof classId === 'string') {
+      const flat = sc as Record<string, unknown>;
+      const perClass: Record<string, unknown> = {};
+      if ('cantrips' in flat) perClass.cantrips = flat.cantrips;
+      if ('prepared' in flat) perClass.prepared = flat.prepared;
+      if ('spellbook' in flat) perClass.spellbook = flat.spellbook;
+
+      const nextSc: Record<string, unknown> = { byClass: { [classId]: perClass } };
+      // Carry the pooled fields through only when present (preserves deep-equal).
+      if ('slotsExpended' in flat) nextSc.slotsExpended = flat.slotsExpended;
+      if ('pactSlotsExpended' in flat) nextSc.pactSlotsExpended = flat.pactSlotsExpended;
+      if ('mysticArcana' in flat) nextSc.mysticArcana = flat.mysticArcana;
+      if ('mysticArcanaExpended' in flat) nextSc.mysticArcanaExpended = flat.mysticArcanaExpended;
+      out.spellcasting = nextSc;
+    }
+    // (If spellcasting is absent, or no class id is known, leave it untouched.)
+
+    out._v = 2;
+    return out;
+  },
 };
 
-/** The lowest version a record can be at: a legacy record with no `_v`. */
-const LEGACY_VERSION = 0;
+/**
+ * The version a record with no `_v` is treated as. This app never shipped a v0
+ * schema: its earliest persisted shape IS v1 (single-class `class` + flat
+ * spellcasting — exactly the input MIGRATIONS[1] expects). `character-store`
+ * has always stamped `_v` on creation, so a genuinely `_v`-less record would
+ * only arrive from a corrupted/hand-edited import; treating it as v1 (not v0)
+ * means it still flows through MIGRATIONS[1] and gets the v1→v2 reshape, rather
+ * than being stamped to current with its shape un-migrated. There is no
+ * MIGRATIONS[0], so a `LEGACY_VERSION` of 0 would skip the reshape — hence 1.
+ */
+const LEGACY_VERSION = 1;
 
 /** Result of running the migration pipeline. */
 export type MigrationResult =
@@ -59,10 +114,11 @@ export type MigrationResult =
 
 /**
  * Read a record's starting version. A missing / non-numeric `_v` is treated as
- * the lowest version (legacy), so legacy records are upgraded rather than
- * rejected. A `_v` greater than CURRENT_VERSION (a record from a NEWER app) is
- * returned as-is so the caller can decide; the runner itself leaves such a
- * record untouched (no down-migration).
+ * LEGACY_VERSION (1 — this app's earliest schema; see LEGACY_VERSION), so such a
+ * record still runs through MIGRATIONS[1] and is upgraded rather than skipped. A
+ * `_v` greater than CURRENT_VERSION (a record from a NEWER app) is returned as-is
+ * so the caller can decide; the runner itself leaves such a record untouched
+ * (no down-migration).
  */
 function readVersion(record: Record<string, unknown>): number {
   const v = record._v;

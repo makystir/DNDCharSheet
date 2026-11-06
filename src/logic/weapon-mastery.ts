@@ -27,7 +27,7 @@ import type { Character, InventoryItem } from '../types/character';
 import { getWeapon, type MasteryProperty, type WeaponData } from '../data/weapons';
 import { getClass } from '../data/classes';
 import { CLASS_MASTERY_RULES } from '../data/weapon-mastery';
-import { resolveClass } from './classes';
+import { primaryClass, resolveClass } from './classes';
 import { classProficientWithWeapon } from './attacks';
 import type { Breakdown } from './breakdown';
 import { resolveWeapon } from './weapons';
@@ -81,7 +81,7 @@ const LOCK_TEXT: Record<MasteryLockReason, string> = {
 };
 
 function classLevel(character: Character): number {
-  return character.class?.level ?? character.level;
+  return primaryClass(character)?.level ?? character.level;
 }
 
 function uniqueChosen(character: Character): string[] {
@@ -96,7 +96,7 @@ export function masteryChoices(character: Character): {
   overCap: string[];
   slotsLeft: number;
 } {
-  const cap = masteryCount(character.class?.id, classLevel(character));
+  const cap = masteryCount(primaryClass(character)?.id, classLevel(character));
   const chosen = uniqueChosen(character);
   return {
     cap,
@@ -109,7 +109,7 @@ export function masteryChoices(character: Character): {
 
 /** Whether the mastery of one weapon kind (catalog id) is usable (D8). */
 export function weaponMasteryStatus(character: Character, weaponId: string): MasteryStatus {
-  const classId = character.class?.id;
+  const classId = primaryClass(character)?.id;
   const cap = masteryCount(classId, classLevel(character));
   const locked = (reason: MasteryLockReason): MasteryStatus => ({ usable: false, reason, explanation: LOCK_TEXT[reason], cap });
   if (!resolveClass(character)) return locked('no-class');
@@ -126,7 +126,7 @@ export function weaponMasteryStatus(character: Character, weaponId: string): Mas
 /** The same check for an inventory weapon item (custom weapons are locked: no catalog kind). */
 export function itemMasteryStatus(character: Character, item: InventoryItem): MasteryStatus {
   const weapon = resolveWeapon(item);
-  if (!weapon) return { usable: false, reason: 'not-chosen', explanation: LOCK_TEXT['not-chosen'], cap: masteryCount(character.class?.id, classLevel(character)) };
+  if (!weapon) return { usable: false, reason: 'not-chosen', explanation: LOCK_TEXT['not-chosen'], cap: masteryCount(primaryClass(character)?.id, classLevel(character)) };
   return weaponMasteryStatus(character, weapon.id);
 }
 
@@ -138,7 +138,7 @@ export interface ChooseMasteryResult {
 
 /** Choose a weapon kind for Weapon Mastery. Never mutates; rejects ineligible or over-cap picks. */
 export function chooseWeaponMastery(character: Character, weaponId: string): ChooseMasteryResult {
-  const classId = character.class?.id;
+  const classId = primaryClass(character)?.id;
   if (!resolveClass(character)) return { character, ok: false, reason: 'no-class' };
   const cap = masteryCount(classId, classLevel(character));
   if (cap === 0) return { character, ok: false, reason: 'no-feature' };

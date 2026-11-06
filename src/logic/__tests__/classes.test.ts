@@ -17,7 +17,7 @@ import { ABILITIES } from '../../types/character';
 
 /** Builds a character with a class selection on top of BLANK_CHARACTER. */
 function withClass(sel: ClassSelection, level = sel.level): Character {
-  return { ...BLANK_CHARACTER, level, class: sel };
+  return { ...BLANK_CHARACTER, level, classes: [sel] };
 }
 
 describe('resolveClass / resolveSubclass', () => {
@@ -27,7 +27,7 @@ describe('resolveClass / resolveSubclass', () => {
   });
 
   it('tolerates an unknown class id', () => {
-    const c = { ...BLANK_CHARACTER, class: { id: 'bogus' as never, level: 1 } };
+    const c = { ...BLANK_CHARACTER, classes: [{ id: 'bogus' as never, level: 1 }] };
     expect(resolveClass(c)).toBeUndefined();
     expect(resolveSubclass(c)).toBeUndefined();
   });
@@ -139,7 +139,7 @@ describe('classFeaturesByLevel', () => {
     ];
     const character: Character = {
       ...BLANK_CHARACTER,
-      class: { id: 'wizard', level: 3 },
+      classes: [{ id: 'wizard', level: 3 }],
       level: 3,
     };
     // The resolver groups a real catalog class; to exercise the grouping with a

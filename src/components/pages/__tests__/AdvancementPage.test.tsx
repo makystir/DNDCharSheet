@@ -37,7 +37,7 @@ function renderStateful(overrides: Partial<Character> = {}, now: () => number = 
 function fighter4(): Partial<Character> {
   return {
     level: 4,
-    class: { id: 'fighter', level: 4 },
+    classes: [{ id: 'fighter', level: 4 }],
     abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
   };
 }
@@ -151,12 +151,12 @@ describe('AdvancementPage — per-level HP choice + breakdown', () => {
 
 describe('AdvancementPage — next-level preview flags', () => {
   it('flags the subclass choice at level 3 (Fighter at level 2)', () => {
-    renderStateful({ level: 2, class: { id: 'fighter', level: 2 } });
+    renderStateful({ level: 2, classes: [{ id: 'fighter', level: 2 }] });
     expect(within(screen.getByText(/Advancing to level 3/).closest('div')!).getByText('Choose a subclass')).toBeInTheDocument();
   });
 
   it('flags a feat slot opening at level 4 (Fighter at level 3)', () => {
-    renderStateful({ level: 3, class: { id: 'fighter', level: 3 } });
+    renderStateful({ level: 3, classes: [{ id: 'fighter', level: 3 }] });
     expect(screen.getByRole('button', { name: /A feat slot opens/ })).toBeInTheDocument();
   });
 
@@ -185,7 +185,7 @@ describe('AdvancementPage — choices pending', () => {
   });
 
   it('flags the subclass as pending at or above the subclass level', () => {
-    renderStateful({ level: 3, class: { id: 'fighter', level: 3 } });
+    renderStateful({ level: 3, classes: [{ id: 'fighter', level: 3 }] });
     expect(screen.getByText(/Subclass not chosen/)).toBeInTheDocument();
   });
 });

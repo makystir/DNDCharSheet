@@ -40,7 +40,7 @@ function buildCharacter(
   return {
     ...character,
     level,
-    class: { id: classId as CatalogClassId, level },
+    classes: [{ id: classId as CatalogClassId, level }],
     ...(chosen || granted
       ? {
           languages: {

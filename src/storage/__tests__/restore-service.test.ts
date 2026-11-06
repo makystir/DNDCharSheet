@@ -10,6 +10,7 @@ import * as managerModule from '../character-manager';
 import { _resetDbForTests, getCharacter } from '../character-store';
 import { _resetPortraitDbForTests } from '../portrait-store';
 import type { BackupCharacterEntry } from '../backup-types';
+import { CURRENT_VERSION } from '../../types/character';
 
 /**
  * Unit tests for the B3 RestoreService:
@@ -187,7 +188,7 @@ describe('restoreCharacters — fresh-id adoption (never overwrites)', () => {
     expect(summary.imported).toBe(1);
     const all = await listSummaries();
     const saved = await getCharacter(all[0].id);
-    expect(saved?._v).toBe(1);
+    expect(saved?._v).toBe(CURRENT_VERSION);
   });
 });
 

@@ -46,7 +46,7 @@ function shortCharacter(i: ShortRestCase['input']): Character {
   const c: Character = {
     ...createCharacter('Tester'),
     level: i.hitDiceTotal,
-    class: { id: HIT_DIE_CLASS[i.hitDie] as never, level: i.hitDiceTotal },
+    classes: [{ id: HIT_DIE_CLASS[i.hitDie] as never, level: i.hitDiceTotal }],
     hpMax: i.max,
     abilities: { ...createCharacter('Tester').abilities, con: 10 + 2 * i.conMod },
   };
@@ -190,9 +190,9 @@ describe('golden SHORT_REST_CASES', () => {
   });
 
   it('clears pactSlotsExpended without deleting the rest of spellcasting', () => {
-    const c: Character = { ...shortCharacter(SHORT_REST_CASES[0].input), spellcasting: { slotsExpended: { 1: 1 }, pactSlotsExpended: 2, cantrips: ['light' as SpellId] } };
+    const c: Character = { ...shortCharacter(SHORT_REST_CASES[0].input), spellcasting: { slotsExpended: { 1: 1 }, pactSlotsExpended: 2, byClass: { warlock: { cantrips: ['light' as SpellId] } } } };
     const out = shortRest(c, { rolls: [] }).character;
-    expect(out.spellcasting).toEqual({ slotsExpended: { 1: 1 }, cantrips: ['light'] });
+    expect(out.spellcasting).toEqual({ slotsExpended: { 1: 1 }, byClass: { warlock: { cantrips: ['light'] } } });
   });
 
   it('reports hit dice available from level and spent', () => {

@@ -421,11 +421,13 @@ export function applyLevelUp(
   if (!canLevelUp(character)) return null;
   const nextLevel = clampLevel(character.level + 1);
 
-  // Mirror setLevel: set level then reconcile spellcasting. The class `level`
-  // tracks character level for a single-class character (multiclassing is later).
+  // Mirror setLevel: set the stored TOTAL level, then keep the single class
+  // entry's level in sync (single-class this stage — exactly one entry, whose
+  // level tracks the total; multiclass level-up is M4). PHB 2024 "Multiclassing".
   let next: Character = { ...character, level: nextLevel };
-  if (next.class) {
-    next = { ...next, class: { ...next.class, level: nextLevel } };
+  const primary = next.classes?.[0];
+  if (primary) {
+    next = { ...next, classes: [{ ...primary, level: nextLevel }, ...next.classes!.slice(1)] };
   }
   if (next.spellcasting) {
     const reconciled = reconcileSpellcastingForLevel(next);
@@ -454,8 +456,9 @@ export function applyLevelUp(
 export function setLevel(character: Character, rawLevel: number): Character {
   const level = clampLevel(rawLevel);
   let next: Character = { ...character, level };
-  if (next.class) {
-    next = { ...next, class: { ...next.class, level } };
+  const primary = next.classes?.[0];
+  if (primary) {
+    next = { ...next, classes: [{ ...primary, level }, ...next.classes!.slice(1)] };
   }
   if (next.spellcasting) {
     const reconciled = reconcileSpellcastingForLevel(next);

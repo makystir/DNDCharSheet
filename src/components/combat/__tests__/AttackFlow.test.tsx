@@ -77,7 +77,7 @@ function fighter(overrides: Partial<Character> = {}): Character {
   return {
     ...c,
     level: 5,
-    class: { id: 'fighter' as ClassId, level: 5 },
+    classes: [{ id: 'fighter' as ClassId, level: 5 }],
     abilities: { ...c.abilities, str: 16, dex: 12 },
     hpMax: 40,
     inventory: [weapon('w1', 'longsword')],

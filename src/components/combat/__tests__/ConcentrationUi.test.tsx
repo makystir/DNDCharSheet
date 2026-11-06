@@ -32,7 +32,7 @@ function fighter(overrides: Partial<Character> = {}): Character {
   return {
     ...base,
     level: 3,
-    class: { id: 'fighter', level: 3 },
+    classes: [{ id: 'fighter', level: 3 }],
     abilities: { ...base.abilities, con: 14 },
     hpMax: 100,
     concentration: { spellId: 'fog-cloud' },
@@ -269,10 +269,14 @@ describe('useConcentrationAutoEnd', () => {
 describe('Spells tab Concentrating toggle', () => {
   const wizard: Partial<Character> = {
     level: 5,
-    class: { id: 'wizard', level: 5 },
+    classes: [{ id: 'wizard', level: 5 }],
     spellcasting: {
-      spellbook: ['fog-cloud', 'detect-magic', 'magic-missile'],
-      prepared: ['fog-cloud', 'detect-magic', 'magic-missile'],
+      byClass: {
+        wizard: {
+          spellbook: ['fog-cloud', 'detect-magic', 'magic-missile'],
+          prepared: ['fog-cloud', 'detect-magic', 'magic-missile'],
+        },
+      },
     },
   };
 

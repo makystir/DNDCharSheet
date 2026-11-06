@@ -59,9 +59,9 @@ function charWith(
   const c = createCharacter('T');
   c.level = level;
   if (classId !== '') {
-    c.class = { id: classId as ClassId, level, skillChoices: [] };
+    c.classes = [{ id: classId as ClassId, level, skillChoices: [] }];
     if (opts?.hasSubclass) {
-      c.class.subclassId = SUBCLASS_BY_CLASS[classId];
+      c.classes[0].subclassId = SUBCLASS_BY_CLASS[classId];
     }
   }
 
@@ -90,7 +90,7 @@ function xpChar(level: number, xp: number): Character {
   c.level = level;
   // Any class works for the XP math; use wizard. The progress projection reads
   // only level + XP, both independent of class.
-  c.class = { id: 'wizard', level, skillChoices: [] };
+  c.classes = [{ id: 'wizard', level, skillChoices: [] }];
   c.advancement = { leveling: { mode: 'xp', xp } };
   return c;
 }

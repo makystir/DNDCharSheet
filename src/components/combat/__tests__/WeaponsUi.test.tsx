@@ -37,7 +37,7 @@ function fighter(overrides: Partial<Character> = {}): Character {
   return {
     ...c,
     level: 5,
-    class: { id: 'fighter' as ClassId, level: 5 },
+    classes: [{ id: 'fighter' as ClassId, level: 5 }],
     abilities: { ...c.abilities, str: 16, dex: 12 },
     hpMax: 40,
     ...overrides,
@@ -129,7 +129,7 @@ describe('Weapons panel', () => {
   });
 
   it('locks every mastery for a class with no Weapon Mastery', () => {
-    renderPage(withSword({ class: { id: 'wizard' as ClassId, level: 5 }, weaponMasteries: ['longsword'] }));
+    renderPage(withSword({ classes: [{ id: 'wizard' as ClassId, level: 5 }], weaponMasteries: ['longsword'] }));
     fireEvent.mouseEnter(screen.getByRole('button', { name: /Sap \(locked\)/ }));
     expect(screen.getByRole('tooltip').textContent).toContain('Your class has no Weapon Mastery feature');
   });
@@ -184,7 +184,7 @@ describe('Weapons panel', () => {
 
   it('says when the wielder is not proficient', () => {
     renderPage(
-      withSword({ class: { id: 'wizard' as ClassId, level: 5 } }),
+      withSword({ classes: [{ id: 'wizard' as ClassId, level: 5 }] }),
     );
     expect(screen.getByText(/Not proficient/)).toBeTruthy();
     expect(screen.getByRole('button', { name: /Longsword attack bonus/ }).textContent).toBe('+3');
@@ -272,14 +272,14 @@ describe('Ammunition tracker', () => {
 
 describe('Weapon Mastery chooser', () => {
   it('shows no chooser, only a locked note, for a class with no Weapon Mastery', () => {
-    renderPage(fighter({ class: { id: 'wizard' as ClassId, level: 5 } }));
+    renderPage(fighter({ classes: [{ id: 'wizard' as ClassId, level: 5 }] }));
     expect(screen.getByTestId('mastery-locked-note').textContent).toContain('Every weapon mastery is locked');
     expect(screen.queryByLabelText('Add a weapon')).toBeNull();
   });
 
   it('shows no chooser when no class is selected', () => {
     const c = fighter();
-    renderPage({ ...c, class: undefined });
+    renderPage({ ...c, classes: undefined });
     expect(screen.getByTestId('mastery-locked-note')).toBeTruthy();
     expect(screen.queryByLabelText('Add a weapon')).toBeNull();
   });
@@ -300,7 +300,7 @@ describe('Weapon Mastery chooser', () => {
   });
 
   it('only offers weapons the class can pick', () => {
-    renderPage(fighter({ class: { id: 'barbarian' as ClassId, level: 5 } }));
+    renderPage(fighter({ classes: [{ id: 'barbarian' as ClassId, level: 5 }] }));
     const options = Array.from(
       (screen.getByLabelText('Add a weapon') as HTMLSelectElement).options,
     ).map((o) => o.value);

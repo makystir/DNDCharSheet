@@ -87,7 +87,7 @@ describe('CombatPage — out of combat (flat stack)', () => {
     renderPage({
       level: 3,
       abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
-      class: { id: 'wizard', level: 3 },
+      classes: [{ id: 'wizard', level: 3 }],
     });
     expect(screen.getByText('d6')).toBeInTheDocument();
     const hitDice = screen.getByRole('button', { name: /Hit Dice total/ });
@@ -125,7 +125,7 @@ describe('CombatPage — out of combat (flat stack)', () => {
     renderPage({
       level: 1,
       abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
-      class: { id: 'fighter', level: 1 },
+      classes: [{ id: 'fighter', level: 1 }],
     });
     // HP card, Take Damage, Defenses & Movement, Death Saves, Concentration,
     // Active Conditions, Core Stats, Hit Dice, Weapons, Unarmed Strike.
@@ -198,7 +198,7 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
     renderPage({
       level: 1,
       abilities: { str: 10, dex: 14, con: 16, int: 10, wis: 10, cha: 10 },
-      class: { id: 'barbarian', level: 1 },
+      classes: [{ id: 'barbarian', level: 1 }],
     });
     const ac = within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });
     expect(ac).toHaveTextContent('15');
@@ -217,7 +217,7 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
     renderPage({
       level: 1,
       abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 16, cha: 10 },
-      class: { id: 'monk', level: 1 },
+      classes: [{ id: 'monk', level: 1 }],
       inventory: [shieldItem],
       equipped: { shieldItemId: 'shield-1' },
     });

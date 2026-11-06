@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import type { AbilityScores, Character } from '../../types/character';
+import type { AbilityScores, Character, ClassEntry } from '../../types/character';
 import { CURRENT_VERSION } from '../../types/character';
+import type { SpellId } from '../../data/spells';
 import { abilityModifier, proficiencyBonus } from '../abilities';
 import {
   alwaysPreparedSpells,
@@ -29,8 +30,35 @@ import { getSpell } from '../../data/spells';
 
 const SCORES: AbilityScores = { str: 10, dex: 14, con: 12, int: 16, wis: 13, cha: 18 };
 
-function char(partial: Partial<Character>): Character {
-  return {
+/**
+ * Flat (pre-M1) spellcasting input accepted by the `char` helper for brevity;
+ * it is remapped to the v2 `byClass[classId]` shape so the existing single-class
+ * fixtures stay concise. Pooled fields stay top-level.
+ */
+type FlatSpellcasting = {
+  cantrips?: SpellId[];
+  prepared?: SpellId[];
+  spellbook?: SpellId[];
+  slotsExpended?: Partial<Record<number, number>>;
+  pactSlotsExpended?: number;
+  mysticArcana?: Partial<Record<number, SpellId>>;
+  mysticArcanaExpended?: Partial<Record<number, boolean>>;
+};
+
+/**
+ * Builds a single-class test character. For brevity the fixtures pass the pre-M1
+ * single `class` and FLAT `spellcasting`; this helper remaps them to the v2 shape
+ * (`classes: [class]` and per-class selections under `byClass[classId]`), so the
+ * single-class assertions are byte-identical while the stored shape is current.
+ */
+function char(
+  partial: Omit<Partial<Character>, 'classes' | 'spellcasting'> & {
+    class?: ClassEntry;
+    spellcasting?: FlatSpellcasting;
+  },
+): Character {
+  const { class: cls, spellcasting: flat, ...rest } = partial;
+  const base: Character = {
     _v: CURRENT_VERSION,
     id: 'test',
     name: 'Test',
@@ -38,8 +66,21 @@ function char(partial: Partial<Character>): Character {
     abilities: { ...SCORES },
     createdAt: 0,
     updatedAt: 0,
-    ...partial,
+    ...rest,
   };
+  if (cls) base.classes = [cls];
+  if (flat) {
+    const { cantrips, prepared, spellbook, ...pooled } = flat;
+    const perClass: { cantrips?: SpellId[]; prepared?: SpellId[]; spellbook?: SpellId[] } = {};
+    if (cantrips !== undefined) perClass.cantrips = cantrips;
+    if (prepared !== undefined) perClass.prepared = prepared;
+    if (spellbook !== undefined) perClass.spellbook = spellbook;
+    base.spellcasting = {
+      ...pooled,
+      ...(cls && Object.keys(perClass).length > 0 ? { byClass: { [cls.id]: perClass } } : {}),
+    };
+  }
+  return base;
 }
 
 describe('isSpellcaster (level-aware)', () => {
@@ -380,8 +421,8 @@ describe('reconcileSpellcastingForLevel (level-down pruning)', () => {
       spellcasting: { cantrips: ['fire-bolt'], prepared: ['fireball', 'magic-missile'] },
     });
     const reconciled = reconcileSpellcastingForLevel(lowered)!;
-    expect(reconciled.prepared).toEqual(['magic-missile']); // Fireball (L3) pruned.
-    expect(reconciled.cantrips).toEqual(['fire-bolt']);
+    expect(reconciled.byClass?.wizard?.prepared).toEqual(['magic-missile']); // Fireball (L3) pruned.
+    expect(reconciled.byClass?.wizard?.cantrips).toEqual(['fire-bolt']);
   });
 
   it('trims cantrips over the new cap but keeps required cantrips', () => {
@@ -394,8 +435,8 @@ describe('reconcileSpellcastingForLevel (level-down pruning)', () => {
       },
     });
     const reconciled = reconcileSpellcastingForLevel(lowered)!;
-    expect(reconciled.cantrips!.length).toBe(3);
-    expect(reconciled.cantrips).toContain('mage-hand'); // required, kept.
+    expect(reconciled.byClass?.rogue?.cantrips!.length).toBe(3);
+    expect(reconciled.byClass?.rogue?.cantrips).toContain('mage-hand'); // required, kept.
   });
 
   it('clamps expended slots to the new maxima', () => {
@@ -428,10 +469,10 @@ describe('reconcileSpellcastingForLevel (level-down pruning)', () => {
       },
     });
     const reconciled = reconcileSpellcastingForLevel(c)!;
-    expect(reconciled.prepared!.length).toBe(preparedCount(c));
-    expect(reconciled.prepared!.length).toBe(4);
+    expect(reconciled.byClass?.wizard?.prepared!.length).toBe(preparedCount(c));
+    expect(reconciled.byClass?.wizard?.prepared!.length).toBe(4);
     // The kept entries are the first four (stable order).
-    expect(reconciled.prepared).toEqual(['magic-missile', 'shield', 'mage-armor', 'grease']);
+    expect(reconciled.byClass?.wizard?.prepared).toEqual(['magic-missile', 'shield', 'mage-armor', 'grease']);
   });
 
   it('drops prepared spells no longer on a legal source list (Bard 10 -> 9)', () => {
@@ -443,8 +484,8 @@ describe('reconcileSpellcastingForLevel (level-down pruning)', () => {
       spellcasting: { prepared: ['fireball', 'charm-person'] },
     });
     const reconciled = reconcileSpellcastingForLevel(demoted)!;
-    expect(reconciled.prepared).not.toContain('fireball'); // off the Bard list now.
-    expect(reconciled.prepared).toContain('charm-person'); // still a Bard spell.
+    expect(reconciled.byClass?.bard?.prepared).not.toContain('fireball'); // off the Bard list now.
+    expect(reconciled.byClass?.bard?.prepared).toContain('charm-person'); // still a Bard spell.
   });
 
   it('drops cantrips no longer on the class list after a class change', () => {
@@ -457,8 +498,8 @@ describe('reconcileSpellcastingForLevel (level-down pruning)', () => {
       spellcasting: { cantrips: ['sacred-flame', 'fire-bolt'] },
     });
     const reconciled = reconcileSpellcastingForLevel(c)!;
-    expect(reconciled.cantrips).toContain('sacred-flame');
-    expect(reconciled.cantrips).not.toContain('fire-bolt');
+    expect(reconciled.byClass?.cleric?.cantrips).toContain('sacred-flame');
+    expect(reconciled.byClass?.cleric?.cantrips).not.toContain('fire-bolt');
   });
 
   it('prunes Mystic Arcanum choices no longer available at the level', () => {

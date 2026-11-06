@@ -45,7 +45,7 @@ import {
   cantripsKnown,
   preparedCount,
 } from '../../logic/spellcasting';
-import { resolveClass, classFeaturesByLevel } from '../../logic/classes';
+import { primaryClass, resolveClass, classFeaturesByLevel } from '../../logic/classes';
 import { knownLanguages } from '../../logic/languages';
 import { activeConditionIds, exhaustionLevelOf } from '../../logic/conditions';
 import { equippedWeapons, weaponAttackProfile, unarmedStrike } from '../../logic/attacks';
@@ -182,7 +182,7 @@ export function buildIdentity(character: Character): IdentitySection {
   const species = resolveSpecies(character);
   const cls = resolveClass(character);
   const classAndLevel = cls
-    ? `${cls.name} ${character.class?.level ?? character.level}`
+    ? `${cls.name} ${primaryClass(character)?.level ?? character.level}`
     : 'No class';
   // Resolve a structured (wizard-created) background to its display name the
   // same way CharacterPage does — getBackground(id)?.name — so the printed
@@ -327,14 +327,17 @@ export function buildSpells(character: Character): SpellsSection | undefined {
     }
   }
 
-  const sc = character.spellcasting;
+  // Per-class selections now live under spellcasting.byClass[classId]. Display
+  // stays single-class this stage (design 9-E): read the PRIMARY class's bucket.
+  const primaryId = primaryClass(character)?.id;
+  const perClass = primaryId ? character.spellcasting?.byClass?.[primaryId] : undefined;
   const spellNames = (ids: readonly string[] | undefined): string[] =>
     (ids ?? []).flatMap((id) => {
       const name = getSpell(id)?.name;
       return name !== undefined ? [name as string] : [];
     });
-  const cantrips = spellNames(sc?.cantrips);
-  const prepared = spellNames(sc?.prepared);
+  const cantrips = spellNames(perClass?.cantrips);
+  const prepared = spellNames(perClass?.prepared);
 
   return {
     saveDc: dc?.total,
