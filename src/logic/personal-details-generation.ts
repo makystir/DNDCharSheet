@@ -61,6 +61,17 @@ function formatHeight(totalInches: number): string {
 }
 
 /**
+ * Upper-case the first character of a generated flavour value so every
+ * Personal Detail reads as a proper label (e.g. `dark brown` -> `Dark brown`).
+ * The underlying NON-RAW pools (name-tables.ts) are stored lower-case; this is
+ * a display-casing fix applied at generation time, leaving the data untouched.
+ * Empty strings pass through unchanged.
+ */
+function capitalizeFirst(value: string): string {
+  return value.length === 0 ? value : value[0].toUpperCase() + value.slice(1);
+}
+
+/**
  * Generate a first name for a (species, gender) from the NON-RAW pools. Falls
  * back to the neutral pool only if a specific pool is somehow empty (the pools
  * guarantee this never happens for a supported species).
@@ -80,9 +91,11 @@ export function generateAppearance(
   _gender: NameGender,
   rng: RNG,
 ): GeneratedAppearance {
-  const eyes = pick(rng, eyeColorsFor(species));
-  const hair = pick(rng, hairColorsFor(species));
-  const skin = pick(rng, skinsFor(species));
+  // Eyes/hair/skin pools are stored lower-case (NON-RAW flavor); capitalize the
+  // first letter so the generated Personal Detail reads as a proper label.
+  const eyes = capitalizeFirst(pick(rng, eyeColorsFor(species)));
+  const hair = capitalizeFirst(pick(rng, hairColorsFor(species)));
+  const skin = capitalizeFirst(pick(rng, skinsFor(species)));
   const h = heightRangeFor(species);
   const w = weightRangeFor(species);
   const height = formatHeight(pickInt(rng, h.min, h.max));
