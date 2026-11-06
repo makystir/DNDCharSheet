@@ -192,6 +192,17 @@ describe('Conditional, level-gated Spells tab', () => {
     fireEvent.change(select, { target: { value: classId } });
   }
 
+  /**
+   * Sets the character level via the authoritative Advancement-page control
+   * (P4 removed the duplicate Level editor from Character → Overview). Leaves
+   * the app on the Advancement tab; callers navigate on from there.
+   */
+  async function setLevelOnAdvancement(level: number) {
+    fireEvent.click(navButton('Advancement'));
+    const input = (await screen.findByLabelText('Level')) as HTMLInputElement;
+    fireEvent.change(input, { target: { value: String(level) } });
+  }
+
   it('hides the Spells tab for a non-caster (default class-less character)', async () => {
     await renderApp();
     expect(screen.queryByRole('button', { name: 'Spells' })).not.toBeInTheDocument();
@@ -208,13 +219,12 @@ describe('Conditional, level-gated Spells tab', () => {
     // Level 1 Fighter: no casting.
     await selectClass('fighter');
     expect(screen.queryByRole('button', { name: 'Spells' })).not.toBeInTheDocument();
-    // Raise to level 3 on the Overview sub-tab (where the Level input lives).
-    fireEvent.click(screen.getByRole('tab', { name: 'Overview' }));
-    const level = (await screen.findByLabelText('Level')) as HTMLInputElement;
-    fireEvent.change(level, { target: { value: '3' } });
+    // Raise to level 3 via the Advancement page (the authoritative Level editor).
+    await setLevelOnAdvancement(3);
     // Still no subclass chosen → still hidden.
     expect(screen.queryByRole('button', { name: 'Spells' })).not.toBeInTheDocument();
     // Choose Eldritch Knight (the subclass select appears at level 3).
+    fireEvent.click(navButton('Character'));
     fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });
@@ -275,9 +285,8 @@ describe('Conditional, level-gated Spells tab', () => {
     await renderApp();
     // Build a level-3 Eldritch Knight (a caster), then open the Spells tab.
     await selectClass('fighter');
-    fireEvent.click(screen.getByRole('tab', { name: 'Overview' }));
-    const level = (await screen.findByLabelText('Level')) as HTMLInputElement;
-    fireEvent.change(level, { target: { value: '3' } });
+    await setLevelOnAdvancement(3);
+    fireEvent.click(navButton('Character'));
     fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });

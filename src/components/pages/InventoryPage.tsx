@@ -570,12 +570,14 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
             </div>
           </div>
           <div>
-            <SectionHeader icon={Scale} title="Encumbrance" />
+            <SectionHeader icon={Scale} title="Weight by Category" />
             <div className={styles.encBreakdown}>
-              {/* One row per carried-weight component (Weapons / Armor / Other
-                  gear / Coins). The Coins row's weight opens the per-denomination
-                  coin-weight tooltip (finding #1) — there is no separate
-                  duplicate coin-weight row and no always-visible static panel. */}
+              {/* P7: a per-category DRILLDOWN of carried weight (Weapons / Armor
+                  / Other gear / Coins). The encumbrance TOTAL and capacity live
+                  once in the top progress bar, so this section is purely the
+                  category breakdown and no longer repeats the Total / Capacity
+                  summary. The Coins row's weight opens the per-denomination
+                  coin-weight tooltip (finding #1). */}
               {carriedBd.components.map((c) =>
                 c.label === 'Coins' ? (
                   <div key={c.label} className={styles.encRow}>
@@ -589,19 +591,6 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
                   </div>
                 ),
               )}
-              <hr className={styles.encSeparator} />
-              <div className={styles.encTotalRow}>
-                <span>Total / Capacity</span>
-                <span>
-                  <CalculatedValue label="Carried weight" breakdown={carriedBd}>
-                    {carriedBd.total}
-                  </CalculatedValue>{' '}
-                  /{' '}
-                  <CalculatedValue label="Carrying capacity" breakdown={capacityBd}>
-                    {capacityBd.total} lb
-                  </CalculatedValue>
-                </span>
-              </div>
             </div>
           </div>
         </div>

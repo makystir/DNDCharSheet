@@ -8,6 +8,8 @@ import { ContentTooltip } from '../../shared/ContentTooltip';
 import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
+import { getBackground } from '../../../data/backgrounds';
+import { srdBadge } from '../sheet-helpers';
 import { User } from 'lucide-react';
 import type { NameGender } from '../../../data/name-tables';
 import {
@@ -95,6 +97,12 @@ export function PersonalDetailsSection({
     const next = DEITY_LIST[Math.floor(createDefaultRng()() * DEITY_LIST.length)];
     onChange({ ...character, faith: next.name });
   };
+
+  // P5: the wizard-selected background (read-only) now sits beside the
+  // free-text Background field here on Overview, so "Background" means one thing
+  // in one place (it previously showed on the Species sub-tab). Identity/flavor
+  // only — background MECHANICS remain a deferred stage.
+  const selectedBackground = getBackground(character.backgroundSelection?.id);
 
   // When the current faith value matches a catalog deity, surface its overview
   // (epithet, home plane, typical worshipers, symbol) as an informational hint.
@@ -361,14 +369,29 @@ export function PersonalDetailsSection({
                 🎲
               </button>
             </div>
-            {/* Free text only this stage. The 2024 Background MECHANICS
+            {/* Free text only this stage, with the wizard-selected background
+                shown read-only beside it (P5). The 2024 Background MECHANICS
                 (ability increases, skill/tool proficiencies, origin feat —
                 PHB 2024 "Backgrounds") are a LATER stage, deliberately NOT here. */}
-            <EditableField
-              label="Background"
-              value={character.background ?? ''}
-              onSave={(v) => setField('background', String(v))}
-            />
+            <div className={styles.backgroundField}>
+              <EditableField
+                label="Background"
+                value={character.background ?? ''}
+                onSave={(v) => setField('background', String(v))}
+              />
+              {selectedBackground && (
+                <span className={styles.backgroundSelection}>
+                  Selected: {selectedBackground.name}
+                  <span
+                    className={styles.backgroundBadge}
+                    title={srdBadge(selectedBackground.srd).title}
+                  >
+                    {' '}
+                    {srdBadge(selectedBackground.srd).text}
+                  </span>
+                </span>
+              )}
+            </div>
           </div>
 
           <div className={styles.personalityField}>

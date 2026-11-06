@@ -43,9 +43,9 @@ function renderStatefulPage(overrides = {}) {
   return { onChange };
 }
 
-/** The Core Stats card hosts the labelled AC / Initiative / PP / HP triggers. */
+/** The Combat Stats card hosts the labelled AC / Initiative / PP / HP triggers. */
 function coreStatsCard() {
-  return screen.getByRole('heading', { name: 'Core Stats' }).closest('div')!
+  return screen.getByRole('heading', { name: 'Combat Stats' }).closest('div')!
     .parentElement as HTMLElement;
 }
 
@@ -75,11 +75,21 @@ describe('CombatPage — out of combat (flat stack)', () => {
     expect(onChange.mock.calls.at(-1)?.[0].acOverride).toBeUndefined();
   });
 
-  it('entering an HP max emits hpMax', () => {
-    const { onChange } = renderPage();
-    const input = screen.getByLabelText('Hit Point maximum');
-    fireEvent.change(input, { target: { value: '24' } });
-    expect(onChange.mock.calls.at(-1)?.[0].hpMax).toBe(24);
+  it('shows the Hit Point Maximum read-only (no editable HP input on Combat)', () => {
+    // P1: HP max is authoritative on the Advancement tab; Combat shows only the
+    // read-only CalculatedValue, so the editable #hp-max input is gone.
+    renderPage();
+    const core = within(coreStatsCard());
+    expect(core.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Hit Point maximum')).toBeNull();
+  });
+
+  it('does not render the rolled-HP house-rule toggle on Combat (P1)', () => {
+    // The rolled-HP house rule moved off Combat; its toggle and total input are
+    // no longer part of the in-combat glance.
+    renderPage();
+    expect(screen.queryByLabelText('Use rolled HP (house rule)')).toBeNull();
+    expect(screen.queryByLabelText('Rolled HP total')).toBeNull();
   });
 
   it('surfaces the Hit Dice total and HP max for a selected class', () => {
@@ -103,19 +113,6 @@ describe('CombatPage — out of combat (flat stack)', () => {
     expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
   });
 
-  it('reveals a rolled-HP total input when the house rule is on', () => {
-    renderPage();
-    expect(screen.queryByLabelText('Rolled HP total')).toBeNull();
-    renderPage({ houseRules: { rolledHp: true } });
-    expect(screen.getAllByLabelText('Rolled HP total').at(-1)).toBeInTheDocument();
-  });
-
-  it('toggling the rolled-HP house rule emits houseRules.rolledHp', () => {
-    const { onChange } = renderPage();
-    fireEvent.click(screen.getByLabelText('Use rolled HP (house rule)'));
-    expect(onChange.mock.calls.at(-1)?.[0].houseRules.rolledHp).toBe(true);
-  });
-
   it('shows no Attack/Defend/Status segmented control out of combat', () => {
     renderPage();
     expect(screen.queryByRole('tablist', { name: 'Combat mode' })).toBeNull();
@@ -128,10 +125,10 @@ describe('CombatPage — out of combat (flat stack)', () => {
       classes: [{ id: 'fighter', level: 1 }],
     });
     // HP card, Take Damage, Defenses & Movement, Death Saves, Concentration,
-    // Active Conditions, Core Stats, Hit Dice, Weapons, Unarmed Strike.
+    // Active Conditions, Combat Stats, Hit Dice, Weapons, Unarmed Strike.
     expect(screen.getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Defenses & Movement' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Core Stats' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Combat Stats' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
     // The Initiative tracker (starts combat) is reachable with a Start Combat button.
     expect(screen.getByRole('button', { name: 'Start Combat' })).toBeInTheDocument();
@@ -183,11 +180,11 @@ describe('CombatPage — in combat (segmented control)', () => {
     expect(screen.getByRole('tab', { name: 'Attack' })).toHaveAttribute('tabindex', '-1');
   });
 
-  it('Status mode hosts Active Conditions, Death Saves and Core Stats', () => {
+  it('Status mode hosts Active Conditions, Death Saves and Combat Stats', () => {
     renderInCombat();
     fireEvent.click(screen.getByRole('tab', { name: 'Status' }));
     const statusPanel = document.getElementById('combat-mode-panel-status')!;
-    expect(within(statusPanel).getByRole('heading', { name: 'Core Stats' })).toBeInTheDocument();
+    expect(within(statusPanel).getByRole('heading', { name: 'Combat Stats' })).toBeInTheDocument();
     expect(within(statusPanel).getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
   });
 });

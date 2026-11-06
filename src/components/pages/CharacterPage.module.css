@@ -32,19 +32,21 @@
   color: var(--text-secondary);
 }
 
-.levelInput {
-  width: 64px;
+.levelValue {
   font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
   color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 4px 8px;
 }
 
-.levelInput:focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 1px;
+.levelHint {
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+.levelHint:hover,
+.levelHint:focus-visible {
+  text-decoration: underline;
 }
 
 .profValue {

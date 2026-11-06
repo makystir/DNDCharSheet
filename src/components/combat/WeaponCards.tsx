@@ -234,6 +234,15 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
         />
       )}
       {weapons.length > 0 && (
+        <p className={styles.manageHint}>
+          Add, remove, or equip weapons on the{' '}
+          <a className={styles.manageLink} href="#inventory">
+            Inventory page
+          </a>
+          .
+        </p>
+      )}
+      {weapons.length > 0 && (
         <ul
           className={viewMode === 'list' ? styles.list : styles.cardGrid}
           aria-label="Equipped weapons"

@@ -14,7 +14,6 @@ import {
   abilityModifierBreakdown,
   proficiencyBonusBreakdown,
   clampAbilityScore,
-  clampLevel,
 } from '../../logic/abilities';
 import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats';
 import { formatSigned } from '../../logic/breakdown';
@@ -35,14 +34,10 @@ import {
   speciesTraits,
   speedBreakdown,
 } from '../../logic/species';
-import {
-  reconcileSpellcastingForLevel,
-  shouldResetSpellcasting,
-} from '../../logic/spellcasting';
+import { shouldResetSpellcasting } from '../../logic/spellcasting';
 import { knownLanguages } from '../../logic/languages';
 import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
-import { getBackground } from '../../data/backgrounds';
 import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
 import type { ClassEntry, SpeciesSelection } from '../../types/character';
@@ -141,29 +136,10 @@ export function CharacterPage({
     onSubTabChange?.(tab);
   };
 
-  const setLevel = (raw: string) => {
-    const level = clampLevel(Number.parseInt(raw, 10));
-    const next: Character = { ...character, level };
-    // Keep the single-class invariant level === sum(classes[].level): the Level
-    // control is single-class (multiclass level-up is the Advancement page's
-    // M4 path), so a lone class entry's level must mirror the character level.
-    // Without this the per-class level drifts from the total, and per-class
-    // resolvers (e.g. Eldritch Knight / Arcane Trickster casting gated at class
-    // level 3) would read a stale entry level (PHB 2024 "Multiclassing").
-    if (next.classes && next.classes.length === 1) {
-      next.classes = [{ ...next.classes[0], level }];
-    }
-    // Reconcile spell selections to the new level: lowering a level can strand
-    // cantrips over the cap or prepared/spellbook spells above the highest
-    // castable level, which would otherwise stay hidden yet still count toward
-    // caps and be unremovable (review finding: level reduction strands state).
-    if (next.spellcasting) {
-      const reconciled = reconcileSpellcastingForLevel(next);
-      if (reconciled) next.spellcasting = reconciled;
-      else delete next.spellcasting;
-    }
-    onChange(next);
-  };
+  // P4: Level is authoritative on the Advancement tab (which delegates to
+  // logic/advancement.setLevel for the clamp + single-class invariant +
+  // spellcasting reconcile). Character → Overview now shows it READ-ONLY, so the
+  // duplicate editor and its hand-rolled reconcile path are gone.
 
   const setScore = (ability: Ability, raw: string) => {
     const score = clampAbilityScore(Number.parseInt(raw, 10));
@@ -280,7 +256,6 @@ export function CharacterPage({
   // languages (PHB 2024 "Choose Languages", L1294). The stored ids are
   // lowercase; title-case them for display.
   const knownLangs = knownLanguages(character);
-  const selectedBackground = getBackground(character.backgroundSelection?.id);
   const speedBd = speedBreakdown(character);
   const darkvisionBd = darkvisionBreakdown(character);
   const size = resolveSize(character);
@@ -367,19 +342,14 @@ export function CharacterPage({
 
           <Card>
             <div className={styles.header}>
+          {/* P4: Level is READ-ONLY here; it is authoritative on the Advancement
+              tab. The hint links to Advancement to level up. */}
           <div className={styles.levelField}>
-            <label className={styles.fieldLabel} htmlFor="char-level">
-              Level
-            </label>
-            <input
-              id="char-level"
-              className={styles.levelInput}
-              type="number"
-              min={1}
-              max={20}
-              value={character.level}
-              onChange={(e) => setLevel(e.target.value)}
-            />
+            <span className={styles.fieldLabel}>Level</span>
+            <span className={styles.levelValue}>{character.level}</span>
+            <a className={styles.levelHint} href="#advancement">
+              Level up on Advancement
+            </a>
           </div>
 
           <div className={styles.profField}>
@@ -537,21 +507,6 @@ export function CharacterPage({
               </span>
             </div>
 
-            {selectedBackground && (
-              <div className={styles.speciesField}>
-                <span className={styles.fieldLabel}>Background</span>
-                <span className={styles.speciesText}>
-                  {selectedBackground.name}
-                  <span
-                    className={styles.srdBadge}
-                    title={srdBadge(selectedBackground.srd).title}
-                  >
-                    {' '}
-                    {srdBadge(selectedBackground.srd).text}
-                  </span>
-                </span>
-              </div>
-            )}
           </div>
 
           <div className={styles.derivedGrid}>

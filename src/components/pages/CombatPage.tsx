@@ -13,6 +13,7 @@ import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
+import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { SectionHeader } from '../shared/SectionHeader';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { ActiveConditions } from '../combat/ActiveConditions';
@@ -108,9 +109,6 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
   const setAcOverride = (raw: string) =>
     onChange({ ...character, acOverride: parseNumberInput(raw, true) });
 
-  const setHpMax = (raw: string) =>
-    onChange({ ...character, hpMax: parseNumberInput(raw, true) });
-
   const setInitiativeBonus = (raw: string) =>
     onChange({ ...character, initiativeBonus: parseNumberInput(raw, false) });
 
@@ -119,17 +117,6 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
     const clamped = parsed === undefined ? undefined : Math.min(parsed, total);
     onChange({ ...character, hitDiceSpent: clamped });
   };
-
-  const setRolledHpTotal = (raw: string) =>
-    onChange({ ...character, rolledHpTotal: parseNumberInput(raw, true) });
-
-  // Toggles the rolled-HP house rule; leaves rolledHpTotal untouched so a
-  // previously-entered total is preserved if the rule is re-enabled.
-  const setRolledHpRule = (on: boolean) =>
-    onChange({
-      ...character,
-      houseRules: { ...character.houseRules, rolledHp: on },
-    });
 
   const selectedSpecies = resolveSpecies(character);
   const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
@@ -197,33 +184,26 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
     components: [{ label: 'Character level', value: hitDiceTotalValue }],
   };
   const hitDiceSpent = character.hitDiceSpent ?? 0;
-  const rolledHpOn = character.houseRules?.rolledHp ?? false;
 
   // ── Panel groups (rendered as functions so they can be placed in either the
   // flat out-of-combat stack or the in-combat tabpanels without duplication). ──
 
+  // Combat Stats card (P1/P6): the read-only combat values at a glance (AC,
+  // Initiative, Passive Perception, HP maximum), each a CalculatedValue so the
+  // breakdown tooltip is preserved. HP maximum is now read-only here — it is
+  // authoritative on the Advancement tab (removes the duplicate HP editor). The
+  // remaining single-source setup editors (AC override, Initiative bonus) are
+  // tucked behind a collapsible "Adjust" affordance so they stay editable
+  // without cluttering the in-combat glance.
   const coreStatsCard = (
     <Card>
-      <SectionHeader icon={Swords} title="Core Stats" />
+      <SectionHeader icon={Swords} title="Combat Stats" />
       <div className={styles.derivedGrid}>
         <div className={styles.derivedCard}>
           <span className={styles.fieldLabel}>Armor Class</span>
           <span className={styles.derivedValue}>
             <CalculatedValue label="Armor Class" breakdown={acBreakdown} />
           </span>
-          <label className={styles.derivedInputLabel} htmlFor="ac-override">
-            Override
-          </label>
-          <input
-            id="ac-override"
-            className={styles.derivedInput}
-            type="number"
-            min={0}
-            value={character.acOverride ?? ''}
-            placeholder="auto"
-            aria-label="Armor Class override"
-            onChange={(e) => setAcOverride(e.target.value)}
-          />
         </div>
 
         <div className={styles.derivedCard}>
@@ -233,18 +213,6 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
               {formatSigned(initBreakdown.total)}
             </CalculatedValue>
           </span>
-          <label className={styles.derivedInputLabel} htmlFor="init-bonus">
-            Bonus
-          </label>
-          <input
-            id="init-bonus"
-            className={styles.derivedInput}
-            type="number"
-            value={character.initiativeBonus ?? ''}
-            placeholder="0"
-            aria-label="Initiative bonus"
-            onChange={(e) => setInitiativeBonus(e.target.value)}
-          />
         </div>
 
         <div className={styles.derivedCard}>
@@ -259,48 +227,51 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
           <span className={styles.derivedValue}>
             <CalculatedValue label="Hit Point Maximum" breakdown={hpBreakdown} />
           </span>
-          <label className={styles.derivedInputLabel} htmlFor="hp-max">
-            HP max
-          </label>
-          <input
-            id="hp-max"
-            className={styles.derivedInput}
-            type="number"
-            min={0}
-            value={character.hpMax ?? ''}
-            placeholder="set"
-            aria-label="Hit Point maximum"
-            onChange={(e) => setHpMax(e.target.value)}
-          />
-          <label className={styles.checkboxCell}>
-            <input
-              type="checkbox"
-              className={styles.checkbox}
-              checked={rolledHpOn}
-              aria-label="Use rolled HP (house rule)"
-              onChange={(e) => setRolledHpRule(e.target.checked)}
-            />
-            <span className={styles.checkboxText}>Use rolled HP (house rule)</span>
-          </label>
-          {rolledHpOn && (
-            <>
-              <label className={styles.derivedInputLabel} htmlFor="rolled-hp-total">
-                Rolled HP total
-              </label>
-              <input
-                id="rolled-hp-total"
-                className={styles.derivedInput}
-                type="number"
-                min={0}
-                value={character.rolledHpTotal ?? ''}
-                placeholder="0"
-                aria-label="Rolled HP total"
-                onChange={(e) => setRolledHpTotal(e.target.value)}
-              />
-            </>
-          )}
+          <span className={styles.speciesNote}>Set on the Advancement tab</span>
         </div>
       </div>
+
+      {/* The single-source setup editors (AC override, Initiative bonus) sit
+          behind a collapsible affordance so the combat glance stays read-only.
+          Both remain editable; they are just tucked away. */}
+      <CollapsibleSection
+        title="Adjust"
+        storageKey="dnd-collapse-combat-adjust"
+        defaultExpanded={false}
+      >
+        <div className={styles.adjustGrid}>
+          <div className={styles.adjustField}>
+            <label className={styles.derivedInputLabel} htmlFor="ac-override">
+              Armor Class override
+            </label>
+            <input
+              id="ac-override"
+              className={styles.derivedInput}
+              type="number"
+              min={0}
+              value={character.acOverride ?? ''}
+              placeholder="auto"
+              aria-label="Armor Class override"
+              onChange={(e) => setAcOverride(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.adjustField}>
+            <label className={styles.derivedInputLabel} htmlFor="init-bonus">
+              Initiative bonus
+            </label>
+            <input
+              id="init-bonus"
+              className={styles.derivedInput}
+              type="number"
+              value={character.initiativeBonus ?? ''}
+              placeholder="0"
+              aria-label="Initiative bonus"
+              onChange={(e) => setInitiativeBonus(e.target.value)}
+            />
+          </div>
+        </div>
+      </CollapsibleSection>
     </Card>
   );
 
@@ -468,13 +439,15 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
            Core Stats, Hit Dice + Rests, Weapons, Ammunition). No A5a–A5d panel
            is lost; the layout is only reorganised. */
         <>
+          {/* P9: lead with the defense / combat-stats panel (HP / AC / Speed)
+              before Conditions, matching the in-combat Defend emphasis. */}
           <HitPointsCard character={character} onChange={onChange} />
           <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
           <DefenseReadout character={character} />
+          {coreStatsCard}
           <DeathSavesCard character={character} onChange={onChange} rollRequest={deathSaveRequest} />
           <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
           <ActiveConditions character={character} onChange={onChange} />
-          {coreStatsCard}
           {hitDiceCard}
           <SpellSlotSummary character={character} />
           <WeaponCards character={character} onAttack={openAttack} />

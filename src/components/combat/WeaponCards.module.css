@@ -148,6 +148,22 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
+
+/* P8: one-line hint pointing players to the editable weapon list on Inventory. */
+.manageHint {
+  margin: 0 0 8px;
+  min-width: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.manageLink {
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+.manageLink:hover,
+.manageLink:focus-visible {
+  text-decoration: underline;
+}
 .unarmedGrid {
   display: flex;
   flex-wrap: wrap;

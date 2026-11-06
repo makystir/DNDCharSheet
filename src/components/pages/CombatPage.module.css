@@ -92,6 +92,21 @@
   outline-offset: 1px;
 }
 
+/* P6: the collapsible "Adjust" affordance holding the single-source setup
+   editors (AC override, Initiative bonus) under the read-only Combat Stats. */
+.adjustGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.adjustField {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 /* Hit Dice row. */
 .hitDiceRow {
   display: flex;
@@ -105,39 +120,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.checkboxCell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-  color: var(--text-secondary);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent-gold);
-}
-
-.checkboxText {
-  user-select: none;
-}
-
 /* Mobile: enlarge tap targets. */
 @media (hover: none), (max-width: 767px) {
-  .checkbox {
-    width: 24px;
-    height: 24px;
-  }
-
-  .checkboxCell {
-    min-height: 44px;
-  }
-
   .derivedInput {
     min-height: 44px;
   }

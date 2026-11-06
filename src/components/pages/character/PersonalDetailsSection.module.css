@@ -76,6 +76,27 @@
   line-height: 1;
 }
 
+/* P5: the Background free-text field + the read-only wizard-selected
+   background name beneath it, so "Background" reads as one labelled area. */
+.backgroundField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.backgroundSelection {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.backgroundBadge {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
 .personalityField {
   display: flex;
   flex-direction: column;
