@@ -36,7 +36,12 @@ export function SubTabBar({ tabs, activeTab, onTabChange, editMode }: SubTabBarP
   const containerRef = useRef<HTMLDivElement>(null);
   const pendingFocusRef = useRef<FocusTarget | null>(null);
   const [announcement, setAnnouncement] = useState('');
-  const [showEditButton, setShowEditButton] = useState(false);
+  // The edit (pencil) toggle is shown by default whenever reordering is
+  // available (the `editMode` prop is provided), so the "reorder sub-tabs"
+  // affordance is discoverable without a hidden gesture. Long-press and
+  // right-click (below) remain as alternate reveals and are now no-ops since
+  // the button is already visible.
+  const [showEditButton, setShowEditButton] = useState(true);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Show edit button when edit mode is active (user toggled it).

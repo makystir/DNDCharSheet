@@ -46,7 +46,20 @@ describe('SubTabBar — plain (no editMode)', () => {
 });
 
 describe('SubTabBar — edit mode', () => {
-  it('reveals the edit toggle on a 500ms long-press', () => {
+  it('shows the edit toggle by default whenever reordering is available', () => {
+    render(
+      <SubTabBar
+        tabs={TABS}
+        activeTab="overview"
+        onTabChange={vi.fn()}
+        editMode={editModeProps()}
+      />,
+    );
+    // Discoverable without any gesture: the pencil is present on first render.
+    expect(screen.getByRole('button', { name: 'Edit tab order' })).toBeInTheDocument();
+  });
+
+  it('keeps the edit toggle visible after a long-press (no longer a reveal gate)', () => {
     vi.useFakeTimers();
     render(
       <SubTabBar
@@ -56,7 +69,6 @@ describe('SubTabBar — edit mode', () => {
         editMode={editModeProps()}
       />,
     );
-    expect(screen.queryByRole('button', { name: 'Edit tab order' })).toBeNull();
     const tablist = screen.getByRole('tablist');
     fireEvent.pointerDown(tablist);
     act(() => {
@@ -65,7 +77,7 @@ describe('SubTabBar — edit mode', () => {
     expect(screen.getByRole('button', { name: 'Edit tab order' })).toBeInTheDocument();
   });
 
-  it('reveals the edit toggle on context menu', () => {
+  it('keeps the edit toggle visible after a context menu (no longer a reveal gate)', () => {
     render(
       <SubTabBar
         tabs={TABS}
@@ -76,6 +88,11 @@ describe('SubTabBar — edit mode', () => {
     );
     fireEvent.contextMenu(screen.getByRole('tablist'));
     expect(screen.getByRole('button', { name: 'Edit tab order' })).toBeInTheDocument();
+  });
+
+  it('renders no edit toggle when reordering is unavailable (no editMode prop)', () => {
+    render(<SubTabBar tabs={TABS} activeTab="overview" onTabChange={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: 'Edit tab order' })).toBeNull();
   });
 
   it('shows chevron buttons in active edit mode and calls move handlers', () => {
