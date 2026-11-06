@@ -21,15 +21,18 @@
 
 import type { Ability, Character, SpellcastingState } from '../types/character';
 import { ABILITY_NAMES } from '../types/character';
-import type { ClassEntry } from '../types/character';
+import type { ClassEntry, ClassSpellcasting } from '../types/character';
+import type { ClassId } from '../data/classes';
+import { getClass } from '../data/classes';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
-import { primaryClass, resolveClass } from './classes';
+import { allClasses, primaryClass, resolveClass } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
 import {
   CANTRIPS_KNOWN,
+  FULL_CASTER_SLOTS,
   MYSTIC_ARCANUM_LEVELS,
   PACT_MAGIC,
   PREPARED_COUNT,
@@ -492,88 +495,35 @@ export function reconcileSpellcastingForLevel(
   const sc = character.spellcasting;
   if (!sc) return undefined;
 
-  // The per-class selections (cantrips/prepared/spellbook) now live under
-  // byClass[classId]. For a single-class character there is exactly one key —
-  // the primary class id — so reconcile reads/writes that one bucket, leaving
-  // the shared/pooled fields (slotsExpended/pactSlotsExpended/mysticArcana*)
-  // top-level. Behaviour is identical to the pre-M1 flat shape, nested one level.
-  const primaryId = primaryClass(character)?.id;
-  const perClass = primaryId ? sc.byClass?.[primaryId] : undefined;
-
-  const topLevel = maxSpellLevel(character);
-  const cantripCap = cantripsKnown(character);
-  const preparedCap = preparedCount(character);
-  const required = requiredCantrips(character);
   const next: SpellcastingState = { ...sc };
-  // The reconciled per-class selections for the primary class (rebuilt below).
-  const nextPerClass: { cantrips?: SpellId[]; prepared?: SpellId[]; spellbook?: SpellId[] } = {};
 
-  // The spell lists currently legal for this character. Prepared/spellbook
-  // spells must belong to one of them, and cantrips to the (narrower) cantrip
-  // list — otherwise a list change (e.g. Bard 10→9 dropping Magical Secrets, or
-  // a class change) can strand an entry that is hidden in the picker yet still
-  // counts toward a cap (review finding: level-down reconciliation incomplete).
-  const preparedLists = new Set(spellListClassIds(character));
-  const cantripLists = new Set(cantripListClassIds(character));
-  const onLists = (id: SpellId, lists: Set<string>): boolean => {
-    const spell = getSpell(id);
-    return spell !== undefined && spell.classes.some((c) => lists.has(c));
-  };
-
-  // Drop leveled spells above the highest castable level OR off the current
-  // legal lists (prepared + spellbook).
-  const legalLeveled = (id: SpellId, lists: Set<string>): boolean => {
-    const spell = getSpell(id);
-    return (
-      spell !== undefined &&
-      spell.level >= 1 &&
-      spell.level <= topLevel &&
-      onLists(id, lists)
-    );
-  };
-  if (perClass?.prepared) {
-    // Keep only level-legal, list-legal prepared spells, then clamp to the
-    // current Prepared Spells cap (PHB 2024 class "Prepared Spells" column).
-    const pruned = perClass.prepared.filter((id) => legalLeveled(id, preparedLists));
-    const capped = preparedCap > 0 ? pruned.slice(0, preparedCap) : [];
-    if (capped.length > 0) nextPerClass.prepared = capped;
-  }
-  if (perClass?.spellbook) {
-    // The spellbook is Wizard-only and uncapped this stage, but still must stay
-    // within the castable level and on the (Wizard) list.
-    const pruned = perClass.spellbook.filter((id) => legalLeveled(id, preparedLists));
-    if (pruned.length > 0) nextPerClass.spellbook = pruned;
-  }
-
-  // Trim cantrips to the current cap and legal cantrip list, keeping required
-  // cantrips (Arcane Trickster's Mage Hand) first.
-  if (perClass?.cantrips) {
-    const legalCantrips = perClass.cantrips.filter(
-      (id) => required.includes(id) || onLists(id, cantripLists),
-    );
-    const requiredKept = legalCantrips.filter((id) => required.includes(id));
-    const optional = legalCantrips.filter((id) => !required.includes(id));
-    const room = Math.max(0, cantripCap - requiredKept.length);
-    const kept = [...requiredKept, ...optional.slice(0, room)];
-    if (kept.length > 0) nextPerClass.cantrips = kept;
-  }
-
-  // Write the reconciled per-class selections back under byClass[primaryId],
-  // preserving any OTHER classes' selections untouched (single-class: none).
-  if (primaryId) {
-    const nextByClass: NonNullable<SpellcastingState['byClass']> = { ...sc.byClass };
-    if (Object.keys(nextPerClass).length > 0) {
-      nextByClass[primaryId] = nextPerClass;
-    } else {
-      delete nextByClass[primaryId];
+  // Reconcile EACH class's stored selections under byClass against THAT class's
+  // own caps and legal spell lists (PHB 2024 "Multiclassing: Spellcasting",
+  // L2119: each class prepares as a single-classed member of itself). For a
+  // single-class character byClass has exactly one key = the primary class id,
+  // so this loops once and the output is byte-identical to the pre-M3 behaviour.
+  // A stored class id that is no longer on the character's classes[] is dropped
+  // entirely (its selections belong to a class the character no longer has).
+  if (sc.byClass) {
+    const entriesById = new Map(allClasses(character).map((e) => [e.id, e] as const));
+    const nextByClass: NonNullable<SpellcastingState['byClass']> = {};
+    for (const [classId, perClass] of Object.entries(sc.byClass)) {
+      const entry = entriesById.get(classId as ClassId);
+      if (!entry || !perClass) continue; // class no longer present → drop.
+      const reconciled = reconcilePerClass(entry, perClass);
+      if (Object.keys(reconciled).length > 0) nextByClass[classId as ClassId] = reconciled;
     }
     if (Object.keys(nextByClass).length > 0) next.byClass = nextByClass;
     else delete next.byClass;
   }
 
-  // Clamp expended standard slots to the new per-level maxima.
+  // Clamp expended standard slots to the new per-level maxima. The maxima are
+  // the EFFECTIVE Spellcasting slots (combined table for 2+ Spellcasting
+  // classes, else the lone class's own table) — a shared pool across all
+  // Spellcasting classes (PHB 2024 L2162). For a single-class caster this equals
+  // the old spellSlots(character) exactly.
   if (sc.slotsExpended) {
-    const slots = spellSlots(character);
+    const slots = effectiveSpellSlots(character);
     const clamped: Partial<Record<number, number>> = {};
     for (const [key, spent] of Object.entries(sc.slotsExpended)) {
       const level = Number(key);
@@ -585,9 +535,11 @@ export function reconcileSpellcastingForLevel(
     else delete next.slotsExpended;
   }
 
-  // Clamp expended Pact Magic slots to the new maximum.
+  // Clamp expended Pact Magic slots to the new maximum (the Warlock entry's own
+  // level — the Pact Magic pool is separate from the combined Spellcasting
+  // slots, PHB 2024 "Warlock: Pact Magic").
   if (sc.pactSlotsExpended !== undefined) {
-    const pactMax = pactMagicSlots(character)?.slots ?? 0;
+    const pactMax = pactMagicSlotsForClass(character)?.slots ?? 0;
     const value = Math.max(0, Math.min(pactMax, sc.pactSlotsExpended));
     if (value > 0) next.pactSlotsExpended = value;
     else delete next.pactSlotsExpended;
@@ -597,7 +549,12 @@ export function reconcileSpellcastingForLevel(
   // the character no longer has access to, and any choice that is no longer a
   // legal Warlock spell of the matching level (PHB 2024 "Warlock: Mystic
   // Arcanum" — one Warlock spell per granted arcanum level).
-  const arcanumLevels = new Set(mysticArcanumLevels(character));
+  // Mystic Arcanum levels come from the WARLOCK entry's own level (PHB 2024
+  // "Warlock: Mystic Arcanum", levels 11/13/15/17) — keyed to the Warlock class
+  // level, which may not be the primary class in a multiclass character. For a
+  // single-class Warlock this equals mysticArcanumLevels(character) exactly.
+  const warlockLevel = allClasses(character).find((e) => e.id === 'warlock')?.level ?? 0;
+  const arcanumLevels = new Set(MYSTIC_ARCANUM_LEVELS[warlockLevel] ?? []);
   const arcanumLegal = (level: number, id: SpellId | undefined): boolean => {
     if (id === undefined || !arcanumLevels.has(level)) return false;
     const spell = getSpell(id);
@@ -627,4 +584,432 @@ export function reconcileSpellcastingForLevel(
   }
 
   return Object.keys(next).length > 0 ? next : undefined;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// MULTICLASS SPELLCASTING (Stage M3)
+//
+// PHB 2024 "Multiclassing: Spellcasting" (~p.37, Docs/PlayersHandbook.md
+// L2119-2165): "Your capacity for spellcasting depends partly on your combined
+// levels in all your spellcasting classes and partly on your individual levels
+// in those classes. Once you have the Spellcasting feature from more than one
+// class, use the rules below. If you multiclass but have the Spellcasting
+// feature from only one class, follow the rules for that class."
+//
+// Design per .agents/tasks/investigate-multiclassing-design/report.md §4. The
+// combined Multiclass Spellcaster slot table IS the full-caster grid, held
+// verbatim as FULL_CASTER_SLOTS (reused here, no second copy). The PHB's own
+// OCR of the table (L2128-2155) is mangled; FULL_CASTER_SLOTS is the RAW table.
+// ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * The spellcasting descriptor for a single class entry, or undefined when the
+ * class is not a caster. Per-class analogue of {@link descriptorFor}.
+ */
+function descriptorForEntry(entry: ClassEntry): SpellcastingDescriptor | undefined {
+  return SPELLCASTING_DESCRIPTORS[entry.id as keyof typeof SPELLCASTING_DESCRIPTORS];
+}
+
+/**
+ * Whether a single class entry has an ACTIVE casting feature (Spellcasting OR
+ * Pact Magic) at its own class level. Per-class analogue of {@link isSpellcaster}
+ * (which gates on the primary class). A subclass caster (Eldritch Knight /
+ * Arcane Trickster) is active only once it has the casting subclass AND has
+ * reached the subclass's casting level (3 in 2024); base-class casters cast
+ * from level 1 (PHB 2024 "Eldritch Knight" ~p.52 / "Arcane Trickster" ~p.123).
+ */
+export function entryIsSpellcaster(entry: ClassEntry): boolean {
+  const descriptor = descriptorForEntry(entry);
+  if (!descriptor) return false;
+  if (descriptor.subclassCastingLevel !== undefined) {
+    if (entry.subclassId !== descriptor.subclassId) return false;
+    return entry.level >= descriptor.subclassCastingLevel;
+  }
+  return true;
+}
+
+/**
+ * The class entries that have an ACTIVE "Spellcasting" feature (full/half/third
+ * kinds), EXCLUDING Warlock Pact Magic — PHB 2024 "Multiclassing: Spellcasting"
+ * treats Pact Magic as a separate feature, so it is never counted as "a class
+ * whose Spellcasting feature you have" for the combined table / single-vs-
+ * combined decision (L2119, "Pact Magic" paragraph L2165). Used to decide
+ * whether the combined multiclass slot table applies ({@link effectiveSpellSlots}).
+ */
+export function spellcastingClasses(character: Character): ClassEntry[] {
+  return allClasses(character).filter((entry) => {
+    const descriptor = descriptorForEntry(entry);
+    return descriptor !== undefined && descriptor.kind !== 'pact' && entryIsSpellcaster(entry);
+  });
+}
+
+/**
+ * The combined spellcaster level used to index the Multiclass Spellcaster slot
+ * table (PHB 2024 "Multiclassing: Spellcasting: Spell Slots", L2156-2163):
+ *   + all levels in FULL casters (Bard/Cleric/Druid/Sorcerer/Wizard);
+ *   + half your levels ROUNDED UP in Paladin and Ranger — per class;
+ *   + one third of your Fighter/Rogue levels ROUNDED DOWN, only with the
+ *     Eldritch Knight / Arcane Trickster subclass (and only once its casting
+ *     level is reached) — per class;
+ *   - Warlock Pact Magic levels are EXCLUDED.
+ * Rounding is applied PER CLASS before summing (RAW). A non-EK/AT Fighter/Rogue,
+ * and any non-caster class, contributes 0.
+ */
+export function combinedCasterLevel(character: Character): number {
+  let total = 0;
+  for (const entry of allClasses(character)) {
+    const descriptor = descriptorForEntry(entry);
+    if (!descriptor) continue;
+    switch (descriptor.kind) {
+      case 'full':
+        total += entry.level;
+        break;
+      case 'half':
+        // PHB L2160: half your Paladin/Ranger levels, rounded UP, per class.
+        total += Math.ceil(entry.level / 2);
+        break;
+      case 'third':
+        // PHB L2161: one third of Fighter/Rogue levels, rounded DOWN, only with
+        // the Eldritch Knight / Arcane Trickster subclass active (its casting
+        // level reached). entryIsSpellcaster gates the subclass + casting level.
+        if (entryIsSpellcaster(entry)) total += Math.floor(entry.level / 3);
+        break;
+      case 'pact':
+        // PHB L2156-2163: Warlock Pact Magic levels are excluded from the sum.
+        break;
+    }
+  }
+  return total;
+}
+
+/**
+ * The combined Multiclass Spellcaster leveled slot vector (1-indexed by spell
+ * level, index 0 unused): FULL_CASTER_SLOTS[combinedCasterLevel]. PHB 2024
+ * L2162 — "look up this total level in the Level column of the Multiclass
+ * Spellcaster table". The table equals the full-caster grid (FULL_CASTER_SLOTS).
+ * Does NOT include Warlock Pact Magic slots (tracked separately via
+ * {@link pactMagicSlots}). Returns undefined when the combined level is 0.
+ */
+export function multiclassSpellSlots(character: Character): SlotVector | undefined {
+  const level = combinedCasterLevel(character);
+  if (level <= 0) return undefined;
+  return FULL_CASTER_SLOTS[level];
+}
+
+/**
+ * Whether the combined Multiclass Spellcaster table applies: true only when 2+
+ * classes have an ACTIVE Spellcasting feature (Pact Magic excluded). With
+ * exactly one Spellcasting class, PHB 2024 L2122 says to follow that class's own
+ * rules (its single-class table at its class level).
+ */
+export function isCombinedSpellcaster(character: Character): boolean {
+  return spellcastingClasses(character).length >= 2;
+}
+
+/**
+ * The effective leveled Spellcasting slot vector for the character (1-indexed by
+ * spell level, index 0 unused), honouring the single-vs-combined rule (PHB 2024
+ * "Multiclassing: Spellcasting", L2119-2163):
+ *   - 2+ Spellcasting classes → the combined table at the combined caster level
+ *     (FULL_CASTER_SLOTS[combinedCasterLevel]);
+ *   - exactly 1 Spellcasting class → THAT class's own single-class table at its
+ *     own class level (slotTableForKind(kind)[classLevel]);
+ *   - 0 Spellcasting classes → undefined.
+ * Warlock Pact Magic slots are ALWAYS separate (see {@link pactMagicSlots}) and
+ * are never reflected here. For a single-class caster this equals the old
+ * {@link spellSlots} exactly (one Spellcasting class → its own table).
+ */
+export function effectiveSpellSlots(character: Character): SlotVector | undefined {
+  const casters = spellcastingClasses(character);
+  if (casters.length === 0) return undefined;
+  if (casters.length >= 2) {
+    // Combined table (PHB L2162): FULL_CASTER_SLOTS[combinedCasterLevel].
+    return multiclassSpellSlots(character);
+  }
+  // Exactly one Spellcasting class (PHB L2122): its own table at its own level.
+  const only = casters[0];
+  const descriptor = descriptorForEntry(only);
+  if (!descriptor) return undefined;
+  const table = slotTableForKind(descriptor.kind);
+  return table ? table[only.level] : undefined;
+}
+
+/**
+ * The Warlock Pact Magic row for the character, drawn from the WARLOCK class
+ * entry's own level (PHB 2024 "Warlock: Pact Magic" ~p.154), or undefined when
+ * the character has no Warlock levels. Multiclass-aware replacement for the
+ * primary-class {@link pactMagicSlots}: the Pact Magic pool is separate from the
+ * combined Spellcasting slots and keyed to the Warlock class level specifically.
+ */
+export function pactMagicSlotsForClass(character: Character): PactMagicRow | undefined {
+  const warlock = allClasses(character).find((e) => e.id === 'warlock');
+  if (!warlock) return undefined;
+  return PACT_MAGIC[warlock.level];
+}
+
+// ── Per-class resolvers (DC / attack / cantrips / prepared / max level) ──────
+// PHB 2024 "Multiclassing: Spellcasting: Spells Prepared" (L2119): prepared
+// spells are determined per class as a single-classed member of that class;
+// each prepared spell uses that class's spellcasting ability. So save DC /
+// attack are PER CLASS. The Proficiency Bonus is by TOTAL character level
+// (unchanged — character.level is the stored total). The cantrip/prepared COUNTS
+// use each class's own progression at its own class level; cantrip SCALING
+// (damage dice) uses total level (L2127), which is unchanged.
+
+/**
+ * The spellcasting ability for a given class entry, or undefined when the class
+ * is not an active caster. Per-class analogue of {@link spellcastingAbility}.
+ * Includes Warlock (Pact Magic still has a spellcasting ability / DC).
+ */
+export function classSpellcastingAbility(entry: ClassEntry): Ability | undefined {
+  if (!entryIsSpellcaster(entry)) return undefined;
+  return descriptorForEntry(entry)?.ability;
+}
+
+/**
+ * Per-class spell save DC breakdown: 8 + Proficiency Bonus (TOTAL level) +
+ * modifier of THAT class's spellcasting ability (PHB 2024 L2119). Returns
+ * undefined when the class is not an active caster. The components sum to the
+ * total (calculated-totals steering — the UI renders this as a tooltip).
+ */
+export function classSpellSaveDcBreakdown(
+  character: Character,
+  entry: ClassEntry,
+): Breakdown | undefined {
+  const ability = classSpellcastingAbility(entry);
+  if (ability === undefined) return undefined;
+  const pb = proficiencyBonus(character.level);
+  const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
+  const className = getClass(entry.id)?.name ?? entry.id;
+  return {
+    total: 8 + pb + mod,
+    components: [
+      { label: 'Base', value: 8 },
+      { label: 'Proficiency', value: pb },
+      { label: `${className} ${ABILITY_NAMES[ability]} mod`, value: mod },
+    ],
+  };
+}
+
+/**
+ * Per-class spell attack bonus breakdown: Proficiency Bonus (TOTAL level) +
+ * modifier of THAT class's spellcasting ability (PHB 2024 L2119). Returns
+ * undefined when the class is not an active caster.
+ */
+export function classSpellAttackBreakdown(
+  character: Character,
+  entry: ClassEntry,
+): Breakdown | undefined {
+  const ability = classSpellcastingAbility(entry);
+  if (ability === undefined) return undefined;
+  const pb = proficiencyBonus(character.level);
+  const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
+  const className = getClass(entry.id)?.name ?? entry.id;
+  return {
+    total: pb + mod,
+    components: [
+      { label: 'Proficiency', value: pb },
+      { label: `${className} ${ABILITY_NAMES[ability]} mod`, value: mod },
+    ],
+  };
+}
+
+/**
+ * The number of cantrips a given class knows at ITS OWN class level, or 0 when
+ * the class has no cantrips (Paladin/Ranger) or is not an active caster (PHB
+ * 2024 per-class "Cantrips" column). The count is per class; cantrip SCALING is
+ * by total level (unchanged, L2127).
+ */
+export function classCantripsKnown(entry: ClassEntry): number {
+  if (!entryIsSpellcaster(entry)) return 0;
+  const table = CANTRIPS_KNOWN[entry.id as keyof typeof CANTRIPS_KNOWN];
+  return table?.[entry.level] ?? 0;
+}
+
+/**
+ * The number of leveled spells a given class can prepare at ITS OWN class level,
+ * or 0 when the class is not an active caster (PHB 2024 per-class "Prepared
+ * Spells" column; prepared per class as a single-classed member — L2119).
+ */
+export function classPreparedCount(entry: ClassEntry): number {
+  if (!entryIsSpellcaster(entry)) return 0;
+  const table = PREPARED_COUNT[entry.id as keyof typeof PREPARED_COUNT];
+  return table?.[entry.level] ?? 0;
+}
+
+/**
+ * The highest spell level a given class can PREPARE at its own class level
+ * (1-9), or 0 when it cannot prepare leveled spells. PHB 2024 L2119: each class
+ * prepares as a single-classed member of that class, so its prepared-spell level
+ * ceiling comes from its OWN single-class table at its OWN level (NOT the
+ * combined slots, which may be higher — those higher slots can only cast the
+ * lower-level spells you actually prepared, L2163). For a Warlock this is the
+ * Pact Magic slot level.
+ */
+export function classMaxPreparedLevel(entry: ClassEntry): number {
+  if (!entryIsSpellcaster(entry)) return 0;
+  const descriptor = descriptorForEntry(entry);
+  if (!descriptor) return 0;
+  if (descriptor.kind === 'pact') {
+    return PACT_MAGIC[entry.level]?.slotLevel ?? 0;
+  }
+  const table = slotTableForKind(descriptor.kind);
+  const slots = table?.[entry.level];
+  if (!slots) return 0;
+  let max = 0;
+  for (let level = 1; level < slots.length; level++) {
+    if ((slots[level] ?? 0) > 0) max = level;
+  }
+  return max;
+}
+
+/**
+ * One per-class spellcasting summary entry for display: the class, its ability,
+ * and its save DC / attack breakdowns. Produced for every ACTIVE caster class
+ * (including Warlock, whose DC/attack still derive from 8 + PB + Cha mod even
+ * though its slots are Pact Magic). This is the per-class data the M5 display
+ * reshape will render; M3 only computes it (decision 9-E — display deferred).
+ */
+export interface ClassSpellcastingSummary {
+  classId: ClassId;
+  className: string;
+  ability: Ability;
+  saveDc: Breakdown;
+  attack: Breakdown;
+  cantripsKnown: number;
+  preparedCount: number;
+  maxPreparedLevel: number;
+}
+
+/**
+ * The per-class spellcasting summaries for every ACTIVE caster class (full/half/
+ * third AND Warlock pact), in stored class order. Empty for a non-caster. Each
+ * carries that class's ability, save DC, attack, and per-class counts (PHB 2024
+ * "Multiclassing: Spellcasting", L2119). The combined/single leveled slot vector
+ * is obtained separately via {@link effectiveSpellSlots}; Pact Magic via
+ * {@link pactMagicSlotsForClass}.
+ */
+/**
+ * The primary class id whose spell list a given class entry draws leveled spells
+ * from. Per-class analogue of {@link spellListClassId}: a subclass caster
+ * (Eldritch Knight / Arcane Trickster) prepares from the Wizard list (PHB 2024);
+ * otherwise the class's own list. Undefined when the entry is not a caster.
+ */
+export function classSpellListClassId(entry: ClassEntry): string | undefined {
+  if (!entryIsSpellcaster(entry)) return undefined;
+  const descriptor = descriptorForEntry(entry);
+  return descriptor?.spellListClassId ?? entry.id;
+}
+
+/**
+ * Every leveled-spell list a given class entry may prepare from. Per-class
+ * analogue of {@link spellListClassIds}: a level-10+ Bard gains Magical Secrets
+ * (Bard/Cleric/Druid/Wizard union — PHB 2024 "Bard: Magical Secrets"); every
+ * other caster uses its primary list. [] when the entry is not a caster.
+ */
+export function classSpellListClassIds(entry: ClassEntry): string[] {
+  const primary = classSpellListClassId(entry);
+  if (primary === undefined) return [];
+  if (entry.id === 'bard' && entry.level >= 10) {
+    return ['bard', 'cleric', 'druid', 'wizard'];
+  }
+  return [primary];
+}
+
+/**
+ * The list a given class entry draws CANTRIPS from. Per-class analogue of
+ * {@link cantripListClassIds}: NOT widened by Bard Magical Secrets (cantrips stay
+ * the class's own list). [] when the entry is not a caster.
+ */
+export function classCantripListClassIds(entry: ClassEntry): string[] {
+  const primary = classSpellListClassId(entry);
+  return primary === undefined ? [] : [primary];
+}
+
+/**
+ * Cantrip ids a given class entry is REQUIRED to know (Arcane Trickster's Mage
+ * Hand — PHB 2024 ~p.123). Per-class analogue of {@link requiredCantrips}.
+ */
+export function classRequiredCantrips(entry: ClassEntry): SpellId[] {
+  if (!entryIsSpellcaster(entry)) return [];
+  if (entry.subclassId === 'arcaneTrickster' && getSpell('mage-hand')) {
+    return ['mage-hand'];
+  }
+  return [];
+}
+
+/**
+ * Reconciles ONE class's stored selections (cantrips/prepared/spellbook) against
+ * that class's current caps and legal spell lists, returning the pruned bucket
+ * (possibly empty). Pure per-class analogue of the primary-class pruning that
+ * {@link reconcileSpellcastingForLevel} applied pre-M3 — each class prepares as a
+ * single-classed member of that class (PHB 2024 "Multiclassing: Spellcasting",
+ * L2119), so its caps and lists come from its OWN class level, not the combined
+ * level.
+ */
+function reconcilePerClass(
+  entry: ClassEntry,
+  perClass: ClassSpellcasting,
+): ClassSpellcasting {
+  const topLevel = classMaxPreparedLevel(entry);
+  const cantripCap = classCantripsKnown(entry);
+  const preparedCap = classPreparedCount(entry);
+  const required = classRequiredCantrips(entry);
+  const preparedLists = new Set(classSpellListClassIds(entry));
+  const cantripLists = new Set(classCantripListClassIds(entry));
+  const next: ClassSpellcasting = {};
+
+  const onLists = (id: SpellId, lists: Set<string>): boolean => {
+    const spell = getSpell(id);
+    return spell !== undefined && spell.classes.some((c) => lists.has(c));
+  };
+  const legalLeveled = (id: SpellId, lists: Set<string>): boolean => {
+    const spell = getSpell(id);
+    return (
+      spell !== undefined && spell.level >= 1 && spell.level <= topLevel && onLists(id, lists)
+    );
+  };
+
+  if (perClass.prepared) {
+    const pruned = perClass.prepared.filter((id) => legalLeveled(id, preparedLists));
+    const capped = preparedCap > 0 ? pruned.slice(0, preparedCap) : [];
+    if (capped.length > 0) next.prepared = capped;
+  }
+  if (perClass.spellbook) {
+    const pruned = perClass.spellbook.filter((id) => legalLeveled(id, preparedLists));
+    if (pruned.length > 0) next.spellbook = pruned;
+  }
+  if (perClass.cantrips) {
+    const legalCantrips = perClass.cantrips.filter(
+      (id) => required.includes(id) || onLists(id, cantripLists),
+    );
+    const requiredKept = legalCantrips.filter((id) => required.includes(id));
+    const optional = legalCantrips.filter((id) => !required.includes(id));
+    const room = Math.max(0, cantripCap - requiredKept.length);
+    const kept = [...requiredKept, ...optional.slice(0, room)];
+    if (kept.length > 0) next.cantrips = kept;
+  }
+  return next;
+}
+
+export function perClassSpellcasting(character: Character): ClassSpellcastingSummary[] {
+  const summaries: ClassSpellcastingSummary[] = [];
+  for (const entry of allClasses(character)) {
+    if (!entryIsSpellcaster(entry)) continue;
+    const ability = classSpellcastingAbility(entry);
+    const saveDc = classSpellSaveDcBreakdown(character, entry);
+    const attack = classSpellAttackBreakdown(character, entry);
+    if (ability === undefined || saveDc === undefined || attack === undefined) continue;
+    summaries.push({
+      classId: entry.id,
+      className: getClass(entry.id)?.name ?? entry.id,
+      ability,
+      saveDc,
+      attack,
+      cantripsKnown: classCantripsKnown(entry),
+      preparedCount: classPreparedCount(entry),
+      maxPreparedLevel: classMaxPreparedLevel(entry),
+    });
+  }
+  return summaries;
 }
