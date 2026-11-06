@@ -253,8 +253,40 @@ export function Navigation({
       className={`${styles.sidebar} ${!isMobile && collapsed ? styles.sidebarCollapsed : ''}`}
       aria-label="Main navigation"
     >
+      {/* Top-of-panel search: a magnifying-glass icon in the title bar (mirrors
+          the WFRP app). Expanded shows the app title with the icon beside it;
+          collapsed shows just the icon. Opens the command palette. */}
       {!isMobile && !collapsed && (
-        <div className={styles.appTitle}>⚔ D&amp;D 5.5e Character Assistant</div>
+        <div className={styles.appTitle}>
+          <span className={styles.appTitleText}>⚔ D&amp;D 5.5e Character Assistant</span>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            onClick={() => openPalette()}
+            aria-label="Open command palette"
+            title="Search"
+            data-section="search"
+          >
+            <Search size={14} />
+          </button>
+          <HelpPopover concept="command-palette">
+            {getHelpContent('command-palette')}
+          </HelpPopover>
+        </div>
+      )}
+      {!isMobile && collapsed && (
+        <div className={styles.searchBar}>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            onClick={() => openPalette()}
+            aria-label="Open command palette"
+            title="Search"
+            data-section="search"
+          >
+            <Search size={14} />
+          </button>
+        </div>
       )}
 
       {/* Character switcher (Stage B1): shows the active character and opens the
@@ -289,33 +321,6 @@ export function Navigation({
       )}
 
       {isMobile ? renderMobileNav() : renderDesktopNav()}
-
-      {/* Stage B6: command-palette open affordance (desktop sidebar). When the
-          sidebar is expanded, a dismissible contextual HelpPopover (the
-          'command-palette' concept) sits beside it to introduce the palette and
-          its Ctrl/⌘+K shortcut on first use. */}
-      {!isMobile && (
-        <div className={styles.searchAffordance}>
-          <button
-            type="button"
-            className={`${styles.navItem} ${collapsed ? styles.navItemCollapsed : ''}`}
-            onClick={() => openPalette()}
-            aria-label="Open command palette"
-            title={collapsed ? 'Search' : undefined}
-            data-section="search"
-          >
-            <span className={styles.iconWrapper}>
-              <Search size={18} />
-            </span>
-            {!collapsed && <span>Search</span>}
-          </button>
-          {!collapsed && (
-            <HelpPopover concept="command-palette">
-              {getHelpContent('command-palette')}
-            </HelpPopover>
-          )}
-        </div>
-      )}
 
       {/* Stage B6: keyboard-shortcuts overlay affordance (desktop sidebar). */}
       {!isMobile && (

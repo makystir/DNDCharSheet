@@ -34,6 +34,51 @@
   margin-bottom: 4px;
   text-align: center;
   line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* The title's text label; lets the magnifying-glass button sit beside it
+   without the text pushing it off-center. */
+.appTitleText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Magnifying-glass search affordance that lives in the top bar (mirrors the
+   WFRP app). Icon-only; opens the command palette. */
+.searchBtn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.searchBtn:hover {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
+/* When the sidebar is collapsed, the top bar holds just the search icon,
+   centered. appTitle's border/spacing is dropped so it reads as a bare icon. */
+.searchBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Character switcher (Stage B1): active-character chip above the nav items. */
@@ -102,21 +147,6 @@
   width: 100%;
   text-align: left;
   transition: background 0.1s, color 0.1s;
-}
-
-/*
- * Stage B6: the desktop Search affordance pairs the palette-open nav button
- * with a dismissible contextual HelpPopover. The button keeps its full-row
- * behaviour; the help trigger sits at the trailing edge of the same row.
- */
-.searchAffordance {
-  display: flex;
-  align-items: center;
-}
-
-.searchAffordance .navItem {
-  flex: 1;
-  min-width: 0;
 }
 
 .navItem:hover {
