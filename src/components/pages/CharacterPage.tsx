@@ -40,6 +40,7 @@ import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SpeciesSection } from './character/SpeciesSection';
 import { OverviewVitals } from './character/OverviewVitals';
 import { OverviewConditions } from './character/OverviewConditions';
+import { OverviewReactions } from './character/OverviewReactions';
 import { OverviewSkills } from './character/OverviewSkills';
 import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
@@ -371,7 +372,7 @@ export function CharacterPage({
           <OverviewVitals character={character} />
           <div className={styles.overviewGrid}>
             <OverviewConditions character={character} />
-            {/* Reactions card goes here (later batch). */}
+            <OverviewReactions character={character} />
             <OverviewSkills character={character} />
             <OverviewTraits character={character} />
           </div>

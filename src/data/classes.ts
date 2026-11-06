@@ -445,6 +445,7 @@ export const CLASS_CATALOG = {
         name: 'Countercharm',
         level: 7,
         effect: 'When you or a creature within 30 feet fails a save against being Charmed or Frightened, use a Reaction to reroll it with Advantage.',
+        mechanics: { activation: 'reaction' },
         source: 'PHB 2024 "Bard: Countercharm" (line ~2930)',
       },
       {
@@ -1033,6 +1034,7 @@ export const CLASS_CATALOG = {
         name: 'Deflect Attacks',
         level: 3,
         effect: 'When hit by an attack dealing Bludgeoning/Piercing/Slashing, use a Reaction to reduce damage by 1d10 + Dex mod + Monk level; if reduced to 0, spend 1 Focus Point to redirect force.',
+        mechanics: { activation: 'reaction' },
         source: 'PHB 2024 "Monk: Deflect Attacks" (line ~4591)',
       },
       {
@@ -1053,6 +1055,7 @@ export const CLASS_CATALOG = {
         name: 'Slow Fall',
         level: 4,
         effect: 'Use a Reaction when you fall to reduce the fall damage by five times your Monk level.',
+        mechanics: { activation: 'reaction' },
         source: 'PHB 2024 "Monk: Slow Fall" (line ~4603)',
       },
       {
@@ -1590,6 +1593,7 @@ export const CLASS_CATALOG = {
         name: 'Uncanny Dodge',
         level: 5,
         effect: 'When a visible attacker hits you, use your Reaction to halve the attack\u2019s damage.',
+        mechanics: { activation: 'reaction' },
         source: 'PHB 2024 "Rogue: Uncanny Dodge" (line ~5963)',
       },
       {
