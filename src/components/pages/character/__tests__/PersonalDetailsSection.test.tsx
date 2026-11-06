@@ -24,7 +24,7 @@ describe('PersonalDetailsSection', () => {
     expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Alignment' })).toBeInTheDocument();
     expect(screen.getByLabelText('Personality')).toBeInTheDocument();
-    for (const label of ['Faith / Deity', 'Sex', 'Age', 'Height', 'Weight', 'Eyes', 'Hair', 'Skin', 'Background']) {
+    for (const label of ['Faith / Deity', 'Age', 'Height', 'Weight', 'Eyes', 'Hair', 'Skin', 'Background']) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }
   });
@@ -121,11 +121,5 @@ describe('PersonalDetailsSection', () => {
     const { onChange } = renderSection();
     fireEvent.click(screen.getByRole('button', { name: 'Roll alignment' }));
     expect(onChange.mock.calls.at(-1)?.[0].alignment).toBeTruthy();
-  });
-
-  it('rolling sex fills from the selected gender', () => {
-    const { onChange } = renderSection({ gender: 'female' });
-    fireEvent.click(screen.getByRole('button', { name: 'Roll sex' }));
-    expect(onChange.mock.calls.at(-1)?.[0].sex).toBe('female');
   });
 });

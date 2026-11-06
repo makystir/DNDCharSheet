@@ -136,7 +136,6 @@ describe('character-store', () => {
       ...base,
       alignment: 'Chaotic Good' as const,
       faith: 'Sigmar',
-      sex: 'Female',
       age: '27',
       height: "5'8\"",
       weight: '140 lb',
@@ -151,7 +150,6 @@ describe('character-store', () => {
     expect(loaded).not.toBeNull();
     expect(loaded?.alignment).toBe('Chaotic Good');
     expect(loaded?.faith).toBe('Sigmar');
-    expect(loaded?.sex).toBe('Female');
     expect(loaded?.age).toBe('27');
     expect(loaded?.height).toBe("5'8\"");
     expect(loaded?.weight).toBe('140 lb');
@@ -170,7 +168,6 @@ describe('character-store', () => {
     for (const field of [
       'alignment',
       'faith',
-      'sex',
       'age',
       'height',
       'weight',

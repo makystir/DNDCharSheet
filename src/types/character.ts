@@ -796,8 +796,6 @@ export interface Character {
   alignment?: Alignment;
   /** Faith / patron deity (free text; PHB 2024 lists deities as flavour, no mechanic here). */
   faith?: string;
-  /** Biological sex / gender descriptor (free text). */
-  sex?: string;
   /** Age (free text — species lifespans vary; no validation). */
   age?: string;
   /** Height (free text). */
@@ -859,8 +857,8 @@ export interface Character {
    */
   languages?: { chosen: string[]; granted?: string[] };
   /**
-   * Gender used to drive name/appearance generation (the free-text `sex` field
-   * above stays for display). Absent = unset. No mechanic (rules-compliance).
+   * Gender used to drive name/appearance generation and shown under Personal
+   * Details. Absent = unset. No mechanic (rules-compliance).
    */
   gender?: 'male' | 'female' | 'neutral';
   /**

@@ -66,8 +66,6 @@ export function PersonalDetailsSection({
     if (!speciesId) return;
     onChange({ ...character, name: generateName(speciesId, gender, createDefaultRng()) });
   };
-  const rollField = (field: keyof Character, value: string) =>
-    onChange({ ...character, [field]: value });
   // Roll a single appearance field (eyes/hair/skin/height/weight) from the
   // species+gender pools without disturbing the others (non-destructive).
   const rollAppearanceField = (field: 'eyes' | 'hair' | 'skin' | 'height' | 'weight') => {
@@ -189,23 +187,6 @@ export function PersonalDetailsSection({
               value={character.faith ?? ''}
               onSave={(v) => setField('faith', String(v))}
             />
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Sex"
-                value={character.sex ?? ''}
-                onSave={(v) => setField('sex', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollField('sex', gender)}
-                aria-label="Roll sex"
-                title="Fill sex from the selected gender"
-              >
-                🎲
-              </button>
-            </div>
             <div className={styles.fieldWithRoll}>
               <EditableField
                 label="Age"

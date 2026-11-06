@@ -133,7 +133,6 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const [gender, setGender] = useState<NameGender>('neutral');
   const [alignment, setAlignment] = useState('');
   const [details, setDetails] = useState<{
-    sex: string;
     age: string;
     height: string;
     weight: string;
@@ -141,7 +140,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     hair: string;
     skin: string;
     personality: string;
-  }>({ sex: '', age: '', height: '', weight: '', eyes: '', hair: '', skin: '', personality: '' });
+  }>({ age: '', height: '', weight: '', eyes: '', hair: '', skin: '', personality: '' });
 
   // Step 5: Equipment.
   const [equipmentChoice, setEquipmentChoice] = useState<EquipmentChoice>('A');
@@ -381,7 +380,6 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       ...character,
       gender,
       ...(alignment ? { alignment: alignment as Character['alignment'] } : {}),
-      ...(details.sex ? { sex: details.sex } : {}),
       ...(details.age ? { age: details.age } : {}),
       ...(details.height ? { height: details.height } : {}),
       ...(details.weight ? { weight: details.weight } : {}),
