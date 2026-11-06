@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import type { Character } from '../../../types/character';
 import { ALIGNMENTS } from '../../../types/character';
 import { Card } from '../../shared/Card';
@@ -10,7 +10,8 @@ import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
 import { getBackground } from '../../../data/backgrounds';
 import { srdBadge } from '../sheet-helpers';
-import { User } from 'lucide-react';
+import { User, Sparkles } from 'lucide-react';
+import { PortraitPromptDialog } from '../../shared/PortraitPromptDialog';
 import type { NameGender } from '../../../data/name-tables';
 import {
   generateName,
@@ -59,6 +60,7 @@ export function PersonalDetailsSection({
   const faithId = useId();
   const faithListId = useId();
   const personalityId = useId();
+  const [showPromptDialog, setShowPromptDialog] = useState(false);
 
   const setField = (field: keyof Character, value: string) =>
     onChange({ ...character, [field]: value });
@@ -417,8 +419,21 @@ export function PersonalDetailsSection({
               onChange={(e) => setField('personality', e.target.value)}
             />
           </div>
+          <div className={styles.promptRow}>
+            <button
+              type="button"
+              className={styles.promptBtn}
+              onClick={() => setShowPromptDialog(true)}
+            >
+              <Sparkles size={14} aria-hidden="true" />
+              Generate portrait prompt
+            </button>
+          </div>
         </Card>
       </div>
+      {showPromptDialog && (
+        <PortraitPromptDialog character={character} onClose={() => setShowPromptDialog(false)} />
+      )}
     </section>
   );
 }

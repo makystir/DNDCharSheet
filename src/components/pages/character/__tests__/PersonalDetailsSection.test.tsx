@@ -32,6 +32,16 @@ describe('PersonalDetailsSection', () => {
     }
   });
 
+  it('the "Generate portrait prompt" trigger opens and closes the dialog', () => {
+    const { onChange } = renderSection();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /generate portrait prompt/i }));
+    expect(screen.getByRole('dialog', { name: 'Generate portrait prompt' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('renders the portrait beside the card (placeholder when none)', () => {
     renderSection();
     expect(screen.getByText('No portrait set')).toBeInTheDocument();
