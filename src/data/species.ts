@@ -196,7 +196,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Celestial Revelation',
         effect:
-          'At character level 3 you can transform as a Bonus Action (Heavenly Wings, Inner Radiance, or Necrotic Shroud), adding bonus damage once per turn. Active effect handled in a later stage.',
+          'At character level 3 you can transform as a Bonus Action (Heavenly Wings, Inner Radiance, or Necrotic Shroud), adding bonus damage once per turn.',
         source: 'PHB 2024 "Aasimar Traits: Celestial Revelation"',
       },
     ],
@@ -232,7 +232,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Breath Weapon',
         effect:
-          'Replace one attack with a 15-ft Cone or 30-ft Line; targets make a Dex save (DC 8 + Con mod + PB) for 1d10 of your ancestry damage type (scales at levels 5/11/17). Active effect handled in a later stage.',
+          'Replace one attack with a 15-ft Cone or 30-ft Line; targets make a Dex save (DC 8 + Con mod + PB) for 1d10 of your ancestry damage type (scales at levels 5/11/17).',
         source: 'PHB 2024 "Dragonborn Traits: Breath Weapon"',
       },
       {
@@ -249,7 +249,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Draconic Flight',
         effect:
-          'At character level 5 you can sprout spectral wings as a Bonus Action for a Fly Speed equal to your Speed. Active effect handled in a later stage.',
+          'At character level 5 you can sprout spectral wings as a Bonus Action for a Fly Speed equal to your Speed.',
         source: 'PHB 2024 "Dragonborn Traits: Draconic Flight"',
       },
     ],
@@ -454,14 +454,14 @@ export const SPECIES_CATALOG = {
       {
         name: 'Giant Ancestry',
         effect:
-          'Choose one giant boon (Cloud/Fire/Hill/Frost/Stone/Storm); uses equal to your Proficiency Bonus, recharging on a Long Rest. Active effect handled in a later stage.',
+          'Choose one giant boon (Cloud/Fire/Hill/Frost/Stone/Storm); uses equal to your Proficiency Bonus, recharging on a Long Rest.',
         source: 'PHB 2024 "Goliath Traits: Giant Ancestry"',
         requiresChoice: true,
       },
       {
         name: 'Large Form',
         effect:
-          'At character level 5 you can become Large as a Bonus Action for 10 minutes (Advantage on Strength checks, +10 ft Speed). Active effect handled in a later stage.',
+          'At character level 5 you can become Large as a Bonus Action for 10 minutes (Advantage on Strength checks, +10 ft Speed).',
         source: 'PHB 2024 "Goliath Traits: Large Form"',
       },
       {
@@ -549,7 +549,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Versatile',
         effect:
-          'Gain an Origin feat of your choice (Skilled is recommended). Feats are handled in a later stage.',
+          'Gain an Origin feat of your choice (Skilled is recommended).',
         source: 'PHB 2024 "Human Traits: Versatile"',
       },
     ],
@@ -586,7 +586,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Adrenaline Rush',
         effect:
-          'Dash as a Bonus Action and gain Temporary Hit Points equal to your Proficiency Bonus; uses equal to your Proficiency Bonus, recharging on a Short or Long Rest. Active effect handled in a later stage.',
+          'Dash as a Bonus Action and gain Temporary Hit Points equal to your Proficiency Bonus; uses equal to your Proficiency Bonus, recharging on a Short or Long Rest.',
         source: 'PHB 2024 "Orc Traits: Adrenaline Rush"',
       },
       {
@@ -598,7 +598,7 @@ export const SPECIES_CATALOG = {
       {
         name: 'Relentless Endurance',
         effect:
-          'When reduced to 0 HP but not killed outright, drop to 1 HP instead; recharges on a Long Rest. Active effect handled in a later stage.',
+          'When reduced to 0 HP but not killed outright, drop to 1 HP instead; recharges on a Long Rest.',
         source: 'PHB 2024 "Orc Traits: Relentless Endurance"',
       },
     ],

@@ -39,6 +39,9 @@ import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SpeciesSection } from './character/SpeciesSection';
 import { OverviewVitals } from './character/OverviewVitals';
+import { OverviewConditions } from './character/OverviewConditions';
+import { OverviewSkills } from './character/OverviewSkills';
+import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
@@ -366,6 +369,12 @@ export function CharacterPage({
             onSpeciesChoiceChange={setSpeciesChoice}
           />
           <OverviewVitals character={character} />
+          <div className={styles.overviewGrid}>
+            <OverviewConditions character={character} />
+            {/* Reactions card goes here (later batch). */}
+            <OverviewSkills character={character} />
+            <OverviewTraits character={character} />
+          </div>
         </>
       )}
 

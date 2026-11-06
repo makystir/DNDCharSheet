@@ -1,0 +1,109 @@
+/* Read-only Skills & Saves mirror for the Overview. */
+.saves {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.chipName {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  column-gap: 16px;
+  row-gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Subtle highlight; the P / E text marker carries the meaning too. */
+.trained {
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-gold);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+}
+
+.ability {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.marker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.value {
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5ch;
+  text-align: right;
+}
+
+.legend {
+  margin: 8px 0 4px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.manage {
+  font-size: 0.78rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+.manage:hover,
+.manage:focus-visible {
+  text-decoration: underline;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .skills {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row {
+    min-height: 44px;
+  }
+
+  .manage {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

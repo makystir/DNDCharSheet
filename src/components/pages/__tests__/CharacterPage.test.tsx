@@ -281,8 +281,9 @@ describe('CharacterPage', () => {
 
     it('renders species traits with names and effects, untruncated', () => {
       renderPage({ species: { id: 'dwarf' } }, 'identity');
-      expect(screen.getByText('Dwarven Toughness')).toBeInTheDocument();
-      expect(screen.getByText(/Hit Point maximum increases/)).toBeInTheDocument();
+      // Shown in the Species section and mirrored in the Overview Traits card.
+      expect(screen.getAllByText('Dwarven Toughness').length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Hit Point maximum increases/).length).toBeGreaterThan(0);
     });
   });
 

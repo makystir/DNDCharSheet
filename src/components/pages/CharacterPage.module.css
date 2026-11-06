@@ -310,3 +310,12 @@
     min-height: 44px;
   }
 }
+
+/* Overview session cards: two columns on wide screens, one on mobile. */
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
