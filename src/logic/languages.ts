@@ -10,8 +10,7 @@
  */
 
 import type { Character } from '../types/character';
-import { resolveClass } from './classes';
-import type { ClassFeature } from '../data/classes';
+import { resolveClasses } from './classes';
 
 /** The always-known base language (stored/compared lowercase). PHB 2024 L1294. */
 export const COMMON_LANGUAGE = 'common';
@@ -107,31 +106,36 @@ const FEATURE_LANGUAGE_GRANTS: Record<string, { fixed: string[]; chooseCount: nu
 };
 
 /**
- * The feature-driven language grant for a single-class character at its current
- * level: the FIXED auto-granted ids and how many languages the player CHOOSES
- * from features. Derived by scanning the character's base-class feature rows in
- * src/data/classes.ts for a language-granting feature the character has REACHED
- * (feature.level <= character level), so classes.ts stays the source of truth
- * for which class/level grants what. Multiclassing is out of scope (single
- * class). A class/level with no reached language feature yields
+ * The feature-driven language grant for the character across ALL its classes:
+ * the FIXED auto-granted ids and how many languages the player CHOOSES from
+ * features. Derived by scanning each class's feature rows in src/data/classes.ts
+ * for a language-granting feature the character has REACHED in THAT class
+ * (feature.level <= that class's own level — PHB 2024 "Multiclassing": you gain
+ * each class's features of your level or lower in that class), so classes.ts
+ * stays the source of truth for which class/level grants what.
+ *
+ * Multiclass-aware: e.g. a Rogue 1 / Ranger 2 gets Thieves' Cant (fixed
+ * 'thieves-cant' + choose 1, Rogue L1) AND Deft Explorer (choose 2, Ranger L2).
+ * A single-class character yields exactly that class's reached grants
+ * (unchanged). A character with no reached language feature yields
  * { fixed: [], chooseCount: 0 }. PHB 2024 (Rogue L1 "Thieves' Cant"; Ranger L2
  * "Deft Explorer").
  */
 export function featureLanguageGrants(
   character: Character,
 ): { fixed: string[]; chooseCount: number } {
-  const cls = resolveClass(character);
-  if (!cls) return { fixed: [], chooseCount: 0 };
   const fixed: string[] = [];
   let chooseCount = 0;
-  for (const feature of cls.features as ClassFeature[]) {
-    const grant = FEATURE_LANGUAGE_GRANTS[feature.name];
-    // Gate on the character having REACHED the feature's level (classes.ts row).
-    if (!grant || feature.level > character.level) continue;
-    for (const id of grant.fixed) {
-      if (!fixed.includes(id)) fixed.push(id);
+  for (const { entry, data } of resolveClasses(character)) {
+    for (const feature of data.features) {
+      const grant = FEATURE_LANGUAGE_GRANTS[feature.name];
+      // Gate on the feature being REACHED in THIS class (per-class level).
+      if (!grant || feature.level > entry.level) continue;
+      for (const id of grant.fixed) {
+        if (!fixed.includes(id)) fixed.push(id);
+      }
+      chooseCount += grant.chooseCount;
     }
-    chooseCount += grant.chooseCount;
   }
   return { fixed, chooseCount };
 }

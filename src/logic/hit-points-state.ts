@@ -65,7 +65,8 @@ import {
 } from './conditions';
 import { d20TestBreakdown } from './dice';
 import { effectiveAbilityScores } from './feats';
-import { hitPointMaxBreakdown } from './hit-points';
+import { hitPointMaxBreakdown, multiclassHitPointMaxBreakdown } from './hit-points';
+import { resolveClasses } from './classes';
 import { resolveSpecies } from './species';
 
 // â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -187,8 +188,25 @@ function wholeSigned(value: number | undefined): number {
 export function characterHitPointMaxBreakdown(character: Character): Breakdown {
   const species = resolveSpecies(character);
   const hpPerLevel = species?.traits.find((t) => t.mechanics?.hpPerLevel)?.mechanics?.hpPerLevel;
+  const scores = effectiveAbilityScores(character);
+
+  // PHB 2024 "Multiclassing: Hit Points" (L2094): with TWO OR MORE classes the
+  // HP math sums per-class contributions with exactly one level-1 max-die term
+  // (from the initial class). A SINGLE-class character stays on the original
+  // single-Hit-Die path so its breakdown (components, labels, rolled/floor
+  // notes) is byte-identical to before.
+  const classes = resolveClasses(character);
+  if (classes.length >= 2) {
+    return multiclassHitPointMaxBreakdown({
+      scores,
+      classes: classes.map(({ entry, data }) => ({ hitDie: data.hitDie, level: entry.level })),
+      hpMax: character.hpMax,
+      hpPerLevel,
+    });
+  }
+
   return hitPointMaxBreakdown({
-    scores: effectiveAbilityScores(character),
+    scores,
     level: character.level,
     hitDie: resolveClass(character)?.hitDie,
     hpMax: character.hpMax,

@@ -97,6 +97,33 @@ export interface WeaponProficiencyRule {
   martialWithAnyOf?: WeaponProperty[];
 }
 
+/**
+ * The REDUCED set of proficiencies a class grants when it is taken as a
+ * NON-INITIAL (multiclass) class (PHB 2024, each class's "As a Multiclass
+ * Character" entry in Chapter 3). The INITIAL class (`classes[0]`) still grants
+ * its FULL starting proficiencies (the `armorTraining` / `weaponProficiency` /
+ * `skillChoices` / `toolProficiencies` above); later classes contribute only
+ * this subset. No save proficiencies are ever granted on a multiclass (PHB:
+ * the multiclass entries list none), and Heavy armor is never granted this way.
+ *
+ * Shape mirrors the Stage-M2 golden (MULTICLASS_PROF_CASES):
+ *  - `armor`:  armor-training categories ('light' | 'medium' | 'shields').
+ *  - `martialWeapons`:  true when Martial weapon proficiency is granted.
+ *  - `skills`:  how many skills are chosen from this class's list (0 = none).
+ *  - `tools`:  tool/instrument CHOICE markers (e.g. 'thieves-tools',
+ *             'musical-instrument'), empty when none.
+ */
+export interface MulticlassProficiencies {
+  /** Armor training granted ('light' | 'medium' | 'shields'); never 'heavy'. */
+  armor: Array<'light' | 'medium' | 'shields'>;
+  /** Martial weapon proficiency granted? */
+  martialWeapons: boolean;
+  /** Number of skills chosen from this class's skill list (0 = none). */
+  skills: number;
+  /** Tool/instrument choice markers granted (e.g. 'thieves-tools'). */
+  tools: string[];
+}
+
 /** A class' full mechanical profile. */
 export interface ClassData {
   id: string;
@@ -129,6 +156,13 @@ export interface ClassData {
   features: ClassFeature[];
   /** Subclasses (names + level only this stage). */
   subclasses: SubclassData[];
+  /**
+   * The reduced proficiencies granted when this class is taken as a NON-initial
+   * multiclass (PHB 2024, each class's "As a Multiclass Character" entry). The
+   * initial class grants its full starting proficiencies instead; see
+   * {@link MulticlassProficiencies}.
+   */
+  multiclassProficiencies: MulticlassProficiencies;
   /** Class level at which the subclass is chosen (PHB 2024 Features table). */
   subclassLevel: number;
   /** SRD-safety classification for redistribution (see file header). */
@@ -325,6 +359,8 @@ export const CLASS_CATALOG = {
       { id: 'worldTree', name: 'Path of the World Tree', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
       { id: 'zealot', name: 'Path of the Zealot', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
     ],
+    // PHB 2024 "Barbarian: As a Multiclass Character" (line ~2407): Martial weapons + training with Shields.
+    multiclassProficiencies: { armor: ['shields'], martialWeapons: true, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE BARD TRAITS" / "BARD FEATURES" (line ~2682/~2763).
@@ -459,6 +495,8 @@ export const CLASS_CATALOG = {
       { id: 'lore', name: 'College of Lore', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
       { id: 'valor', name: 'College of Valor', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
     ],
+    // PHB 2024 "Bard: As a Multiclass Character" (line ~2716): one skill of your choice, one Musical Instrument, Light armor training.
+    multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 1, tools: ['musical-instrument'] },
   },
 
   // PHB 2024 "CORE CLERIC TRAITS" / "CLERIC FEATURES" (line ~3119/~3178).
@@ -584,6 +622,8 @@ export const CLASS_CATALOG = {
       { id: 'trickery', name: 'Trickery Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
       { id: 'war', name: 'War Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
     ],
+    // PHB 2024 "Cleric: As a Multiclass Character" (line ~3158): training with Light and Medium armor and Shields.
+    multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: false, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE DRUID TRAITS" / "DRUID FEATURES" (line ~3587/~3633).
@@ -722,6 +762,8 @@ export const CLASS_CATALOG = {
       { id: 'sea', name: 'Circle of the Sea', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
       { id: 'stars', name: 'Circle of the Stars', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
     ],
+    // PHB 2024 "Druid: As a Multiclass Character" (line ~3606): training with Light armor and Shields.
+    multiclassProficiencies: { armor: ['light', 'shields'], martialWeapons: false, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE FIGHTER TRAITS" / "FIGHTER FEATURES" (line ~4086/~4156).
@@ -910,6 +952,8 @@ export const CLASS_CATALOG = {
       { id: 'eldritchKnight', name: 'Eldritch Knight', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
       { id: 'psiWarrior', name: 'Psi Warrior', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
     ],
+    // PHB 2024 "Fighter: As a Multiclass Character" (line ~4137): Martial weapons, training with Light and Medium armor and Shields.
+    multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE MONK TRAITS" / "MONK FEATURES" (line ~4479/~4544).
@@ -1104,6 +1148,8 @@ export const CLASS_CATALOG = {
       { id: 'openHand', name: 'Warrior of the Open Hand', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
       { id: 'shadow', name: 'Warrior of Shadow', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
     ],
+    // PHB 2024 "Monk: As a Multiclass Character" (line ~4509): nothing beyond the Hit Point Die.
+    multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE PALADIN TRAITS" / "PALADIN FEATURES" (line ~4817/~4871).
@@ -1269,6 +1315,8 @@ export const CLASS_CATALOG = {
       { id: 'ancients', name: 'Oath of the Ancients', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
       { id: 'vengeance', name: 'Oath of Vengeance', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
     ],
+    // PHB 2024 "Paladin: As a Multiclass Character" (line ~4845): Martial weapons, training with Light and Medium armor and Shields.
+    multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE RANGER TRAITS" / "RANGER FEATURES" (line ~5316/~5379).
@@ -1434,6 +1482,8 @@ export const CLASS_CATALOG = {
       { id: 'gloomStalker', name: 'Gloom Stalker', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
       { id: 'hunter', name: 'Hunter', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
     ],
+    // PHB 2024 "Ranger: As a Multiclass Character" (line ~5364): Martial weapons, one skill from the Ranger list, training with Light and Medium armor and Shields.
+    multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 1, tools: [] },
   },
 
   // PHB 2024 "CORE ROGUE TRAITS" / "ROGUE FEATURES" (line ~5872/~5908).
@@ -1614,6 +1664,8 @@ export const CLASS_CATALOG = {
       { id: 'soulknife', name: 'Soulknife', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
       { id: 'thief', name: 'Thief', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
     ],
+    // PHB 2024 "Rogue: As a Multiclass Character" (line ~5875): one skill from the Rogue list, Thieves' Tools, training with Light armor.
+    multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 1, tools: ['thieves-tools'] },
   },
 
   // PHB 2024 "CORE SORCERER TRAITS" / "SORCERER FEATURES" (line ~6229/~6273).
@@ -1748,6 +1800,8 @@ export const CLASS_CATALOG = {
       { id: 'draconic', name: 'Draconic Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
       { id: 'wildMagic', name: 'Wild Magic Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
     ],
+    // PHB 2024 "Sorcerer: As a Multiclass Character" (line ~6253): nothing beyond the Hit Point Die.
+    multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE WARLOCK TRAITS" / "WARLOCK FEATURES" (line ~6771/~6829).
@@ -1882,6 +1936,8 @@ export const CLASS_CATALOG = {
       { id: 'fiend', name: 'Fiend Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
       { id: 'greatOldOne', name: 'Great Old One Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
     ],
+    // PHB 2024 "Warlock: As a Multiclass Character" (line ~6782): training with Light armor only.
+    multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 0, tools: [] },
   },
 
   // PHB 2024 "CORE WIZARD TRAITS" / "WIZARD FEATURES" (line ~7320/~7395).
@@ -1998,6 +2054,8 @@ export const CLASS_CATALOG = {
       { id: 'evoker', name: 'Evoker', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
       { id: 'illusionist', name: 'Illusionist', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
     ],
+    // PHB 2024 "Wizard: As a Multiclass Character" (line ~7389): nothing beyond the Hit Point Die.
+    multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },
   },
 } as const satisfies Record<string, ClassData>;
 

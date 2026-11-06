@@ -30,7 +30,7 @@ import type { Character } from '../types/character';
 import type { ClassFeature, HitDie } from '../data/classes';
 import type { Breakdown } from './breakdown';
 import { abilityModifier, clampLevel, proficiencyBonus, MAX_LEVEL, MIN_LEVEL } from './abilities';
-import { classFeaturesByLevel, resolveClass } from './classes';
+import { classFeaturesByLevel, resolveClass, resolveClasses } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { characterHitPointMaxBreakdown } from './hit-points-state';
 import { reconcileSpellcastingForLevel } from './spellcasting';
@@ -129,36 +129,63 @@ export function canLevelUp(character: Character): boolean {
  * migration.
  */
 export interface FeatSlot {
-  /** The asi-marker level this slot was gained at. */
+  /** The asi-marker level this slot was gained at (the CLASS level, not total). */
   level: number;
+  /**
+   * The class whose asi-marker row granted this slot (PHB 2024 "Multiclassing":
+   * ASI markers are per class). Lets M4 bind a feat to the right class. Optional
+   * for backward compatibility; always set by {@link featSlots}.
+   */
+  classId?: string;
   /** A6a: no feat is selected yet, so every slot is pending. */
   pending: true;
 }
 
 /**
- * The feat/ASI-marker levels the class grants AT OR BELOW the character's level,
- * ascending. Read from classFeaturesByLevel's kind:'asi-marker' rows (PHB 2024:
- * standard classes 4/8/12/16/19; Fighter also 6 and 14; Rogue also 10 — the
- * level-19 row is the Epic Boon slot). No class = no slots.
+ * The feat/ASI-marker levels the character's classes grant AT OR BELOW each
+ * class's OWN level, ascending (PHB 2024 "Multiclassing: Class Features" —
+ * ASI markers are PER CLASS, so the slots are the UNION of each class's
+ * asi-marker rows evaluated at that class's own level, NOT the single-class
+ * count at the total level). Standard classes 4/8/12/16/19; Fighter also 6 and
+ * 14; Rogue also 10 — the level-19 row is the Epic Boon slot.
+ *
+ * The result is the flattened (NON-deduplicated) list of marker levels across
+ * all classes, so its LENGTH is the true number of feat/ASI slots: e.g.
+ * Fighter 6 / Rogue 4 → [4, 4, 6] (3 slots). A single-class character gives
+ * exactly that class's marker levels (unchanged from before). No class = [].
  */
 export function featSlotLevels(character: Character): number[] {
-  const level = clampLevel(character.level);
-  const byLevel = classFeaturesByLevel(character);
   const levels: number[] = [];
-  for (const [featureLevel, features] of byLevel) {
-    if (featureLevel > level) continue;
-    if (features.some((f) => f.kind === 'asi-marker')) levels.push(featureLevel);
+  for (const { entry, data } of resolveClasses(character)) {
+    const classLevel = clampLevel(entry.level);
+    for (const feature of data.features) {
+      if (feature.kind === 'asi-marker' && feature.level <= classLevel) {
+        levels.push(feature.level);
+      }
+    }
   }
   return levels.sort((a, b) => a - b);
 }
 
 /**
- * The feat/ASI slots a character has so far (one per asi-marker level at or
- * below their level). A6a surfaces each as a pending "choices pending"
- * placeholder; the actual feat picker is A6b.
+ * The feat/ASI slots a character has so far, one per asi-marker level at or
+ * below each class's level, tagged with the class that granted it (PHB 2024
+ * "Multiclassing": the slot belongs to the class whose asi-marker row it is, so
+ * M4 can bind a feat to the right {classId, level}). A6a/M2 surface each as a
+ * pending placeholder; the actual feat picker is A6b. For a single-class
+ * character this is one slot per that class's marker level (unchanged count).
  */
 export function featSlots(character: Character): FeatSlot[] {
-  return featSlotLevels(character).map((level) => ({ level, pending: true }));
+  const slots: FeatSlot[] = [];
+  for (const { entry, data } of resolveClasses(character)) {
+    const classLevel = clampLevel(entry.level);
+    for (const feature of data.features) {
+      if (feature.kind === 'asi-marker' && feature.level <= classLevel) {
+        slots.push({ level: feature.level, classId: data.id, pending: true });
+      }
+    }
+  }
+  return slots.sort((a, b) => a.level - b.level);
 }
 
 // ─── Per-level HP choice ─────────────────────────────────────────────────────

@@ -29,7 +29,12 @@
  * class grants at most one Unarmored Defense, and because Unarmored Defense
  * requires not wearing armour, it and a worn-armour base are never both
  * available — when a suit is worn, Unarmored Defense simply does not apply (even
- * if it would be higher). `unarmoredDefenseFor(character)` reads the class.
+ * if it would be higher). For a MULTICLASS character that has two base-AC
+ * features (only Barbarian Con-UD + Monk Wis-UD is possible with the shipped
+ * base classes), `unarmoredDefenseFor(character)` auto-picks the higher-AC one
+ * (decision 9-D) and records the superseded source so the breakdown stays
+ * explainable. `unarmoredDefenseFor(character)` reads all the character's
+ * classes.
  *
  * Functions are pure and return a Breakdown (calculated-totals steering): every
  * component — including zeros — is listed, and non-additive facts (a Dex cap, a
@@ -42,7 +47,8 @@ import { ABILITY_NAMES } from '../types/character';
 import type { ArmorData } from '../data/armor';
 import { abilityModifier } from './abilities';
 import type { Breakdown } from './breakdown';
-import { resolveClass } from './classes';
+import { resolveClasses } from './classes';
+import { effectiveAbilityScores } from './feats';
 
 /** Unarmored base AC: 10 + Dexterity modifier (PHB 2024 "Armor Class"). */
 export function baseArmorClass(dexMod: number): number {
@@ -60,6 +66,13 @@ export interface UnarmoredDefense {
   shieldAllowed: boolean;
   /** Feature name used to label the breakdown component. */
   sourceLabel: string;
+  /**
+   * When a multiclass character has TWO base-AC features (only Barbarian Con +
+   * Monk Wis is possible with the shipped base classes), the higher-AC one is
+   * auto-picked (PHB 2024 "Only One Base AC", L2106-2110) and this names the
+   * SUPERSEDED feature so the AC breakdown can state what was set aside. Absent
+   * for a single Unarmored Defense (the common case). */
+  supersededLabel?: string;
 }
 
 /**
@@ -78,14 +91,42 @@ const UNARMORED_DEFENSE_BY_CLASS: Record<string, UnarmoredDefense> = {
 
 /**
  * Resolves the character's class-granted Unarmored Defense, or undefined when
- * the class grants none (A5e / D9). Barbarian and Monk both grant it at level 1
+ * no class grants one (A5e / D9). Barbarian and Monk both grant it at level 1
  * (PHB 2024 Barbarian/Monk level-1 "Unarmored Defense"), so no level gate is
  * needed. Tolerates an unset/unknown class.
+ *
+ * PHB 2024 "Only One Base AC" (L2106-2110): a multiclass character with TWO
+ * base-AC features (only Barbarian Con-UD + Monk Wis-UD is possible with the
+ * shipped base classes) uses only ONE. This auto-picks the one that yields the
+ * higher AC (decision 9-D) — since both compute 10 + Dex + an ability mod, the
+ * winner is simply the class whose governing ability modifier is higher (ties
+ * keep the first in class order) — and records the superseded feature in
+ * `supersededLabel` for the breakdown. A single-class character (or a
+ * multiclass with only one base-AC feature) is unaffected: exactly that one
+ * Unarmored Defense, with no `supersededLabel`.
  */
 export function unarmoredDefenseFor(character: Character): UnarmoredDefense | undefined {
-  const cls = resolveClass(character);
-  if (!cls) return undefined;
-  return UNARMORED_DEFENSE_BY_CLASS[cls.id];
+  const options: UnarmoredDefense[] = [];
+  for (const { data } of resolveClasses(character)) {
+    const ud = UNARMORED_DEFENSE_BY_CLASS[data.id];
+    // A class can appear only once per character, so no de-dup is needed; guard
+    // against listing the same feature twice defensively all the same.
+    if (ud && !options.some((o) => o.sourceLabel === ud.sourceLabel)) options.push(ud);
+  }
+  if (options.length === 0) return undefined;
+  if (options.length === 1) return options[0];
+
+  // Two base-AC features: pick the higher resulting AC by the governing ability
+  // modifier (PHB "Only One Base AC"). Ties keep the first in class order.
+  const scores = effectiveAbilityScores(character);
+  let chosen = options[0];
+  for (let i = 1; i < options.length; i += 1) {
+    if (abilityModifier(scores[options[i].ability]) > abilityModifier(scores[chosen.ability])) {
+      chosen = options[i];
+    }
+  }
+  const superseded = options.find((o) => o.sourceLabel !== chosen.sourceLabel);
+  return { ...chosen, supersededLabel: superseded?.sourceLabel };
 }
 
 /**
@@ -233,6 +274,13 @@ export function armorClassBreakdown(
     const udMod = abilityModifier(scores[ud.ability]);
     const abilityLabel = ABILITY_NAMES[ud.ability];
     const total = baseArmorClass(dexMod) + udMod + shieldBonus;
+    // PHB 2024 "Only One Base AC": name the superseded base-AC feature when a
+    // multiclass character had two and this one was auto-picked as higher.
+    if (ud.supersededLabel !== undefined) {
+      notes.push(
+        `${ud.sourceLabel} gives the higher AC and is used; ${ud.supersededLabel} is set aside (PHB "Only One Base AC").`,
+      );
+    }
     return {
       total,
       components: [

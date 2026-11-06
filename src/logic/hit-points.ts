@@ -230,3 +230,102 @@ function describeComputation(
   const mode = useRolled ? 'rolled levels 2-L' : 'fixed levels 2-L';
   return `L${level} HP (d${hitDie}, ${mode})`;
 }
+
+// ─── Multiclass HP maximum (PHB 2024 "Multiclassing: Hit Points", L2094) ──────
+
+/** One class's contribution to a multiclass HP computation, in stored order. */
+export interface HitPointClassEntry {
+  /** The class's Hit Die size. */
+  hitDie: HitDie;
+  /** The character's level in THIS class (>= 1). */
+  level: number;
+}
+
+/** Options for {@link multiclassHitPointMaxBreakdown}. */
+export interface MulticlassHitPointOptions {
+  scores: AbilityScores;
+  /**
+   * Ordered class entries; the FIRST entry is the INITIAL class (it alone
+   * carries the single level-1 "max die + Con" term). Must be non-empty.
+   */
+  classes: HitPointClassEntry[];
+  /** Manual HP-max override (finite = supersedes the computed total). */
+  hpMax?: number;
+  /** Species HP-per-level rider (Dwarven Toughness); 0/undefined = none. */
+  hpPerLevel?: number;
+}
+
+/**
+ * The Hit Point maximum for a MULTICLASS character (two or more class entries),
+ * with a breakdown for a tooltip (calculated-totals steering).
+ *
+ * PHB 2024 "Multiclassing: Hit Points" (L2094): you gain the level-1 maximum
+ * Hit Die only when your TOTAL level is 1 — so across the whole character there
+ * is exactly ONE "level-1 = max die + Con" term, taken from the INITIAL class
+ * (`classes[0]`). Every other class level — and every level past 1 of the
+ * initial class — adds that class's FIXED per-level HP (Hit Die/2 + 1) + Con,
+ * each floored at a minimum of 1 ("Gaining a Level", L2014). Dwarven Toughness
+ * (+1 HP per TOTAL level) is added on top, and a finite manual override
+ * supersedes everything (mirrors the single-class path).
+ *
+ * This is the fixed-HP computation the Stage-M2 golden (HP_MAX_CASES) pins.
+ * Rolled-HP per-level records still thread through the single-class rolled path
+ * via advancement.ts for the primary class; a fuller per-class rolled-HP model
+ * is deferred (M5). The single-class path stays on
+ * {@link hitPointMaxBreakdown} and is byte-identical to before.
+ */
+export function multiclassHitPointMaxBreakdown(
+  options: MulticlassHitPointOptions,
+): Breakdown {
+  const { scores, classes, hpMax, hpPerLevel } = options;
+  const conMod = abilityModifier(scores.con);
+
+  const initial = classes[0];
+  // The single level-1 term: the INITIAL class's max Hit Die + Con, min 1.
+  const level1 = Math.max(1, initial.hitDie + conMod);
+
+  const components: BreakdownComponent[] = [
+    { label: `Level 1 (initial class, max d${initial.hitDie})`, value: level1 },
+  ];
+
+  let total = level1;
+  // Per-level fixed contributions: every class level beyond the single L1 term.
+  // For the initial class that is its levels 2..L; for every other class it is
+  // ALL of its levels (their first level is NOT the character's level 1).
+  for (let i = 0; i < classes.length; i += 1) {
+    const { hitDie, level } = classes[i];
+    const fixedPerLevel = hitDie / 2 + 1; // PHB "Fixed Hit Points by Class".
+    const perLevel = Math.max(1, fixedPerLevel + conMod); // min-1 floor per level.
+    const levelsCounted = i === 0 ? Math.max(0, level - 1) : Math.max(0, level);
+    if (levelsCounted > 0) {
+      const value = perLevel * levelsCounted;
+      total += value;
+      components.push({
+        label: `${i === 0 ? 'Levels 2-L' : 'Levels'} (d${hitDie} fixed ${perLevel}×${levelsCounted})`,
+        value,
+      });
+    }
+  }
+
+  // PHB 2024 "Dwarf Traits: Dwarven Toughness": +1 HP max per TOTAL level.
+  const totalLevel = classes.reduce((s, c) => s + c.level, 0);
+  const toughness =
+    hpPerLevel !== undefined && Number.isFinite(hpPerLevel)
+      ? hpPerLevel * totalLevel
+      : 0;
+  if (toughness !== 0) {
+    components.push({ label: 'Dwarven Toughness', value: toughness });
+    total += toughness;
+  }
+
+  // Manual override wins unconditionally (mirror the single-class path).
+  if (hpMax !== undefined && Number.isFinite(hpMax)) {
+    return {
+      total: hpMax,
+      components: [{ label: 'Manual override', value: hpMax }],
+      note: `Computed multiclass HP = ${total} (superseded by manual override)`,
+    };
+  }
+
+  return { total, components };
+}
