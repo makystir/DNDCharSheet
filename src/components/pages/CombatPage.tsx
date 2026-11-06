@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Character } from '../../types/character';
-import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
-import { effectiveAbilityScores } from '../../logic/feats';
-import { getArmor } from '../../data/armor';
+import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { resolveClass, hitDiceTotal } from '../../logic/classes';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -108,46 +106,9 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
     onChange({ ...character, hitDiceSpent: clamped });
   };
 
-  // Resolve the equipped armor/shield (A1 equipped state → inventory item →
-  // ArmorData catalog) so the compact AC strip reflects worn armour. A custom
-  // armor with no catalogId has no catalog stats, so it does not change the
-  // computed AC (unarmored); that is surfaced as no armor contribution. The
-  // consolidated DefenseReadout resolves AC the same way for its own display
-  // (P2); this breakdown is still needed here for the mobile CombatCompactBar.
-  const inventory = character.inventory ?? [];
-  const equipped = character.equipped;
-  const resolveEquippedArmor = (id: string | undefined) => {
-    if (!id) return undefined;
-    const item = inventory.find((i) => i.id === id);
-    return item?.catalogId ? getArmor(item.catalogId) : undefined;
-  };
-  const equippedArmor = resolveEquippedArmor(equipped?.armorItemId);
-  const equippedShield = resolveEquippedArmor(equipped?.shieldItemId);
-
-  // A worn armour item whose catalog lookup fails (a custom, catalog-less suit)
-  // cannot set a base AC — surface its name so the AC breakdown explains why the
-  // ticked "Worn" box left AC unchanged (finding #3). Only names a worn item
-  // that actually resolved to no ArmorData.
-  const wornArmorItem = equipped?.armorItemId
-    ? inventory.find((i) => i.id === equipped.armorItemId)
-    : undefined;
-  const wornArmorIgnoredName =
-    wornArmorItem && equippedArmor === undefined
-      ? (wornArmorItem.name ?? 'Custom armor')
-      : undefined;
-
-  // A6b: the AC reads the EFFECTIVE scores (base + feat/ASI increases) so a feat
-  // that raises Dex/Con flows to AC (effectiveAbilityScores; base abilities are
-  // never mutated). A5e: the AC passes the class-derived Unarmored Defense so
-  // the number reflects it (Barbarian → Con-based AC; Monk loses it with a
-  // Shield). Used by the mobile CombatCompactBar below.
-  const effectiveScores = effectiveAbilityScores(character);
-  const acBreakdown = armorClassBreakdown(effectiveScores, character.acOverride, {
-    armor: equippedArmor,
-    shield: equippedShield,
-    wornArmorIgnoredName,
-    unarmoredDefense: unarmoredDefenseFor(character),
-  });
+  // Shared AC assembly (effective scores, equipped armour/shield, Unarmored
+  // Defense, override). Used by the mobile CombatCompactBar below.
+  const acBreakdown = characterArmorClassBreakdown(character);
 
   const selectedClass = resolveClass(character);
   // Hit Dice total equals the character level (PHB 2024 "Hit Points"); shown as

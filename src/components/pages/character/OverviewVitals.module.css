@@ -1,0 +1,71 @@
+/* At-a-glance vitals strip for the Overview. Auto-fit grid: 2 columns on a
+   phone, more as width allows. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 8px;
+  text-align: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.value {
+  font-size: 1.8rem;
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.bloodied {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--danger, #c0392b);
+}
+
+.manage {
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+.manage:hover,
+.manage:focus-visible {
+  text-decoration: underline;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .manage {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

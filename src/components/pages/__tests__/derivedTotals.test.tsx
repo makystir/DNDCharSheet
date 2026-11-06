@@ -19,11 +19,21 @@ describe('derived totals survive the page split', () => {
   };
 
   it('CharacterPage exposes every expected CalculatedValue trigger across sub-tabs', () => {
-    // P3 Identity: Proficiency Bonus.
+    // Overview vitals strip: AC, HP, Initiative, Speed, Passive Perception,
+    // Proficiency Bonus, Darkvision and Hit Dice.
     render(<CharacterPage character={character} onChange={vi.fn()} subTab="identity" />);
-    expect(
-      screen.getByRole('button', { name: /Proficiency Bonus/ }),
-    ).toBeInTheDocument();
+    for (const name of [
+      /Armor Class/,
+      /Hit Point Maximum/,
+      /Initiative/,
+      /Speed/,
+      /Passive Perception/,
+      /Proficiency Bonus/,
+      /Darkvision/,
+      /Hit Dice remaining/,
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
     cleanup();
 
     // P3 Abilities & Skills: ability modifiers + every saving throw + every skill
@@ -46,10 +56,10 @@ describe('derived totals survive the page split', () => {
     }
     cleanup();
 
-    // P3 Build: Speed + Darkvision (species) on the merged Build tab.
+    // Class & Features no longer carries Speed/Darkvision (vitals strip only).
     render(<CharacterPage character={character} onChange={vi.fn()} subTab="build" />);
-    expect(screen.getByRole('button', { name: /Speed/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Darkvision/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Speed/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Darkvision/ })).toBeNull();
   });
 
   it('CombatPage exposes every expected CalculatedValue trigger', () => {

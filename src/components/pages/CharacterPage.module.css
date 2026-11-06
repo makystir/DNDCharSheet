@@ -4,54 +4,11 @@
   gap: 24px;
 }
 
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px 24px;
-}
-
-.nameField {
-  flex: 1 1 240px;
-  min-width: 180px;
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-}
-
-.levelField,
-.profField {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .fieldLabel {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
-}
-
-.levelValue {
-  font-size: 1.1rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-}
-
-.levelHint {
-  font-size: 0.72rem;
-  color: var(--accent-gold);
-  text-decoration: none;
-}
-
-.levelHint:hover,
-.levelHint:focus-visible {
-  text-decoration: underline;
-}
-
-.profValue {
-  font-size: 1.1rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .abilityGrid {
@@ -115,7 +72,6 @@
 }
 
 /* Species / class selection + sub-choices. */
-.speciesGrid,
 .classGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -148,11 +104,6 @@
 .speciesText {
   font-size: 1.05rem;
   color: var(--text-primary);
-}
-
-.speciesNote {
-  color: var(--text-secondary);
-  font-size: 0.82em;
 }
 
 .srdBadge {
@@ -197,48 +148,6 @@
 .traitEffect {
   color: var(--text-primary);
   font-size: 0.92rem;
-}
-
-.traitSource {
-  color: var(--text-secondary);
-  font-size: 0.72rem;
-}
-
-/* Derived species stats (Speed / Darkvision) shown with the Species section. */
-.derivedGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.derivedCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 10px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.derivedValue {
-  font-size: 2rem;
-  font-family: var(--font-heading);
-  color: var(--accent-gold);
-  font-variant-numeric: tabular-nums;
-}
-
-.derivedInput {
-  width: 72px;
-  text-align: center;
-  font-size: 1rem;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 4px 6px;
 }
 
 /* Class starting-skill choice checkboxes. */
@@ -398,10 +307,6 @@
   }
 
   .checkboxCell {
-    min-height: 44px;
-  }
-
-  .derivedInput {
     min-height: 44px;
   }
 }

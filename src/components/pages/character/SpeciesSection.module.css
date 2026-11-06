@@ -1,0 +1,103 @@
+/* SpeciesSection styles: species selector + sub-choices, size, languages and the
+   species trait list. Shown at the top of the Overview next to Personal Details. */
+.speciesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.speciesField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.speciesSelect {
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  min-height: 36px;
+}
+
+.speciesSelect:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.speciesText {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.speciesNote {
+  color: var(--text-secondary);
+  font-size: 0.82em;
+}
+
+.srdBadge {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+/* Species traits: rich rows — name on line 1 (never truncated), effect + source
+   below (ui-layout rule 5). */
+.traitList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.traitRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.traitName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.traitEffect {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+}
+
+.traitSource {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+/* Mobile: enlarge tap targets. */
+@media (hover: none), (max-width: 767px) {
+  .speciesSelect {
+    min-height: 44px;
+  }
+}

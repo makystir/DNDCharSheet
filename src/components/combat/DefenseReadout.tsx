@@ -1,12 +1,9 @@
 import { Shield } from 'lucide-react';
 import type { Character } from '../../types/character';
-import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
+import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { effectiveAbilityScores } from '../../logic/feats';
-import { getArmor } from '../../data/armor';
 import { speedBreakdown } from '../../logic/species';
-import { hitPointMaxBreakdown } from '../../logic/hit-points';
-import { resolveClass } from '../../logic/classes';
-import { resolveSpecies } from '../../logic/species';
+import { characterHitPointMaxBreakdown } from '../../logic/hit-points-state';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { formatSigned } from '../../logic/breakdown';
@@ -44,8 +41,7 @@ export interface DefenseReadoutProps {
  *
  * Every number comes from a Part 1 / A5a–A5d logic function — no rule is
  * computed here:
- *  - AC: `armorClassBreakdown(...)` with the class-derived Unarmored Defense
- *    (`unarmoredDefenseFor`) passed in, so a Barbarian with no armour shows the
+ *  - AC: `characterArmorClassBreakdown(...)` (class-derived Unarmored Defense included), so a Barbarian with no armour shows the
  *    Con-based AC and a Monk loses it with a Shield (PHB 2024 Barbarian L2446 /
  *    Monk L4534).
  *  - Speed: `speedBreakdown(character)`, which carries the worn-armour
@@ -60,51 +56,18 @@ export interface DefenseReadoutProps {
  * behind the "Adjust" collapsible (P2/P6), so the glance stays read-only.
  */
 export function DefenseReadout({ character, onChange }: DefenseReadoutProps) {
-  // Resolve equipped armour/shield (A1 equipped → inventory item → ArmorData),
-  // matching the former CombatPage Core Stats resolution so the number is
-  // identical.
-  const inventory = character.inventory ?? [];
-  const equipped = character.equipped;
-  const resolveEquippedArmor = (id: string | undefined) => {
-    if (!id) return undefined;
-    const item = inventory.find((i) => i.id === id);
-    return item?.catalogId ? getArmor(item.catalogId) : undefined;
-  };
-  const equippedArmor = resolveEquippedArmor(equipped?.armorItemId);
-  const equippedShield = resolveEquippedArmor(equipped?.shieldItemId);
-  const wornArmorItem = equipped?.armorItemId
-    ? inventory.find((i) => i.id === equipped.armorItemId)
-    : undefined;
-  const wornArmorIgnoredName =
-    wornArmorItem && equippedArmor === undefined
-      ? (wornArmorItem.name ?? 'Custom armor')
-      : undefined;
-
+  // Shared assembly (equipped armour/shield, Unarmored Defense, override) so
+  // this matches the Combat bar, the Overview and the print sheet.
   const effectiveScores = effectiveAbilityScores(character);
-  const acBreakdown = armorClassBreakdown(effectiveScores, character.acOverride, {
-    armor: equippedArmor,
-    shield: equippedShield,
-    wornArmorIgnoredName,
-    unarmoredDefense: unarmoredDefenseFor(character),
-  });
+  const acBreakdown = characterArmorClassBreakdown(character);
 
   const speed = speedBreakdown(character);
   const initBreakdown = initiativeBreakdown(effectiveScores, character.initiativeBonus);
   const ppBreakdown = passivePerceptionBreakdown(character);
 
   // HP maximum breakdown (read-only mirror; authoritative on Advancement).
-  const selectedSpecies = resolveSpecies(character);
-  const hpPerLevel = selectedSpecies?.traits.find((t) => t.mechanics?.hpPerLevel)
-    ?.mechanics?.hpPerLevel;
-  const hpBreakdown = hitPointMaxBreakdown({
-    scores: effectiveScores,
-    level: character.level,
-    hitDie: resolveClass(character)?.hitDie,
-    hpMax: character.hpMax,
-    hpPerLevel,
-    rolledHp: character.houseRules?.rolledHp,
-    rolledHpTotal: character.rolledHpTotal,
-  });
+  // Multiclass-aware (PHB 2024 "Multiclassing: Hit Points").
+  const hpBreakdown = characterHitPointMaxBreakdown(character);
 
   const combat = character.combat;
   const turn = combat?.turn;

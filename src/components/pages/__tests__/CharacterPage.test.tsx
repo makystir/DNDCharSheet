@@ -68,7 +68,7 @@ describe('CharacterPage', () => {
     );
   });
 
-  it('shows Proficiency Bonus +2 at level 1 with a breakdown', () => {
+  it('shows Proficiency Bonus +2 at level 1 with a breakdown (Overview vitals)', () => {
     renderPage({ level: 1 });
     const prof = screen.getByRole('button', { name: /Proficiency Bonus/ });
     expect(prof).toHaveTextContent('+2');
@@ -198,11 +198,22 @@ describe('CharacterPage', () => {
       expect(screen.getByText('No portrait set')).toBeInTheDocument();
     });
 
-    it('shows the read-only Level and Proficiency Bonus on identity', () => {
+    it('shows the read-only Level and Proficiency Bonus in the Overview vitals strip', () => {
       renderPage({ level: 3 });
-      expect(screen.getByText('Level')).toBeInTheDocument();
+      expect(screen.getByTestId('vital-level')).toHaveTextContent('3');
       expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Level up on Advancement' })).toBeInTheDocument();
+    });
+
+    it('puts Personal Details (with portrait) above Species and the vitals strip', () => {
+      renderPage({ level: 3 });
+      const details = screen.getByRole('heading', { name: 'Personal Details' });
+      const species = screen.getByRole('combobox', { name: 'Species' });
+      const vitals = screen.getByRole('group', { name: 'Vitals' });
+      expect(details.compareDocumentPosition(species) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(species.compareDocumentPosition(vitals) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      // Species is no longer behind a collapse and no longer on Class & Features.
+      expect(species).toBeVisible();
     });
 
     it('Ability Scores is NOT on identity (it moved to Abilities & Skills)', () => {
@@ -227,18 +238,19 @@ describe('CharacterPage', () => {
 
   describe('species', () => {
     it('shows sensible placeholders with no species selected', () => {
-      renderPage({}, 'species');
+      renderPage({}, 'identity');
       expect(
         (screen.getByRole('combobox', { name: 'Species' }) as HTMLSelectElement).value,
       ).toBe('');
+      // Speed/Darkvision are derived tiles in the Overview vitals strip (not the species card).
       expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('30 ft');
       expect(screen.getByRole('button', { name: /Darkvision/ })).toHaveTextContent(
-        'none',
+        'None',
       );
     });
 
     it('selecting a species emits a fresh species selection', () => {
-      const { onChange } = renderPage({}, 'species');
+      const { onChange } = renderPage({}, 'identity');
       fireEvent.change(screen.getByRole('combobox', { name: 'Species' }), {
         target: { value: 'dwarf' },
       });
@@ -246,29 +258,29 @@ describe('CharacterPage', () => {
     });
 
     it('Wood Elf updates Speed to 35 and Drow updates Darkvision to 120', () => {
-      renderPage({ species: { id: 'elf', elvenLineage: 'woodElf' } }, 'species');
+      renderPage({ species: { id: 'elf', elvenLineage: 'woodElf' } }, 'identity');
       expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('35 ft');
-      renderPage({ species: { id: 'elf', elvenLineage: 'drow' } }, 'species');
+      renderPage({ species: { id: 'elf', elvenLineage: 'drow' } }, 'identity');
       expect(
         screen.getAllByRole('button', { name: /Darkvision/ }).at(-1),
       ).toHaveTextContent('120 ft');
     });
 
     it('shows the resolved size for a selected species', () => {
-      renderPage({ species: { id: 'dwarf' } }, 'species');
+      renderPage({ species: { id: 'dwarf' } }, 'identity');
       expect(screen.getByText('Medium')).toBeInTheDocument();
     });
 
     it('renders sub-choice selects only for the selected species', () => {
-      renderPage({ species: { id: 'dwarf' } }, 'species');
+      renderPage({ species: { id: 'dwarf' } }, 'identity');
       expect(screen.queryByLabelText('Draconic Ancestry')).toBeNull();
 
-      renderPage({ species: { id: 'dragonborn' } }, 'species');
+      renderPage({ species: { id: 'dragonborn' } }, 'identity');
       expect(screen.getAllByLabelText('Draconic Ancestry').at(-1)).toBeInTheDocument();
     });
 
     it('renders species traits with names and effects, untruncated', () => {
-      renderPage({ species: { id: 'dwarf' } }, 'species');
+      renderPage({ species: { id: 'dwarf' } }, 'identity');
       expect(screen.getByText('Dwarven Toughness')).toBeInTheDocument();
       expect(screen.getByText(/Hit Point maximum increases/)).toBeInTheDocument();
     });
@@ -384,19 +396,19 @@ describe('CharacterPage', () => {
       const tablist = screen.getByRole('tablist');
       const tabs = within(tablist).getAllByRole('tab');
       expect(tabs.map((t) => t.textContent)).toEqual([
-        'Identity',
+        'Overview',
         'Abilities & Skills',
-        'Build',
+        'Class & Features',
       ]);
     });
 
-    it('defaults to identity (Personal Details + Level/Proficiency, no other sections)', () => {
+    it('defaults to the Overview (Personal Details + Species + vitals, no other sections)', () => {
       renderPage();
       expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
       // Ability Scores / Species / Class / Saving Throws are gated to other tabs.
       expect(screen.queryByText('Ability Scores')).toBeNull();
-      expect(screen.queryByRole('combobox', { name: 'Species' })).toBeNull();
+      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
       expect(screen.queryByRole('combobox', { name: 'Class' })).toBeNull();
       expect(screen.queryByLabelText('Dexterity save proficiency')).toBeNull();
     });
@@ -410,9 +422,9 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
     });
 
-    it('Build merges Species and Class & Features onto one tab', () => {
+    it('Class & Features holds the class editor and NOT the species editor', () => {
       renderPage({}, 'build');
-      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      expect(screen.queryByRole('combobox', { name: 'Species' })).toBeNull();
       expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
@@ -422,9 +434,9 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
     });
 
-    it('deep-links to #character/build land on the Build sub-tab', () => {
+    it('deep-links to #character/build land on the Class & Features sub-tab', () => {
       renderPage({}, 'build');
-      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
     // ── P3 migration: legacy (old four-tab) ids must not break. ──
@@ -440,9 +452,9 @@ describe('CharacterPage', () => {
       expect(screen.getByText('Ability Scores')).toBeInTheDocument();
     });
 
-    it('legacy deep links #character/species and #character/class alias to Build', () => {
+    it('legacy deep link #character/species aliases to Class & Features (id build); #character/class too', () => {
       renderPage({}, 'species');
-      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
       cleanup();
       renderPage({}, 'class');
       expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
@@ -481,10 +493,10 @@ describe('CharacterPage', () => {
           onSubTabChange={onSubTabChange}
         />,
       );
-      fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+      fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
       expect(onSubTabChange).toHaveBeenCalledWith('build');
       expect(localStorage.getItem('lastSubTab:character')).toBe('build');
-      expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
     it('a bare #character (null sub-tab) resolves to stored last-used when present', () => {
@@ -501,9 +513,21 @@ describe('CharacterPage', () => {
     });
 
     it('every CalculatedValue trigger renders in its sub-tab home', () => {
-      // Identity: Proficiency Bonus.
-      renderPage({ level: 3 }, 'identity');
-      expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
+      // Overview: the vitals strip (AC, HP max, Initiative, Speed, Passive
+      // Perception, Proficiency Bonus, Darkvision, Hit Dice).
+      renderPage({ level: 3, classes: [{ id: 'fighter', level: 3 }] }, 'identity');
+      for (const name of [
+        /Armor Class/,
+        /Hit Point Maximum/,
+        /Initiative/,
+        /Speed/,
+        /Passive Perception/,
+        /Proficiency Bonus/,
+        /Darkvision/,
+        /Hit Dice remaining/,
+      ]) {
+        expect(screen.getByRole('button', { name })).toBeInTheDocument();
+      }
 
       cleanup();
       // Abilities & Skills: ability modifiers + saves + skill checks.
@@ -513,10 +537,10 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
 
       cleanup();
-      // Build: Speed + Darkvision.
+      // Class & Features: Speed/Darkvision no longer live here (vitals strip).
       renderPage({ level: 3 }, 'build');
-      expect(screen.getByRole('button', { name: /Speed/ })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Darkvision/ })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Speed/ })).toBeNull();
+      expect(screen.queryByRole('button', { name: /Darkvision/ })).toBeNull();
     });
   });
 });

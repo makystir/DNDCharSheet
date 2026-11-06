@@ -45,6 +45,7 @@
 import type { AbilityScores, Ability, Character } from '../types/character';
 import { ABILITY_NAMES } from '../types/character';
 import type { ArmorData } from '../data/armor';
+import { getArmor } from '../data/armor';
 import { abilityModifier } from './abilities';
 import type { Breakdown } from './breakdown';
 import { resolveClasses } from './classes';
@@ -306,4 +307,36 @@ export function armorClassBreakdown(
     ],
     note: notes.length > 0 ? notes.join('; ') : undefined,
   };
+}
+
+/**
+ * The character's Armor Class breakdown, assembled from the character's own
+ * state: effective ability scores (base + feat increases), the manual override,
+ * the equipped armour/shield resolved through the inventory and armour catalog,
+ * and the class-derived Unarmored Defense. This is the single assembly shared by
+ * the Combat page, the Defenses panel, the Overview and the print sheet so every
+ * surface shows the same number. A worn item with no catalog stats is named in
+ * the note (it never invents an armour value).
+ */
+export function characterArmorClassBreakdown(character: Character): Breakdown {
+  const inventory = character.inventory ?? [];
+  const equipped = character.equipped;
+  const resolveWorn = (id: string | undefined) => {
+    if (!id) return undefined;
+    const item = inventory.find((i) => i.id === id);
+    return item?.catalogId ? getArmor(item.catalogId) : undefined;
+  };
+  const armor = resolveWorn(equipped?.armorItemId);
+  const shield = resolveWorn(equipped?.shieldItemId);
+  const wornArmorItem = equipped?.armorItemId
+    ? inventory.find((i) => i.id === equipped.armorItemId)
+    : undefined;
+  const wornArmorIgnoredName =
+    wornArmorItem && armor === undefined ? (wornArmorItem.name ?? 'Custom armor') : undefined;
+  return armorClassBreakdown(effectiveAbilityScores(character), character.acOverride, {
+    armor,
+    shield,
+    wornArmorIgnoredName,
+    unarmoredDefense: unarmoredDefenseFor(character),
+  });
 }

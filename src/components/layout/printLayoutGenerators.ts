@@ -22,7 +22,7 @@ import {
   proficiencyBonus,
 } from '../../logic/abilities';
 import { effectiveAbilityScores, characterFeats } from '../../logic/feats';
-import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
+import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { getArmor } from '../../data/armor';
 import { getWeapon } from '../../data/weapons';
 import { getEquipment } from '../../data/equipment';
@@ -251,11 +251,7 @@ export function buildAbilities(character: Character): AbilityRow[] {
 /** Proficiency bonus, AC, HP max (+ current), speed, initiative, passive Perception. */
 export function buildCoreStats(character: Character): CoreStat[] {
   const effScores = effectiveAbilityScores(character);
-  const ac = armorClassBreakdown(effScores, character.acOverride, {
-    armor: resolveEquippedArmor(character, character.equipped?.armorItemId),
-    shield: resolveEquippedArmor(character, character.equipped?.shieldItemId),
-    unarmoredDefense: unarmoredDefenseFor(character),
-  });
+  const ac = characterArmorClassBreakdown(character);
   const hpMax = characterHitPointMaxBreakdown(character);
   const currentHp = effectiveHp(character);
   const speed = speedBreakdown(character);
@@ -508,13 +504,6 @@ export function buildConditions(character: Character): string[] {
 /** Title-case a condition id for display (e.g. 'prone' → 'Prone'). */
 function conditionLabel(id: string): string {
   return id.charAt(0).toUpperCase() + id.slice(1);
-}
-
-/** Resolve the equipped ArmorData (armour or shield) for AC, or undefined. */
-function resolveEquippedArmor(character: Character, id: string | undefined) {
-  if (!id) return undefined;
-  const item = (character.inventory ?? []).find((i) => i.id === id);
-  return item?.catalogId ? getArmor(item.catalogId) : undefined;
 }
 
 /**

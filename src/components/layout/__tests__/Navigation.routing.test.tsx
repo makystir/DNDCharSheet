@@ -149,14 +149,14 @@ describe('Character sub-tab routing', () => {
     localStorage.removeItem('tabOrder:character');
   });
 
-  it('deep-links #character/species land on the Species sub-tab', async () => {
+  it('legacy deep-link #character/species lands on the Class & Features sub-tab', async () => {
     history.replaceState(null, '', '#character/species');
     render(<App />);
-    await screen.findByRole('combobox', { name: 'Species' });
+    await screen.findByRole('combobox', { name: 'Class' });
     expect(window.location.hash).toBe('#character/species');
   });
 
-  it('#character with no sub-tab lands on the default Identity tab', async () => {
+  it('#character with no sub-tab lands on the default Overview tab', async () => {
     history.replaceState(null, '', '#character');
     render(<App />);
     expect(
@@ -164,7 +164,7 @@ describe('Character sub-tab routing', () => {
     ).toBeInTheDocument();
   });
 
-  it('#character/bogus falls back to the default Identity tab when no last-used is stored', async () => {
+  it('#character/bogus falls back to the default Overview tab when no last-used is stored', async () => {
     localStorage.removeItem('lastSubTab:character');
     history.replaceState(null, '', '#character/bogus');
     render(<App />);
@@ -176,10 +176,10 @@ describe('Character sub-tab routing', () => {
   it('clicking a sub-tab updates the hash and persists last-used', async () => {
     history.replaceState(null, '', '#character');
     render(<App />);
-    // P3: the default Identity tab shows Personal Details (Ability Scores moved
+    // P3: the default Overview tab shows Personal Details (Ability Scores moved
     // to the Abilities & Skills tab).
     await screen.findByRole('heading', { name: 'Personal Details' });
-    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     await screen.findByRole('combobox', { name: 'Class' });
     expect(window.location.hash).toBe('#character/build');
     expect(localStorage.getItem('lastSubTab:character')).toBe('build');
@@ -212,9 +212,9 @@ describe('Character sub-tab routing', () => {
     const tablist = screen.getByRole('tablist');
     const tabs = within(tablist).getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual([
-      'Identity',
+      'Overview',
       'Abilities & Skills',
-      'Build',
+      'Class & Features',
     ]);
   });
 });
@@ -242,7 +242,7 @@ describe('Conditional, level-gated Spells tab', () => {
 
   /** Picks a class via the Character page's Build sub-tab (P3). */
   async function selectClass(classId: string) {
-    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const select = await screen.findByRole('combobox', { name: 'Class' });
     fireEvent.change(select, { target: { value: classId } });
   }
@@ -280,7 +280,7 @@ describe('Conditional, level-gated Spells tab', () => {
     expect(screen.queryByRole('button', { name: 'Spells' })).not.toBeInTheDocument();
     // Choose Eldritch Knight (the subclass select appears at level 3).
     fireEvent.click(navButton('Character'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });
     expect(await screen.findByRole('button', { name: 'Spells' })).toBeInTheDocument();
@@ -342,7 +342,7 @@ describe('Conditional, level-gated Spells tab', () => {
     await selectClass('fighter');
     await setLevelOnAdvancement(3);
     fireEvent.click(navButton('Character'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Build' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const subclass = await screen.findByRole('combobox', { name: 'Subclass' });
     fireEvent.change(subclass, { target: { value: 'eldritchKnight' } });
     const spellsTab = await screen.findByRole('button', { name: 'Spells' });
@@ -498,4 +498,3 @@ describe('Reactive route guard (character invalidated while #spells active)', ()
     await waitFor(() => expect(screen.getByTestId('page')).toHaveTextContent('character'));
   });
 });
-

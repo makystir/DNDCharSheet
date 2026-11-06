@@ -8,8 +8,7 @@ import {
   proficiencyBonusBreakdown,
 } from '../../logic/abilities';
 import { effectiveAbilityScores } from '../../logic/feats';
-import { armorClassBreakdown, unarmoredDefenseFor } from '../../logic/armor-class';
-import { getArmor } from '../../data/armor';
+import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { characterHitPointMaxBreakdown } from '../../logic/hit-points-state';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
@@ -90,13 +89,6 @@ function goBackToMyCharacters(): void {
   window.dispatchEvent(new HashChangeEvent('hashchange'));
 }
 
-/** Resolve the equipped ArmorData (armour or shield) for AC, or undefined. */
-function resolveEquipped(character: Character, id: string | undefined) {
-  if (!id) return undefined;
-  const item = (character.inventory ?? []).find((i) => i.id === id);
-  return item?.catalogId ? getArmor(item.catalogId) : undefined;
-}
-
 export function SharedCharacterViewer({ encoded }: SharedCharacterViewerProps) {
   const [state, setState] = useState<LoadState>({ phase: 'loading' });
 
@@ -151,11 +143,7 @@ export function SharedCharacterViewer({ encoded }: SharedCharacterViewerProps) {
   const cls = resolveClass(character);
   const species = resolveSpecies(character);
 
-  const acBreakdown = armorClassBreakdown(effScores, character.acOverride, {
-    armor: resolveEquipped(character, character.equipped?.armorItemId),
-    shield: resolveEquipped(character, character.equipped?.shieldItemId),
-    unarmoredDefense: unarmoredDefenseFor(character),
-  });
+  const acBreakdown = characterArmorClassBreakdown(character);
   const hpBreakdown = characterHitPointMaxBreakdown(character);
   const initBreakdown = initiativeBreakdown(effScores, character.initiativeBonus);
   const ppBreakdown = passivePerceptionBreakdown(character);

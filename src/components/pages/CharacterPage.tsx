@@ -12,7 +12,6 @@ import {
 } from '../../types/character';
 import {
   abilityModifierBreakdown,
-  proficiencyBonusBreakdown,
   clampAbilityScore,
 } from '../../logic/abilities';
 import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats';
@@ -27,17 +26,9 @@ import {
 } from '../../logic/classes';
 import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
 import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
-import {
-  darkvisionBreakdown,
-  resolveSize,
-  resolveSpecies,
-  speciesTraits,
-  speedBreakdown,
-} from '../../logic/species';
 import { shouldResetSpellcasting } from '../../logic/spellcasting';
-import { knownLanguages } from '../../logic/languages';
-import { SPECIES_LIST, getSpecies } from '../../data/species';
-import type { SpeciesChoiceSpec, SpeciesData } from '../../data/species';
+import { getSpecies } from '../../data/species';
+import type { SpeciesChoiceSpec } from '../../data/species';
 import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
 import type { ClassEntry, SpeciesSelection } from '../../types/character';
@@ -46,10 +37,12 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
+import { SpeciesSection } from './character/SpeciesSection';
+import { OverviewVitals } from './character/OverviewVitals';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
-import { SIZE_LABELS, choiceOptions, formatLanguage, srdBadge } from './sheet-helpers';
+import { srdBadge } from './sheet-helpers';
 import styles from './CharacterPage.module.css';
 
 export interface CharacterPageProps {
@@ -77,9 +70,9 @@ type CharSubTab = 'identity' | 'abilities' | 'build';
 const VALID_SUBTABS: CharSubTab[] = ['identity', 'abilities', 'build'];
 
 const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
-  { id: 'identity', label: 'Identity' },
+  { id: 'identity', label: 'Overview' },
   { id: 'abilities', label: 'Abilities & Skills' },
-  { id: 'build', label: 'Build' },
+  { id: 'build', label: 'Class & Features' },
 ];
 
 /**
@@ -88,10 +81,10 @@ const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
  * {identity,abilities,build}. A stored `lastSubTab:character` or a deep-link
  * hash (#character/<old-id>) holding an OLD id is mapped to its NEW home so the
  * page opens on the equivalent tab instead of a blank/broken state:
- *   overview → identity   (personal details + level live on Identity)
+ *   overview → identity   (personal details + level live on the Overview, id 'identity')
  *   skills   → abilities  (saves & skills live on Abilities & Skills)
- *   species  → build      (species lives on Build)
- *   class    → build      (class & features live on Build)
+ *   species  → build      (species now lives on the Overview)
+ *   class    → build      (class & features live on Class & Features, id 'build')
  * Any id not in this map and not a current valid id falls back to the default
  * (first) tab. The stored `tabOrder:character` of OLD ids is handled separately
  * by reconcileTabOrder (tab-order-store.ts): it drops the unknown old ids and
@@ -113,9 +106,9 @@ function aliasSubTab(value: string | null | undefined): CharSubTab | null {
 }
 
 /**
- * The Character tab: Identity (personal details + level/proficiency), Abilities
+ * The Character tab: Overview (personal details + species + the vitals strip), Abilities
  * & Skills (the six ability scores + derived modifiers WITH saving throws and
- * skills), and Build (Species incl. Speed/Darkvision + Class & features). Every
+ * skills), and Class & Features (class, subclass, skills + feature list). Every
  * CalculatedValue call-site is preserved; the sections are only regrouped.
  */
 export function CharacterPage({
@@ -289,20 +282,6 @@ export function CharacterPage({
     onChange({ ...character, species: next });
   };
 
-  const selectedSpecies: SpeciesData | undefined = resolveSpecies(character);
-  // Languages: Common is always known (prepended by resolveLanguages, via
-  // knownLanguages) plus the player's chosen additional languages AND any
-  // base-class feature grants (Rogue L1 Thieves' Cant + 1 choice, Ranger L2
-  // Deft Explorer + 2 choices — PHB 2024). 2024 species grant no fixed
-  // languages (PHB 2024 "Choose Languages", L1294). The stored ids are
-  // lowercase; title-case them for display.
-  const knownLangs = knownLanguages(character);
-  const speedBd = speedBreakdown(character);
-  const darkvisionBd = darkvisionBreakdown(character);
-  const size = resolveSize(character);
-  const traits = speciesTraits(character);
-
-  const profBreakdown = proficiencyBonusBreakdown(character.level);
   // Effective ability scores (base + feat increases) drive the displayed
   // modifier and every derived total; the base-score editor stays the creation
   // value (A6b). effectiveAbilityScores is pure and never mutates abilities.
@@ -381,28 +360,12 @@ export function CharacterPage({
             onPortraitRemove={onPortraitRemove ?? (() => {})}
           />
 
-          <Card>
-            <div className={styles.header}>
-          {/* P4: Level is READ-ONLY here; it is authoritative on the Advancement
-              tab. The hint links to Advancement to level up. */}
-          <div className={styles.levelField}>
-            <span className={styles.fieldLabel}>Level</span>
-            <span className={styles.levelValue}>{character.level}</span>
-            <a className={styles.levelHint} href="#advancement">
-              Level up on Advancement
-            </a>
-          </div>
-
-          <div className={styles.profField}>
-            <span className={styles.fieldLabel}>Proficiency Bonus</span>
-            <span className={styles.profValue}>
-              <CalculatedValue label="Proficiency Bonus" breakdown={profBreakdown}>
-                {formatSigned(profBreakdown.total)}
-              </CalculatedValue>
-            </span>
-          </div>
-        </div>
-      </Card>
+          <SpeciesSection
+            character={character}
+            onSpeciesChange={setSpecies}
+            onSpeciesChoiceChange={setSpeciesChoice}
+          />
+          <OverviewVitals character={character} />
         </>
       )}
 
@@ -560,122 +523,6 @@ export function CharacterPage({
 
       {activeSubTab === 'build' && (
         <>
-      <Card>
-        <CollapsibleSection title="Species" storageKey="dnd-collapse-species">
-          <div className={styles.speciesGrid}>
-            <div className={styles.speciesField}>
-              <label className={styles.fieldLabel} htmlFor="species-select">
-                Species
-              </label>
-              <select
-                id="species-select"
-                className={styles.speciesSelect}
-                value={character.species?.id ?? ''}
-                aria-label="Species"
-                onChange={(e) => setSpecies(e.target.value)}
-              >
-                <option value="">— None —</option>
-                {SPECIES_LIST.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              {selectedSpecies && (
-                <span
-                  className={styles.srdBadge}
-                  title={srdBadge(selectedSpecies.srd).title}
-                >
-                  {srdBadge(selectedSpecies.srd).text}
-                </span>
-              )}
-            </div>
-
-            {selectedSpecies?.choices?.map((spec) => {
-              const value =
-                (character.species?.[spec.field] as string | undefined) ?? '';
-              const options = choiceOptions(spec);
-              const selectId = `species-choice-${spec.field}`;
-              return (
-                <div key={spec.field} className={styles.speciesField}>
-                  <label className={styles.fieldLabel} htmlFor={selectId}>
-                    {spec.label}
-                  </label>
-                  <select
-                    id={selectId}
-                    className={styles.speciesSelect}
-                    value={value}
-                    aria-label={spec.label}
-                    onChange={(e) => setSpeciesChoice(spec.field, e.target.value)}
-                  >
-                    <option value="">choose…</option>
-                    {options.map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.label}
-                        {o.note ? ` (${o.note})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-            })}
-
-            <div className={styles.speciesField}>
-              <span className={styles.fieldLabel}>Size</span>
-              <span className={styles.speciesText}>
-                {size ? SIZE_LABELS[size] : '—'}
-              </span>
-            </div>
-
-            <div className={styles.speciesField}>
-              <span className={styles.fieldLabel}>Languages</span>
-              <span className={styles.speciesText}>
-                {knownLangs.map(formatLanguage).join(', ')}
-                {knownLangs.length === 1 && (
-                  <span className={styles.speciesNote}>
-                    {' '}
-                    (choose more in character creation)
-                  </span>
-                )}
-              </span>
-            </div>
-
-          </div>
-
-          <div className={styles.derivedGrid}>
-            <div className={styles.derivedCard}>
-              <span className={styles.fieldLabel}>Speed</span>
-              <span className={styles.derivedValue}>
-                <CalculatedValue label="Speed" breakdown={speedBd}>
-                  {speedBd.total} ft
-                </CalculatedValue>
-              </span>
-            </div>
-
-            <div className={styles.derivedCard}>
-              <span className={styles.fieldLabel}>Darkvision</span>
-              <span className={styles.derivedValue}>
-                <CalculatedValue label="Darkvision" breakdown={darkvisionBd}>
-                  {darkvisionBd.total > 0 ? `${darkvisionBd.total} ft` : 'none'}
-                </CalculatedValue>
-              </span>
-            </div>
-          </div>
-
-          {traits.length > 0 && (
-            <ul className={styles.traitList} aria-label="Species Traits">
-              {traits.map((trait) => (
-                <li key={trait.name} className={styles.traitRow}>
-                  <span className={styles.traitName}>{trait.name}</span>
-                  <span className={styles.traitEffect}>{trait.effect}</span>
-                  <span className={styles.traitSource}>source: {trait.source}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CollapsibleSection>
-      </Card>
-
       <Card>
         <CollapsibleSection title="Class" storageKey="dnd-collapse-class">
           <div className={styles.classGrid}>
