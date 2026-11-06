@@ -22,6 +22,7 @@ import { createCharacter } from '../storage/character-store';
 import { SPECIES_LIST, getSpecies, type SpeciesId } from '../data/species';
 import { CLASS_LIST, type ClassId } from '../data/classes';
 import { BACKGROUND_LIST, type BackgroundId } from '../data/backgrounds';
+import { DEITY_LIST } from '../data/deities';
 import { SKILLS, type SkillId } from '../types/character';
 import {
   firstNamesFor,
@@ -150,6 +151,15 @@ export function generatePersonality(rng: RNG): string {
   return pick(rng, PERSONALITY_TRAITS);
 }
 
+/**
+ * Pick a deity NAME from the Gods of Greyhawk catalog (DMG 2024, src/data/
+ * deities.ts). Descriptive flavour only (the stored `faith` stays free text);
+ * the catalog carries no mechanic (rules-compliance rule 1).
+ */
+export function generateDeity(rng: RNG): string {
+  return pick(rng, DEITY_LIST.map((d) => d.name));
+}
+
 /** Options to steer random-character generation. */
 export interface RandomCharacterOptions {
   /** Force a species; otherwise random from SPECIES_LIST. */
@@ -248,6 +258,7 @@ export function generateRandomCharacter(
     ...character,
     gender,
     alignment: generateAlignment(rng),
+    faith: generateDeity(rng),
     personality: generatePersonality(rng),
   };
 

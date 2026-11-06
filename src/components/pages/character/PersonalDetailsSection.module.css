@@ -50,6 +50,32 @@
   outline-offset: 1px;
 }
 
+/* A text input that doubles as a combo (free text + <datalist> suggestions).
+   Mirrors the .select look so the Faith / Deity combo matches neighbouring
+   controls. */
+.comboInput {
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: inherit;
+  min-height: 28px;
+  width: 100%;
+}
+
+.comboInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* The deity overview hint trigger (ℹ) sits next to the combo when the current
+   faith matches a catalog deity. */
+.deityHintTrigger {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
 .personalityField {
   display: flex;
   flex-direction: column;
@@ -132,6 +158,11 @@
   }
 
   .select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .comboInput {
     min-height: 44px;
     font-size: 16px;
   }

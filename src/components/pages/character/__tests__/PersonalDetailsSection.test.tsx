@@ -24,7 +24,10 @@ describe('PersonalDetailsSection', () => {
     expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Alignment' })).toBeInTheDocument();
     expect(screen.getByLabelText('Personality')).toBeInTheDocument();
-    for (const label of ['Faith / Deity', 'Age', 'Height', 'Weight', 'Eyes', 'Hair', 'Skin', 'Background']) {
+    // Faith / Deity is now a combo (text input with a <datalist>, so its
+    // implicit ARIA role is combobox).
+    expect(screen.getByRole('combobox', { name: 'Faith / Deity' })).toBeInTheDocument();
+    for (const label of ['Age', 'Height', 'Weight', 'Eyes', 'Hair', 'Skin', 'Background']) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }
   });
@@ -50,13 +53,17 @@ describe('PersonalDetailsSection', () => {
     expect(onChange.mock.calls.at(-1)?.[0].alignment).toBeUndefined();
   });
 
-  it('editing a text field (Faith) emits the updated value', () => {
+  it('the Faith / Deity combo accepts free text (homebrew deities allowed)', () => {
     const { onChange } = renderSection();
-    fireEvent.click(screen.getByRole('button', { name: 'Faith / Deity' }));
-    const input = screen.getByRole('textbox', { name: 'Faith / Deity' });
+    const input = screen.getByRole('combobox', { name: 'Faith / Deity' });
     fireEvent.change(input, { target: { value: 'Sigmar' } });
-    fireEvent.blur(input);
     expect(onChange.mock.calls.at(-1)?.[0].faith).toBe('Sigmar');
+  });
+
+  it('rolling a deity fills faith with a canonical catalog name', () => {
+    const { onChange } = renderSection();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll deity' }));
+    expect(onChange.mock.calls.at(-1)?.[0].faith).toBeTruthy();
   });
 
   it('editing the Personality textarea emits the updated value', () => {

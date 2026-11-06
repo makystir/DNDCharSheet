@@ -794,7 +794,12 @@ export interface Character {
 
   /** Alignment — a PHB 2024 nine-alignment label or "Unaligned" (descriptive, not a mechanic). */
   alignment?: Alignment;
-  /** Faith / patron deity (free text; PHB 2024 lists deities as flavour, no mechanic here). */
+  /**
+   * Faith / patron deity (free text; no mechanic here). The DMG 2024 "Gods of
+   * Greyhawk" catalog (src/data/deities.ts) powers a suggestion list for this
+   * field, but the stored value stays free text so homebrew / other-setting
+   * deities are still allowed.
+   */
   faith?: string;
   /** Age (free text — species lifespans vary; no validation). */
   age?: string;

@@ -39,7 +39,9 @@ import {
   generateName,
   generateAppearance,
   generatePersonality,
+  generateDeity,
 } from '../../logic/personal-details-generation';
+import { DEITY_LIST } from '../../data/deities';
 import type { NameGender } from '../../data/name-tables';
 import { createDefaultRng } from '../../logic/random';
 import { formatSigned, type Breakdown } from '../../logic/breakdown';
@@ -139,8 +141,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     eyes: string;
     hair: string;
     skin: string;
+    faith: string;
     personality: string;
-  }>({ age: '', height: '', weight: '', eyes: '', hair: '', skin: '', personality: '' });
+  }>({ age: '', height: '', weight: '', eyes: '', hair: '', skin: '', faith: '', personality: '' });
 
   // Step 5: Equipment.
   const [equipmentChoice, setEquipmentChoice] = useState<EquipmentChoice>('A');
@@ -352,6 +355,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
   const genPersonality = () => setDetails((prev) => ({ ...prev, personality: generatePersonality(rng) }));
   const genAlignment = () => setAlignment(ALIGNMENTS[Math.floor(rng() * ALIGNMENTS.length)]);
+  const genFaith = () => setDetails((prev) => ({ ...prev, faith: generateDeity(rng) }));
 
   // ─── Completion ─────────────────────────────────────────────────────────
 
@@ -386,6 +390,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       ...(details.eyes ? { eyes: details.eyes } : {}),
       ...(details.hair ? { hair: details.hair } : {}),
       ...(details.skin ? { skin: details.skin } : {}),
+      ...(details.faith ? { faith: details.faith } : {}),
       ...(details.personality ? { personality: details.personality } : {}),
     };
 
@@ -999,6 +1004,35 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           ))}
         </select>
         <button type="button" className={styles.genBtn} onClick={genAlignment} aria-label="Generate alignment">
+          🎲
+        </button>
+      </div>
+
+      {/* Faith / Deity: a <datalist> of the 27 Gods of Greyhawk suggestions
+          plus free text (homebrew / other-setting deities stay allowed). The
+          🎲 picks a random catalog deity. */}
+      <div className={styles.genRow}>
+        <label className={styles.fieldLabel} htmlFor="wiz-faith">
+          Faith / Deity (optional)
+        </label>
+        <input
+          id="wiz-faith"
+          className={styles.textInput}
+          type="text"
+          list="wiz-faith-list"
+          value={details.faith}
+          aria-label="Faith / Deity"
+          placeholder="Deity name or homebrew"
+          onChange={(e) => setDetails((prev) => ({ ...prev, faith: e.target.value }))}
+        />
+        <datalist id="wiz-faith-list">
+          {DEITY_LIST.map((d) => (
+            <option key={d.id} value={d.name}>
+              {d.epithet}
+            </option>
+          ))}
+        </datalist>
+        <button type="button" className={styles.genBtn} onClick={genFaith} aria-label="Generate deity">
           🎲
         </button>
       </div>

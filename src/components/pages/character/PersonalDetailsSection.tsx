@@ -4,7 +4,10 @@ import { ALIGNMENTS } from '../../../types/character';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { EditableField } from '../../shared/EditableField';
+import { ContentTooltip } from '../../shared/ContentTooltip';
+import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
+import { DEITY_LIST } from '../../../data/deities';
 import { User } from 'lucide-react';
 import type { NameGender } from '../../../data/name-tables';
 import {
@@ -51,6 +54,8 @@ export function PersonalDetailsSection({
   const headerId = useId();
   const alignmentId = useId();
   const genderId = useId();
+  const faithId = useId();
+  const faithListId = useId();
   const personalityId = useId();
 
   const setField = (field: keyof Character, value: string) =>
@@ -83,6 +88,26 @@ export function PersonalDetailsSection({
   const rollAlignment = () => {
     const next = ALIGNMENTS[Math.floor(createDefaultRng()() * ALIGNMENTS.length)];
     onChange({ ...character, alignment: next });
+  };
+  // Pick a random deity NAME from the Gods of Greyhawk catalog (free text stays
+  // allowed; this only fills the field with a canonical suggestion).
+  const rollFaith = () => {
+    const next = DEITY_LIST[Math.floor(createDefaultRng()() * DEITY_LIST.length)];
+    onChange({ ...character, faith: next.name });
+  };
+
+  // When the current faith value matches a catalog deity, surface its overview
+  // (epithet, home plane, typical worshipers, symbol) as an informational hint.
+  const matchedDeity = DEITY_LIST.find(
+    (d) => d.name.toLowerCase() === (character.faith ?? '').trim().toLowerCase(),
+  );
+  const deityHint: TooltipContent | undefined = matchedDeity && {
+    title: `${matchedDeity.name}${matchedDeity.epithet ? `, ${matchedDeity.epithet}` : ''}`,
+    sections: [
+      { label: 'Home Plane', text: matchedDeity.homePlane },
+      { label: 'Typical Worshipers', text: matchedDeity.worshipers },
+      { label: 'Symbol', text: matchedDeity.symbol },
+    ],
   };
 
   return (
@@ -182,11 +207,52 @@ export function PersonalDetailsSection({
               </div>
             </div>
 
-            <EditableField
-              label="Faith / Deity"
-              value={character.faith ?? ''}
-              onSave={(v) => setField('faith', String(v))}
-            />
+            {/* Faith / Deity is a COMBO: a <datalist> of the 27 Gods of
+                Greyhawk suggestions plus free text, so homebrew / other-setting
+                deities are not blocked. The stored value is the deity name
+                string. A 🎲 picks a random catalog deity; when the value matches
+                a catalog deity, an ℹ hint shows its overview. */}
+            <div className={styles.selectWrapper}>
+              <div className={styles.personalityHeader}>
+                <label className={styles.selectLabel} htmlFor={faithId}>
+                  Faith / Deity
+                </label>
+                {deityHint && (
+                  <ContentTooltip content={deityHint} className={styles.deityHintTrigger}>
+                    <span aria-label={`About ${matchedDeity!.name}`}>ℹ</span>
+                  </ContentTooltip>
+                )}
+              </div>
+              <div className={styles.fieldWithRoll}>
+                <input
+                  id={faithId}
+                  type="text"
+                  className={styles.comboInput}
+                  list={faithListId}
+                  value={character.faith ?? ''}
+                  aria-label="Faith / Deity"
+                  placeholder="Deity name or homebrew"
+                  onChange={(e) => setField('faith', e.target.value)}
+                  style={{ flex: 1 }}
+                />
+                <datalist id={faithListId}>
+                  {DEITY_LIST.map((d) => (
+                    <option key={d.id} value={d.name}>
+                      {d.epithet}
+                    </option>
+                  ))}
+                </datalist>
+                <button
+                  type="button"
+                  className={styles.rollBtn}
+                  onClick={rollFaith}
+                  aria-label="Roll deity"
+                  title="Roll a random deity"
+                >
+                  🎲
+                </button>
+              </div>
+            </div>
             <div className={styles.fieldWithRoll}>
               <EditableField
                 label="Age"
