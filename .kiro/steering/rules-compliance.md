@@ -12,7 +12,6 @@ Reference these documents (in priority order) when implementing or modifying any
 2. Dungeon Master's Guide (2024) — DM-facing rules, magic items, optional/variant rules — *(add to the project and link here when available)*
 3. Monster Manual (2024) — stat blocks, creature rules — *(add to the project and link here when available)*
 4. Sage Advice Compendium / official errata (overrides the core books where they conflict) — *(add to the project and link here when available)*
-5. System Reference Document (SRD 5.2) — the openly licensed subset; use to confirm what content is safe to redistribute — *(add to the project and link here when available)*
 
 > When you add a reference document, place it in the project and update this list with a `#[[file:<path>]]` link so it is pulled into context automatically. Keep the priority order above.
 
@@ -26,12 +25,10 @@ Reference these documents (in priority order) when implementing or modifying any
 
 4. **Rules-as-written by default; variants are opt-in.** Implement the core rules as written. Optional and variant rules (e.g. flanking, variant encumbrance, proficiency dice, alternative resting) must not change default behaviour — gate them behind an explicit toggle/house-rule setting, and cite the book and page where the variant is defined.
 
-5. **Respect content licensing.** Prefer SRD-safe content for any redistributable data (names, descriptions, stat blocks). When implementing or transcribing content that is NOT in the SRD, flag it so the user can decide how to handle it. Never reproduce long verbatim passages of non-SRD text; transcribe only the mechanical values needed and paraphrase descriptions.
+5. **Verify before implementing.** When implementing any game mechanic (ability modifiers, proficiency bonus, AC, HP, spell save DC, attack/damage, skill checks, saving throws, conditions, rests, class/species features), read the relevant rules section first to confirm the formula/rule. Do not rely on memory or assumptions.
 
-6. **Verify before implementing.** When implementing any game mechanic (ability modifiers, proficiency bonus, AC, HP, spell save DC, attack/damage, skill checks, saving throws, conditions, rests, class/species features), read the relevant rules section first to confirm the formula/rule. Do not rely on memory or assumptions.
+6. **Cite the source.** When implementing a rule, note which book and page/section it comes from in a code comment (e.g., `// PHB 2024 p.XX: Proficiency Bonus by level`). For errata-driven behaviour, cite the Sage Advice entry.
 
-7. **Cite the source.** When implementing a rule, note which book and page/section it comes from in a code comment (e.g., `// PHB 2024 p.XX: Proficiency Bonus by level`). For errata-driven behaviour, cite the Sage Advice entry.
+7. **Flag ambiguities.** If a rule is unclear or could be interpreted multiple ways, flag it to the user rather than picking an interpretation silently. D&D has many edge cases (stacking bonuses, "bonus" vs "modifier", advantage interactions) — surface them.
 
-8. **Flag ambiguities.** If a rule is unclear or could be interpreted multiple ways, flag it to the user rather than picking an interpretation silently. D&D has many edge cases (stacking bonuses, "bonus" vs "modifier", advantage interactions) — surface them.
-
-9. **New rulebooks.** Any new rules documents added to the project (supplements, adventure-specific rules, Unearthed Arcana the user opts into) should be treated as additional authoritative sources and referenced where relevant, respecting the edition-precedence and licensing rules above.
+8. **New rulebooks.** Any new rules documents added to the project (supplements, adventure-specific rules, Unearthed Arcana the user opts into) should be treated as additional authoritative sources and referenced where relevant, respecting the edition-precedence rules above.

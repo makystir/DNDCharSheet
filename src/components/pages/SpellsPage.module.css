@@ -165,9 +165,12 @@
   }
 }
 
+/* The label gets a real flex-basis (not 0) so that, in the wrapping .pickRow,
+   a "Concentrating" toggle drops to its own line when the cell is narrow
+   instead of squeezing the spell name down to a few letters per line. */
 .pickLabel {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 8rem;
+  min-width: min(8rem, 100%);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -181,7 +184,9 @@
 }
 
 .pickName {
-  overflow-wrap: anywhere;
+  /* Break between words; only split inside a word if a single word is wider
+     than the whole cell. (`anywhere` made names break between every letter.) */
+  overflow-wrap: break-word;
   color: var(--text-primary);
 }
 
