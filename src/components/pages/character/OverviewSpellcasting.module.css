@@ -1,16 +1,21 @@
-/* Spellcasting summary for the Overview (casters only). */
+/* Spellcasting summary for the Overview (casters only). The wrapper stacks the
+   Spellcasting card and the Spell Slots card with the page's section gap. */
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--section-gap, 16px);
   min-width: 0;
+}
+/* The shared Card adds a sibling margin; the flex gap already spaces the cards. */
+.wrap.wrap > :not(.never) {
+  margin: 0;
 }
 .list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   list-style: none;
-  margin: 0 0 8px;
+  margin: 0;
   padding: 0;
 }
 .row {
@@ -41,16 +46,4 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
-}
-.manage {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  font-size: 0.8rem;
-  color: var(--accent-gold);
-  text-decoration: none;
-}
-.manage:hover,
-.manage:focus-visible {
-  text-decoration: underline;
 }

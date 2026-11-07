@@ -12,8 +12,7 @@
  * Frightened, Grappled, Incapacitated, Invisible, Paralyzed, Petrified,
  * Poisoned, Prone, Restrained, Stunned, Unconscious. There is no discrepancy
  * from the expected 15. Each entry carries a `// PHB 2024` line citation to its
- * own glossary entry and a conservative `srd: false` flag (rules-compliance
- * rules 5 and 7). Mechanical VALUES (5 feet, x10 weight, -2 x level, ...) are
+ * own glossary entry (rules-compliance rule 7). Mechanical VALUES (5 feet, x10 weight, -2 x level, ...) are
  * transcribed exactly; the prose in `description` / `effects` / `endsWhen` is
  * written in our own words and is NOT a copy of the PHB sentences.
  *
@@ -124,8 +123,6 @@ export interface ConditionData {
   endsWhen?: string;
   /** Conditions this one also applies (read-only derived information). */
   implies: ConditionId[];
-  /** Conservative SRD flag; false (flagged) until the user confirms. */
-  srd: boolean;
   /** Per-entry PHB 2024 citation (glossary entry + markdown line). */
   source: string;
 }
@@ -147,7 +144,6 @@ export const CONDITIONS: ConditionData[] = [
       ownAttacks: 'disadvantage',
     },
     implies: [],
-    srd: false,
     // PHB 2024 "Blinded [Condition]" (Docs/PlayersHandbook.md L20675-20681)
     source: 'PHB 2024 "Blinded" (Docs/PlayersHandbook.md L20675-20681)',
   },
@@ -161,7 +157,6 @@ export const CONDITIONS: ConditionData[] = [
     ],
     mechanics: { cannotHarmCharmer: true, charmerSocialAdvantage: true },
     implies: [],
-    srd: false,
     // PHB 2024 "Charmed [Condition]" (L20812-20818)
     source: 'PHB 2024 "Charmed" (Docs/PlayersHandbook.md L20812-20818)',
   },
@@ -172,7 +167,6 @@ export const CONDITIONS: ConditionData[] = [
     effects: ['You cannot hear, so any ability check that relies on hearing fails automatically.'],
     mechanics: { cannotHear: true, autoFailChecksRequiring: 'hearing' },
     implies: [],
-    srd: false,
     // PHB 2024 "Deafened [Condition]" (L20939-20943)
     source: 'PHB 2024 "Deafened" (Docs/PlayersHandbook.md L20939-20943)',
   },
@@ -197,7 +191,6 @@ export const CONDITIONS: ConditionData[] = [
     },
     endsWhen: 'Each Long Rest removes 1 level, and the condition ends once your level reaches 0.',
     implies: [],
-    srd: false,
     // PHB 2024 "Exhaustion [Condition]" (L21018-21028)
     source: 'PHB 2024 "Exhaustion" (Docs/PlayersHandbook.md L21018-21028)',
   },
@@ -216,7 +209,6 @@ export const CONDITIONS: ConditionData[] = [
       cannotApproachSource: true,
     },
     implies: [],
-    srd: false,
     // PHB 2024 "Frightened [Condition]" (L21062-21068)
     source: 'PHB 2024 "Frightened" (Docs/PlayersHandbook.md L21062-21068)',
   },
@@ -237,7 +229,6 @@ export const CONDITIONS: ConditionData[] = [
     endsWhen:
       'You break free by using your action on a Strength (Athletics) or Dexterity (Acrobatics) check against the escape DC. It also ends if the grappler becomes Incapacitated or the grapple\u2019s range is exceeded.',
     implies: [],
-    srd: false,
     // PHB 2024 "Grappled [Condition]" (L21070-21078); escape rules "Grappling" (L21092)
     source: 'PHB 2024 "Grappled" (Docs/PlayersHandbook.md L21070-21078, L21092)',
   },
@@ -258,7 +249,6 @@ export const CONDITIONS: ConditionData[] = [
       initiative: 'disadvantage',
     },
     implies: [],
-    srd: false,
     // PHB 2024 "Incapacitated [Condition]" (L21184-21192)
     source: 'PHB 2024 "Incapacitated" (Docs/PlayersHandbook.md L21184-21192)',
   },
@@ -283,7 +273,6 @@ export const CONDITIONS: ConditionData[] = [
       ownAttacks: 'advantage-unless-seen',
     },
     implies: [],
-    srd: false,
     // PHB 2024 "Invisible [Condition]" (L21261-21269)
     source: 'PHB 2024 "Invisible" (Docs/PlayersHandbook.md L21261-21269)',
   },
@@ -305,7 +294,6 @@ export const CONDITIONS: ConditionData[] = [
       critWithin5ft: true,
     },
     implies: ['incapacitated'],
-    srd: false,
     // PHB 2024 "Paralyzed [Condition]" (L21344-21356)
     source: 'PHB 2024 "Paralyzed" (Docs/PlayersHandbook.md L21344-21356)',
   },
@@ -334,7 +322,6 @@ export const CONDITIONS: ConditionData[] = [
       immuneToPoisoned: true,
     },
     implies: ['incapacitated'],
-    srd: false,
     // PHB 2024 "Petrified [Condition]" (L21370-21382)
     source: 'PHB 2024 "Petrified" (Docs/PlayersHandbook.md L21370-21382)',
   },
@@ -345,7 +332,6 @@ export const CONDITIONS: ConditionData[] = [
     effects: ['Your attacks and ability checks have disadvantage.'],
     mechanics: { ownAttacks: 'disadvantage', abilityChecks: 'disadvantage' },
     implies: [],
-    srd: false,
     // PHB 2024 "Poisoned [Condition]" (L21390-21394)
     source: 'PHB 2024 "Poisoned" (Docs/PlayersHandbook.md L21390-21394)',
   },
@@ -368,7 +354,6 @@ export const CONDITIONS: ConditionData[] = [
     },
     endsWhen: 'You stand up by spending half your Speed (rounded down).',
     implies: [],
-    srd: false,
     // PHB 2024 "Prone [Condition]" (L21406-21412); countered by standing up (L1212)
     source: 'PHB 2024 "Prone" (Docs/PlayersHandbook.md L21406-21412, L1212)',
   },
@@ -389,7 +374,6 @@ export const CONDITIONS: ConditionData[] = [
       dexSaves: 'disadvantage',
     },
     implies: [],
-    srd: false,
     // PHB 2024 "Restrained [Condition]" (L21432-21440)
     source: 'PHB 2024 "Restrained" (Docs/PlayersHandbook.md L21432-21440)',
   },
@@ -404,7 +388,6 @@ export const CONDITIONS: ConditionData[] = [
     ],
     mechanics: { autoFailStrDexSaves: true, attacksAgainst: 'advantage' },
     implies: ['incapacitated'],
-    srd: false,
     // PHB 2024 "Stunned [Condition]" (L21611-21619)
     source: 'PHB 2024 "Stunned" (Docs/PlayersHandbook.md L21611-21619)',
   },
@@ -430,7 +413,6 @@ export const CONDITIONS: ConditionData[] = [
       critWithin5ft: true,
     },
     implies: ['incapacitated', 'prone'],
-    srd: false,
     // PHB 2024 "Unconscious [Condition]" (L21697-21709)
     source: 'PHB 2024 "Unconscious" (Docs/PlayersHandbook.md L21697-21709)',
   },

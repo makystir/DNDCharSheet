@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, within } from '@testing-library/react';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { CharacterPage } from '../CharacterPage';
@@ -56,6 +56,51 @@ describe('CharacterPage Overview order', () => {
     const attacks = order.findIndex((h) => h.includes('Attacks'));
     const skills = order.findIndex((h) => h.includes('Skills & Saves'));
     expect(skills).toBe(attacks + 1);
+    // No empty placeholder is left in the "right now" column either: Attacks
+    // is its last card.
+    const now = screen.getByTestId('overview-column-now');
+    const last = now.lastElementChild as HTMLElement;
+    expect(within(last).getByRole('heading', { level: 3 })).toHaveTextContent('Attacks');
+  });
+
+  it('lays the grid cards out as two independent column stacks (no shared rows)', () => {
+    const wizard: Character = {
+      ...createCharacter('Caster'),
+      level: 5,
+      classes: [{ id: 'wizard', level: 5 }],
+    };
+    renderOverview(wizard);
+    const titlesIn = (testId: string) =>
+      within(screen.getByTestId(testId))
+        .getAllByRole('heading', { level: 3 })
+        .map((h) => h.textContent ?? '');
+    // Left: the "right now" cards (Spellcasting is followed by its Spell Slots card).
+    expect(titlesIn('overview-column-now')).toEqual([
+      'Conditions & Effects',
+      'Reactions',
+      'Attacks',
+      'Spellcasting',
+      'Spell Slots',
+    ]);
+    // Right: the reference cards. Each has exactly ONE header.
+    expect(titlesIn('overview-column-reference')).toEqual(['Skills & Saves', 'Traits & Feats']);
+  });
+
+  it('renders no SRD status text anywhere on the Overview', () => {
+    const hermit: Character = {
+      ...createCharacter('Hermit'),
+      species: { id: 'elf' },
+      backgroundSelection: { id: 'hermit' },
+      classes: [{ id: 'wizard', level: 3, subclassId: 'evoker' }],
+      level: 3,
+    };
+    renderOverview(hermit);
+    // The selected background still shows, by name only.
+    expect(screen.getByTestId('pd-selected-background')).toHaveTextContent('Hermit');
+    expect(document.body.textContent).not.toMatch(/srd/i);
+    // ...and no hover copy (title attributes) mentions it either.
+    const titles = [...document.querySelectorAll('[title]')].map((el) => el.getAttribute('title'));
+    expect(titles.filter((t) => /srd/i.test(t ?? ''))).toEqual([]);
   });
 });
 

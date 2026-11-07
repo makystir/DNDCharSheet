@@ -6,7 +6,7 @@ import { SPECIES_LIST } from '../../../data/species';
 import type { SpeciesChoiceSpec } from '../../../data/species';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
-import { SIZE_LABELS, choiceOptions, formatLanguage, srdBadge } from '../sheet-helpers';
+import { SIZE_LABELS, choiceOptions, formatLanguage } from '../sheet-helpers';
 import styles from './SpeciesSection.module.css';
 
 export interface SpeciesSectionProps {
@@ -59,11 +59,6 @@ export function SpeciesSection({
               </option>
             ))}
           </select>
-          {selectedSpecies && (
-            <span className={styles.srdBadge} title={srdBadge(selectedSpecies.srd).title}>
-              {srdBadge(selectedSpecies.srd).text}
-            </span>
-          )}
         </div>
 
         {selectedSpecies?.choices?.map((spec) => {
@@ -102,10 +97,12 @@ export function SpeciesSection({
         <div className={styles.speciesField}>
           <span className={styles.fieldLabel}>Languages</span>
           <span className={styles.speciesText}>
-            {knownLangs.map(formatLanguage).join(', ')}
-            {knownLangs.length === 1 && (
-              <span className={styles.speciesNote}> (choose more in character creation)</span>
-            )}
+            <span>
+              {knownLangs.map(formatLanguage).join(', ')}
+              {knownLangs.length === 1 && (
+                <span className={styles.speciesNote}> (choose more in character creation)</span>
+              )}
+            </span>
           </span>
         </div>
       </div>

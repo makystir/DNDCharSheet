@@ -20,7 +20,6 @@ import {
   primaryClass,
   allClasses,
   resolveClass,
-  resolveSubclass,
   classProficiencies,
   classFeaturesByLevel,
 } from '../../logic/classes';
@@ -49,7 +48,6 @@ import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
-import { srdBadge } from './sheet-helpers';
 import styles from './CharacterPage.module.css';
 
 export interface CharacterPageProps {
@@ -299,7 +297,6 @@ export function CharacterPage({
   const skillBreakdowns = allSkillBreakdowns(character);
 
   const selectedClass: ClassData | undefined = resolveClass(character);
-  const selectedSubclass = resolveSubclass(character);
   const classProfs = classProficiencies(character);
   const featuresByLevel = classFeaturesByLevel(character);
   // The class's starting skill-choice list ('any' means every skill is
@@ -376,13 +373,24 @@ export function CharacterPage({
           />
           <OverviewVitals character={character} />
           <OverviewInspiration character={character} onChange={onChange} />
-          <div className={styles.overviewGrid}>
-            <OverviewConditions character={character} />
-            <OverviewReactions character={character} />
-            <OverviewAttacks character={character} />
-            <OverviewSpellcasting character={character} />
-            <OverviewSkills character={character} />
-            <OverviewTraits character={character} />
+          {/* Two independent column stacks (no shared grid rows, so a short
+              card never leaves a hole beside a tall one): the "right now"
+              cards on the left, the reference cards on the right. On a narrow
+              page the columns stack in DOM order, so mobile reads Conditions,
+              Reactions, Attacks, Spellcasting, then Skills & Saves, Traits. */}
+          <div className={styles.overviewGrid} data-testid="overview-grid">
+            <div className={styles.overviewColumns}>
+              <div className={styles.overviewColumn} data-testid="overview-column-now">
+                <OverviewConditions character={character} />
+                <OverviewReactions character={character} />
+                <OverviewAttacks character={character} />
+                <OverviewSpellcasting character={character} />
+              </div>
+              <div className={styles.overviewColumn} data-testid="overview-column-reference">
+                <OverviewSkills character={character} />
+                <OverviewTraits character={character} />
+              </div>
+            </div>
           </div>
         </>
       )}
@@ -390,7 +398,8 @@ export function CharacterPage({
       {activeSubTab === 'abilities' && (
         <>
       <Card>
-        <h2 className={styles.fieldLabel}>Ability Scores</h2>
+        {/* Same shared header as the Saving Throws / Skills cards beside it. */}
+        <CollapsibleSection title="Ability Scores" storageKey="dnd-collapse-ability-scores">
         <div className={styles.abilityGrid}>
           {ABILITIES.map((ability) => {
             // The base score is the point-buy/creation value the input edits; it
@@ -448,6 +457,7 @@ export function CharacterPage({
             );
           })}
         </div>
+        </CollapsibleSection>
       </Card>
 
       <Card>
@@ -562,14 +572,6 @@ export function CharacterPage({
                   </option>
                 ))}
               </select>
-              {selectedClass && (
-                <span
-                  className={styles.srdBadge}
-                  title={srdBadge(selectedClass.srd).title}
-                >
-                  {srdBadge(selectedClass.srd).text}
-                </span>
-              )}
             </div>
 
             {selectedClass && character.level >= selectedClass.subclassLevel && (
@@ -591,14 +593,6 @@ export function CharacterPage({
                     </option>
                   ))}
                 </select>
-                {selectedSubclass && (
-                  <span
-                    className={styles.srdBadge}
-                    title={srdBadge(selectedSubclass.srd).title}
-                  >
-                    {srdBadge(selectedSubclass.srd).text}
-                  </span>
-                )}
               </div>
             )}
 

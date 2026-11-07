@@ -414,12 +414,6 @@ describe('SPELL_CATALOG shape & integrity', () => {
     expect(ids).toContain('mage-hand');
   });
 
-  it('carries NO srd/licensing flag (user manages spell licensing)', () => {
-    for (const s of SPELL_CATALOG) {
-      expect('srd' in s).toBe(false);
-    }
-  });
-
   it('spot-checks known PHB 2024 spells', () => {
     const fireball = getSpell('fireball')!;
     expect(fireball).toBeDefined();

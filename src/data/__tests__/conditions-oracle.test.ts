@@ -306,9 +306,8 @@ describe('conditions completeness oracle', () => {
     }
   });
 
-  it('is conservatively flagged (srd false) and colour-keyed for every condition', () => {
+  it('is colour-keyed for every condition', () => {
     for (const c of CONDITIONS) {
-      expect(c.srd, `${c.id} srd flag`).toBe(false);
       expect(CONDITION_COLORS[c.id], `${c.id} colour`).toBeDefined();
     }
   });

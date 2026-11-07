@@ -13,15 +13,9 @@
  *    BackgroundId union is DERIVED from it so the persisted shape cannot drift.
  *  - Skill ids are the catalog camelCase SkillId (src/types/character.ts).
  *  - originFeatId is a FeatId that resolves in FEAT_CATALOG (data/feats.ts).
- *  - Every entry carries a PHB `source` citation and a conservative `srd` flag.
+ *  - Every entry carries a PHB `source` citation.
  *  - `description` is a SHORT paraphrase, never verbatim PHB prose
  *    (rules-compliance rule 5).
- *
- * CONTENT LICENSING — FLAGGED FOR THE USER
- * ----------------------------------------
- * The SRD 5.2 document is not in the repo, so SRD membership cannot be
- * positively confirmed. Per rules-compliance rule 5 the conservative default is
- * `srd: 'uncertain'` on every entry (same posture as species.ts / feats.ts).
  *
  * EQUIPMENT PACKAGES: `packageItems` hold the option-A grant strings (minus the
  * trailing GP), phrased so src/logic/equipment-resolver.ts parses them
@@ -69,8 +63,6 @@ export interface BackgroundData {
   equipment: BackgroundEquipment;
   /** Short paraphrase of the printed narrative (never verbatim). */
   description: string;
-  /** SRD-safety classification for redistribution (see file header). */
-  srd: 'non-srd' | 'uncertain';
   /** PHB citation this entry is transcribed from. */
   source: string;
 }
@@ -116,7 +108,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Served in a temple under a priest, performing rites and studying religion, and learned to channel a modicum of divine power.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Acolyte" background',
   },
 
@@ -134,7 +125,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       "Apprenticed in an artisan's workshop, learning a craft, a persuasive tongue, and a keen eye for detail.",
-    srd: 'uncertain',
     source: 'PHB 2024 "Artisan" background',
   },
 
@@ -152,7 +142,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Worked the taverns preying on the gullible with comforting lies, sham potions, and forged records.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Charlatan" background',
   },
 
@@ -170,7 +159,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Scraped a living in dark alleyways cutting purses and burgling shops, alone or in a small gang.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Criminal" background',
   },
 
@@ -188,7 +176,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Followed roving fairs and carnivals, learning to play, perform, and thrive on applause.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Entertainer" background',
   },
 
@@ -213,7 +200,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Grew up close to the land, tending animals and crops, rewarded with patience and good health.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Farmer" background',
   },
 
@@ -240,7 +226,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Stood watch on a tower wall, trained to eye both the wilderness without and the troublemakers within.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Guard" background',
   },
 
@@ -266,7 +251,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Came of age in the wild, learning to fend for yourself and to channel a little of nature’s magic.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Guide" background',
   },
 
@@ -292,7 +276,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Lived in seclusion beyond the nearest settlement, pondering the mysteries of creation.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Hermit" background',
   },
 
@@ -310,7 +293,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Apprenticed to a trader or caravan master, traveling broadly and dealing in raw materials and crafted goods.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Merchant" background',
   },
 
@@ -328,7 +310,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Raised in a castle amid wealth and privilege, given a first-class education and a close view of courtly leadership.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Noble" background',
   },
 
@@ -352,7 +333,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Traveled between manors and monasteries trading work for library access, studying lore and the rudiments of magic.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Sage" background',
   },
 
@@ -370,7 +350,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Lived as a seafarer through mighty storms and countless ports of call, trading stories with folk beneath the waves.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Sailor" background',
   },
 
@@ -394,7 +373,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Spent formative years in a scriptorium learning a clear hand and a careful eye for detail copying texts.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Scribe" background',
   },
 
@@ -420,7 +398,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Trained for war from adulthood; battle is in your blood, and you waged it to protect the realm.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Soldier" background',
   },
 
@@ -445,7 +422,6 @@ export const BACKGROUND_CATALOG = {
     },
     description:
       'Grew up on the streets among castoffs, sleeping where you could and never losing your pride or your hope.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Wayfarer" background',
   },
 } as const satisfies Record<string, BackgroundData>;

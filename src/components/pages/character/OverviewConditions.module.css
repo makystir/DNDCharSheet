@@ -56,7 +56,7 @@
 .fatal {
   margin: 0;
   font-weight: 600;
-  color: var(--danger, #c0392b);
+  color: var(--accent-red);
 }
 
 .concentration {
@@ -103,8 +103,8 @@
 }
 
 .failure {
-  border-color: var(--danger, #c0392b);
-  color: var(--danger, #c0392b);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
 }
 
 .attacks {
@@ -113,24 +113,12 @@
   color: var(--text-secondary);
 }
 
-.manage {
-  font-size: 0.78rem;
-  color: var(--accent-gold);
-  text-decoration: none;
-}
-
-.manage:hover,
-.manage:focus-visible {
-  text-decoration: underline;
-}
-
 @media (hover: none), (max-width: 767px) {
   .list {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .more summary,
-  .manage {
+  .more summary {
     min-height: 44px;
     display: inline-flex;
     align-items: center;

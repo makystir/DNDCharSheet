@@ -22,8 +22,8 @@ import { resolveConditionTooltip, resolveExhaustionLevelTooltip } from '../../..
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { ContentTooltip } from '../../shared/ContentTooltip';
-import { EmptyState } from '../../shared/EmptyState';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { OverviewEmpty, OverviewFooter } from './OverviewShared';
 import styles from './OverviewConditions.module.css';
 
 export interface OverviewConditionsProps {
@@ -78,7 +78,7 @@ export function OverviewConditions({ character }: OverviewConditionsProps) {
     <Card>
       <SectionHeader icon={AlertTriangle} title="Conditions & Effects" />
       {isEmpty ? (
-        <EmptyState compact icon={AlertTriangle} heading="No active conditions" />
+        <OverviewEmpty text="No active conditions" />
       ) : (
         <ul className={styles.list} aria-label="Active conditions">
           {ids.map((id) => {
@@ -190,9 +190,7 @@ export function OverviewConditions({ character }: OverviewConditionsProps) {
         </p>
       )}
 
-      <a className={styles.manage} href="#combat">
-        Manage conditions on Combat
-      </a>
+      <OverviewFooter links={[{ href: '#combat', text: 'Manage conditions on Combat' }]} />
     </Card>
   );
 }

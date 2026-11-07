@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import type { Character, FeatSelection } from '../../../types/character';
 import { SKILLS } from '../../../types/character';
@@ -9,8 +9,9 @@ import { characterFeats } from '../../../logic/feats';
 import { speciesTraits } from '../../../logic/species';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
-import { CollapsibleSection } from '../../shared/CollapsibleSection';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
+import { OverviewEmpty, OverviewLinkAnchor } from './OverviewShared';
 import styles from './OverviewTraits.module.css';
 
 export interface OverviewTraitsProps {
@@ -53,8 +54,13 @@ function choiceLine(selection: FeatSelection): string | null {
  * Read-only mirror of species traits, feats and gained class features. The
  * effect texts come from the existing data catalogs; feats are edited only on
  * Advancement, class on Class & Features.
+ *
+ * The card's own "Traits & Feats" header is the collapse toggle (one header,
+ * default expanded, same localStorage key as before).
  */
 export function OverviewTraits({ character }: OverviewTraitsProps) {
+  const [expanded, toggle] = usePersistedExpanded('dnd-collapse-overview-traits');
+  const titleId = useId();
   const traits = speciesTraits(character);
   const feats = characterFeats(character);
   const proficiency = proficiencyBonusBreakdown(character.level);
@@ -65,13 +71,20 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
 
   return (
     <Card>
-      <SectionHeader icon={Sparkles} title="Traits & Feats" />
-      <CollapsibleSection title="Traits, feats and features" storageKey="dnd-collapse-overview-traits">
+      <SectionHeader
+        icon={Sparkles}
+        title="Traits & Feats"
+        titleId={titleId}
+        collapsible
+        collapsed={!expanded}
+        onToggleCollapse={toggle}
+      />
+      <div className={styles.body} role="region" aria-labelledby={titleId} hidden={!expanded}>
         <div className={styles.groups}>
           <section className={styles.group} aria-label="Species traits">
             <h4 className={styles.groupTitle}>Species traits</h4>
             {traits.length === 0 ? (
-              <p className={styles.muted}>No species selected.</p>
+              <OverviewEmpty text="No species selected" />
             ) : (
               <ul className={styles.list}>
                 {traits.map((trait) => (
@@ -87,7 +100,7 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
           <section className={styles.group} aria-label="Feats">
             <h4 className={styles.groupTitle}>Feats</h4>
             {feats.length === 0 ? (
-              <p className={styles.muted}>No feats yet.</p>
+              <OverviewEmpty text="No feats yet" />
             ) : (
               <ul className={styles.list}>
                 {feats.map((selection, i) => {
@@ -119,15 +132,13 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
                 })}
               </ul>
             )}
-            <a className={styles.manage} href="#advancement">
-              Manage feats on Advancement
-            </a>
+            <OverviewLinkAnchor href="#advancement" text="Manage feats on Advancement" />
           </section>
 
           <section className={styles.group} aria-label="Class features">
             <h4 className={styles.groupTitle}>Class features</h4>
             {features.length === 0 ? (
-              <p className={styles.muted}>No class selected.</p>
+              <OverviewEmpty text="No class selected" />
             ) : (
               <ul className={styles.list}>
                 {features.map(({ feature, classId }) => (
@@ -138,12 +149,10 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
                 ))}
               </ul>
             )}
-            <a className={styles.manage} href="#character/build">
-              Full list on Class &amp; Features
-            </a>
+            <OverviewLinkAnchor href="#character/build" text="Full list on Class & Features" />
           </section>
         </div>
-      </CollapsibleSection>
+      </div>
     </Card>
   );
 }

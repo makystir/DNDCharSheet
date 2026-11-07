@@ -6,6 +6,7 @@ import { itemMasteryStatus } from '../../../logic/weapon-mastery';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
+import { OverviewEmpty, OverviewFooter } from './OverviewShared';
 import styles from './OverviewAttacks.module.css';
 
 export interface OverviewAttacksProps {
@@ -31,12 +32,10 @@ export function OverviewAttacks({ character }: OverviewAttacksProps) {
     <Card>
       <SectionHeader icon={Swords} title="Attacks" />
       {rows.length === 0 ? (
-        <p className={styles.empty}>
-          No weapons equipped{' '}
-          <a className={styles.manage} href="#inventory">
-            Equip weapons on Inventory
-          </a>
-        </p>
+        <OverviewEmpty
+          text="No weapons equipped"
+          link={{ href: '#inventory', text: 'Equip weapons on Inventory' }}
+        />
       ) : (
         <ul className={styles.list}>
           {rows.map(({ entry, profile }) => {
@@ -68,9 +67,7 @@ export function OverviewAttacks({ character }: OverviewAttacksProps) {
           })}
         </ul>
       )}
-      <a className={styles.manage} href="#combat">
-        Make attacks on Combat
-      </a>
+      <OverviewFooter links={[{ href: '#combat', text: 'Make attacks on Combat' }]} />
     </Card>
   );
 }

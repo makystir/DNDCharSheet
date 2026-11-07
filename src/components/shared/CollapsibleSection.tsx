@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect, useId } from 'react';
+import { useId } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { usePersistedExpanded } from '../../hooks/usePersistedExpanded';
 import styles from './CollapsibleSection.module.css';
 
 interface CollapsibleSectionProps {
@@ -8,34 +9,6 @@ interface CollapsibleSectionProps {
   storageKey: string;
   defaultExpanded?: boolean;
   children: ReactNode;
-}
-
-/**
- * Read the expanded state from localStorage.
- * Returns undefined if not found or on error (graceful fallback).
- */
-function readPersistedState(storageKey: string): boolean | undefined {
-  try {
-    const raw = localStorage.getItem(storageKey);
-    if (raw === 'true') return true;
-    if (raw === 'false') return false;
-    return undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * Write the expanded state to localStorage.
- * Silently swallows errors (quota exceeded, private browsing, etc.) and
- * continues with in-memory state only.
- */
-function writePersistedState(storageKey: string, expanded: boolean): void {
-  try {
-    localStorage.setItem(storageKey, String(expanded));
-  } catch {
-    // Graceful fallback: continue with in-memory state only
-  }
 }
 
 /**
@@ -51,28 +24,8 @@ export function CollapsibleSection({
   defaultExpanded = true,
   children,
 }: CollapsibleSectionProps) {
-  const [expanded, setExpanded] = useState<boolean>(() => {
-    const persisted = readPersistedState(storageKey);
-    return persisted ?? defaultExpanded;
-  });
+  const [expanded, toggle] = usePersistedExpanded(storageKey, defaultExpanded);
   const titleId = useId();
-
-  // Sync with storageKey changes (e.g. character switch).
-  // Intentional setState-in-effect: reads persisted expand/collapse state from
-  // localStorage (an external system) when the storageKey changes.
-  useEffect(() => {
-    const persisted = readPersistedState(storageKey);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setExpanded(persisted ?? defaultExpanded);
-  }, [storageKey, defaultExpanded]);
-
-  const toggle = useCallback(() => {
-    setExpanded((prev) => {
-      const next = !prev;
-      writePersistedState(storageKey, next);
-      return next;
-    });
-  }, [storageKey]);
 
   return (
     <div className={styles.section}>

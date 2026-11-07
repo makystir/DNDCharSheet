@@ -79,6 +79,18 @@ describe('OverviewTraits', () => {
     expect(document.body.textContent).not.toMatch(/later stage/i);
   });
 
+  it('has a single card header that is also the collapse toggle', () => {
+    render(<OverviewTraits character={withFeats} />);
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      'Traits & Feats',
+    ]);
+    expect(screen.queryByText(/Traits, feats and features/i)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Traits & Feats' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+  });
+
   it('lists class features gained so far with a link to Class & Features', () => {
     render(<OverviewTraits character={make({ classes: [{ id: 'fighter', level: 1 }], level: 1 })} />);
     const group = screen.getByRole('region', { name: 'Class features' });

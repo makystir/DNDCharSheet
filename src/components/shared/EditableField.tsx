@@ -14,6 +14,13 @@ interface EditableFieldProps {
   required?: boolean;
   onSave: (value: string | number) => void;
   style?: CSSProperties;
+  /**
+   * Keep the tap-to-edit display on ONE line: long values are truncated with an
+   * ellipsis and the full value is available via the title attribute.
+   */
+  singleLine?: boolean;
+  /** Extra class for the display / edit input (e.g. a shared control height). */
+  controlClassName?: string;
 }
 
 function validateField(draft: string, type: 'text' | 'number', required: boolean): string | null {
@@ -34,7 +41,10 @@ export function EditableField({
   required = false,
   onSave,
   style,
+  singleLine = false,
+  controlClassName,
 }: EditableFieldProps) {
+  const extra = controlClassName ? ` ${controlClassName}` : '';
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +192,9 @@ export function EditableField({
 
   return (
     <div className={styles.container} style={style}>
-      <span className={styles.label}>{label}</span>
+      <span className={singleLine ? `${styles.label} ${styles.singleLineText}` : styles.label}>
+        {label}
+      </span>
       {editing ? (
         <>
           <input
@@ -202,7 +214,7 @@ export function EditableField({
                 setEditing(false);
               }
             }}
-            className={`${styles.input} ${error ? styles.inputError : ''}`}
+            className={`${styles.input} ${error ? styles.inputError : ''}${extra}`}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? errorId : undefined}
           />
@@ -222,9 +234,14 @@ export function EditableField({
           onKeyDown={(e) => {
             if (e.key === 'Enter') setEditing(true);
           }}
-          className={`${styles.display} ${styles.underlineAffordance}`}
+          className={`${styles.display} ${styles.underlineAffordance}${singleLine ? ` ${styles.singleLine}` : ''}${extra}`}
+          title={singleLine && value !== '' ? String(value) : undefined}
         >
-          {value || '—'}
+          {singleLine ? (
+            <span className={styles.singleLineText}>{value || '—'}</span>
+          ) : (
+            value || '—'
+          )}
         </div>
       )}
     </div>

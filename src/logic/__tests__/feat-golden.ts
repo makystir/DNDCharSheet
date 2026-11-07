@@ -90,8 +90,8 @@ export const CATALOG_ORACLE = {
   repeatableIds: ['ability-score-improvement', 'elemental-adept', 'magic-initiate', 'skilled'],
   /** Valid categories. */
   categories: ['origin', 'general', 'fighting-style', 'epic-boon'] as FeatCategory[],
-  /** Every catalog entry must carry a non-empty PHB citation and an srd flag. */
-  requireCitationAndSrd: true,
+  /** Every catalog entry must carry a non-empty PHB citation. */
+  requireCitation: true,
   /** Origin feats must NOT have a minLevel; General feats that gate carry minLevel 4; Epic Boon 19. */
   originHasNoMinLevel: true,
 };

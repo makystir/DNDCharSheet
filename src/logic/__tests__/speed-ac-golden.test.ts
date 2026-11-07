@@ -126,7 +126,7 @@ function assertUnarmoredDefenseCase(tc: UnarmoredDefenseCase): void {
   const { input, expect: want } = tc;
   const sc = scores(input.dex, input.con, input.wis);
   const shield = input.shield
-    ? ({ id: 'shield', name: 'Shield', category: 'shield', baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, srd: false, source: 'test' } as const)
+    ? ({ id: 'shield', name: 'Shield', category: 'shield', baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, source: 'test' } as const)
     : undefined;
 
   let bd;
@@ -144,7 +144,7 @@ function assertUnarmoredDefenseCase(tc: UnarmoredDefenseCase): void {
       stealthDisadvantage: false,
       weightLb: 0,
       costGp: 0,
-      srd: false,
+     
       source: 'test',
     };
     // The golden's armorAppliedDex is the Dex the armour contributes; a light
@@ -308,7 +308,7 @@ describe('Unarmored Defense — edge cases', () => {
     expect(without.total).toBe(15); // 10 + 3 + 2
     const withShield = armorClassBreakdown(sc(16, 10, 14), undefined, {
       unarmoredDefense: ud,
-      shield: { id: 'shield', name: 'Shield', category: 'shield', baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, srd: false, source: 't' },
+      shield: { id: 'shield', name: 'Shield', category: 'shield', baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, source: 't' },
     });
     expect(withShield.total).toBe(15); // 10 + 3 + 2 (UD lost, +2 shield)
     expect(withShield.components.some((x) => x.label === 'Wisdom mod')).toBe(false);
@@ -316,7 +316,7 @@ describe('Unarmored Defense — edge cases', () => {
   });
 
   it('worn armour disables Unarmored Defense even for a Barbarian', () => {
-    const armor = { id: 'a', name: 'Chain Shirt', category: 'medium' as const, baseAc: 13, addsDex: true, dexCap: 2, stealthDisadvantage: false, weightLb: 20, costGp: 50, srd: false, source: 't' };
+    const armor = { id: 'a', name: 'Chain Shirt', category: 'medium' as const, baseAc: 13, addsDex: true, dexCap: 2, stealthDisadvantage: false, weightLb: 20, costGp: 50, source: 't' };
     const bd = armorClassBreakdown(sc(14, 18, 10), undefined, {
       armor,
       unarmoredDefense: udForKind('barbarian'),
@@ -357,7 +357,7 @@ describe('fail-closed mutation tests', () => {
 
   it('MUTANT: Monk keeping Unarmored Defense with a Shield would raise the total', () => {
     const ud = udForKind('monk');
-    const shield = { id: 'shield', name: 'Shield', category: 'shield' as const, baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, srd: false, source: 't' };
+    const shield = { id: 'shield', name: 'Shield', category: 'shield' as const, baseAc: 2, addsDex: false, stealthDisadvantage: false, weightLb: 6, costGp: 10, source: 't' };
     const real = armorClassBreakdown(scores(16, 10, 14), undefined, { unarmoredDefense: ud, shield });
     expect(real.total).toBe(15); // UD LOST: 10 + 3 + 2
     const mutantKeepsUd = 10 + 3 + 2 + 2; // 17 — Wis mod wrongly kept
@@ -376,7 +376,7 @@ describe('fail-closed mutation tests', () => {
   it('MUTANT: applying Unarmored Defense while armour is worn would raise the total', () => {
     // Golden "Only One Base AC": Barbarian in light armour base 11 + Dex 2 = 13,
     // NOT UD 16. A mutant that applied UD over worn armour would give 16.
-    const armor = { id: 'a', name: 'Light', category: 'light' as const, baseAc: 11, addsDex: true, stealthDisadvantage: false, weightLb: 0, costGp: 0, srd: false, source: 't' };
+    const armor = { id: 'a', name: 'Light', category: 'light' as const, baseAc: 11, addsDex: true, stealthDisadvantage: false, weightLb: 0, costGp: 0, source: 't' };
     const real = armorClassBreakdown(scores(14, 18, 10), undefined, {
       armor,
       unarmoredDefense: udForKind('barbarian'),

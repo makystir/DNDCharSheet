@@ -96,19 +96,6 @@ describe('SPECIES_CATALOG', () => {
     }
   });
 
-  // Test 4: every species has an srd classification; flag non-srd-safe.
-  it('classifies every species for SRD and flags all non-srd-safe ones', () => {
-    const flagged: string[] = [];
-    for (const s of SPECIES_LIST) {
-      expect(['srd-safe', 'non-srd', 'uncertain']).toContain(s.srd);
-      if (s.srd !== 'srd-safe') flagged.push(s.id);
-    }
-    // Conservative default: nothing is confirmed srd-safe, so all ten are
-    // flagged for the user to review before redistribution.
-    expect(flagged).toEqual([...EXPECTED_IDS]);
-    expect(SPECIES_LIST.some((s) => s.srd === 'srd-safe')).toBe(false);
-  });
-
   // Test 5: no-verbatim heuristic — no over-long effect strings.
   it('keeps every trait effect a short paraphrase (no verbatim PHB prose)', () => {
     for (const s of SPECIES_LIST) {

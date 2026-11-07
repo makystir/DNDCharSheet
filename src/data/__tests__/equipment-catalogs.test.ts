@@ -128,7 +128,6 @@ describe('WEAPON_CATALOG', () => {
   it('keys each weapon under its own id and carries a per-entry PHB source', () => {
     for (const w of WEAPON_LIST) {
       expect(WEAPON_CATALOG[w.id].id).toBe(w.id);
-      expect(w.srd).toBe(false); // conservative flag per rules-compliance rule 5
       expect(w.source).toMatch(/PHB 2024/); // per-entry citation (finding #8)
     }
   });
@@ -230,7 +229,6 @@ describe('ARMOR_CATALOG', () => {
   it('keys each armor under its own id and carries a per-entry PHB source', () => {
     for (const a of ARMOR_LIST) {
       expect(ARMOR_CATALOG[a.id].id).toBe(a.id);
-      expect(a.srd).toBe(false);
       expect(a.source).toMatch(/PHB 2024/);
     }
   });
@@ -274,10 +272,9 @@ describe('ARMOR_CATALOG', () => {
 });
 
 describe('EQUIPMENT_CATALOG', () => {
-  it('keys each item under its own id, flags srd false, carries a per-entry source', () => {
+  it('keys each item under its own id and carries a per-entry source', () => {
     for (const e of EQUIPMENT_LIST) {
       expect(EQUIPMENT_CATALOG[e.id].id).toBe(e.id);
-      expect(e.srd).toBe(false);
       expect(e.source).toMatch(/PHB 2024/); // per-entry citation (finding #8)
       expect(['gear', 'tool', 'ammunition', 'pack', 'consumable']).toContain(e.kind);
     }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
 import { PersonalDetailsSection } from '../PersonalDetailsSection';
 import { createCharacter } from '../../../../storage/character-store';
 
@@ -132,6 +132,69 @@ describe('PersonalDetailsSection', () => {
     const { onChange } = renderSection();
     fireEvent.click(screen.getByRole('button', { name: 'Roll personality' }));
     expect(onChange.mock.calls.at(-1)?.[0].personality).toBeTruthy();
+  });
+
+  // ── Even grid layout ──────────────────────────────────────────────────────
+  it('lays every field out in one grid, in the pinned row order', () => {
+    renderSection();
+    const grid = screen.getByTestId('personal-details-grid');
+    const cells = [...grid.children].map((c) => c.getAttribute('data-testid'));
+    expect(cells).toEqual([
+      'pd-field-name',
+      'pd-field-gender',
+      'pd-field-alignment',
+      'pd-field-faith',
+      'pd-field-age',
+      'pd-field-height',
+      'pd-field-weight',
+      'pd-field-eyes',
+      'pd-field-hair',
+      'pd-field-skin',
+      'pd-field-background',
+    ]);
+  });
+
+  it('every cell ends with exactly one roll slot; Gender reserves an empty one', () => {
+    renderSection();
+    const grid = screen.getByTestId('personal-details-grid');
+    for (const cell of [...grid.children]) {
+      const slots = cell.querySelectorAll('[data-roll-slot]');
+      expect(slots, `${cell.getAttribute('data-testid')} roll slot`).toHaveLength(1);
+      // The slot is the last element in the cell's control row.
+      expect(cell.lastElementChild).toBe(slots[0]);
+    }
+    const genderSlot = screen.getByTestId('pd-field-gender').querySelector('[data-roll-slot]')!;
+    expect(genderSlot).toHaveAttribute('data-roll-slot', 'placeholder');
+    expect(genderSlot).toHaveAttribute('aria-hidden', 'true');
+    // The placeholder shares the roll button's size class.
+    const nameBtn = screen.getByRole('button', { name: 'Roll name' });
+    const shared = [...genderSlot.classList].filter((c) => nameBtn.classList.contains(c));
+    expect(shared.length).toBeGreaterThan(0);
+  });
+
+  it('puts the Faith / Deity info icon inside the label row', () => {
+    renderSection({ faith: 'Pelor' });
+    const labelRow = screen.getByTestId('pd-faith-label-row');
+    expect(within(labelRow).getByText('Faith / Deity')).toBeInTheDocument();
+    expect(within(labelRow).getByLabelText('About Pelor')).toBeInTheDocument();
+  });
+
+  it('keeps long values on one line with the full value in a title', () => {
+    renderSection({ skin: 'Fair with a faint glow', faith: 'A very long homebrew deity name' });
+    expect(screen.getByRole('button', { name: 'Skin' })).toHaveAttribute(
+      'title',
+      'Fair with a faint glow',
+    );
+    expect(screen.getByRole('combobox', { name: 'Faith / Deity' })).toHaveAttribute(
+      'title',
+      'A very long homebrew deity name',
+    );
+  });
+
+  it('shows the selected background by name only (no SRD status text)', () => {
+    renderSection({ backgroundSelection: { id: 'hermit' } });
+    expect(screen.getByTestId('pd-selected-background')).toHaveTextContent('Hermit');
+    expect(document.body.textContent).not.toMatch(/srd/i);
   });
 
   it('rolling alignment sets a valid alignment', () => {

@@ -106,8 +106,8 @@ export interface SkillTraining {
 
 /**
  * The canonical 2024 skill list with each skill's governing ability.
- * Transcribed from the PHB 2024 "Skills" table / "Skill List" (SRD-safe
- * mechanical identifiers only; no descriptive prose is reproduced).
+ * Transcribed from the PHB 2024 "Skills" table / "Skill List" (mechanical
+ * identifiers only; no descriptive prose is reproduced).
  * This is the single source of truth shared by the logic and the UI,
  * mirroring how ABILITIES / ABILITY_NAMES are placed above.
  */

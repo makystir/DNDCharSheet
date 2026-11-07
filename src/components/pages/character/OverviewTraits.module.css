@@ -1,7 +1,11 @@
 /* Read-only Traits & Feats mirror for the Overview. */
+.body[hidden] {
+  display: none;
+}
+
 .groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 16px;
 }
 
@@ -22,7 +26,7 @@
   flex-direction: column;
   gap: 6px;
   list-style: none;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   padding: 0;
 }
 
@@ -94,24 +98,8 @@
   color: var(--text-secondary);
 }
 
-.manage {
-  font-size: 0.78rem;
-  color: var(--accent-gold);
-  text-decoration: none;
-}
-
-.manage:hover,
-.manage:focus-visible {
-  text-decoration: underline;
-}
-
 @media (hover: none), (max-width: 767px) {
-  .groups {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .toggle,
-  .manage {
+  .toggle {
     min-height: 44px;
     display: inline-flex;
     align-items: center;

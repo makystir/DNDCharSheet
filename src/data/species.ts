@@ -24,17 +24,6 @@
  * and use the background's). This catalog therefore has NO ability-score field
  * and no species applies an ASI. Confirmed against every species block in
  * Docs/PlayersHandbook.md "SPECIES DESCRIPTIONS".
- *
- * CONTENT LICENSING — FLAGGED FOR THE USER
- * ----------------------------------------
- * The SRD 5.2 document is not in the repo, so SRD membership cannot be
- * positively confirmed for any species. Per rules-compliance rule 5 the
- * conservative default is to FLAG everything whose SRD status is not
- * confirmable: no species is marked `srd-safe` in this stage. Aasimar and
- * Goliath are marked `non-srd` (historically variable SRD inclusion); the other
- * eight are marked `uncertain`. Every species is surfaced with its flag so the
- * user can decide how to handle redistribution before publishing. When the user
- * supplies the SRD, these `srd` values become a data-only update.
  */
 
 import type { Ability, SkillId } from '../types/character';
@@ -129,8 +118,6 @@ export interface SpeciesData {
   traits: SpeciesTrait[];
   /** Sub-choices this species requires (drives the selection UI). */
   choices?: SpeciesChoiceSpec[];
-  /** SRD-safety classification for redistribution (see file header). */
-  srd: 'srd-safe' | 'non-srd' | 'uncertain';
   /** Line-anchored PHB citation this entry is transcribed from. */
   source: string;
 }
@@ -167,7 +154,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 60,
     grantedLanguages: [],
-    srd: 'non-srd',
     source: 'PHB 2024 "Aasimar Traits"',
     traits: [
       {
@@ -219,7 +205,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 60,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Dragonborn Traits"',
     traits: [
       {
@@ -284,7 +269,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 120,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Dwarf Traits"',
     traits: [
       {
@@ -324,7 +308,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 60,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Elf Traits"',
     traits: [
       {
@@ -398,7 +381,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 60,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Gnome Traits"',
     traits: [
       {
@@ -448,7 +430,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 35,
     darkvisionFt: 0,
     grantedLanguages: [],
-    srd: 'non-srd',
     source: 'PHB 2024 "Goliath Traits"',
     traits: [
       {
@@ -497,7 +478,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 0,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Halfling Traits"',
     traits: [
       {
@@ -532,7 +512,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 0,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Human Traits"',
     traits: [
       {
@@ -580,7 +559,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 120,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Orc Traits"',
     traits: [
       {
@@ -613,7 +591,6 @@ export const SPECIES_CATALOG = {
     baseSpeedFt: 30,
     darkvisionFt: 60,
     grantedLanguages: [],
-    srd: 'uncertain',
     source: 'PHB 2024 "Tiefling Traits"',
     traits: [
       {

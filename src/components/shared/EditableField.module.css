@@ -28,6 +28,23 @@
   border-color: var(--border-strong);
 }
 
+/* singleLine: never wrap; the inner text truncates with an ellipsis (the
+   full value is on the element's title). The inner span keeps the ellipsis
+   working when the display is a flex container (mobile). */
+.singleLine {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.singleLineText {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .display:focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 1px;

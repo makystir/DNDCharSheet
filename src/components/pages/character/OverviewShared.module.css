@@ -1,0 +1,45 @@
+/* Shared Overview card pieces: one empty-state style and one footer-link style
+   so every Overview card reads the same (left-aligned, muted text, links on
+   their own line). */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+/* Footer: the card's "manage on X" link, always on its own line at the end. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration: underline;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .link {
+    min-height: 44px;
+  }
+}

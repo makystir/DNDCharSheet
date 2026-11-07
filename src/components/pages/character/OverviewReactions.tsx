@@ -9,6 +9,7 @@ import {
 import type { ReactionEntry, ReactionKind, ReactionUnavailable } from '../../../logic/reactions';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { OverviewEmpty, OverviewFooter } from './OverviewShared';
 import styles from './OverviewReactions.module.css';
 
 export interface OverviewReactionsProps {
@@ -64,31 +65,33 @@ export function OverviewReactions({ character }: OverviewReactionsProps) {
       <p className={styles.status} role="status" data-testid="overview-reaction-status">
         {statusText(character)}
       </p>
-      <ul className={styles.list}>
-        {entries.map((entry: ReactionEntry) => (
-          <li
-            key={`${entry.kind}-${entry.name}`}
-            className={entry.unavailable ? `${styles.item} ${styles.unavailable}` : styles.item}
-            data-testid="overview-reaction"
-          >
-            <span className={styles.head}>
-              <span className={styles.name}>{entry.name}</span>
-              <span className={styles.tag}>
-                {KIND_LABEL[entry.kind]}
-                {entry.spellLevel !== undefined ? ` \u00B7 Level ${entry.spellLevel}` : ''}
+      {entries.length === 0 ? (
+        <OverviewEmpty text="No reactions available" />
+      ) : (
+        <ul className={styles.list}>
+          {entries.map((entry: ReactionEntry) => (
+            <li
+              key={`${entry.kind}-${entry.name}`}
+              className={entry.unavailable ? `${styles.item} ${styles.unavailable}` : styles.item}
+              data-testid="overview-reaction"
+            >
+              <span className={styles.head}>
+                <span className={styles.name}>{entry.name}</span>
+                <span className={styles.tag}>
+                  {KIND_LABEL[entry.kind]}
+                  {entry.spellLevel !== undefined ? ` \u00B7 Level ${entry.spellLevel}` : ''}
+                </span>
+                {entry.unavailable && (
+                  <span className={styles.reason}>{REASON_TEXT[entry.unavailable]}</span>
+                )}
               </span>
-              {entry.unavailable && (
-                <span className={styles.reason}>{REASON_TEXT[entry.unavailable]}</span>
-              )}
-            </span>
-            <ExpandableText text={entry.summary} />
-          </li>
-        ))}
-      </ul>
+              <ExpandableText text={entry.summary} />
+            </li>
+          ))}
+        </ul>
+      )}
       <p className={styles.note}>Subclass and feat reactions are not listed yet.</p>
-      <a className={styles.manage} href="#combat">
-        Reaction used? Manage on Combat
-      </a>
+      <OverviewFooter links={[{ href: '#combat', text: 'Reaction used? Manage on Combat' }]} />
     </Card>
   );
 }

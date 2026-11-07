@@ -2,6 +2,12 @@
 
 .section {
   display: block;
+  /* Shared control metrics: every input / select / tap-to-edit display / roll
+     button in the grid uses these, so all controls are the same height and
+     every roll slot the same width. */
+  --pd-control-h: 32px;
+  --pd-roll-w: 32px;
+  --pd-gap: 12px;
 }
 
 .identityRow {
@@ -13,119 +19,158 @@
   flex-wrap: wrap;
 }
 
-.gridAutoFill {
+/* The card column takes the remaining width beside the portrait. */
+.detailsColumn {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+/* Inline-size container: the field grid's column count follows the CARD's
+   width (the portrait shares the row), not the viewport. */
+.fieldsContainer {
+  container-type: inline-size;
+}
+
+/* A strict, even grid: equal-width columns, every row the same height. 5
+   columns on a wide card (Name, Gender, Alignment, Faith / Deity, Age / Height,
+   Weight, Eyes, Hair, Skin), then 3, 2 and 1 as the card narrows. */
+.fieldGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pd-gap);
+  align-items: end;
 }
 
-.selectWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+@container (min-width: 340px) {
+  .fieldGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.selectLabel {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+@container (min-width: 520px) {
+  .fieldGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.select {
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: inherit;
-  min-height: 28px;
-  width: 100%;
+@container (min-width: 860px) {
+  .fieldGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
-.select:focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 1px;
-}
-
-/* A text input that doubles as a combo (free text + <datalist> suggestions).
-   Mirrors the .select look so the Faith / Deity combo matches neighbouring
-   controls. */
-.comboInput {
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: inherit;
-  min-height: 28px;
-  width: 100%;
-}
-
-.comboInput:focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 1px;
-}
-
-/* The deity overview hint trigger (ℹ) sits next to the combo when the current
-   faith matches a catalog deity. */
-.deityHintTrigger {
-  font-size: 0.85rem;
-  line-height: 1;
-}
-
-/* P5: the Background free-text field + the read-only wizard-selected
-   background name beneath it, so "Background" reads as one labelled area. */
-.backgroundField {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.backgroundSelection {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-}
-
-.backgroundBadge {
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.personalityField {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 12px;
-  min-width: 0;
-}
-
-.personalityHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* A field + its 🎲 roll button sit on one row; the field flexes, the button
-   stays a compact fixed target. */
-.fieldWithRoll {
+/* One cell = the field (label above its single-line control) + the roll slot,
+   bottom-aligned so the roll button sits level with the control. */
+.cell {
   display: flex;
   align-items: flex-end;
   gap: 6px;
   min-width: 0;
 }
 
+.cellMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The EditableField wrapper inside a cell must also be allowed to shrink. */
+.cellMain > * {
+  min-width: 0;
+}
+
+/* Background spans every column. */
+.cellFull {
+  grid-column: 1 / -1;
+}
+
+/* Label row: the label plus any inline affordance (the Faith ℹ hint). Same
+   font metrics as the EditableField label so every label row is one height. */
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.72rem;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The shared single-line control look (select, combo input, tap-to-edit
+   display and its edit input). Doubled class so it out-ranks the
+   EditableField module's own display/input rules regardless of CSS order. */
+.control.control {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--pd-control-h);
+  min-height: var(--pd-control-h);
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.control.control:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Selects keep their native arrow; text-overflow applies to the closed box. */
+.select {
+  display: block;
+}
+
+/* A text input that doubles as a combo (free text + <datalist> suggestions). */
+.comboInput {
+  display: block;
+}
+
+/* The deity overview hint trigger (ℹ) sits inline with the Faith label. */
+.deityHintTrigger {
+  font-size: inherit;
+  line-height: 1;
+  color: var(--accent-gold);
+}
+
+/* The read-only wizard-selected background name, a quiet line beneath. */
+.backgroundSelection {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* The roll slot: identical size for a 🎲 button and the empty placeholder. */
+.rollSlot {
+  flex: 0 0 var(--pd-roll-w);
+  box-sizing: border-box;
+  width: var(--pd-roll-w);
+  height: var(--pd-control-h);
+}
+
 .rollBtn {
-  flex: 0 0 auto;
-  min-height: 28px;
-  min-width: 32px;
-  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
   background: var(--bg-tertiary);
@@ -149,7 +194,26 @@
   outline-offset: 1px;
 }
 
+/* Personality: full width under the grid; its label row ends with the 🎲 at
+   the same right edge as the grid's roll slots. */
+.personalityField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--pd-gap);
+  min-width: 0;
+}
+
+.personalityHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
 .textarea {
+  box-sizing: border-box;
   width: 100%;
   resize: vertical;
   padding: 6px 8px;
@@ -167,33 +231,27 @@
   outline-offset: 1px;
 }
 
-/* Mobile: stack the portrait above the card, one-column fields, 44px targets. */
+/* Mobile: stack the portrait above the full-width card; 44px touch targets
+   (controls and roll slots grow together so rows stay even). */
 @media (max-width: 767px) {
+  .section {
+    --pd-control-h: 44px;
+    --pd-roll-w: 44px;
+  }
+
   .identityRow {
     flex-direction: column;
     align-items: center;
   }
 
-  .gridAutoFill {
-    grid-template-columns: 1fr;
+  .detailsColumn {
+    flex: 0 0 auto;
+    align-self: stretch;
+    width: 100%;
   }
 
-  .select {
-    min-height: 44px;
-    font-size: 16px;
-  }
-
-  .comboInput {
-    min-height: 44px;
-    font-size: 16px;
-  }
-
+  .control.control,
   .textarea {
     font-size: 16px;
-  }
-
-  .rollBtn {
-    min-height: 44px;
-    min-width: 44px;
   }
 }

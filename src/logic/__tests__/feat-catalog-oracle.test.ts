@@ -7,7 +7,7 @@
  * LOGIC golden groups (effective scores, breakdown, ASI allocation, prereqs);
  * this file owns the DATA assertions the golden table delegates to PART 2:
  *   - CATALOG_ORACLE  → FEAT_CATALOG shape (required ids, repeatable flags,
- *                       valid categories, citation + srd + paraphrase, Origin
+ *                       valid categories, citation + paraphrase, Origin
  *                       feats carry no minLevel).
  *   - TRANCHE_FEATS   → each tranche row matches its catalog entry (category,
  *                       repeatable, minLevel, abilityMin, abilityIncrease).
@@ -61,12 +61,11 @@ describe('CATALOG_ORACLE — FEAT_CATALOG is well-formed', () => {
     }
   });
 
-  it('every entry carries a non-empty PHB citation and an srd flag', () => {
-    expect(CATALOG_ORACLE.requireCitationAndSrd).toBe(true);
+  it('every entry carries a non-empty PHB citation', () => {
+    expect(CATALOG_ORACLE.requireCitation).toBe(true);
     for (const feat of allFeats()) {
       expect(feat.source.trim().length, `${feat.id} needs a citation`).toBeGreaterThan(0);
       expect(feat.source, `${feat.id} citation should name the PHB`).toContain('PHB 2024');
-      expect(['non-srd', 'uncertain'], `${feat.id} srd flag`).toContain(feat.srd);
     }
   });
 

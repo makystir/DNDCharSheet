@@ -10,8 +10,7 @@
  * Every mechanical value (category, base AC, Dex contribution + cap, Strength
  * requirement, Stealth disadvantage, weight, cost) is transcribed from the PHB
  * 2024 "Armor" table (Docs/PlayersHandbook.md L9589-9646). NO armor is invented
- * (rules-compliance rule 1). Each entry carries a conservative `srd` flag + a
- * `// PHB 2024 …` citation.
+ * (rules-compliance rule 1). Each entry carries a `// PHB 2024 …` citation.
  *
  * DEX / CATEGORY MODEL (PHB 2024 "Armor", L9611-9646):
  *   - Light  → base AC + full Dex modifier (addsDex: true, no dexCap).
@@ -34,9 +33,6 @@
  *   - Strength column: 'Str 13' (Chain Mail), 'Str 15' (Splint, Plate); light
  *     and medium rows list no Strength requirement.
  * Costs are already in GP in the Armor table, so no cp/sp conversion is needed.
- *
- * LICENSING: per rules-compliance rule 5 the conservative default is to FLAG:
- * `srd` is false on every entry until the user confirms redistribution.
  */
 
 /** Armor proficiency/weight category. PHB 2024 "Armor": Light/Medium/Heavy + Shield. */
@@ -64,8 +60,6 @@ export interface ArmorData {
   weightLb: number;
   /** Cost in gold pieces (Armor table is already GP). */
   costGp: number;
-  /** Conservative SRD flag — false (flagged) until the user confirms (rule 5). */
-  srd: boolean;
   /**
    * Per-entry PHB 2024 citation (rules-compliance rule 7 / blueprint §2.2, §7.5):
    * the exact table + markdown line the row was transcribed from.
@@ -104,7 +98,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 8, // OCR '816.' → 8 lb.
     costGp: 5,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'leather-armor': {
@@ -116,7 +109,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 10,
     costGp: 10,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'studded-leather-armor': {
@@ -128,7 +120,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 13,
     costGp: 45,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   // ── Medium Armor (Dex, max +2) ────────────────────────────────────────────
@@ -142,7 +133,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 12, // OCR '1216.' → 12 lb.
     costGp: 10,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'chain-shirt': {
@@ -155,7 +145,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 20,
     costGp: 50,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'scale-mail': {
@@ -168,7 +157,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 45,
     costGp: 50,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   breastplate: {
@@ -181,7 +169,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 20,
     costGp: 400,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'half-plate-armor': {
@@ -194,7 +181,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 40,
     costGp: 750,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   // ── Heavy Armor (no Dex) ──────────────────────────────────────────────────
@@ -207,7 +193,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 40,
     costGp: 30,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'chain-mail': {
@@ -220,7 +205,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 55,
     costGp: 75,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'splint-armor': {
@@ -233,7 +217,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 60,
     costGp: 200,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   'plate-armor': {
@@ -246,7 +229,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: true,
     weightLb: 65,
     costGp: 1500,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
   // ── Shield (+2 bonus, not a base AC) ──────────────────────────────────────
@@ -259,7 +241,6 @@ export const ARMOR_CATALOG: Record<string, ArmorData> = {
     stealthDisadvantage: false,
     weightLb: 6, // OCR '616.' → 6 lb.
     costGp: 10,
-    srd: false,
     source: ARMOR_TABLE_SOURCE,
   },
 };

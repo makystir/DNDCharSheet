@@ -177,10 +177,6 @@ const MODULE_HEADER = `/**
  * bounded (<=160-char) truncation of the real \`effect\` prose, not a
  * field-assembled summary.
  *
- * LICENSING: per the user's instruction, spell-content licensing is managed on
- * the user's side, so — unlike the species/class catalogs — this catalog carries
- * NO srd/uncertain flag and no redistribution gating.
- *
  * GENERATED FILE — DO NOT HAND-EDIT.
  * This file is produced by scripts/generate-spells.ts from the in-repo PHB 2024
  * markdown. To change it, edit the generator (scripts/spell-extract.ts, the

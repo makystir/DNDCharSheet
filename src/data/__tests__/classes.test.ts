@@ -125,22 +125,6 @@ describe('CLASS_CATALOG', () => {
     expect(c.subclassLevel).toBe(FIXTURES[id].subclassLevel);
   });
 
-  it('classifies every class and subclass for SRD and flags them all (none srd-safe)', () => {
-    const flagged: string[] = [];
-    for (const c of CLASS_LIST) {
-      expect(['non-srd', 'uncertain']).toContain(c.srd);
-      expect(c.srd).not.toBe('srd-safe');
-      flagged.push(c.id);
-      for (const sub of c.subclasses) {
-        expect(['non-srd', 'uncertain']).toContain(sub.srd);
-        expect(sub.srd).not.toBe('srd-safe');
-      }
-    }
-    // Conservative default: every class is flagged for user review.
-    expect(flagged).toEqual([...EXPECTED_IDS]);
-    expect(CLASS_LIST.some((c) => (c.srd as string) === 'srd-safe')).toBe(false);
-  });
-
   it('every class and subclass carries a non-empty source citation', () => {
     for (const c of CLASS_LIST) {
       expect(c.source.trim().length).toBeGreaterThan(0);

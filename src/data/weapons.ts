@@ -12,7 +12,7 @@
  * is transcribed from the PHB 2024 "Weapons" table (Docs/PlayersHandbook.md
  * L9388-9430), with property/mastery definitions from L9300-9386. NO weapon is
  * invented and no value is guessed (rules-compliance rule 1). Each entry carries
- * a conservative `srd` flag + the `// PHB 2024 …` citation below.
+ * the `// PHB 2024 …` citation below.
  *
  * OCR CORRECTIONS (verified against the PHB 2024 Weapons table, L9388-9430).
  * The source markdown is OCR-noisy; the following were corrected to the printed
@@ -26,10 +26,6 @@
  * Costs are normalised to GP (costGp) for later weight/encumbrance math:
  * 1 GP = 10 SP = 100 CP (PHB 2024 "Coins", L9247-9272). So 1 SP = 0.1 GP,
  * 2 SP = 0.2 GP, 5 SP = 0.5 GP, 5 CP = 0.05 GP.
- *
- * LICENSING: equipment mechanical values are largely SRD-safe, but per
- * rules-compliance rule 5 the conservative default is to FLAG: `srd` is set
- * false on every entry so the user decides redistribution before publishing.
  */
 
 /** A weapon's proficiency category. PHB 2024 "Weapons": Simple or Martial. */
@@ -118,8 +114,6 @@ export interface WeaponData {
   weightLb: number;
   /** Cost normalised to gold pieces. */
   costGp: number;
-  /** Conservative SRD flag — false (flagged) until the user confirms (rule 5). */
-  srd: boolean;
   /**
    * Per-entry PHB 2024 citation (rules-compliance rule 7 / blueprint §2.2, §7.5):
    * the exact table + markdown line the row was transcribed from, so each
@@ -224,7 +218,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 2,
     costGp: 0.1, // 1 SP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   dagger: {
@@ -240,7 +233,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'nick',
     weightLb: 1,
     costGp: 2,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   greatclub: {
@@ -254,7 +246,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'push',
     weightLb: 10,
     costGp: 0.2, // 2 SP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   handaxe: {
@@ -270,7 +261,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 2,
     costGp: 5,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   javelin: {
@@ -286,7 +276,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 2,
     costGp: 0.5, // 5 SP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   'light-hammer': {
@@ -302,7 +291,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'nick',
     weightLb: 2,
     costGp: 2,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   mace: {
@@ -316,7 +304,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 4,
     costGp: 5,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   quarterstaff: {
@@ -331,7 +318,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'topple',
     weightLb: 4,
     costGp: 0.2, // 2 SP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   sickle: {
@@ -345,7 +331,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'nick',
     weightLb: 2,
     costGp: 1,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   spear: {
@@ -362,7 +347,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 3,
     costGp: 1,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   // ── Simple Ranged Weapons ─────────────────────────────────────────────────
@@ -379,7 +363,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 0.25, // PHB: 1/4 lb.
     costGp: 0.05, // 5 CP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   'light-crossbow': {
@@ -396,7 +379,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 5,
     costGp: 25,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   shortbow: {
@@ -413,7 +395,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 2,
     costGp: 25,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   sling: {
@@ -430,7 +411,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 0, // PHB lists no weight for the Sling.
     costGp: 0.1, // 1 SP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   // ── Martial Melee Weapons ─────────────────────────────────────────────────
@@ -446,7 +426,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'topple',
     weightLb: 4,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   flail: {
@@ -460,7 +439,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 2,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   glaive: {
@@ -474,7 +452,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'graze',
     weightLb: 6,
     costGp: 20,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   greataxe: {
@@ -488,7 +465,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'cleave',
     weightLb: 7,
     costGp: 30,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   greatsword: {
@@ -502,7 +478,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'graze',
     weightLb: 6,
     costGp: 50, // OCR 'SOGP' → 50 GP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   halberd: {
@@ -516,7 +491,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'cleave',
     weightLb: 6,
     costGp: 20,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   lance: {
@@ -536,7 +510,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'topple',
     weightLb: 6,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   longsword: {
@@ -551,7 +524,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 3,
     costGp: 15,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   maul: {
@@ -565,7 +537,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'topple',
     weightLb: 10,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   morningstar: {
@@ -579,7 +550,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 4,
     costGp: 15,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   pike: {
@@ -593,7 +563,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'push',
     weightLb: 18,
     costGp: 5,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   rapier: {
@@ -607,7 +576,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 2,
     costGp: 25,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   scimitar: {
@@ -621,7 +589,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'nick',
     weightLb: 3, // OCR '316.' → 3 lb.
     costGp: 25,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   shortsword: {
@@ -635,7 +602,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 2,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   trident: {
@@ -652,7 +618,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'topple',
     weightLb: 4,
     costGp: 5,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   warhammer: {
@@ -667,7 +632,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'push',
     weightLb: 5,
     costGp: 15,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   'war-pick': {
@@ -682,7 +646,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'sap',
     weightLb: 2,
     costGp: 5,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   whip: {
@@ -696,7 +659,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 3,
     costGp: 2,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   // ── Martial Ranged Weapons ────────────────────────────────────────────────
@@ -714,7 +676,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 1,
     costGp: 10,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   'hand-crossbow': {
@@ -731,7 +692,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 3,
     costGp: 75,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   'heavy-crossbow': {
@@ -748,7 +708,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'push',
     weightLb: 18,
     costGp: 50, // OCR '50GP' → 50 GP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   longbow: {
@@ -765,7 +724,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 2, // OCR '216.' → 2 lb.
     costGp: 50, // OCR '50GP' → 50 GP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   musket: {
@@ -782,7 +740,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'slow',
     weightLb: 10,
     costGp: 500, // OCR '500GP' → 500 GP
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
   pistol: {
@@ -799,7 +756,6 @@ export const WEAPON_CATALOG: Record<string, WeaponData> = {
     mastery: 'vex',
     weightLb: 3,
     costGp: 250,
-    srd: false,
     source: WEAPONS_TABLE_SOURCE,
   },
 };

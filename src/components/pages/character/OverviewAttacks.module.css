@@ -4,7 +4,7 @@
   flex-direction: column;
   gap: 6px;
   list-style: none;
-  margin: 0 0 8px;
+  margin: 0;
   padding: 0;
 }
 .item {
@@ -35,20 +35,4 @@
 .mastery {
   font-size: 0.78rem;
   color: var(--text-secondary);
-}
-.empty {
-  margin: 0 0 8px;
-  color: var(--text-secondary);
-}
-.manage {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  font-size: 0.8rem;
-  color: var(--accent-gold);
-  text-decoration: none;
-}
-.manage:hover,
-.manage:focus-visible {
-  text-decoration: underline;
 }

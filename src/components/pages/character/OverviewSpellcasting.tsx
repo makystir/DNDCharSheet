@@ -12,6 +12,7 @@ import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SpellSlotSummary } from '../../combat/SpellSlotSummary';
+import { OverviewFooter } from './OverviewShared';
 import styles from './OverviewSpellcasting.module.css';
 
 export interface OverviewSpellcastingProps {
@@ -76,9 +77,7 @@ export function OverviewSpellcasting({ character }: OverviewSpellcastingProps) {
             </li>
           ))}
         </ul>
-        <a className={styles.manage} href="#spells">
-          Manage spells
-        </a>
+        <OverviewFooter links={[{ href: '#spells', text: 'Manage spells' }]} />
       </Card>
       <SpellSlotSummary character={character} />
     </div>

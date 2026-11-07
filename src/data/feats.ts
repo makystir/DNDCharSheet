@@ -10,16 +10,8 @@
  * CONVENTIONS (match data/classes.ts / data/conditions.ts):
  *  - One keyed record (FEAT_CATALOG); the FeatId union is DERIVED from it so the
  *    persisted FeatSelection.featId and the catalog cannot drift.
- *  - Every entry carries a line-anchored PHB citation (`source`) and a
- *    conservative SRD flag (`srd`).
+ *  - Every entry carries a line-anchored PHB citation (`source`).
  *  - Benefit prose is PARAPHRASED, never verbatim (rules-compliance rule 5).
- *
- * CONTENT LICENSING — FLAGGED FOR THE USER
- * ----------------------------------------
- * The SRD 5.2 document is not in the repo, so SRD membership cannot be
- * positively confirmed. Per rules-compliance rule 5 the conservative default is
- * `srd: 'uncertain'` on every entry (same posture as classes.ts). The user
- * decides redistribution before publishing.
  *
  * RULES-COMPLIANCE: ability increases are modelled; caps are 20 for General/ASI
  * feats and 30 for Epic Boon feats (PHB 2024 "Ability Score Improvement" L8558,
@@ -83,8 +75,6 @@ export interface FeatData {
   grants?: { skills?: number; tools?: number; expertise?: number; note?: string };
   /** Short PHB-cited paraphrase of the benefit (never verbatim). */
   effect: string;
-  /** SRD-safety classification for redistribution (see file header). */
-  srd: 'non-srd' | 'uncertain';
   /** Line-anchored PHB citation this entry is transcribed from. */
   source: string;
 }
@@ -108,7 +98,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8558: increase one score by 2, or two scores by 1; cannot exceed 20.
     effect:
       'Increase one ability score by 2, or two ability scores by 1 (maximum 20).',
-    srd: 'uncertain',
     source: 'PHB 2024 "Ability Score Improvement" (L8558)',
   },
 
@@ -120,7 +109,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8458: add your Proficiency Bonus to Initiative; swap Initiative with a willing ally.
     effect:
       'Add your Proficiency Bonus to Initiative, and swap Initiative with a willing ally after rolling.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Alert" (L8458)',
   },
   'savage-attacker': {
@@ -130,7 +118,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8528: once per turn on a weapon hit, roll the damage dice twice and use either.
     effect:
       'Once per turn, when you hit with a weapon, roll the damage dice twice and use either roll.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Savage Attacker" (L8528)',
   },
   skilled: {
@@ -141,7 +128,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8532: proficiency in any combination of three skills or tools.
     grants: { skills: 3, tools: 0, note: 'Any combination of three skills or tools.' },
     effect: 'Gain proficiency in any combination of three skills or tools of your choice.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Skilled" (L8532)',
   },
   tough: {
@@ -151,7 +137,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8550: HP maximum increases by twice your level, and by 2 more each level after.
     effect:
       'Your Hit Point maximum increases by twice your character level, and by 2 more each level gained thereafter.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Tough" (L8550)',
   },
 
@@ -171,7 +156,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
     effect:
       'Learn two cantrips and one level-1 spell from the Cleric spell list (the level-1 spell can be cast once per Long Rest without a slot).',
-    srd: 'uncertain',
     source: 'PHB 2024 "Magic Initiate" (L8506)',
   },
   'magic-initiate-druid': {
@@ -182,7 +166,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
     effect:
       'Learn two cantrips and one level-1 spell from the Druid spell list (the level-1 spell can be cast once per Long Rest without a slot).',
-    srd: 'uncertain',
     source: 'PHB 2024 "Magic Initiate" (L8506)',
   },
   'magic-initiate-wizard': {
@@ -193,7 +176,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8506: learn two cantrips + one level-1 spell from the chosen list.
     effect:
       'Learn two cantrips and one level-1 spell from the Wizard spell list (the level-1 spell can be cast once per Long Rest without a slot).',
-    srd: 'uncertain',
     source: 'PHB 2024 "Magic Initiate" (L8506)',
   },
   crafter: {
@@ -204,7 +186,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     grants: { tools: 3, note: "Three Artisan's Tools of your choice from the Fast Crafting table." },
     effect:
       "Gain proficiency with three Artisan's Tools; get a 20% discount on nonmagical purchases; craft one piece of gear on a Long Rest (Fast Crafting).",
-    srd: 'uncertain',
     source: 'PHB 2024 "Crafter" (L8468)',
   },
   musician: {
@@ -215,7 +196,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     grants: { tools: 3, note: 'Three Musical Instruments of your choice.' },
     effect:
       'Gain proficiency with three Musical Instruments; on a Short or Long Rest, grant Heroic Inspiration to allies (up to your Proficiency Bonus) who hear your song.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Musician" (L8520)',
   },
   healer: {
@@ -225,7 +205,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8488: Battle Medic (Healer's Kit heal via Hit Dice + PB); reroll healing 1s.
     effect:
       "Use a Healer's Kit to let a creature spend a Hit Die and heal (roll + your Proficiency Bonus); reroll any 1 when rolling healing dice.",
-    srd: 'uncertain',
     source: 'PHB 2024 "Healer" (L8488)',
   },
   lucky: {
@@ -235,7 +214,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8496: Luck Points equal to PB; spend for Advantage on a d20 Test or impose Disadvantage.
     effect:
       'You have Luck Points equal to your Proficiency Bonus; spend one for Advantage on a D20 Test, or to impose Disadvantage on an attack against you. Regained on a Long Rest.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Lucky" (L8496)',
   },
   'tavern-brawler': {
@@ -245,7 +223,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8538: enhanced Unarmed Strike (1d4 + Str); reroll 1s; improvised weapons; Push.
     effect:
       'Deal 1d4 + Strength modifier Bludgeoning damage with an Unarmed Strike; reroll a 1 on its damage die; gain improvised-weapon proficiency and a once-per-turn 5-ft Push.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Tavern Brawler" (L8538)',
   },
 
@@ -260,7 +237,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8568: +1 Cha (max 20); Advantage to impersonate; mimic sounds/speech.
     effect:
       'Increase Charisma by 1 (maximum 20); gain Advantage to impersonate a person, and mimic sounds and speech.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Actor" (L8568)',
   },
   resilient: {
@@ -272,7 +248,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L8874: +1 to a chosen ability you lack a save proficiency in (max 20); gain that save proficiency.
     effect:
       'Increase one chosen ability (in which you lack save proficiency) by 1 (maximum 20), and gain saving throw proficiency with it.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Resilient" (L8874)',
   },
 
@@ -286,7 +261,6 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     // PHB 2024 L9126: +1 to one chosen ability (max 30); once per turn turn a miss into a hit.
     effect:
       'Increase one chosen ability by 1 (maximum 30); once per turn, when you miss with an attack roll, you can hit instead.',
-    srd: 'uncertain',
     source: 'PHB 2024 "Boon of Combat Prowess" (L9126)',
   },
 };

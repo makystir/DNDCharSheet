@@ -1,5 +1,8 @@
 /* At-a-glance vitals strip for the Overview. Auto-fit grid: 2 columns on a
-   phone, more as width allows. */
+   phone, more as width allows. Every tile is the same height (grid rows
+   stretch) and uses the same internal rhythm: a two-line label slot, the value,
+   any sub-lines, then the manage link pinned to the bottom — so values line up
+   across a row even when one label wraps or one tile has no link. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -20,6 +23,12 @@
 }
 
 .label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reserve two lines so a wrapping label never pushes its value down. */
+  min-height: 2.4em;
+  line-height: 1.2;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -28,6 +37,7 @@
 
 .value {
   font-size: 1.8rem;
+  line-height: 1.2;
   font-family: var(--font-heading);
   color: var(--accent-gold);
   font-variant-numeric: tabular-nums;
@@ -44,13 +54,18 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--danger, #c0392b);
+  color: var(--accent-red);
 }
 
 .manage {
   font-size: 0.72rem;
   color: var(--accent-gold);
   text-decoration: none;
+}
+
+/* The tile's own link sits at the bottom of every tile. */
+.tile > .manage {
+  margin-top: auto;
 }
 
 .manage:hover,
@@ -64,7 +79,7 @@
   }
 
   .manage {
-    min-height: 32px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
   }

@@ -1,7 +1,9 @@
 .page {
+  /* One section gap for every top-level section and every Overview column. */
+  --section-gap: 16px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--section-gap);
 }
 
 .fieldLabel {
@@ -104,19 +106,6 @@
 .speciesText {
   font-size: 1.05rem;
   color: var(--text-primary);
-}
-
-.srdBadge {
-  align-self: flex-start;
-  margin-top: 2px;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 2px 6px;
 }
 
 /* Species traits: rich two-line rows — name on line 1 (never truncated),
@@ -311,11 +300,43 @@
   }
 }
 
-/* Overview session cards: two columns on wide screens, one on mobile. */
+/* Overview session cards: two INDEPENDENT column stacks on a wide page (no
+   shared grid rows, so a short card never leaves a hole beside a tall one),
+   one column in DOM order on a narrow page. The outer element is an
+   inline-size container so the breakpoint follows the page width, not the
+   viewport (the app shell's side nav takes part of the viewport). */
 .overviewGrid {
+  container-type: inline-size;
+}
+
+.overviewColumns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--section-gap);
   align-items: start;
+}
+
+@container (min-width: 860px) {
+  .overviewColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.overviewColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  min-width: 0;
+}
+
+/* The shared Card adds a sibling top margin (and a mobile bottom margin) for
+   block-flow stacks. Here the flex/grid gap is the ONE section gap, so the
+   extra margins are removed; otherwise the first card in a column sits higher
+   than the cards beside it. The doubled class + :not() out-ranks the Card
+   module's `.card + .card` selector regardless of stylesheet order. */
+.page.page > :not(.never),
+.overviewColumn.overviewColumn > :not(.never) {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 

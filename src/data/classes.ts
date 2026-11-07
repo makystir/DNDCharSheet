@@ -24,15 +24,6 @@
  * features so the sheet can surface them without the class logic ever mutating
  * ability modifiers. The no-ASI guard in the logic tests locks this in.
  *
- * CONTENT LICENSING — FLAGGED FOR THE USER
- * ----------------------------------------
- * The SRD 5.2 document is not in the repo, so SRD membership cannot be
- * positively confirmed. Per rules-compliance rule 5 the conservative default is
- * to FLAG everything: no class or subclass is marked `srd-safe`. Each class is
- * `uncertain` and each subclass is `non-srd` (subclass content historically
- * sits outside the SRD). Every class/subclass is surfaced with its flag so the
- * user can decide how to handle redistribution before publishing.
- *
  * CLASS FEATURE LISTS
  * -------------------
  * All twelve classes now ship with their full level-1-to-20 CLASS feature
@@ -81,8 +72,6 @@ export interface ClassFeature {
 export interface SubclassData {
   id: string;
   name: string;
-  /** SRD-safety classification for redistribution (see file header). */
-  srd: 'non-srd' | 'uncertain';
   /** Subclass features — deferred for all subclasses this stage. */
   features: ClassFeature[];
   /** Line-anchored PHB citation this entry is transcribed from. */
@@ -175,8 +164,6 @@ export interface ClassData {
   multiclassProficiencies: MulticlassProficiencies;
   /** Class level at which the subclass is chosen (PHB 2024 Features table). */
   subclassLevel: number;
-  /** SRD-safety classification for redistribution (see file header). */
-  srd: 'non-srd' | 'uncertain';
   /** Line-anchored PHB citation this entry is transcribed from. */
   source: string;
 }
@@ -206,7 +193,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Greataxe, 4 Handaxes, Explorer's Pack, 15 GP; or (B) 75 GP", // PHB 2024 "Core Barbarian Traits" (line ~2389).
     subclassLevel: 3, // PHB 2024 "Barbarian Features": Barbarian Subclass at level 3 (line ~2456).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Barbarian Traits" / "Barbarian Features"',
     features: [
       {
@@ -365,10 +351,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'berserker', name: 'Path of the Berserker', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2556)' },
-      { id: 'wildHeart', name: 'Path of the Wild Heart', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
-      { id: 'worldTree', name: 'Path of the World Tree', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
-      { id: 'zealot', name: 'Path of the Zealot', srd: 'non-srd', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
+      { id: 'berserker', name: 'Path of the Berserker', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2556)' },
+      { id: 'wildHeart', name: 'Path of the Wild Heart', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
+      { id: 'worldTree', name: 'Path of the World Tree', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
+      { id: 'zealot', name: 'Path of the Zealot', features: [], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
     ],
     // PHB 2024 "Barbarian: As a Multiclass Character" (line ~2407): Martial weapons + training with Shields.
     multiclassProficiencies: { armor: ['shields'], martialWeapons: true, skills: 0, tools: [] },
@@ -390,7 +376,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Leather Armor, 2 Daggers, Musical Instrument, Entertainer's Pack, 19 GP; or (B) 90 GP", // PHB 2024 "Core Bard Traits".
     subclassLevel: 3, // PHB 2024 "Bard: Bard Subclass" at level 3 (line ~2806).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Bard Traits" / "Bard Features"',
     // PHB 2024 p.58: Bard features by level (features table line ~2763; descriptions line ~2727).
     features: [
@@ -503,10 +488,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'dance', name: 'College of Dance', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
-      { id: 'glamour', name: 'College of Glamour', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
-      { id: 'lore', name: 'College of Lore', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
-      { id: 'valor', name: 'College of Valor', srd: 'non-srd', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
+      { id: 'dance', name: 'College of Dance', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
+      { id: 'glamour', name: 'College of Glamour', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
+      { id: 'lore', name: 'College of Lore', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
+      { id: 'valor', name: 'College of Valor', features: [], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
     ],
     // PHB 2024 "Bard: As a Multiclass Character" (line ~2716): one skill of your choice, one Musical Instrument, Light armor training.
     multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 1, tools: ['musical-instrument'] },
@@ -532,7 +517,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, 7 GP; or (B) 110 GP", // PHB 2024 "Core Cleric Traits" (line ~3122).
     subclassLevel: 3, // PHB 2024 "Cleric Features": Cleric Subclass at level 3 (line ~3197).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Cleric Traits" / "Cleric Features"',
     features: [
       {
@@ -631,10 +615,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'life', name: 'Life Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
-      { id: 'light', name: 'Light Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
-      { id: 'trickery', name: 'Trickery Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
-      { id: 'war', name: 'War Domain', srd: 'non-srd', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
+      { id: 'life', name: 'Life Domain', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
+      { id: 'light', name: 'Light Domain', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
+      { id: 'trickery', name: 'Trickery Domain', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
+      { id: 'war', name: 'War Domain', features: [], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
     ],
     // PHB 2024 "Cleric: As a Multiclass Character" (line ~3158): training with Light and Medium armor and Shields.
     multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: false, skills: 0, tools: [] },
@@ -660,7 +644,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Leather Armor, Shield, Sickle, Druidic Focus (Quarterstaff), Explorer's Pack, Herbalism Kit, 9 GP; or (B) 50 GP", // PHB 2024 "Core Druid Traits" (line ~3590).
     subclassLevel: 3, // PHB 2024 "Druid: Druid Subclass" at level 3 (line ~3710).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Druid Traits" / "Druid Features"',
     // PHB 2024 p.78: Druid features by level (features table line ~3633; descriptions line ~3647).
     features: [
@@ -772,10 +755,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'land', name: 'Circle of the Land', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
-      { id: 'moon', name: 'Circle of the Moon', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
-      { id: 'sea', name: 'Circle of the Sea', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
-      { id: 'stars', name: 'Circle of the Stars', srd: 'non-srd', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
+      { id: 'land', name: 'Circle of the Land', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
+      { id: 'moon', name: 'Circle of the Moon', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
+      { id: 'sea', name: 'Circle of the Sea', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
+      { id: 'stars', name: 'Circle of the Stars', features: [], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
     ],
     // PHB 2024 "Druid: As a Multiclass Character" (line ~3606): training with Light armor and Shields.
     multiclassProficiencies: { armor: ['light', 'shields'], martialWeapons: false, skills: 0, tools: [] },
@@ -801,7 +784,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, 4 GP; (B) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, 11 GP; or (C) 155 GP", // PHB 2024 "Core Fighter Traits" (line ~4089).
     subclassLevel: 3, // PHB 2024 "Fighter: Fighter Subclass" at level 3 (line ~4181).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Fighter Traits" / "Fighter Features"',
     // PHB 2024 p.90: Fighter features by level (features table line ~4156; descriptions line ~4106).
     features: [
@@ -963,10 +945,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'battleMaster', name: 'Battle Master', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
-      { id: 'champion', name: 'Champion', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
-      { id: 'eldritchKnight', name: 'Eldritch Knight', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
-      { id: 'psiWarrior', name: 'Psi Warrior', srd: 'non-srd', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
+      { id: 'battleMaster', name: 'Battle Master', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
+      { id: 'champion', name: 'Champion', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
+      { id: 'eldritchKnight', name: 'Eldritch Knight', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
+      { id: 'psiWarrior', name: 'Psi Warrior', features: [], source: 'PHB 2024 "Fighter: Fighter Subclass" (line ~4184)' },
     ],
     // PHB 2024 "Fighter: As a Multiclass Character" (line ~4137): Martial weapons, training with Light and Medium armor and Shields.
     multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 0, tools: [] },
@@ -992,7 +974,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Spear, 5 Daggers, Artisan's Tools or Musical Instrument, Explorer's Pack, 11 GP; or (B) 50 GP", // PHB 2024 "Core Monk Traits".
     subclassLevel: 3, // PHB 2024 "Monk Features": Monk Subclass at level 3 (line ~4544).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Monk Traits" / "Monk Features"',
     // PHB 2024 p.100: Monk features by level (features table line ~4544; descriptions line ~4513).
     features: [
@@ -1162,10 +1143,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'elements', name: 'Warrior of the Elements', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
-      { id: 'mercy', name: 'Warrior of Mercy', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
-      { id: 'openHand', name: 'Warrior of the Open Hand', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
-      { id: 'shadow', name: 'Warrior of Shadow', srd: 'non-srd', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
+      { id: 'elements', name: 'Warrior of the Elements', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
+      { id: 'mercy', name: 'Warrior of Mercy', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
+      { id: 'openHand', name: 'Warrior of the Open Hand', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
+      { id: 'shadow', name: 'Warrior of Shadow', features: [], source: 'PHB 2024 "Monk Subclasses" (Chapter 3)' },
     ],
     // PHB 2024 "Monk: As a Multiclass Character" (line ~4509): nothing beyond the Hit Point Die.
     multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },
@@ -1191,7 +1172,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, 9 GP; or (B) 150 GP", // PHB 2024 "Core Paladin Traits" (line ~4820).
     subclassLevel: 3, // PHB 2024 "Paladin Features": Paladin Subclass at level 3 (line ~4871).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Paladin Traits" / "Paladin Features"',
     // PHB 2024 p.108: Paladin features by level (features table line ~4871; descriptions line ~4849).
     // Level 20 is a subclass feature (no class-level feature), so no row is added for it.
@@ -1330,10 +1310,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'devotion', name: 'Oath of Devotion', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
-      { id: 'glory', name: 'Oath of Glory', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
-      { id: 'ancients', name: 'Oath of the Ancients', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
-      { id: 'vengeance', name: 'Oath of Vengeance', srd: 'non-srd', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
+      { id: 'devotion', name: 'Oath of Devotion', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
+      { id: 'glory', name: 'Oath of Glory', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
+      { id: 'ancients', name: 'Oath of the Ancients', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
+      { id: 'vengeance', name: 'Oath of Vengeance', features: [], source: 'PHB 2024 "Paladin Subclasses" (Chapter 3)' },
     ],
     // PHB 2024 "Paladin: As a Multiclass Character" (line ~4845): Martial weapons, training with Light and Medium armor and Shields.
     multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 0, tools: [] },
@@ -1359,7 +1339,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus, Explorer's Pack, 7 GP; or (B) 150 GP", // PHB 2024 "Core Ranger Traits" (line ~5334).
     subclassLevel: 3, // PHB 2024 "Ranger: Ranger Subclass" at level 3 (line ~5424).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Ranger Traits" / "Ranger Features"',
     // PHB 2024 p.118: Ranger features by level (features table line ~5379; descriptions line ~5329).
     features: [
@@ -1498,10 +1477,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'beastMaster', name: 'Beast Master', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
-      { id: 'feyWanderer', name: 'Fey Wanderer', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
-      { id: 'gloomStalker', name: 'Gloom Stalker', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
-      { id: 'hunter', name: 'Hunter', srd: 'non-srd', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
+      { id: 'beastMaster', name: 'Beast Master', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
+      { id: 'feyWanderer', name: 'Fey Wanderer', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
+      { id: 'gloomStalker', name: 'Gloom Stalker', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
+      { id: 'hunter', name: 'Hunter', features: [], source: 'PHB 2024 "Ranger: Ranger Subclass" (line ~5427)' },
     ],
     // PHB 2024 "Ranger: As a Multiclass Character" (line ~5364): Martial weapons, one skill from the Ranger list, training with Light and Medium armor and Shields.
     multiclassProficiencies: { armor: ['light', 'medium', 'shields'], martialWeapons: true, skills: 1, tools: [] },
@@ -1527,7 +1506,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, 8 GP; or (B) 100 GP", // PHB 2024 "Core Rogue Traits" (line ~5874).
     subclassLevel: 3, // PHB 2024 "Rogue Features": Rogue Subclass at level 3 (line ~5908).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Rogue Traits" / "Rogue Features"',
     features: [
       {
@@ -1682,10 +1660,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'arcaneTrickster', name: 'Arcane Trickster', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
-      { id: 'assassin', name: 'Assassin', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
-      { id: 'soulknife', name: 'Soulknife', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
-      { id: 'thief', name: 'Thief', srd: 'non-srd', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
+      { id: 'arcaneTrickster', name: 'Arcane Trickster', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
+      { id: 'assassin', name: 'Assassin', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
+      { id: 'soulknife', name: 'Soulknife', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
+      { id: 'thief', name: 'Thief', features: [], source: 'PHB 2024 "Rogue: Rogue Subclass" (line ~5937)' },
     ],
     // PHB 2024 "Rogue: As a Multiclass Character" (line ~5875): one skill from the Rogue list, Thieves' Tools, training with Light armor.
     multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 1, tools: ['thieves-tools'] },
@@ -1711,7 +1689,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, 28 GP; or (B) 50 GP", // PHB 2024 "Core Sorcerer Traits" (line ~6232).
     subclassLevel: 3, // PHB 2024 "Sorcerer: Sorcerer Subclass" at level 3 (line ~6349).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Sorcerer Traits" / "Sorcerer Features"',
     // PHB 2024 p.138: Sorcerer features by level (features table line ~6273; descriptions line ~6257).
     features: [
@@ -1819,10 +1796,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'aberrant', name: 'Aberrant Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
-      { id: 'clockwork', name: 'Clockwork Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
-      { id: 'draconic', name: 'Draconic Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
-      { id: 'wildMagic', name: 'Wild Magic Sorcery', srd: 'non-srd', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
+      { id: 'aberrant', name: 'Aberrant Sorcery', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
+      { id: 'clockwork', name: 'Clockwork Sorcery', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
+      { id: 'draconic', name: 'Draconic Sorcery', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
+      { id: 'wildMagic', name: 'Wild Magic Sorcery', features: [], source: 'PHB 2024 "Sorcerer: Sorcerer Subclass" (line ~6352)' },
     ],
     // PHB 2024 "Sorcerer: As a Multiclass Character" (line ~6253): nothing beyond the Hit Point Die.
     multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },
@@ -1848,7 +1825,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, 15 GP; or (B) 100 GP", // PHB 2024 "Core Warlock Traits" (line ~6784).
     subclassLevel: 3, // PHB 2024 "Warlock: Warlock Subclass" at level 3 (line ~6874).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Warlock Traits" / "Warlock Features"',
     // PHB 2024 p.152: Warlock features by level (features table line ~6829; descriptions line ~6807).
     features: [
@@ -1956,10 +1932,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'archfey', name: 'Archfey Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
-      { id: 'celestial', name: 'Celestial Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
-      { id: 'fiend', name: 'Fiend Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
-      { id: 'greatOldOne', name: 'Great Old One Patron', srd: 'non-srd', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
+      { id: 'archfey', name: 'Archfey Patron', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
+      { id: 'celestial', name: 'Celestial Patron', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
+      { id: 'fiend', name: 'Fiend Patron', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
+      { id: 'greatOldOne', name: 'Great Old One Patron', features: [], source: 'PHB 2024 "Warlock: Warlock Subclass" (line ~6877)' },
     ],
     // PHB 2024 "Warlock: As a Multiclass Character" (line ~6782): training with Light armor only.
     multiclassProficiencies: { armor: ['light'], martialWeapons: false, skills: 0, tools: [] },
@@ -1985,7 +1961,6 @@ export const CLASS_CATALOG = {
     startingEquipment:
       "(A) 2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar's Pack, 5 GP; or (B) 55 GP", // PHB 2024 "Core Wizard Traits" (line ~7320).
     subclassLevel: 3, // PHB 2024 "Wizard Features": Wizard Subclass at level 3 (line ~7366).
-    srd: 'uncertain',
     source: 'PHB 2024 "Core Wizard Traits" / "Wizard Features"',
     features: [
       {
@@ -2075,10 +2050,10 @@ export const CLASS_CATALOG = {
       },
     ],
     subclasses: [
-      { id: 'abjurer', name: 'Abjurer', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
-      { id: 'diviner', name: 'Diviner', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
-      { id: 'evoker', name: 'Evoker', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
-      { id: 'illusionist', name: 'Illusionist', srd: 'non-srd', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
+      { id: 'abjurer', name: 'Abjurer', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
+      { id: 'diviner', name: 'Diviner', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
+      { id: 'evoker', name: 'Evoker', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
+      { id: 'illusionist', name: 'Illusionist', features: [], source: 'PHB 2024 "Wizard: Wizard Subclass" (line ~7366)' },
     ],
     // PHB 2024 "Wizard: As a Multiclass Character" (line ~7389): nothing beyond the Hit Point Die.
     multiclassProficiencies: { armor: [], martialWeapons: false, skills: 0, tools: [] },

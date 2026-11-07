@@ -1,13 +1,15 @@
+import { useId } from 'react';
 import { ListChecks } from 'lucide-react';
 import type { Character } from '../../../types/character';
 import { ABILITIES, ABILITY_ABBR, ABILITY_NAMES, SKILLS } from '../../../types/character';
 import { formatSigned } from '../../../logic/breakdown';
 import { allSkillBreakdowns, getSkillTraining } from '../../../logic/skills';
 import { allSavingThrowBreakdowns } from '../../../logic/saving-throws';
+import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
-import { CollapsibleSection } from '../../shared/CollapsibleSection';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { OverviewFooter } from './OverviewShared';
 import styles from './OverviewSkills.module.css';
 
 export interface OverviewSkillsProps {
@@ -21,8 +23,13 @@ export interface OverviewSkillsProps {
  * expertise are edited only on Abilities & Skills, so this card just links there.
  * Proficiency is shown with a text marker (P / E) plus an aria-label, never
  * colour alone.
+ *
+ * The card's own "Skills & Saves" header is the collapse toggle (one header,
+ * default expanded, state persisted under the same localStorage key as before).
  */
 export function OverviewSkills({ character }: OverviewSkillsProps) {
+  const [expanded, toggle] = usePersistedExpanded('dnd-collapse-overview-skills');
+  const titleId = useId();
   const skillBreakdowns = allSkillBreakdowns(character);
   const saveBreakdowns = allSavingThrowBreakdowns(character);
   // Alphabetical, as printed on the sheet.
@@ -30,9 +37,21 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
 
   return (
     <Card>
-      <SectionHeader icon={ListChecks} title="Skills & Saves" />
-      <CollapsibleSection title="Saves and skills" storageKey="dnd-collapse-overview-skills">
-        <ul className={styles.saves} aria-label="Saving throws">
+      <SectionHeader
+        icon={ListChecks}
+        title="Skills & Saves"
+        titleId={titleId}
+        collapsible
+        collapsed={!expanded}
+        onToggleCollapse={toggle}
+      />
+      <div
+        className={styles.body}
+        role="region"
+        aria-labelledby={titleId}
+        hidden={!expanded}
+      >
+        <ul className={styles.saves} aria-label="Saving throws" data-testid="overview-saves-grid">
           {ABILITIES.map((ability) => {
             const breakdown = saveBreakdowns[ability];
             const proficient = character.saveProficiencies?.[ability] ?? false;
@@ -46,16 +65,18 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
                 <CalculatedValue label={`${ABILITY_NAMES[ability]} Save`} breakdown={breakdown}>
                   {formatSigned(breakdown.total)}
                 </CalculatedValue>
-                {proficient && (
-                  <span className={styles.marker} role="img" aria-label="proficient" title="Proficient">
-                    P
-                  </span>
-                )}
+                {/* Fixed-width marker slot so every chip lines up. */}
+                <span className={styles.markerSlot}>
+                  {proficient && (
+                    <span className={styles.marker} role="img" aria-label="proficient" title="Proficient">
+                      P
+                    </span>
+                  )}
+                </span>
               </li>
             );
           })}
         </ul>
-
         <ul className={styles.skills} aria-label="Skills">
           {skills.map((skill) => {
             const breakdown = skillBreakdowns[skill.id];
@@ -73,11 +94,14 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
                   {skill.name}
                   <span className={styles.ability}> ({ABILITY_ABBR[skill.ability]})</span>
                 </span>
-                {status && (
-                  <span className={styles.marker} role="img" aria-label={status} title={status}>
-                    {expertise ? 'E' : 'P'}
-                  </span>
-                )}
+                {/* Fixed-width marker slot keeps every modifier at the same x. */}
+                <span className={styles.markerSlot}>
+                  {status && (
+                    <span className={styles.marker} role="img" aria-label={status} title={status}>
+                      {expertise ? 'E' : 'P'}
+                    </span>
+                  )}
+                </span>
                 <span className={styles.value}>
                   <CalculatedValue label={`${skill.name} Check`} breakdown={breakdown}>
                     {formatSigned(breakdown.total)}
@@ -88,10 +112,10 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
           })}
         </ul>
         <p className={styles.legend}>P = proficient, E = expertise</p>
-        <a className={styles.manage} href="#character/abilities">
-          Edit proficiencies on Abilities &amp; Skills
-        </a>
-      </CollapsibleSection>
+        <OverviewFooter
+          links={[{ href: '#character/abilities', text: 'Edit proficiencies on Abilities & Skills' }]}
+        />
+      </div>
     </Card>
   );
 }

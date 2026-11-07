@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, cleanup, within } from '@testing-library/react';
+import { render, screen, cleanup, within, fireEvent } from '@testing-library/react';
 import { OverviewSkills } from '../OverviewSkills';
 import { createCharacter } from '../../../../storage/character-store';
 import type { Character } from '../../../../types/character';
@@ -64,6 +64,31 @@ describe('OverviewSkills', () => {
     ).toBeNull();
     expect(within(screen.getByTestId('overview-save-str')).getByLabelText('proficient')).toBeInTheDocument();
     expect(within(screen.getByTestId('overview-save-dex')).queryByRole('img')).toBeNull();
+  });
+
+  it('has a single header that is also the collapse toggle (persisted)', () => {
+    localStorage.removeItem('dnd-collapse-overview-skills');
+    render(<OverviewSkills character={character} />);
+    const headings = screen.getAllByRole('heading');
+    expect(headings.map((h) => h.textContent)).toEqual(['Skills & Saves']);
+    expect(screen.queryByText(/Saves and skills/i)).toBeNull();
+    const toggle = screen.getByRole('button', { name: 'Skills & Saves' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('region', { name: 'Skills & Saves' })).toBeVisible();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(localStorage.getItem('dnd-collapse-overview-skills')).toBe('false');
+    localStorage.removeItem('dnd-collapse-overview-skills');
+  });
+
+  it('renders the six saves in one grid container', () => {
+    render(<OverviewSkills character={character} />);
+    const grid = screen.getByTestId('overview-saves-grid');
+    expect(grid).toHaveAccessibleName('Saving throws');
+    expect(grid.children).toHaveLength(6);
+    for (const ability of ABILITIES) {
+      expect(grid).toContainElement(screen.getByTestId(`overview-save-${ability}`));
+    }
   });
 
   it('links to Abilities & Skills to edit proficiencies', () => {

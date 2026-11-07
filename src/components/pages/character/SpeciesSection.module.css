@@ -27,8 +27,10 @@
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 6px 8px;
-  min-height: 36px;
+  padding: 0 8px;
+  /* Same control height as the Personal Details fields above. */
+  height: 32px;
+  min-width: 0;
 }
 
 .speciesSelect:focus-visible {
@@ -36,27 +38,20 @@
   outline-offset: 1px;
 }
 
+/* Read-only values (Size, Languages) sit on the same line height as the
+   selects beside them so the grid's rows line up. */
 .speciesText {
-  font-size: 1.05rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 32px;
+  font-size: 1rem;
   color: var(--text-primary);
 }
 
 .speciesNote {
   color: var(--text-secondary);
   font-size: 0.82em;
-}
-
-.srdBadge {
-  align-self: flex-start;
-  margin-top: 2px;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 2px 6px;
 }
 
 /* Species traits: rich rows — name on line 1 (never truncated), effect + source
@@ -98,6 +93,7 @@
 /* Mobile: enlarge tap targets. */
 @media (hover: none), (max-width: 767px) {
   .speciesSelect {
-    min-height: 44px;
+    height: 44px;
+    font-size: 16px;
   }
 }

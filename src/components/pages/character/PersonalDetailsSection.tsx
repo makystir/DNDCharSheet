@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { Character } from '../../../types/character';
 import { ALIGNMENTS } from '../../../types/character';
 import { Card } from '../../shared/Card';
@@ -9,7 +10,6 @@ import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
 import { getBackground } from '../../../data/backgrounds';
-import { srdBadge } from '../sheet-helpers';
 import { User } from 'lucide-react';
 import { PortraitPromptDialog } from '../../shared/PortraitPromptDialog';
 import type { NameGender } from '../../../data/name-tables';
@@ -31,6 +31,52 @@ interface PersonalDetailsSectionProps {
   onPortraitRemove: () => void;
 }
 
+interface RollButtonProps {
+  label: string;
+  title: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+/** The fixed-size 🎲 button that ends every field's control row. */
+function RollButton({ label, title, onClick, disabled }: RollButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.rollSlot} ${styles.rollBtn}`}
+      data-roll-slot="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      title={title}
+    >
+      🎲
+    </button>
+  );
+}
+
+/**
+ * An empty slot the same size as a RollButton, for fields with nothing to roll
+ * (Gender), so every input in the grid ends at the same x position.
+ */
+function RollSlotPlaceholder() {
+  return <span className={styles.rollSlot} data-roll-slot="placeholder" aria-hidden="true" />;
+}
+
+/**
+ * One grid cell: the field (label above its single-line control) followed by
+ * the roll slot. Every cell has this exact shape so labels, controls and roll
+ * buttons line up across each row.
+ */
+function FieldCell({ field, roll, testId }: { field: ReactNode; roll: ReactNode; testId: string }) {
+  return (
+    <div className={styles.cell} data-testid={testId}>
+      <div className={styles.cellMain}>{field}</div>
+      {roll}
+    </div>
+  );
+}
+
 /**
  * Portrait + Personal Details card for the Character page Overview sub-tab.
  * Ported in structure/UX from the WFRP PersonalDetailsSection, re-themed to D&D
@@ -46,6 +92,12 @@ interface PersonalDetailsSectionProps {
  * fill a field from the FEAT-001 flavor generators, honoring the character's
  * current species + gender. The generated values are NON-RAW flavor and stay
  * fully editable; rolling is non-destructive (it only fills the one field).
+ *
+ * LAYOUT: a strict, even grid (5 columns wide, then 3, 2, 1 as the card
+ * narrows). Each cell is label + ONE control row (single-line control that
+ * flexes + a fixed roll slot, reserved even when there is nothing to roll), so
+ * every control has the same height and ends at the same x. Background spans
+ * the full row; Personality sits below the grid at full width.
  */
 export function PersonalDetailsSection({
   character,
@@ -70,6 +122,7 @@ export function PersonalDetailsSection({
   const speciesId = character.species?.id;
   const gender: NameGender = character.gender ?? 'neutral';
   const canGenerate = speciesId !== undefined;
+  const needSpecies = 'Choose a species first';
 
   const rollName = () => {
     if (!speciesId) return;
@@ -100,10 +153,9 @@ export function PersonalDetailsSection({
     onChange({ ...character, faith: next.name });
   };
 
-  // P5: the wizard-selected background (read-only) now sits beside the
-  // free-text Background field here on Overview, so "Background" means one thing
-  // in one place (it previously showed on a separate Species page). Identity/flavor
-  // only — background MECHANICS remain a deferred stage.
+  // P5: the wizard-selected background (read-only) sits under the free-text
+  // Background field here on Overview, so "Background" means one thing in one
+  // place. Identity/flavor only — background MECHANICS remain a deferred stage.
   const selectedBackground = getBackground(character.backgroundSelection?.id);
 
   // When the current faith value matches a catalog deity, surface its overview
@@ -120,6 +172,45 @@ export function PersonalDetailsSection({
     ],
   };
 
+  // A tap-to-edit text field in the grid's shared single-line control style.
+  const textField = (label: string, value: string, onSave: (v: string) => void) => (
+    <EditableField
+      label={label}
+      value={value}
+      type="text"
+      mode="tap-to-edit"
+      singleLine
+      controlClassName={styles.control}
+      onSave={(v) => onSave(String(v))}
+    />
+  );
+
+  const appearanceCell = (
+    field: 'height' | 'weight' | 'eyes' | 'hair' | 'skin',
+    label: string,
+    rollTitle: string,
+  ) => (
+    <FieldCell
+      key={field}
+      testId={`pd-field-${field}`}
+      field={textField(label, character[field] ?? '', (v) => setField(field, v))}
+      roll={
+        <RollButton
+          label={`Roll ${field}`}
+          title={canGenerate ? rollTitle : needSpecies}
+          onClick={() => rollAppearanceField(field)}
+          disabled={!canGenerate}
+        />
+      }
+    />
+  );
+
+  const alignmentLabel = character.alignment ?? '';
+  const genderLabel =
+    character.gender === undefined
+      ? ''
+      : character.gender.charAt(0).toUpperCase() + character.gender.slice(1);
+
   return (
     <section aria-labelledby={headerId} className={styles.section}>
       <div className={styles.identityRow}>
@@ -130,297 +221,203 @@ export function PersonalDetailsSection({
           onRemove={onPortraitRemove}
           onGeneratePrompt={() => setShowPromptDialog(true)}
         />
-        <Card style={{ flex: 1, minWidth: 0 }}>
-          <SectionHeader icon={User} title="Personal Details" titleId={headerId} />
-          <div className={styles.gridAutoFill}>
-            {/* Keep the accessible name "Character name" — it is the single
-                source of truth on character.name (no duplicate name field). */}
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Character name"
-                value={character.name}
-                type="text"
-                mode="tap-to-edit"
-                onSave={(v) => onChange({ ...character, name: String(v) })}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={rollName}
-                disabled={!canGenerate}
-                aria-label="Roll name"
-                title={canGenerate ? 'Roll a name for the current species + gender' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-
-            <div className={styles.selectWrapper}>
-              <label className={styles.selectLabel} htmlFor={genderId}>
-                Gender
-              </label>
-              <select
-                id={genderId}
-                className={styles.select}
-                value={character.gender ?? ''}
-                aria-label="Gender"
-                onChange={(e) => {
-                  const next = { ...character };
-                  if (e.target.value === '') delete next.gender;
-                  else next.gender = e.target.value as Character['gender'];
-                  onChange(next);
-                }}
-              >
-                <option value="">— Unset —</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="neutral">Neutral</option>
-              </select>
-            </div>
-
-            <div className={styles.selectWrapper}>
-              <label className={styles.selectLabel} htmlFor={alignmentId}>
-                Alignment
-              </label>
-              <div className={styles.fieldWithRoll}>
-                <select
-                  id={alignmentId}
-                  className={styles.select}
-                  value={character.alignment ?? ''}
-                  aria-label="Alignment"
-                  onChange={(e) => {
-                    const next = { ...character };
-                    if (e.target.value === '') {
-                      delete next.alignment;
-                    } else {
-                      next.alignment = e.target.value as Character['alignment'];
-                    }
-                    onChange(next);
-                  }}
-                >
-                  <option value="">— None —</option>
-                  {ALIGNMENTS.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className={styles.rollBtn}
-                  onClick={rollAlignment}
-                  aria-label="Roll alignment"
-                  title="Roll alignment"
-                >
-                  🎲
-                </button>
-              </div>
-            </div>
-
-            {/* Faith / Deity is a COMBO: a <datalist> of the 27 Gods of
-                Greyhawk suggestions plus free text, so homebrew / other-setting
-                deities are not blocked. The stored value is the deity name
-                string. A 🎲 picks a random catalog deity; when the value matches
-                a catalog deity, an ℹ hint shows its overview. */}
-            <div className={styles.selectWrapper}>
-              <div className={styles.personalityHeader}>
-                <label className={styles.selectLabel} htmlFor={faithId}>
-                  Faith / Deity
-                </label>
-                {deityHint && (
-                  <ContentTooltip content={deityHint} className={styles.deityHintTrigger}>
-                    <span aria-label={`About ${matchedDeity!.name}`}>ℹ</span>
-                  </ContentTooltip>
-                )}
-              </div>
-              <div className={styles.fieldWithRoll}>
-                <input
-                  id={faithId}
-                  type="text"
-                  className={styles.comboInput}
-                  list={faithListId}
-                  value={character.faith ?? ''}
-                  aria-label="Faith / Deity"
-                  placeholder="Deity name or homebrew"
-                  onChange={(e) => setField('faith', e.target.value)}
-                  style={{ flex: 1 }}
+        <div className={styles.detailsColumn}>
+          <Card>
+            <SectionHeader icon={User} title="Personal Details" titleId={headerId} />
+            <div className={styles.fieldsContainer}>
+              <div className={styles.fieldGrid} data-testid="personal-details-grid">
+                {/* Row 1: Name, Gender, Alignment, Faith / Deity, Age.
+                    Keep the accessible name "Character name" — it is the single
+                    source of truth on character.name (no duplicate name field). */}
+                <FieldCell
+                  testId="pd-field-name"
+                  field={textField('Character name', character.name, (v) =>
+                    onChange({ ...character, name: v }),
+                  )}
+                  roll={
+                    <RollButton
+                      label="Roll name"
+                      title={canGenerate ? 'Roll a name for the current species + gender' : needSpecies}
+                      onClick={rollName}
+                      disabled={!canGenerate}
+                    />
+                  }
                 />
-                <datalist id={faithListId}>
-                  {DEITY_LIST.map((d) => (
-                    <option key={d.id} value={d.name}>
-                      {d.epithet}
-                    </option>
-                  ))}
-                </datalist>
-                <button
-                  type="button"
-                  className={styles.rollBtn}
-                  onClick={rollFaith}
-                  aria-label="Roll deity"
-                  title="Roll a random deity"
-                >
-                  🎲
-                </button>
+
+                <FieldCell
+                  testId="pd-field-gender"
+                  field={
+                    <>
+                      <span className={styles.labelRow}>
+                        <label className={styles.fieldLabel} htmlFor={genderId}>
+                          Gender
+                        </label>
+                      </span>
+                      <select
+                        id={genderId}
+                        className={`${styles.control} ${styles.select}`}
+                        value={character.gender ?? ''}
+                        aria-label="Gender"
+                        title={genderLabel || undefined}
+                        onChange={(e) => {
+                          const next = { ...character };
+                          if (e.target.value === '') delete next.gender;
+                          else next.gender = e.target.value as Character['gender'];
+                          onChange(next);
+                        }}
+                      >
+                        <option value="">— Unset —</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="neutral">Neutral</option>
+                      </select>
+                    </>
+                  }
+                  roll={<RollSlotPlaceholder />}
+                />
+
+                <FieldCell
+                  testId="pd-field-alignment"
+                  field={
+                    <>
+                      <span className={styles.labelRow}>
+                        <label className={styles.fieldLabel} htmlFor={alignmentId}>
+                          Alignment
+                        </label>
+                      </span>
+                      <select
+                        id={alignmentId}
+                        className={`${styles.control} ${styles.select}`}
+                        value={character.alignment ?? ''}
+                        aria-label="Alignment"
+                        title={alignmentLabel || undefined}
+                        onChange={(e) => {
+                          const next = { ...character };
+                          if (e.target.value === '') {
+                            delete next.alignment;
+                          } else {
+                            next.alignment = e.target.value as Character['alignment'];
+                          }
+                          onChange(next);
+                        }}
+                      >
+                        <option value="">— None —</option>
+                        {ALIGNMENTS.map((a) => (
+                          <option key={a} value={a}>
+                            {a}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  }
+                  roll={<RollButton label="Roll alignment" title="Roll alignment" onClick={rollAlignment} />}
+                />
+
+                {/* Faith / Deity is a COMBO: a <datalist> of the 27 Gods of
+                    Greyhawk suggestions plus free text, so homebrew / other-setting
+                    deities are not blocked. The stored value is the deity name
+                    string. A 🎲 picks a random catalog deity; when the value
+                    matches a catalog deity, an ℹ hint (inline with the label)
+                    shows its overview. */}
+                <FieldCell
+                  testId="pd-field-faith"
+                  field={
+                    <>
+                      <span className={styles.labelRow} data-testid="pd-faith-label-row">
+                        <label className={styles.fieldLabel} htmlFor={faithId}>
+                          Faith / Deity
+                        </label>
+                        {deityHint && (
+                          <ContentTooltip content={deityHint} className={styles.deityHintTrigger}>
+                            <span aria-label={`About ${matchedDeity!.name}`}>ℹ</span>
+                          </ContentTooltip>
+                        )}
+                      </span>
+                      <input
+                        id={faithId}
+                        type="text"
+                        className={`${styles.control} ${styles.comboInput}`}
+                        list={faithListId}
+                        value={character.faith ?? ''}
+                        aria-label="Faith / Deity"
+                        title={character.faith || undefined}
+                        placeholder="Deity name or homebrew"
+                        onChange={(e) => setField('faith', e.target.value)}
+                      />
+                      <datalist id={faithListId}>
+                        {DEITY_LIST.map((d) => (
+                          <option key={d.id} value={d.name}>
+                            {d.epithet}
+                          </option>
+                        ))}
+                      </datalist>
+                    </>
+                  }
+                  roll={<RollButton label="Roll deity" title="Roll a random deity" onClick={rollFaith} />}
+                />
+
+                <FieldCell
+                  testId="pd-field-age"
+                  field={textField('Age', character.age ?? '', (v) => setField('age', v))}
+                  roll={
+                    <RollButton
+                      label="Roll age"
+                      title={canGenerate ? 'Roll an age for the current species' : needSpecies}
+                      onClick={rollAge}
+                      disabled={!canGenerate}
+                    />
+                  }
+                />
+
+                {/* Row 2: Height, Weight, Eyes, Hair, Skin. */}
+                {appearanceCell('height', 'Height', 'Roll height for the current species')}
+                {appearanceCell('weight', 'Weight', 'Roll weight for the current species')}
+                {appearanceCell('eyes', 'Eyes', 'Roll eye colour for the current species')}
+                {appearanceCell('hair', 'Hair', 'Roll hair for the current species')}
+                {appearanceCell('skin', 'Skin', 'Roll skin for the current species')}
+
+                {/* Row 3: Background spans the full row. Free text, with the
+                    wizard-selected background name shown read-only beneath it
+                    (P5). The 2024 Background MECHANICS (ability increases,
+                    skill/tool proficiencies, origin feat — PHB 2024
+                    "Backgrounds") are a LATER stage, deliberately NOT here. */}
+                <div className={`${styles.cell} ${styles.cellFull}`} data-testid="pd-field-background">
+                  <div className={styles.cellMain}>
+                    {textField('Background', character.background ?? '', (v) =>
+                      setField('background', v),
+                    )}
+                    {selectedBackground && (
+                      <span className={styles.backgroundSelection} data-testid="pd-selected-background">
+                        Selected background: {selectedBackground.name}
+                      </span>
+                    )}
+                  </div>
+                  <RollSlotPlaceholder />
+                </div>
+              </div>
+
+              <div className={styles.personalityField}>
+                <div className={styles.personalityHeader}>
+                  <label className={styles.fieldLabel} htmlFor={personalityId}>
+                    Personality
+                  </label>
+                  <RollButton
+                    label="Roll personality"
+                    title="Roll a personality trait"
+                    onClick={rollPersonality}
+                  />
+                </div>
+                <textarea
+                  id={personalityId}
+                  className={styles.textarea}
+                  value={character.personality ?? ''}
+                  rows={4}
+                  onChange={(e) => setField('personality', e.target.value)}
+                />
               </div>
             </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Age"
-                value={character.age ?? ''}
-                onSave={(v) => setField('age', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={rollAge}
-                disabled={!canGenerate}
-                aria-label="Roll age"
-                title={canGenerate ? 'Roll an age for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Height"
-                value={character.height ?? ''}
-                onSave={(v) => setField('height', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollAppearanceField('height')}
-                disabled={!canGenerate}
-                aria-label="Roll height"
-                title={canGenerate ? 'Roll height for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Weight"
-                value={character.weight ?? ''}
-                onSave={(v) => setField('weight', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollAppearanceField('weight')}
-                disabled={!canGenerate}
-                aria-label="Roll weight"
-                title={canGenerate ? 'Roll weight for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Eyes"
-                value={character.eyes ?? ''}
-                onSave={(v) => setField('eyes', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollAppearanceField('eyes')}
-                disabled={!canGenerate}
-                aria-label="Roll eyes"
-                title={canGenerate ? 'Roll eye colour for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Hair"
-                value={character.hair ?? ''}
-                onSave={(v) => setField('hair', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollAppearanceField('hair')}
-                disabled={!canGenerate}
-                aria-label="Roll hair"
-                title={canGenerate ? 'Roll hair for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            <div className={styles.fieldWithRoll}>
-              <EditableField
-                label="Skin"
-                value={character.skin ?? ''}
-                onSave={(v) => setField('skin', String(v))}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={() => rollAppearanceField('skin')}
-                disabled={!canGenerate}
-                aria-label="Roll skin"
-                title={canGenerate ? 'Roll skin for the current species' : 'Choose a species first'}
-              >
-                🎲
-              </button>
-            </div>
-            {/* Free text only this stage, with the wizard-selected background
-                shown read-only beside it (P5). The 2024 Background MECHANICS
-                (ability increases, skill/tool proficiencies, origin feat —
-                PHB 2024 "Backgrounds") are a LATER stage, deliberately NOT here. */}
-            <div className={styles.backgroundField}>
-              <EditableField
-                label="Background"
-                value={character.background ?? ''}
-                onSave={(v) => setField('background', String(v))}
-              />
-              {selectedBackground && (
-                <span className={styles.backgroundSelection}>
-                  Selected: {selectedBackground.name}
-                  <span
-                    className={styles.backgroundBadge}
-                    title={srdBadge(selectedBackground.srd).title}
-                  >
-                    {' '}
-                    {srdBadge(selectedBackground.srd).text}
-                  </span>
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.personalityField}>
-            <div className={styles.personalityHeader}>
-              <label className={styles.selectLabel} htmlFor={personalityId}>
-                Personality
-              </label>
-              <button
-                type="button"
-                className={styles.rollBtn}
-                onClick={rollPersonality}
-                aria-label="Roll personality"
-                title="Roll a personality trait"
-              >
-                🎲
-              </button>
-            </div>
-            <textarea
-              id={personalityId}
-              className={styles.textarea}
-              value={character.personality ?? ''}
-              rows={4}
-              onChange={(e) => setField('personality', e.target.value)}
-            />
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
       {showPromptDialog && (
         <PortraitPromptDialog character={character} onClose={() => setShowPromptDialog(false)} />
