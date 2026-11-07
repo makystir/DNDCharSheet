@@ -24,7 +24,7 @@ import {
   classFeaturesByLevel,
 } from '../../logic/classes';
 import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
-import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
+import { allSkillBreakdowns, effectiveSkillTraining, getSkillTraining } from '../../logic/skills';
 import { shouldResetSpellcasting } from '../../logic/spellcasting';
 import { getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec } from '../../data/species';
@@ -511,9 +511,12 @@ export function CharacterPage({
           <ul className={styles.statList}>
             {SKILLS.map((skill) => {
               const breakdown = skillBreakdowns[skill.id];
-              const training = getSkillTraining(character, skill.id);
-              const proficient = training.proficient ?? false;
-              const expertise = training.expertise ?? false;
+              // Effective view: class- and species-granted skills show ticked and
+              // locked (like class saving throws); the tick is editable otherwise.
+              const training = effectiveSkillTraining(character, skill.id);
+              const proficient = training.proficient;
+              const expertise = training.expertise;
+              const granted = training.source === 'class' || training.source === 'species';
               return (
                 <li key={skill.id} className={styles.statRow}>
                   <span className={styles.statName}>
@@ -521,12 +524,16 @@ export function CharacterPage({
                     <span className={styles.statAbility}>
                       ({ABILITY_ABBR[skill.ability]})
                     </span>
+                    {granted && (
+                      <span className={styles.saveSource}>from {training.sourceLabel}</span>
+                    )}
                   </span>
                   <label className={styles.checkboxCell}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
                       checked={proficient}
+                      disabled={granted}
                       aria-label={`${skill.name} proficiency`}
                       onChange={(e) =>
                         setSkill(skill.id, { proficient: e.target.checked })

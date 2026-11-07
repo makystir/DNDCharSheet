@@ -34,7 +34,7 @@ import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { speedBreakdown, resolveSpecies, speciesTraits } from '../../logic/species';
 import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
-import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
+import { allSkillBreakdowns, effectiveSkillTraining } from '../../logic/skills';
 import {
   isSpellcaster,
   anySpellcaster,
@@ -277,14 +277,14 @@ export function buildCoreStats(character: Character): CoreStat[] {
 export function buildSkills(character: Character): SkillRow[] {
   const breakdowns = allSkillBreakdowns(character);
   return SKILLS.map((skill) => {
-    const training = getSkillTraining(character, skill.id);
+    const training = effectiveSkillTraining(character, skill.id);
     return {
       id: skill.id,
       name: skill.name,
       ability: ABILITY_ABBR[skill.ability],
       modifier: breakdowns[skill.id].total,
-      proficient: training.proficient ?? false,
-      expertise: training.expertise ?? false,
+      proficient: training.proficient,
+      expertise: training.expertise,
     };
   });
 }

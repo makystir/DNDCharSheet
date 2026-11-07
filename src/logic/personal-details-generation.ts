@@ -38,6 +38,7 @@ import { standardArray } from './ability-score-generation';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
 import { pick, type RNG } from './random';
 import { speciesGrantedSkills } from './skills';
+import { pickStartingSpells } from './starting-spells';
 
 /** Generated appearance fields (all NON-RAW flavor). */
 export interface GeneratedAppearance {
@@ -300,6 +301,13 @@ export function generateRandomCharacter(
     new Set<SkillId>([...bg.skills, ...(Object.keys(speciesGrantedSkills(character)) as SkillId[])]),
   );
   character = { ...character, classes: [{ id: classId, level: 1, skillChoices }] };
+
+  // Starting spells (casters only), drawn after every other draw so earlier seeded
+  // results are unchanged. Stored exactly as the Spells page stores them.
+  const startingSpells = pickStartingSpells(classId, rng);
+  if (startingSpells) {
+    character = { ...character, spellcasting: { byClass: { [classId]: startingSpells } } };
+  }
 
   return { ...character, abilityGenMethod: 'standard-array' };
 }

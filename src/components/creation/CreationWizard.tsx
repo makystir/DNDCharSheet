@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
-import type { Ability, Character, SkillId } from '../../types/character';
+import type { Ability, Character, ClassSpellcasting, SkillId } from '../../types/character';
 import {
   ABILITIES,
   ABILITY_ABBR,
@@ -57,6 +57,10 @@ import { SegmentedControl } from '../shared/SegmentedControl';
 import { StepIndicator } from '../combat/StepIndicator';
 import { choiceOptions, formatLanguage } from '../pages/sheet-helpers';
 import { SkillsStep } from './SkillsStep';
+import { SpellsStep } from './SpellsStep';
+import { ReviewStep } from './ReviewStep';
+import { startingChoicesFor } from '../../logic/starting-choices';
+import { startingSpellPools } from '../../logic/starting-spells';
 import styles from './CreationWizard.module.css';
 
 export interface CreationWizardProps {
@@ -71,18 +75,26 @@ export interface CreationWizardProps {
  * indicator all key off the step id, so a conditional step (e.g. Spells) can be
  * inserted by adding an entry here.
  */
-type StepId = 'class' | 'origin' | 'skills' | 'abilities' | 'details' | 'equipment';
-const STEPS: { id: StepId; label: string }[] = [
+type StepId =
+  | 'class'
+  | 'origin'
+  | 'skills'
+  | 'abilities'
+  | 'spells'
+  | 'details'
+  | 'equipment'
+  | 'review';
+const ALL_STEPS: { id: StepId; label: string }[] = [
   { id: 'class', label: 'Class' },
   { id: 'origin', label: 'Origin' },
   { id: 'skills', label: 'Skills' },
   { id: 'abilities', label: 'Ability Scores' },
+  // Only for classes with level 1 spellcasting (startingChoicesFor(...).spells).
+  { id: 'spells', label: 'Spells' },
   { id: 'details', label: 'Details' },
   { id: 'equipment', label: 'Equipment' },
+  { id: 'review', label: 'Review' },
 ];
-const STEP_LABELS = STEPS.map((s) => s.label);
-/** The 1-based number shown in a step's heading. */
-const stepNumber = (id: StepId): number => STEPS.findIndex((s) => s.id === id) + 1;
 
 type AbilityMethod = 'standard-array' | 'point-buy' | 'roll';
 type EquipmentChoice = 'A' | 'B';
@@ -142,6 +154,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // Skills step: the class skill picks (stored in classes[0].skillChoices).
   const [skillChoices, setSkillChoices] = useState<SkillId[]>([]);
+
+  // Spells step (casters only): stored at spellcasting.byClass[classId] on finish.
+  const [spellPicks, setSpellPicks] = useState<ClassSpellcasting>({});
 
   // Ability scores step.
   const [abilityMethod, setAbilityMethod] = useState<AbilityMethod>('standard-array');
@@ -227,7 +242,16 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     return poolUsedOnce(arrayAssignment, STANDARD_ARRAY.length);
   };
 
-  const currentStepId = STEPS[step].id;
+  // The Spells step exists only for a class with level 1 spellcasting.
+  const hasSpellsStep = classId !== '' && startingChoicesFor(classId)?.spells != null;
+  const steps = useMemo(
+    () => ALL_STEPS.filter((s) => s.id !== 'spells' || hasSpellsStep),
+    [hasSpellsStep],
+  );
+  const stepLabels = useMemo(() => steps.map((s) => s.label), [steps]);
+  /** The 1-based number shown in a step's heading. */
+  const stepNumber = (id: StepId): number => steps.findIndex((s) => s.id === id) + 1;
+  const currentStepId = steps[step].id;
 
   const canProceed = (): boolean => {
     switch (currentStepId) {
@@ -239,8 +263,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         return abilityStepValid();
       // Skills never blocks: unfinished picks surface on the Overview later.
       case 'skills':
+      case 'spells':
       case 'details':
       case 'equipment':
+      case 'review':
         return true;
       default:
         return false;
@@ -445,11 +471,33 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       character.createdAt,
     );
 
+    // Starting spells, stored exactly as the Spells page stores them
+    // (byClass[classId] = { cantrips, prepared, spellbook }); nothing else in
+    // spellcasting is touched. Always-prepared feature spells are derived, never
+    // stored; required cantrips are locked in and counted.
+    if (hasSpellsStep) {
+      const pools = startingSpellPools(classId);
+      const always = pools?.alwaysPrepared ?? [];
+      const required = pools?.required ?? [];
+      const stored = spellPicks.cantrips ?? [];
+      const cantrips = [...required.filter((id) => !stored.includes(id)), ...stored];
+      const spellbook = spellPicks.spellbook ?? [];
+      const prepared = (spellPicks.prepared ?? []).filter((id) => !always.includes(id));
+      const picks: ClassSpellcasting = {
+        ...(cantrips.length > 0 ? { cantrips } : {}),
+        ...(spellbook.length > 0 ? { spellbook } : {}),
+        ...(prepared.length > 0 ? { prepared } : {}),
+      };
+      if (Object.keys(picks).length > 0) {
+        character = { ...character, spellcasting: { byClass: { [classId]: picks } } };
+      }
+    }
+
     return character;
   };
 
   const goNext = () => {
-    if (step < STEPS.length - 1) {
+    if (step < steps.length - 1) {
       setStep((s) => s + 1);
     } else {
       onComplete(buildCharacter());
@@ -491,6 +539,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           setGrantedLanguages([]);
           // Class skill picks belong to the class list; reset on change.
           setSkillChoices([]);
+          // Spell picks belong to the class list; reset on change.
+          setSpellPicks({});
         }}
       >
         <option value="">— Select a Class —</option>
@@ -1166,6 +1216,20 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
+  const renderSpellsStep = () => (
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Step {stepNumber('spells')}: Spells</h2>
+      <SpellsStep classId={classId} value={spellPicks} onChange={setSpellPicks} />
+    </div>
+  );
+
+  const renderReviewStep = () => (
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Step {stepNumber('review')}: Review</h2>
+      <ReviewStep character={buildCharacter()} />
+    </div>
+  );
+
   const stepRenderers: Record<StepId, () => ReactElement> = {
     class: renderClassStep,
     origin: renderOriginStep,
@@ -1173,11 +1237,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     abilities: renderAbilitiesStep,
     details: renderDetailsStep,
     equipment: renderEquipmentStep,
+    spells: renderSpellsStep,
+    review: renderReviewStep,
   };
 
   return (
     <div className={styles.wizard} role="region" aria-label="Character creation wizard">
-      <StepIndicator steps={STEP_LABELS} currentStep={step} />
+      <StepIndicator steps={stepLabels} currentStep={step} />
       {stepRenderers[currentStepId]()}
       <div className={styles.footer}>
         <button type="button" className={styles.secondaryBtn} onClick={goBack}>
@@ -1189,7 +1255,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           onClick={goNext}
           disabled={!canProceed()}
         >
-          {step === STEPS.length - 1 ? 'Finish' : 'Next'}
+          {step === steps.length - 1 ? 'Finish' : 'Next'}
         </button>
       </div>
     </div>

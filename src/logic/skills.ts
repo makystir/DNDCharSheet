@@ -136,6 +136,52 @@ export function speciesGrantedSkills(
   return result;
 }
 
+/** Where a skill's effective proficiency comes from, for display. */
+export interface EffectiveSkillTraining {
+  proficient: boolean;
+  expertise: boolean;
+  /** 'class' / 'species' = granted (cannot be toggled off); 'manual' = stored flag. */
+  source: 'class' | 'species' | 'manual' | null;
+  /** e.g. 'Wizard (class)' or 'Human (species)'; both are joined with ' / '. */
+  sourceLabel?: string;
+}
+
+/**
+ * The proficiency a skill is effectively shown with. Mirrors the merge
+ * allSkillBreakdowns / skillModifierBreakdown performs: effective proficiency =
+ * stored flag OR species-granted OR class-granted; expertise counts only off
+ * effective proficiency (PHB 2024 "Expertise": PB is multiplied only once, and
+ * there is no PB to double without proficiency). A stored flag (including one
+ * written by a background) is 'manual' for display; a grant takes precedence.
+ */
+export function effectiveSkillTraining(
+  character: Character,
+  skillId: SkillId,
+): EffectiveSkillTraining {
+  const stored = getSkillTraining(character, skillId);
+  const speciesLabel = speciesGrantedSkills(character)[skillId];
+  const classLabel = classGrantedSkills(character)[skillId];
+  const proficient = stored.proficient || speciesLabel !== undefined || classLabel !== undefined;
+  const expertise = proficient && (stored.expertise ?? false);
+  const labels: string[] = [];
+  if (speciesLabel !== undefined) labels.push(`${speciesLabel.split(':')[0]} (species)`);
+  if (classLabel !== undefined) labels.push(classLabel);
+  const source: EffectiveSkillTraining['source'] =
+    classLabel !== undefined
+      ? 'class'
+      : speciesLabel !== undefined
+        ? 'species'
+        : stored.proficient
+          ? 'manual'
+          : null;
+  return {
+    proficient,
+    expertise,
+    source,
+    ...(labels.length > 0 ? { sourceLabel: labels.join(' / ') } : {}),
+  };
+}
+
 /**
  * Breakdowns for every canonical skill, keyed by SkillId. Iterates the SKILLS
  * list (not the stored keys) so a stray/stale stored key cannot throw.

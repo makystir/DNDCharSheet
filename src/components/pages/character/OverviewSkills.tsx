@@ -3,7 +3,7 @@ import { ListChecks } from 'lucide-react';
 import type { Character } from '../../../types/character';
 import { ABILITIES, ABILITY_ABBR, ABILITY_NAMES, SKILLS } from '../../../types/character';
 import { formatSigned } from '../../../logic/breakdown';
-import { allSkillBreakdowns, getSkillTraining } from '../../../logic/skills';
+import { allSkillBreakdowns, effectiveSkillTraining } from '../../../logic/skills';
 import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../../logic/saving-throws';
 import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
 import { Card } from '../../shared/Card';
@@ -80,9 +80,9 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
         <ul className={styles.skills} aria-label="Skills">
           {skills.map((skill) => {
             const breakdown = skillBreakdowns[skill.id];
-            const training = getSkillTraining(character, skill.id);
-            const proficient = training.proficient ?? false;
-            const expertise = proficient && (training.expertise ?? false);
+            const training = effectiveSkillTraining(character, skill.id);
+            const proficient = training.proficient;
+            const expertise = training.expertise;
             const status = expertise ? 'expertise' : proficient ? 'proficient' : '';
             return (
               <li

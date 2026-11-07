@@ -109,6 +109,7 @@ describe('CreationWizard', () => {
     completeStep3StandardArray();
     next(); // -> step 4 (Details)
     next(); // -> step 5 (Equipment)
+    next(); // -> step 6 (Review)
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
 
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -261,6 +262,7 @@ describe('CreationWizard', () => {
     completeStep3StandardArray();
     next(); // -> step 4
     next(); // -> step 5
+    next(); // -> Review
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
 
     const character = onComplete.mock.calls[0][0];
@@ -274,7 +276,7 @@ describe('CreationWizard Skills step', () => {
   it('lists Skills between Origin and Ability Scores in the step indicator', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     const group = screen.getByRole('group', { name: 'Step progress' });
-    expect(group.textContent).toMatch(/Class.*Origin.*Skills.*Ability Scores.*Details.*Equipment/);
+    expect(group.textContent).toMatch(/Class.*Origin.*Skills.*Ability Scores.*Details.*Equipment.*Review/);
   });
 
   it('shows the class saves and origin grants as granted automatically', () => {
@@ -346,6 +348,7 @@ describe('CreationWizard Skills step', () => {
     completeStep3StandardArray();
     next();
     next();
+    next(); // -> Review
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const character = onComplete.mock.calls[0][0];
     expect(character.classes[0].skillChoices).toEqual(['athletics', 'perception']);
