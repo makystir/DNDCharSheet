@@ -1307,7 +1307,7 @@ const HUMAN: SpeciesFlavor = {
   ],
   heightInches: { min: 60, max: 78 },
   weightPounds: { min: 120, max: 260 },
-  ageYears: { min: 18, max: 70 },
+  ageYears: { min: 18, max: 45 },
 };
 
 const DWARF: SpeciesFlavor = {
@@ -1323,7 +1323,7 @@ const DWARF: SpeciesFlavor = {
   ],
   heightInches: { min: 48, max: 58 },
   weightPounds: { min: 150, max: 220 },
-  ageYears: { min: 40, max: 350 },
+  ageYears: { min: 40, max: 175 },
 };
 
 const ELF: SpeciesFlavor = {
@@ -1339,7 +1339,7 @@ const ELF: SpeciesFlavor = {
   ],
   heightInches: { min: 60, max: 74 },
   weightPounds: { min: 100, max: 160 },
-  ageYears: { min: 100, max: 700 },
+  ageYears: { min: 100, max: 375 },
 };
 
 const HALFLING: SpeciesFlavor = {
@@ -1355,7 +1355,7 @@ const HALFLING: SpeciesFlavor = {
   ],
   heightInches: { min: 34, max: 42 },
   weightPounds: { min: 35, max: 48 },
-  ageYears: { min: 20, max: 140 },
+  ageYears: { min: 20, max: 75 },
 };
 
 const GNOME: SpeciesFlavor = {
@@ -1371,7 +1371,7 @@ const GNOME: SpeciesFlavor = {
   ],
   heightInches: { min: 36, max: 44 },
   weightPounds: { min: 35, max: 50 },
-  ageYears: { min: 40, max: 450 },
+  ageYears: { min: 40, max: 225 },
 };
 
 const DRAGONBORN: SpeciesFlavor = {
@@ -1388,7 +1388,7 @@ const DRAGONBORN: SpeciesFlavor = {
   ],
   heightInches: { min: 66, max: 80 },
   weightPounds: { min: 200, max: 340 },
-  ageYears: { min: 15, max: 80 },
+  ageYears: { min: 15, max: 40 },
 };
 
 const TIEFLING: SpeciesFlavor = {
@@ -1406,7 +1406,7 @@ const TIEFLING: SpeciesFlavor = {
   ],
   heightInches: { min: 60, max: 76 },
   weightPounds: { min: 120, max: 240 },
-  ageYears: { min: 18, max: 90 },
+  ageYears: { min: 18, max: 45 },
 };
 
 const ORC: SpeciesFlavor = {
@@ -1422,7 +1422,7 @@ const ORC: SpeciesFlavor = {
   ],
   heightInches: { min: 66, max: 82 },
   weightPounds: { min: 180, max: 320 },
-  ageYears: { min: 14, max: 60 },
+  ageYears: { min: 14, max: 35 },
 };
 
 const GOLIATH: SpeciesFlavor = {
@@ -1438,7 +1438,7 @@ const GOLIATH: SpeciesFlavor = {
   ],
   heightInches: { min: 84, max: 96 },
   weightPounds: { min: 280, max: 420 },
-  ageYears: { min: 18, max: 80 },
+  ageYears: { min: 18, max: 40 },
 };
 
 const AASIMAR: SpeciesFlavor = {
@@ -1454,7 +1454,7 @@ const AASIMAR: SpeciesFlavor = {
   ],
   heightInches: { min: 60, max: 76 },
   weightPounds: { min: 120, max: 240 },
-  ageYears: { min: 18, max: 160 },
+  ageYears: { min: 18, max: 80 },
 };
 
 /** The flavor table keyed by SpeciesId. Every supported species is present. */
@@ -1516,7 +1516,9 @@ export function weightRangeFor(species: SpeciesId): NumericRange {
 
 /**
  * Age range (years, inclusive) for a species (NON-RAW flavor). The PHB has no
- * age table, so this is an invented plausible adult band per species.
+ * age table, so this is an invented plausible band per species, running from
+ * adulthood up to roughly middle age (about half the species' lifespan) at the
+ * oldest, so random rolls never produce an elderly character.
  */
 export function ageRangeFor(species: SpeciesId): NumericRange {
   return flavorFor(species).ageYears;
