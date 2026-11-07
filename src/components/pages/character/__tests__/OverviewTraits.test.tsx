@@ -79,6 +79,10 @@ describe('OverviewTraits', () => {
     expect(document.body.textContent).not.toMatch(/later stage/i);
   });
 
+  it('lists known languages: Common plus chosen ones', () => {
+    render(<OverviewTraits character={{ ...createCharacter('Linguist'), languages: { chosen: ['elvish', 'dwarvish'] } }} />);
+    expect(screen.getByTestId('overview-languages')).toHaveTextContent('Common, Elvish, Dwarvish');
+  });
   it('has a single card header that is also the collapse toggle', () => {
     render(<OverviewTraits character={withFeats} />);
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([

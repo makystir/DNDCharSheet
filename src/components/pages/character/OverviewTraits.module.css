@@ -105,3 +105,15 @@
     align-items: center;
   }
 }
+
+/* Known languages line above the trait groups. */
+.languages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 12px;
+}
+.languages .groupTitle {
+  margin: 0;
+}

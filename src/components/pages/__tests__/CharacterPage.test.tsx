@@ -205,7 +205,7 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('link', { name: 'Level up on Advancement' })).toBeInTheDocument();
     });
 
-    it('puts Personal Details (with portrait) above Species and the vitals strip', () => {
+    it('puts Personal Details (with portrait) above the vitals strip', () => {
       renderPage({ level: 3 });
       const details = screen.getByRole('heading', { name: 'Personal Details' });
       const species = screen.getByRole('combobox', { name: 'Species' });

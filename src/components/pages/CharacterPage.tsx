@@ -36,7 +36,6 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
-import { SpeciesSection } from './character/SpeciesSection';
 import { OverviewSetup } from './character/OverviewSetup';
 import { OverviewVitals } from './character/OverviewVitals';
 import { OverviewInspiration } from './character/OverviewInspiration';
@@ -365,10 +364,6 @@ export function CharacterPage({
             portraitURL={portraitURL}
             onPortraitUpload={onPortraitUpload ?? (() => {})}
             onPortraitRemove={onPortraitRemove ?? (() => {})}
-          />
-
-          <SpeciesSection
-            character={character}
             onSpeciesChange={setSpecies}
             onSpeciesChoiceChange={setSpeciesChoice}
           />

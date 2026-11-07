@@ -7,6 +7,8 @@ import { proficiencyBonusBreakdown } from '../../../logic/abilities';
 import { classFeaturesByLevelTagged } from '../../../logic/classes';
 import { characterFeats } from '../../../logic/feats';
 import { speciesTraits } from '../../../logic/species';
+import { knownLanguages } from '../../../logic/languages';
+import { formatLanguage } from '../sheet-helpers';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SectionHeader } from '../../shared/SectionHeader';
@@ -51,7 +53,7 @@ function choiceLine(selection: FeatSelection): string | null {
 }
 
 /**
- * Read-only mirror of species traits, feats and gained class features. The
+ * Read-only mirror of known languages, species traits, feats and gained class features. The
  * effect texts come from the existing data catalogs; feats are edited only on
  * Advancement, class on Class & Features.
  *
@@ -62,6 +64,9 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
   const [expanded, toggle] = usePersistedExpanded('dnd-collapse-overview-traits');
   const titleId = useId();
   const traits = speciesTraits(character);
+  // Common is always known, plus chosen and class-granted languages (PHB 2024
+  // "Choose Languages"). Stored ids are lowercase; formatLanguage title-cases them.
+  const languages = knownLanguages(character);
   const feats = characterFeats(character);
   const proficiency = proficiencyBonusBreakdown(character.level);
   const features = [...classFeaturesByLevelTagged(character).values()]
@@ -80,6 +85,10 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
         onToggleCollapse={toggle}
       />
       <div className={styles.body} role="region" aria-labelledby={titleId} hidden={!expanded}>
+        <p className={styles.languages} data-testid="overview-languages">
+          <span className={styles.groupTitle}>Languages</span>
+          <span>{languages.map(formatLanguage).join(', ')}</span>
+        </p>
         <div className={styles.groups}>
           <section className={styles.group} aria-label="Species traits">
             <h4 className={styles.groupTitle}>Species traits</h4>

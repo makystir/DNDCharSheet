@@ -9,6 +9,10 @@ import { ContentTooltip } from '../../shared/ContentTooltip';
 import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
+import { SPECIES_LIST } from '../../../data/species';
+import type { SpeciesChoiceSpec } from '../../../data/species';
+import { resolveSize, resolveSpecies } from '../../../logic/species';
+import { SIZE_LABELS, choiceOptions } from '../sheet-helpers';
 import { getBackground } from '../../../data/backgrounds';
 import { User } from 'lucide-react';
 import { PortraitPromptDialog } from '../../shared/PortraitPromptDialog';
@@ -29,6 +33,10 @@ interface PersonalDetailsSectionProps {
   portraitURL: string;
   onPortraitUpload: (file: File) => void;
   onPortraitRemove: () => void;
+  /** Select a species (empty string clears it); owned by the page. */
+  onSpeciesChange: (raw: string) => void;
+  /** Write one species sub-choice field (empty string unsets it); owned by the page. */
+  onSpeciesChoiceChange: (field: SpeciesChoiceSpec['field'], raw: string) => void;
 }
 
 interface RollButtonProps {
@@ -105,11 +113,14 @@ export function PersonalDetailsSection({
   portraitURL,
   onPortraitUpload,
   onPortraitRemove,
+  onSpeciesChange,
+  onSpeciesChoiceChange,
 }: PersonalDetailsSectionProps) {
   const headerId = useId();
   const alignmentId = useId();
   const genderId = useId();
   const faithId = useId();
+  const speciesSelectId = useId();
   const faithListId = useId();
   const personalityId = useId();
   const [showPromptDialog, setShowPromptDialog] = useState(false);
@@ -204,6 +215,14 @@ export function PersonalDetailsSection({
       }
     />
   );
+
+  // Species + its sub-choices + Size. The species editor lives here (the only
+  // one on the sheet). Size is a sub-choice select when the species offers
+  // Small/Medium (it appears among the species' choices); otherwise it is the
+  // fixed read-only size (PHB 2024 "Parts of a Species").
+  const selectedSpecies = resolveSpecies(character);
+  const resolvedSize = resolveSize(character);
+  const hasSizeChoice = selectedSpecies?.choices?.some((c) => c.field === 'size') ?? false;
 
   const alignmentLabel = character.alignment ?? '';
   const genderLabel =
@@ -376,7 +395,89 @@ export function PersonalDetailsSection({
                 {appearanceCell('hair', 'Hair', 'Roll hair for the current species')}
                 {appearanceCell('skin', 'Skin', 'Roll skin for the current species')}
 
-                {/* Row 3: Background spans the full row. Free text, with the
+                {/* Row 3: Species, its sub-choices, and Size. */}
+                <FieldCell
+                  testId="pd-field-species"
+                  field={
+                    <>
+                      <span className={styles.labelRow}>
+                        <label className={styles.fieldLabel} htmlFor={speciesSelectId}>
+                          Species
+                        </label>
+                      </span>
+                      <select
+                        id={speciesSelectId}
+                        className={`${styles.control} ${styles.select}`}
+                        value={character.species?.id ?? ''}
+                        aria-label="Species"
+                        onChange={(e) => onSpeciesChange(e.target.value)}
+                      >
+                        <option value="">— None —</option>
+                        {SPECIES_LIST.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  }
+                  roll={<RollSlotPlaceholder />}
+                />
+
+                {selectedSpecies?.choices?.map((spec) => {
+                  const value = (character.species?.[spec.field] as string | undefined) ?? '';
+                  const selectId = `species-choice-${spec.field}`;
+                  return (
+                    <FieldCell
+                      key={spec.field}
+                      testId={`pd-field-species-${spec.field}`}
+                      field={
+                        <>
+                          <span className={styles.labelRow}>
+                            <label className={styles.fieldLabel} htmlFor={selectId}>
+                              {spec.label}
+                            </label>
+                          </span>
+                          <select
+                            id={selectId}
+                            className={`${styles.control} ${styles.select}`}
+                            value={value}
+                            aria-label={spec.label}
+                            onChange={(e) => onSpeciesChoiceChange(spec.field, e.target.value)}
+                          >
+                            <option value="">choose…</option>
+                            {choiceOptions(spec).map((o) => (
+                              <option key={o.id} value={o.id}>
+                                {o.label}
+                                {o.note ? ` (${o.note})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      }
+                      roll={<RollSlotPlaceholder />}
+                    />
+                  );
+                })}
+
+                {!hasSizeChoice && (
+                  <FieldCell
+                    testId="pd-field-size"
+                    field={
+                      <>
+                        <span className={styles.labelRow}>
+                          <span className={styles.fieldLabel}>Size</span>
+                        </span>
+                        <span className={styles.control} data-testid="pd-size-value">
+                          {resolvedSize ? SIZE_LABELS[resolvedSize] : '—'}
+                        </span>
+                      </>
+                    }
+                    roll={<RollSlotPlaceholder />}
+                  />
+                )}
+
+                {/* Row 4: Background spans the full row. Free text, with the
                     wizard-selected background name shown read-only beneath it
                     (P5). The 2024 Background MECHANICS (ability increases,
                     skill/tool proficiencies, origin feat — PHB 2024

@@ -6,6 +6,8 @@ import { createCharacter } from '../../../../storage/character-store';
 function renderSection(overrides = {}) {
   const character = { ...createCharacter('Tester'), ...overrides };
   const onChange = vi.fn();
+  const onSpeciesChange = vi.fn();
+  const onSpeciesChoiceChange = vi.fn();
   render(
     <PersonalDetailsSection
       character={character}
@@ -13,9 +15,11 @@ function renderSection(overrides = {}) {
       portraitURL=""
       onPortraitUpload={vi.fn()}
       onPortraitRemove={vi.fn()}
+      onSpeciesChange={onSpeciesChange}
+      onSpeciesChoiceChange={onSpeciesChoiceChange}
     />,
   );
-  return { character, onChange };
+  return { character, onChange, onSpeciesChange, onSpeciesChoiceChange };
 }
 
 describe('PersonalDetailsSection', () => {
@@ -150,6 +154,8 @@ describe('PersonalDetailsSection', () => {
       'pd-field-eyes',
       'pd-field-hair',
       'pd-field-skin',
+      'pd-field-species',
+      'pd-field-size',
       'pd-field-background',
     ]);
   });
@@ -201,5 +207,19 @@ describe('PersonalDetailsSection', () => {
     const { onChange } = renderSection();
     fireEvent.click(screen.getByRole('button', { name: 'Roll alignment' }));
     expect(onChange.mock.calls.at(-1)?.[0].alignment).toBeTruthy();
+  });
+  it('lists Species and a fixed Size in Personal Details', () => {
+    const { onSpeciesChange } = renderSection({ species: { id: 'dwarf' } });
+    expect(screen.getByRole('combobox', { name: 'Species' })).toHaveValue('dwarf');
+    expect(screen.getByTestId('pd-size-value')).toHaveTextContent('Medium');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Species' }), {
+      target: { value: 'halfling' },
+    });
+    expect(onSpeciesChange).toHaveBeenCalledWith('halfling');
+  });
+  it('shows Size as a choice select (not a read-only value) when the species offers one', () => {
+    renderSection({ species: { id: 'human' } });
+    expect(screen.getByRole('combobox', { name: 'Size' })).toBeInTheDocument();
+    expect(screen.queryByTestId('pd-size-value')).toBeNull();
   });
 });
