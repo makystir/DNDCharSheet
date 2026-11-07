@@ -189,6 +189,8 @@ export interface PrintSheetData {
   identity: IdentitySection;
   abilities: AbilityRow[];
   coreStats: CoreStat[];
+  /** Heroic Inspiration (PHB 2024): read-only on the sheet; set on the Overview. */
+  heroicInspiration: boolean;
   skills: SkillRow[];
   saves: SaveRow[];
   attacks: AttackRow[];
@@ -517,6 +519,7 @@ export function buildPrintSheetData(character: Character): PrintSheetData {
     identity: buildIdentity(character),
     abilities: buildAbilities(character),
     coreStats: buildCoreStats(character),
+    heroicInspiration: character.heroicInspiration === true,
     skills: buildSkills(character),
     saves: buildSaves(character),
     attacks: buildAttacks(character),

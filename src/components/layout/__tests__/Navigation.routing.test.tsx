@@ -49,9 +49,9 @@ async function renderApp() {
     await saveCharacter(createCharacter('Router'));
   }
   render(<App />);
-  // P3: the Character tab defaults to the Identity sub-tab, which renders the
-  // Personal Details heading once loaded (Ability Scores moved to Abilities &
-  // Skills).
+  // The Character tab defaults to the Overview sub-tab (id 'identity'), which
+  // renders the Personal Details heading once loaded (Ability Scores live on
+  // Abilities & Skills).
   await screen.findByRole('heading', { name: 'Personal Details' });
 }
 
@@ -224,9 +224,9 @@ describe('Conditional, level-gated Spells tab', () => {
     // Fresh DB so each test starts from a class-less (non-caster) character;
     // otherwise a caster persisted by a previous test would leak in.
     await resetCharacterDb();
-    // selectClass() clicks the Build sub-tab, which persists
-    // lastSubTab:character='build'; clear it so renderApp() resolves to the
-    // default Identity sub-tab (Personal Details) on a fresh render.
+    // selectClass() clicks the Class & Features sub-tab (id 'build'), which
+    // persists lastSubTab:character='build'; clear it so renderApp() resolves to
+    // the default Overview sub-tab (Personal Details) on a fresh render.
     localStorage.removeItem('lastSubTab:character');
     localStorage.removeItem('lastSubTab:spells');
     localStorage.removeItem('tabOrder:character');
@@ -240,7 +240,7 @@ describe('Conditional, level-gated Spells tab', () => {
     localStorage.removeItem('tabOrder:spells');
   });
 
-  /** Picks a class via the Character page's Build sub-tab (P3). */
+  /** Picks a class via the Character page's Class & Features sub-tab. */
   async function selectClass(classId: string) {
     fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     const select = await screen.findByRole('combobox', { name: 'Class' });

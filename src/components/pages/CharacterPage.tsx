@@ -39,6 +39,9 @@ import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SpeciesSection } from './character/SpeciesSection';
 import { OverviewVitals } from './character/OverviewVitals';
+import { OverviewInspiration } from './character/OverviewInspiration';
+import { OverviewAttacks } from './character/OverviewAttacks';
+import { OverviewSpellcasting } from './character/OverviewSpellcasting';
 import { OverviewConditions } from './character/OverviewConditions';
 import { OverviewReactions } from './character/OverviewReactions';
 import { OverviewSkills } from './character/OverviewSkills';
@@ -64,10 +67,9 @@ export interface CharacterPageProps {
   onPortraitRemove?: () => void;
 }
 
-// P3 (Option B): the Character page collapses to THREE sub-tabs — Identity,
-// Abilities & Skills, and Build. Ability scores now sit WITH the saves/skills
-// derived from them (the core findability win); Species and Class & Features
-// merge onto one "Build" tab.
+// The Character page has THREE sub-tabs: Overview (id 'identity'), Abilities &
+// Skills (id 'abilities') and Class & Features (id 'build'). The ids are stable;
+// the older ids (overview/skills/species/class) alias to them below.
 type CharSubTab = 'identity' | 'abilities' | 'build';
 
 // Stable identity (module scope) so it stays out of effect dependency arrays.
@@ -110,10 +112,13 @@ function aliasSubTab(value: string | null | undefined): CharSubTab | null {
 }
 
 /**
- * The Character tab: Overview (personal details + species + the vitals strip), Abilities
- * & Skills (the six ability scores + derived modifiers WITH saving throws and
- * skills), and Class & Features (class, subclass, skills + feature list). Every
- * CalculatedValue call-site is preserved; the sections are only regrouped.
+ * The Character tab. Overview is the one-page session sheet, top to bottom:
+ * Personal Details + portrait, Species, Vitals, Heroic Inspiration, then a grid
+ * of read-only cards (Conditions, Reactions, Attacks, Spellcasting for casters,
+ * Skills & Saves, Traits & Feats). Abilities & Skills holds the six ability
+ * scores with the saving throws and skills derived from them. Class & Features
+ * holds class, subclass, skill choices and the feature list. Every
+ * CalculatedValue keeps its breakdown tooltip.
  */
 export function CharacterPage({
   character,
@@ -370,9 +375,12 @@ export function CharacterPage({
             onSpeciesChoiceChange={setSpeciesChoice}
           />
           <OverviewVitals character={character} />
+          <OverviewInspiration character={character} onChange={onChange} />
           <div className={styles.overviewGrid}>
             <OverviewConditions character={character} />
             <OverviewReactions character={character} />
+            <OverviewAttacks character={character} />
+            <OverviewSpellcasting character={character} />
             <OverviewSkills character={character} />
             <OverviewTraits character={character} />
           </div>

@@ -85,6 +85,9 @@ export function PrintLayout({ character }: PrintLayoutProps) {
               </div>
             ))}
           </div>
+          <div className={styles.inspirationLine}>
+            Heroic Inspiration: {data.heroicInspiration ? 'Yes' : 'No'}
+          </div>
         </section>
 
         {/* Abilities + saves */}

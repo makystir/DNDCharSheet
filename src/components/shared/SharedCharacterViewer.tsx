@@ -209,6 +209,10 @@ export function SharedCharacterViewer({ encoded }: SharedCharacterViewerProps) {
             <span className={styles.statLabel}>Passive Perception</span>
             <CalculatedValue label="Passive Perception" breakdown={ppBreakdown} />
           </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Heroic Inspiration</span>
+            <span>{character.heroicInspiration === true ? 'Yes' : 'No'}</span>
+          </div>
           {dcBreakdown && (
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Spell Save DC</span>

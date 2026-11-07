@@ -682,6 +682,13 @@ export interface Character {
    */
   hitDiceSpent?: number;
   /**
+   * Heroic Inspiration (PHB 2024 "Heroic Inspiration", Docs/PlayersHandbook.md
+   * L498-501): a character either has it or not (never more than one). Absent =
+   * false. Set manually from the Overview only (the DM awards it); never changed
+   * automatically. Additive-optional; no _v bump.
+   */
+  heroicInspiration?: boolean;
+  /**
    * The rolled HP maximum when the rolledHp house rule is in effect. Absent
    * means the fixed-value HP max is used (PHB 2024 "Hit Points").
    */

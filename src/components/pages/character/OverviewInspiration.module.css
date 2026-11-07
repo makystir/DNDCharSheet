@@ -1,0 +1,32 @@
+/* Heroic Inspiration toggle tile for the Overview. */
+.toggle {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+/* On state: solid gold border plus the text "Yes" (never color-only). */
+.on {
+  color: var(--accent-gold);
+  border-style: solid;
+  border-color: var(--accent-gold);
+}
+.rule {
+  margin: 8px 0 4px;
+  font-size: 0.85rem;
+}
+.note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}

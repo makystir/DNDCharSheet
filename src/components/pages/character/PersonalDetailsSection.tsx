@@ -102,7 +102,7 @@ export function PersonalDetailsSection({
 
   // P5: the wizard-selected background (read-only) now sits beside the
   // free-text Background field here on Overview, so "Background" means one thing
-  // in one place (it previously showed on the Species sub-tab). Identity/flavor
+  // in one place (it previously showed on a separate Species page). Identity/flavor
   // only — background MECHANICS remain a deferred stage.
   const selectedBackground = getBackground(character.backgroundSelection?.id);
 
