@@ -37,6 +37,7 @@ import {
 import { standardArray } from './ability-score-generation';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
 import { pick, type RNG } from './random';
+import { speciesGrantedSkills } from './skills';
 
 /** Generated appearance fields (all NON-RAW flavor). */
 export interface GeneratedAppearance {
@@ -290,5 +291,40 @@ export function generateRandomCharacter(
     character.createdAt,
   );
 
+  // Class skill proficiencies (PHB 2024 Core <Class> Traits: Skill Proficiencies).
+  // Drawn last so every earlier draw from the injected RNG is unchanged.
+  const classData = CLASS_LIST.find((c) => c.id === classId)!;
+  const skillChoices = pickClassSkills(
+    rng,
+    classData.skillChoices,
+    new Set<SkillId>([...bg.skills, ...(Object.keys(speciesGrantedSkills(character)) as SkillId[])]),
+  );
+  character = { ...character, classes: [{ id: classId, level: 1, skillChoices }] };
+
   return { ...character, abilityGenMethod: 'standard-array' };
+}
+
+/**
+ * Picks exactly count distinct class skills from the class list ('any' = every
+ * skill), preferring skills not already held from the background or species (the
+ * Proficiency Bonus is never added twice, PHB 2024 L525). Falls back to held
+ * skills only if the list is too short to fill the count.
+ */
+function pickClassSkills(
+  rng: RNG,
+  rule: { count: number; from: SkillId[] | 'any' },
+  held: ReadonlySet<SkillId>,
+): SkillId[] {
+  const list: SkillId[] = rule.from === 'any' ? SKILLS.map((s) => s.id) : [...rule.from];
+  const chosen: SkillId[] = [];
+  const draw = (from: SkillId[]) => {
+    const remaining = [...from];
+    while (chosen.length < rule.count && remaining.length > 0) {
+      const [skill] = remaining.splice(Math.floor(rng() * remaining.length), 1);
+      chosen.push(skill);
+    }
+  };
+  draw(list.filter((s) => !held.has(s)));
+  draw(list.filter((s) => held.has(s)));
+  return chosen;
 }

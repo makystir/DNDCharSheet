@@ -33,7 +33,7 @@ import { characterHitPointMaxBreakdown, effectiveHp } from '../../logic/hit-poin
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { speedBreakdown, resolveSpecies, speciesTraits } from '../../logic/species';
-import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
+import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
 import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
 import {
   isSpellcaster,
@@ -246,7 +246,7 @@ export function buildAbilities(character: Character): AbilityRow[] {
     score: scores[ability],
     modifier: abilityModifier(scores[ability]),
     saveModifier: saves[ability].total,
-    saveProficient: character.saveProficiencies?.[ability] ?? false,
+    saveProficient: savingThrowProficiency(character, ability).proficient,
   }));
 }
 
@@ -296,7 +296,7 @@ export function buildSaves(character: Character): SaveRow[] {
     ability,
     name: ABILITY_NAMES[ability],
     modifier: saves[ability].total,
-    proficient: character.saveProficiencies?.[ability] ?? false,
+    proficient: savingThrowProficiency(character, ability).proficient,
   }));
 }
 

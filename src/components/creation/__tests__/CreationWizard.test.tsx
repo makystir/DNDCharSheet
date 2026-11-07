@@ -17,8 +17,8 @@ function completeStep1() {
   next();
 }
 
-/** Fill step 2 (acolyte background +2/+1, species, no extra languages) and advance. */
-function completeStep2() {
+/** Fill the Origin step (acolyte background +2/+1, species, no extra languages) and advance. */
+function completeOrigin() {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   // Acolyte abilities: int/wis/cha. Allocate +2 Int, +1 Wis.
   fireEvent.change(screen.getByLabelText('Intelligence background increase'), {
@@ -28,6 +28,12 @@ function completeStep2() {
     target: { value: '1' },
   });
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
+  next();
+}
+
+/** Origin, then skip past the Skills step (it never blocks), landing on Ability Scores. */
+function completeStep2() {
+  completeOrigin();
   next();
 }
 
@@ -250,7 +256,8 @@ describe('CreationWizard', () => {
     });
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
     fireEvent.click(screen.getByLabelText('Goblin (feature)'));
-    next(); // -> step 3
+    next(); // -> Skills
+    next(); // -> Ability Scores
     completeStep3StandardArray();
     next(); // -> step 4
     next(); // -> step 5
@@ -260,5 +267,95 @@ describe('CreationWizard', () => {
     expect(character.languages?.granted).toEqual(['goblin']);
     // Thieves' Cant is derived, not stored in granted.
     expect(character.languages?.granted).not.toContain('thieves-cant');
+  });
+});
+
+describe('CreationWizard Skills step', () => {
+  it('lists Skills between Origin and Ability Scores in the step indicator', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    const group = screen.getByRole('group', { name: 'Step progress' });
+    expect(group.textContent).toMatch(/Class.*Origin.*Skills.*Ability Scores.*Details.*Equipment/);
+  });
+
+  it('shows the class saves and origin grants as granted automatically', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter
+    completeOrigin(); // acolyte + human
+    expect(screen.getByRole('heading', { name: /Step 3: Skills/ })).toBeInTheDocument();
+    const panel = screen.getByRole('region', { name: 'Granted automatically' });
+    expect(within(panel).getByText(/You don.t choose these/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Saving throws \(Fighter\): Strength & Constitution/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Background skills \(Acolyte\): Insight & Religion/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Origin feat: Magic Initiate/)).toBeInTheDocument();
+  });
+
+  it('enforces the class skill cap and shows a live counter', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter: choose 2
+    completeOrigin();
+    expect(screen.getByTestId('skills-counter')).toHaveTextContent('0 of 2 chosen');
+    fireEvent.click(screen.getByLabelText('Athletics'));
+    fireEvent.click(screen.getByLabelText('Acrobatics'));
+    expect(screen.getByTestId('skills-counter')).toHaveTextContent('2 of 2 chosen');
+    expect(screen.getByLabelText('History')).toBeDisabled();
+    // Unchecking frees a slot.
+    fireEvent.click(screen.getByLabelText('Athletics'));
+    expect(screen.getByLabelText('History')).toBeEnabled();
+  });
+
+  it('notes a skill already held from the background without blocking it', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1(); // fighter (Insight is on its list)
+    completeOrigin(); // acolyte grants Insight + Religion
+    expect(screen.getByLabelText('Insight')).toBeEnabled();
+    expect(
+      screen.getByText(/already proficient from Acolyte background: this adds nothing/),
+    ).toBeInTheDocument();
+  });
+
+  it('never blocks Next and warns when fewer than N are chosen', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1();
+    completeOrigin();
+    expect(screen.getByText(/You can finish this later: the Overview will remind you/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+  });
+
+  it('offers any skill to a Bard', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'bard' } });
+    fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Lyra' } });
+    next();
+    fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
+    fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
+    next();
+    expect(screen.getByLabelText('Performance')).toBeInTheDocument();
+    expect(screen.getByTestId('skills-counter')).toHaveTextContent('0 of 3 chosen');
+  });
+
+  it('stores the picks in classes[0].skillChoices on finish', () => {
+    const onComplete = vi.fn();
+    render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
+    completeStep1();
+    completeOrigin();
+    fireEvent.click(screen.getByLabelText('Athletics'));
+    fireEvent.click(screen.getByLabelText('Perception'));
+    next();
+    completeStep3StandardArray();
+    next();
+    next();
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
+    const character = onComplete.mock.calls[0][0];
+    expect(character.classes[0].skillChoices).toEqual(['athletics', 'perception']);
+  });
+
+  it('goes Back from Skills to Origin', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    completeStep1();
+    completeOrigin();
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByRole('heading', { name: /Step 2: Origin/ })).toBeInTheDocument();
   });
 });

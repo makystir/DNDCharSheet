@@ -19,6 +19,29 @@ function headingOrder(): string[] {
 }
 
 describe('CharacterPage Overview order', () => {
+  it('places Finish setting up between Species and Vitals only when choices are pending', () => {
+    const pending: Character = {
+      ...createCharacter('Pending'),
+      classes: [{ id: 'wizard', level: 1 }],
+    };
+    renderOverview(pending);
+    const order = headingOrder();
+    const species = order.findIndex((h) => h.includes('Species'));
+    const setup = order.findIndex((h) => h.includes('Finish setting up'));
+    const vitals = order.findIndex((h) => h.includes('Vitals'));
+    expect(setup).toBe(species + 1);
+    expect(vitals).toBe(setup + 1);
+    cleanup();
+
+    const done: Character = {
+      ...createCharacter('Done'),
+      classes: [{ id: 'fighter', level: 1, skillChoices: ['athletics', 'acrobatics'] }],
+    };
+    renderOverview(done);
+    expect(headingOrder().some((h) => h.includes('Finish setting up'))).toBe(false);
+    expect(screen.queryByTestId('overview-setup-class-skills')).toBeNull();
+  });
+
   it('stacks Personal Details, Species, Vitals, Inspiration, then the grid cards', () => {
     const wizard: Character = {
       ...createCharacter('Caster'),

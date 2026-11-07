@@ -66,6 +66,16 @@ describe('OverviewSkills', () => {
     expect(within(screen.getByTestId('overview-save-dex')).queryByRole('img')).toBeNull();
   });
 
+  it('marks a class-granted save as proficient without any manual tick', () => {
+    const wizard: Character = {
+      ...createCharacter('Wiz'),
+      classes: [{ id: 'wizard', level: 1 }],
+    };
+    render(<OverviewSkills character={wizard} />);
+    expect(within(screen.getByTestId('overview-save-int')).getByLabelText('proficient')).toBeInTheDocument();
+    expect(within(screen.getByTestId('overview-save-wis')).getByLabelText('proficient')).toBeInTheDocument();
+    expect(within(screen.getByTestId('overview-save-str')).queryByRole('img')).toBeNull();
+  });
   it('has a single header that is also the collapse toggle (persisted)', () => {
     localStorage.removeItem('dnd-collapse-overview-skills');
     render(<OverviewSkills character={character} />);

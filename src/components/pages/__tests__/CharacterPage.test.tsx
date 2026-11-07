@@ -354,6 +354,26 @@ describe('CharacterPage', () => {
       expect(arcana.getAttribute('aria-label')).toContain('Wizard (class)');
     });
 
+    it('shows class-granted saves ticked, locked and labelled; manual extras stay editable', () => {
+      const { onChange } = renderPage(
+        { classes: [{ id: 'wizard', level: 1 }], saveProficiencies: { str: true } },
+        'skills',
+      );
+      const intTick = screen.getByLabelText('Intelligence save proficiency');
+      expect(intTick).toBeChecked();
+      expect(intTick).toBeDisabled();
+      expect(screen.getAllByText('from Wizard (class)')).toHaveLength(2);
+      // Dex is neither class-granted nor ticked: editable and unchecked.
+      const dexTick = screen.getByLabelText('Dexterity save proficiency');
+      expect(dexTick).not.toBeChecked();
+      expect(dexTick).toBeEnabled();
+      // A manual tick (feat) stays editable and is not labelled as class-granted.
+      const strTick = screen.getByLabelText('Strength save proficiency');
+      expect(strTick).toBeChecked();
+      expect(strTick).toBeEnabled();
+      fireEvent.click(strTick);
+      expect(onChange.mock.calls.at(-1)?.[0].saveProficiencies.str).toBe(false);
+    });
     it('toggling a class skill choice emits the skillChoices list', () => {
       const { onChange } = renderPage({ classes: [{ id: 'wizard', level: 1 }] }, 'class');
       fireEvent.click(screen.getByLabelText('Arcana class proficiency'));

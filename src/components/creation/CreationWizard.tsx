@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import type { Ability, Character } from '../../types/character';
+import type { ReactElement } from 'react';
+import type { Ability, Character, SkillId } from '../../types/character';
 import {
   ABILITIES,
   ABILITY_ABBR,
@@ -55,6 +56,7 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { StepIndicator } from '../combat/StepIndicator';
 import { choiceOptions, formatLanguage } from '../pages/sheet-helpers';
+import { SkillsStep } from './SkillsStep';
 import styles from './CreationWizard.module.css';
 
 export interface CreationWizardProps {
@@ -64,8 +66,23 @@ export interface CreationWizardProps {
   onCancel: () => void;
 }
 
-/** The five guided steps, in PHB creation order. */
-const STEP_LABELS = ['Class', 'Origin', 'Ability Scores', 'Details', 'Equipment'];
+/**
+ * The guided steps, in order. Data-driven: renderers, validation and the
+ * indicator all key off the step id, so a conditional step (e.g. Spells) can be
+ * inserted by adding an entry here.
+ */
+type StepId = 'class' | 'origin' | 'skills' | 'abilities' | 'details' | 'equipment';
+const STEPS: { id: StepId; label: string }[] = [
+  { id: 'class', label: 'Class' },
+  { id: 'origin', label: 'Origin' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'abilities', label: 'Ability Scores' },
+  { id: 'details', label: 'Details' },
+  { id: 'equipment', label: 'Equipment' },
+];
+const STEP_LABELS = STEPS.map((s) => s.label);
+/** The 1-based number shown in a step's heading. */
+const stepNumber = (id: StepId): number => STEPS.findIndex((s) => s.id === id) + 1;
 
 type AbilityMethod = 'standard-array' | 'point-buy' | 'roll';
 type EquipmentChoice = 'A' | 'B';
@@ -123,7 +140,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const [grantedLanguages, setGrantedLanguages] = useState<string[]>([]);
   const [toolProficiency, setToolProficiency] = useState('');
 
-  // Step 3: Ability scores.
+  // Skills step: the class skill picks (stored in classes[0].skillChoices).
+  const [skillChoices, setSkillChoices] = useState<SkillId[]>([]);
+
+  // Ability scores step.
   const [abilityMethod, setAbilityMethod] = useState<AbilityMethod>('standard-array');
   // Which standard-array / rolled value is assigned to which ability (ability -> index into pool).
   const [arrayAssignment, setArrayAssignment] = useState<Partial<Record<Ability, number>>>({});
@@ -207,17 +227,20 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     return poolUsedOnce(arrayAssignment, STANDARD_ARRAY.length);
   };
 
+  const currentStepId = STEPS[step].id;
+
   const canProceed = (): boolean => {
-    switch (step) {
-      case 0:
+    switch (currentStepId) {
+      case 'class':
         return name.trim().length > 0 && classId !== '';
-      case 1:
+      case 'origin':
         return backgroundId !== '' && allocationValid && speciesId !== '';
-      case 2:
+      case 'abilities':
         return abilityStepValid();
-      case 3:
-        return true;
-      case 4:
+      // Skills never blocks: unfinished picks surface on the Overview later.
+      case 'skills':
+      case 'details':
+      case 'equipment':
         return true;
       default:
         return false;
@@ -366,7 +389,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     character = {
       ...character,
       level: 1,
-      classes: [{ id: classId as ClassId, level: 1, skillChoices: [] }],
+      classes: [{ id: classId as ClassId, level: 1, skillChoices: [...skillChoices] }],
     };
 
     // Species + required sub-choices.
@@ -426,7 +449,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
 
   const goNext = () => {
-    if (step < STEP_LABELS.length - 1) {
+    if (step < STEPS.length - 1) {
       setStep((s) => s + 1);
     } else {
       onComplete(buildCharacter());
@@ -439,9 +462,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // ─── Render helpers ───────────────────────────────────────────────────────
 
-  const renderStep1 = () => (
+  const renderClassStep = () => (
     <div className={styles.stepBody}>
-      <h2 className={styles.stepTitle}>Step 1: Class</h2>
+      <h2 className={styles.stepTitle}>Step {stepNumber('class')}: Class</h2>
       <label className={styles.fieldLabel} htmlFor="wiz-name">
         Character Name
       </label>
@@ -466,6 +489,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           // Feature-language picks belong to the chosen class; reset them when
           // the class changes so stale/over-cap picks cannot leak across.
           setGrantedLanguages([]);
+          // Class skill picks belong to the class list; reset on change.
+          setSkillChoices([]);
         }}
       >
         <option value="">— Select a Class —</option>
@@ -507,9 +532,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
-  const renderStep2 = () => (
+  const renderOriginStep = () => (
     <div className={styles.stepBody}>
-      <h2 className={styles.stepTitle}>Step 2: Origin</h2>
+      <h2 className={styles.stepTitle}>Step {stepNumber('origin')}: Origin</h2>
 
       <label className={styles.fieldLabel} htmlFor="wiz-background">
         Background
@@ -817,7 +842,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     });
   };
 
-  const renderStep3 = () => {
+  const renderAbilitiesStep = () => {
     const spent = pointBuyTotalCost(pointBuyScores);
     const remaining = POINT_BUY_BUDGET - spent;
     const spentBreakdown: Breakdown = {
@@ -837,7 +862,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
     return (
       <div className={styles.stepBody}>
-        <h2 className={styles.stepTitle}>Step 3: Ability Scores</h2>
+        <h2 className={styles.stepTitle}>Step {stepNumber('abilities')}: Ability Scores</h2>
         <SegmentedControl
           ariaLabel="Ability score method"
           options={[
@@ -965,9 +990,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     );
   };
 
-  const renderStep4 = () => (
+  const renderDetailsStep = () => (
     <div className={styles.stepBody}>
-      <h2 className={styles.stepTitle}>Step 4: Alignment &amp; Details</h2>
+      <h2 className={styles.stepTitle}>Step {stepNumber('details')}: Alignment &amp; Details</h2>
       <label className={styles.fieldLabel} htmlFor="wiz-gender">
         Gender (drives name/appearance generation)
       </label>
@@ -1095,9 +1120,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
-  const renderStep5 = () => (
+  const renderEquipmentStep = () => (
     <div className={styles.stepBody}>
-      <h2 className={styles.stepTitle}>Step 5: Equipment</h2>
+      <h2 className={styles.stepTitle}>Step {stepNumber('equipment')}: Equipment</h2>
       {background ? (
         <>
           <p className={styles.hint}>Choose your starting equipment (PHB 2024 "Parts of a Background").</p>
@@ -1127,12 +1152,33 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
-  const stepRenderers = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5];
+  const renderSkillsStep = () => (
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Step {stepNumber('skills')}: Skills</h2>
+      <SkillsStep
+        classId={classId}
+        backgroundId={backgroundId}
+        speciesId={speciesId}
+        speciesChoices={speciesChoices}
+        chosen={skillChoices}
+        onChange={setSkillChoices}
+      />
+    </div>
+  );
+
+  const stepRenderers: Record<StepId, () => ReactElement> = {
+    class: renderClassStep,
+    origin: renderOriginStep,
+    skills: renderSkillsStep,
+    abilities: renderAbilitiesStep,
+    details: renderDetailsStep,
+    equipment: renderEquipmentStep,
+  };
 
   return (
     <div className={styles.wizard} role="region" aria-label="Character creation wizard">
       <StepIndicator steps={STEP_LABELS} currentStep={step} />
-      {stepRenderers[step]()}
+      {stepRenderers[currentStepId]()}
       <div className={styles.footer}>
         <button type="button" className={styles.secondaryBtn} onClick={goBack}>
           {step === 0 ? 'Cancel' : 'Back'}
@@ -1143,7 +1189,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           onClick={goNext}
           disabled={!canProceed()}
         >
-          {step === STEP_LABELS.length - 1 ? 'Finish' : 'Next'}
+          {step === STEPS.length - 1 ? 'Finish' : 'Next'}
         </button>
       </div>
     </div>

@@ -340,3 +340,10 @@
   margin-bottom: 0;
 }
 
+
+/* Muted source note under a class-granted save (ticked and locked). */
+.saveSource {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}

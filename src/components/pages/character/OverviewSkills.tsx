@@ -4,7 +4,7 @@ import type { Character } from '../../../types/character';
 import { ABILITIES, ABILITY_ABBR, ABILITY_NAMES, SKILLS } from '../../../types/character';
 import { formatSigned } from '../../../logic/breakdown';
 import { allSkillBreakdowns, getSkillTraining } from '../../../logic/skills';
-import { allSavingThrowBreakdowns } from '../../../logic/saving-throws';
+import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../../logic/saving-throws';
 import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
@@ -54,7 +54,7 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
         <ul className={styles.saves} aria-label="Saving throws" data-testid="overview-saves-grid">
           {ABILITIES.map((ability) => {
             const breakdown = saveBreakdowns[ability];
-            const proficient = character.saveProficiencies?.[ability] ?? false;
+            const proficient = savingThrowProficiency(character, ability).proficient;
             return (
               <li
                 key={ability}

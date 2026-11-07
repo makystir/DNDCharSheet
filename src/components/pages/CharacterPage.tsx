@@ -23,7 +23,7 @@ import {
   classProficiencies,
   classFeaturesByLevel,
 } from '../../logic/classes';
-import { allSavingThrowBreakdowns } from '../../logic/saving-throws';
+import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
 import { allSkillBreakdowns, getSkillTraining } from '../../logic/skills';
 import { shouldResetSpellcasting } from '../../logic/spellcasting';
 import { getSpecies } from '../../data/species';
@@ -37,6 +37,7 @@ import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { SpeciesSection } from './character/SpeciesSection';
+import { OverviewSetup } from './character/OverviewSetup';
 import { OverviewVitals } from './character/OverviewVitals';
 import { OverviewInspiration } from './character/OverviewInspiration';
 import { OverviewAttacks } from './character/OverviewAttacks';
@@ -371,6 +372,7 @@ export function CharacterPage({
             onSpeciesChange={setSpecies}
             onSpeciesChoiceChange={setSpeciesChoice}
           />
+          <OverviewSetup character={character} />
           <OverviewVitals character={character} />
           <OverviewInspiration character={character} onChange={onChange} />
           {/* Two independent column stacks (no shared grid rows, so a short
@@ -465,15 +467,25 @@ export function CharacterPage({
           <ul className={styles.statList}>
             {ABILITIES.map((ability) => {
               const breakdown = saveBreakdowns[ability];
-              const proficient = character.saveProficiencies?.[ability] ?? false;
+              // Class-granted saves (initial class only, PHB Core <Class> Traits)
+              // show ticked and locked; the editable tick is for manual extras
+              // such as feats.
+              const profInfo = savingThrowProficiency(character, ability);
+              const fromClass = profInfo.source === 'class';
               return (
                 <li key={ability} className={styles.statRow}>
-                  <span className={styles.statName}>{ABILITY_NAMES[ability]}</span>
+                  <span className={styles.statName}>
+                    {ABILITY_NAMES[ability]}
+                    {fromClass && (
+                      <span className={styles.saveSource}>from {profInfo.classLabel} (class)</span>
+                    )}
+                  </span>
                   <label className={styles.checkboxCell}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
-                      checked={proficient}
+                      checked={profInfo.proficient}
+                      disabled={fromClass}
                       aria-label={`${ABILITY_NAMES[ability]} save proficiency`}
                       onChange={(e) => setSaveProficiency(ability, e.target.checked)}
                     />

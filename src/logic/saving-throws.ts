@@ -13,7 +13,7 @@ import type { AbilityScores, Ability, Character } from '../types/character';
 import { ABILITIES, ABILITY_NAMES } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
-import { classSaveProficiencies } from './classes';
+import { classSaveProficiencies, resolveClass } from './classes';
 import { effectiveAbilityScores } from './feats';
 
 /** The saving-throw modifier: abilityMod + (proficient ? PB : 0). */
@@ -60,6 +60,39 @@ export function savingThrowBreakdown(
       { label: profLabel, value: profValue },
     ],
   };
+}
+
+/** Where a save proficiency comes from, for display. */
+export interface SaveProficiencyInfo {
+  proficient: boolean;
+  /** 'class' = granted by the initial class; 'manual' = the player's own tick. */
+  source: 'class' | 'manual' | null;
+  /** Class name when source is 'class', e.g. 'Wizard'. */
+  classLabel?: string;
+}
+
+/**
+ * Whether (and why) the character is proficient in an ability's saving throw.
+ * PHB 2024 Core <Class> Traits "Saving Throw Proficiencies": granted by the
+ * INITIAL class only (Multiclassing: Proficiencies, L2106). A manual tick on a
+ * class-granted save adds nothing (the Proficiency Bonus is never added twice,
+ * L525), so the source stays 'class'.
+ */
+export function savingThrowProficiency(
+  character: Character,
+  ability: Ability,
+): SaveProficiencyInfo {
+  if (classSaveProficiencies(character)[ability] !== undefined) {
+    return {
+      proficient: true,
+      source: 'class',
+      classLabel: resolveClass(character)?.name,
+    };
+  }
+  if (character.saveProficiencies?.[ability]) {
+    return { proficient: true, source: 'manual' };
+  }
+  return { proficient: false, source: null };
 }
 
 /**
