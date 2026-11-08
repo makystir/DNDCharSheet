@@ -92,7 +92,7 @@ export function availableReactions(character: Character): ReactionEntry[] {
   for (const entry of allClasses(character)) {
     if (!entryIsSpellcaster(entry)) continue;
     const prepared = character.spellcasting?.byClass?.[entry.id]?.prepared ?? [];
-    for (const id of [...prepared, ...classAlwaysPreparedSpells(entry)]) {
+    for (const id of [...prepared, ...classAlwaysPreparedSpells(entry, character)]) {
       if (seen.has(id)) continue;
       const spell = getSpell(id);
       if (!spell || spell.level < 1 || !spell.castingTime.startsWith('Reaction')) continue;

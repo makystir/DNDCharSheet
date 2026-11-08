@@ -13,7 +13,7 @@ import {
   CLASS_CHOICE_GRANTS,
 } from '../../../logic/class-choices';
 import type { ChoiceStatus } from '../../../logic/class-choices';
-import { choiceOptionViews } from '../../../logic/class-choice-options';
+import { choiceOptionViews, landGrantedSpellNames } from '../../../logic/class-choice-options';
 import type { ChoiceOptionView } from '../../../logic/class-choice-options';
 import { multiclassPickStatus } from '../../../logic/multiclass-picks';
 import type { MulticlassPick } from '../../../logic/multiclass-picks';
@@ -214,6 +214,17 @@ export function ClassChoicesOverNote({ statuses }: { statuses: ChoiceStatus[] })
   );
 }
 
+/** Read-only list of the chosen land's spells that are always prepared at the current Druid level. */
+function LandSpellsNote({ character }: { character: Character }) {
+  const names = landGrantedSpellNames(character);
+  if (names.length === 0) return null;
+  return (
+    <p className={styles.count} data-testid="land-granted-spells">
+      Always prepared (Circle spells for your Druid level, not counted against your prepared spells): {names.join(', ')}.
+    </p>
+  );
+}
+
 /**
  * The persistent "Class Choices" list: every group with its chosen values, the
  * owed count (with its derivation) and a picker for manual edits or swaps. The
@@ -249,6 +260,7 @@ export function ClassChoicesSection({
               )}
             </div>
             <ChosenList character={character} onChange={onChange} status={status} />
+            {status.key === 'druid.landType' && <LandSpellsNote character={character} />}
             <details>
               <summary>Edit {status.label}</summary>
               <ChoiceGroupPicker character={character} onChange={onChange} status={status} />

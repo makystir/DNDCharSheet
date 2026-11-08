@@ -187,6 +187,7 @@ export type ClassChoiceKey =
   | 'ranger.huntersPrey'
   | 'ranger.defensiveTactics'
   | 'ranger.primalCompanion'
+  | 'druid.landType'
   | 'sorcerer.elementalAffinity'
   | 'wizard.spellMastery'
   | 'wizard.signatureSpells';

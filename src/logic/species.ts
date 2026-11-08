@@ -23,6 +23,7 @@ import type { CreatureSize, SpeciesData, SpeciesTrait } from '../data/species';
 import { getSpecies } from '../data/species';
 import { getArmor } from '../data/armor';
 import { exhaustionLevelOf } from './conditions';
+import { owlAspectActive } from './class-choice-effects';
 import { effectiveAbilityScores } from './feats';
 
 /** The default walking speed shown when no species is selected, in feet. */
@@ -231,6 +232,21 @@ function resolveDarkvisionFt(character: Character): number {
  * total 0 (the UI renders "none").
  */
 export function darkvisionBreakdown(character: Character): Breakdown {
+  const base = speciesDarkvisionBreakdown(character);
+  // Wild Heart "Aspect of the Wilds: Owl" (PHB 2024 L2593): Darkvision 60 ft, or +60 ft
+  // if you already have it. Either way it adds 60 to the range.
+  if (!owlAspectActive(character)) return base;
+  return {
+    ...base,
+    total: base.total + 60,
+    components: [
+      ...base.components,
+      { label: base.total > 0 ? 'Aspect of the Wilds: Owl (+60 ft)' : 'Aspect of the Wilds: Owl (60 ft)', value: 60 },
+    ],
+  };
+}
+
+function speciesDarkvisionBreakdown(character: Character): Breakdown {
   const species = resolveSpecies(character);
   const effective = resolveDarkvisionFt(character);
 

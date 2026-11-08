@@ -16,6 +16,7 @@
  *    at 3 (L3057); Otherworldly Glamour: Fey Wanderer 3 (L5745)
  *  - Hunter's Prey 3 / Defensive Tactics 7 (L5825/L5833); Primal Companion 3 (L5583);
  *    Elemental Affinity: Draconic 6 (L6679)
+ *  - Circle of the Land: one land type chosen at Druid 3 (L3860-3866; re-chosen after each Long Rest)
  *  - Spell Mastery: two spells at 18 (L7479); Signature Spells: two at 20 (L7489)
  */
 
@@ -48,12 +49,13 @@ export const OWED_GOLDEN: readonly GoldenOwedRow[] = [
   { key: 'ranger.defensiveTactics', classId: 'ranger', subclassId: 'hunter', owedByLevel: [Z, Z, Z, Z, Z, Z, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
   { key: 'ranger.primalCompanion', classId: 'ranger', subclassId: 'beastMaster', owedByLevel: [Z, Z, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
   { key: 'sorcerer.elementalAffinity', classId: 'sorcerer', subclassId: 'draconic', owedByLevel: [Z, Z, Z, Z, Z, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
+  { key: 'druid.landType', classId: 'druid', subclassId: 'land', owedByLevel: [Z, Z, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
   { key: 'wizard.spellMastery', classId: 'wizard', owedByLevel: [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, 2, 2, 2] },
   { key: 'wizard.signatureSpells', classId: 'wizard', owedByLevel: [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, 2] },
 ];
 
 /** Cardinality pin: the number of choice groups with a class-table owed count. */
-export const GOLDEN_OWED_GROUP_COUNT = 19;
+export const GOLDEN_OWED_GROUP_COUNT = 20;
 
 /** Subclass-gated groups owe nothing for a different subclass (or none). */
 export const GOLDEN_SUBCLASS_GATE_ROWS: ReadonlyArray<{ key: string; classId: string; wrongSubclassId: string; level: number }> = [
@@ -63,6 +65,7 @@ export const GOLDEN_SUBCLASS_GATE_ROWS: ReadonlyArray<{ key: string; classId: st
   { key: 'ranger.huntersPrey', classId: 'ranger', wrongSubclassId: 'beastMaster', level: 10 },
   { key: 'ranger.primalCompanion', classId: 'ranger', wrongSubclassId: 'hunter', level: 10 },
   { key: 'sorcerer.elementalAffinity', classId: 'sorcerer', wrongSubclassId: 'wildMagic', level: 10 },
+  { key: 'druid.landType', classId: 'druid', wrongSubclassId: 'moon', level: 10 },
 ];
 
 /** Multiclass rows: each class uses its OWN class level. */

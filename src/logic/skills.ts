@@ -25,6 +25,7 @@ import { ABILITY_NAMES, SKILLS } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classGrantedSkills } from './classes';
+import { orderSkillBonusSources } from './class-choice-effects';
 import { exhaustionLevelOf, withExhaustion } from './conditions';
 import { effectiveAbilityScores, featGrantedExpertise, featGrantedSkills } from './feats';
 
@@ -192,6 +193,28 @@ export function effectiveSkillTraining(
 }
 
 /**
+ * Cleric Thaumaturge (PHB 2024 L3234) and Druid Magician (L3670): a bonus to the
+ * order's listed Intelligence skill checks equal to the Wisdom modifier, minimum +1.
+ * Each source is its own labelled component (shown even at the +1 minimum); two
+ * different features (multiclass Cleric + Druid) each apply. The 2024 PHB gives no
+ * "doesn't stack" text for distinct features. Only skill CHECKS get it: passive
+ * Perception is Wisdom (Perception) so it is untouched (PHB L1914-1918).
+ */
+function withOrderSkillBonuses(breakdown: Breakdown, character: Character, skillId: SkillId): Breakdown {
+  const sources = orderSkillBonusSources(character).filter((s) => s.skills.includes(skillId));
+  if (sources.length === 0) return breakdown;
+  const wisMod = abilityModifier(effectiveAbilityScores(character).wis);
+  const bonus = Math.max(1, wisMod);
+  const added = sources.map((s) => ({ label: `${s.label} (Wis mod, min +1)`, value: bonus }));
+  const next: Breakdown = {
+    total: breakdown.total + added.reduce((n, c) => n + c.value, 0),
+    components: [...breakdown.components, ...added],
+  };
+  if (breakdown.note !== undefined) next.note = breakdown.note;
+  return next;
+}
+
+/**
  * Breakdowns for every canonical skill, keyed by SkillId. Iterates the SKILLS
  * list (not the stored keys) so a stray/stale stored key cannot throw.
  */
@@ -232,7 +255,8 @@ export function allSkillBreakdowns(
       })(),
       granted[skill.id],
     );
-    result[skill.id] = includeExhaustion ? withExhaustion(base, exhaustionLevel) : base;
+    const withOrders = withOrderSkillBonuses(base, character, skill.id);
+    result[skill.id] = includeExhaustion ? withExhaustion(withOrders, exhaustionLevel) : withOrders;
   }
   return result;
 }

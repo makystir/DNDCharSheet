@@ -28,7 +28,7 @@ import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { exhaustionLevelOf, withExhaustion } from './conditions';
 import { allClasses, entrySubclass, primaryClass, resolveClass } from './classes';
-import { extraCantripLabel, extraCantrips } from './class-choice-effects';
+import { chosenLandType, extraCantripLabel, extraCantrips, landSpellIds } from './class-choice-effects';
 import { effectiveAbilityScores } from './feats';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
@@ -405,7 +405,7 @@ export function alwaysPreparedSpells(character: Character): SpellId[] {
   if (!primary) return [];
   // The primary class entry at the TOTAL character level — single-class keeps
   // the pre-M5 behaviour exactly (entry.level === character.level).
-  return classAlwaysPreparedSpells({ ...primary, level: character.level });
+  return classAlwaysPreparedSpells({ ...primary, level: character.level }, character);
 }
 
 /**
@@ -416,7 +416,7 @@ export function alwaysPreparedSpells(character: Character): SpellId[] {
  * its own class level. These do NOT count against that class's Prepared Spells
  * number (per-class spellcasting text) and are rendered locked.
  */
-export function classAlwaysPreparedSpells(entry: ClassEntry): SpellId[] {
+export function classAlwaysPreparedSpells(entry: ClassEntry, character?: Character): SpellId[] {
   if (!entryIsSpellcaster(entry)) return [];
   const forClass = ALWAYS_PREPARED_GRANTS[entry.id] ?? [];
   const ids: SpellId[] = [];
@@ -434,6 +434,16 @@ export function classAlwaysPreparedSpells(entry: ClassEntry): SpellId[] {
         const id = spellId as SpellId;
         if (getSpell(id) && !ids.includes(id)) ids.push(id);
       }
+    }
+  }
+  // Circle of the Land (PHB 2024 L3860-3866): the land type chosen after a Long Rest
+  // (class choice 'druid.landType') makes the spells listed for the Druid level and
+  // lower prepared. Needs the character to read the choice; swapping the land swaps
+  // the set. entrySubclass already gates on the subclass level (Druid 3).
+  if (character && entry.id === 'druid' && entrySubclass(entry)?.id === 'land') {
+    for (const spellId of landSpellIds(chosenLandType(character), entry.level)) {
+      const id = spellId as SpellId;
+      if (getSpell(id) && !ids.includes(id)) ids.push(id);
     }
   }
   return ids;

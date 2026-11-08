@@ -102,7 +102,8 @@ export interface ClassFeature {
   choices?: Array<{ key: string; count: number; options: string[] }>;
   /**
    * Spells granted per option of a sub-choice (Circle of the Land: land type), keyed by option
-   * name. Data only: NOT read by spellcasting.ts (the land type is chosen after each Long Rest).
+   * name. The chosen option is the class choice 'druid.landType' (logic/class-choice-effects.ts
+   * landSpellIds); classAlwaysPreparedSpells in spellcasting.ts grants the chosen land's spells.
    */
   choiceSpells?: Record<string, Array<{ level: number; spells: string[] }>>;
   /** Line-anchored PHB citation this feature is transcribed from. */

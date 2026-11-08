@@ -25,12 +25,31 @@ import {
   SUBCLASS_PICK_OPTIONS,
 } from '../data/class-options';
 import { choiceOptionIds, spellChoiceEligible } from './class-choices';
+import { chosenLandType, landSpellIds, landTypeOptions } from './class-choice-effects';
 
 export interface ChoiceOptionView {
   id: string;
   name: string;
   summary: string;
   source: string;
+}
+
+/** "3: Blur, Burning Hands, Fire Bolt; 5: Fireball; ..." for a land type (all rows, for the picker). */
+function landSpellSummary(landId: string): string {
+  const land = landTypeOptions().find((o) => o.id === landId);
+  return (land?.spells ?? [])
+    .map((row) => `${row.level}: ${row.spells.map((id) => getSpell(id)?.name ?? id).join(', ')}`)
+    .join('; ');
+}
+
+/**
+ * The chosen land's spells already granted at the Druid's level, as names (for the
+ * read-only display next to the chosen land type). Empty when no land is chosen.
+ */
+export function landGrantedSpellNames(character: Character): string[] {
+  const druid = (character.classes ?? []).find((e) => e.id === 'druid' && e.subclassId === 'land');
+  if (!druid) return [];
+  return landSpellIds(chosenLandType(character), druid.level).map((id) => getSpell(id)?.name ?? id);
 }
 
 const skillName = (id: string): string => SKILLS.find((s) => s.id === id)?.name ?? id;
@@ -78,6 +97,13 @@ export function choiceOptionViews(character: Character, key: ClassChoiceKey): Ch
       } as const;
       return SUBCLASS_PICK_OPTIONS[group[key]].map((o) => ({ id: o.id, name: o.name, summary: o.summary, source: o.source }));
     }
+    case 'druid.landType':
+      return landTypeOptions().map((o) => ({
+        id: o.id,
+        name: o.name,
+        summary: `Always-prepared Circle spells by Druid level: ${landSpellSummary(o.id)}.`,
+        source: 'PHB 2024 "Circle of the Land: Circle of the Land Spells" (L3860-3890)',
+      }));
     case 'fighter.studentOfWarTool':
       return ARTISANS_TOOLS.map((t) => ({ id: t.id, name: t.name, summary: "Artisan's Tools proficiency.", source: t.source }));
     case 'bard.multiclassInstrument':

@@ -180,7 +180,7 @@ export function pendingSetupChoices(character: Character): PendingItem[] {
     // Prepared spells (a spellbook class prepares only from its book).
     const preparedNeed = classPreparedCount(entry);
     if (preparedNeed > 0) {
-      const always = classAlwaysPreparedSpells(entry);
+      const always = classAlwaysPreparedSpells(entry, character);
       const have = countValid(
         stored.prepared,
         (id) => !always.includes(id) && legalLeveled(id) && (!usesBook || book.has(id)),

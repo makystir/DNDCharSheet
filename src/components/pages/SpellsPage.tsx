@@ -1073,7 +1073,7 @@ function PreparedClassSection({
   const topSpellLevel = classMaxPreparedLevel(entry);
   const usesSpellbook = classUsesSpellbook(entry);
 
-  const alwaysPrepared = useMemo(() => classAlwaysPreparedSpells(entry), [entry]);
+  const alwaysPrepared = useMemo(() => classAlwaysPreparedSpells(entry, character), [entry, character]);
   const required = useMemo(() => classRequiredCantrips(entry), [entry]);
 
   const chosenPrepared = useMemo(

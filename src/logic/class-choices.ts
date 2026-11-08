@@ -30,6 +30,7 @@ import {
   SUBCLASS_PICK_OPTIONS,
 } from '../data/class-options';
 import { allClasses, entrySubclass } from './classes';
+import { landTypeOptions } from './class-choice-effects';
 import type { Breakdown } from './breakdown';
 
 export interface ChoiceGrant {
@@ -66,6 +67,8 @@ export const CLASS_CHOICE_GRANTS: readonly ChoiceGrant[] = [
   { key: 'ranger.huntersPrey', classId: 'ranger', subclassId: 'hunter', label: "Hunter's Prey", steps: [[3, 1]], kind: 'options', swappable: true, source: 'PHB 2024 "Hunter: Hunter\'s Prey" (L5825)' },
   { key: 'ranger.defensiveTactics', classId: 'ranger', subclassId: 'hunter', label: 'Defensive Tactics', steps: [[7, 1]], kind: 'options', swappable: true, source: 'PHB 2024 "Hunter: Defensive Tactics" (L5833)' },
   { key: 'ranger.primalCompanion', classId: 'ranger', subclassId: 'beastMaster', label: 'Primal Companion', steps: [[3, 1]], kind: 'options', swappable: true, source: 'PHB 2024 "Beast Master: Primal Companion" (L5583-5591)' },
+  // Circle of the Land: one land type from Druid 3; PHB L3860-3866 lets the druid choose again after each Long Rest.
+  { key: 'druid.landType', classId: 'druid', subclassId: 'land', label: 'Land type', steps: [[3, 1]], kind: 'options', swappable: true, source: 'PHB 2024 "Circle of the Land: Circle of the Land Spells" (L3860-3866)' },
   { key: 'sorcerer.elementalAffinity', classId: 'sorcerer', subclassId: 'draconic', label: 'Elemental Affinity', steps: [[6, 1]], kind: 'options', swappable: false, source: 'PHB 2024 "Draconic Sorcery: Elemental Affinity" (L6679)' },
   { key: 'wizard.spellMastery', classId: 'wizard', label: 'Spell Mastery spells', steps: [[18, 2]], kind: 'spells', swappable: true, source: 'PHB 2024 "Wizard: Spell Mastery" (L7479-7483)' },
   { key: 'wizard.signatureSpells', classId: 'wizard', label: 'Signature Spells', steps: [[20, 2]], kind: 'spells', swappable: false, source: 'PHB 2024 "Wizard: Signature Spells" (L7489-7491)' },
@@ -218,6 +221,7 @@ export function choiceOptionIds(key: ClassChoiceKey): readonly string[] | undefi
     case 'ranger.primalCompanion': return SUBCLASS_PICK_OPTIONS.primalCompanion.map((o) => o.id);
     case 'barbarian.aspectOfTheWilds': return SUBCLASS_PICK_OPTIONS.aspectOfTheWilds.map((o) => o.id);
     case 'sorcerer.elementalAffinity': return SUBCLASS_PICK_OPTIONS.elementalAffinity.map((o) => o.id);
+    case 'druid.landType': return landTypeOptions().map((o) => o.id);
     case 'wizard.spellMastery':
     case 'wizard.signatureSpells':
       return undefined;
