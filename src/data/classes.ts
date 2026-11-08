@@ -1061,11 +1061,15 @@ const SOULKNIFE_FEATURES: ClassFeature[] = [
     source: phbSub('Soulknife: Psychic Blades', 6139),
   },
   {
-    // FLAG: the OCR text only shows Psychic Teleportation; the "Homing Strikes" power is in an image and is not recorded.
+    // Homing Strikes text is from the printed PHB (the OCR shows it only as an image, L6157).
     name: 'Soul Blades',
     level: 9,
-    effect: 'Psychic Teleportation: as a Bonus Action, manifest a Psychic Blade, spend and roll one Psionic Energy Die, and throw the blade to an unoccupied space you can see up to 10 times the roll in feet away; you teleport there and the blade vanishes.',
-    dice: [{ expr: '10 x 1 Psionic Die ft', label: 'Psychic Teleportation distance (Bonus Action)' }],
+    effect: 'Your Psychic Blades gain two powers. Homing Strikes: when a Psychic Blade attack roll misses, you can roll one Psionic Energy Die and add the result to the roll; the die is expended only if that makes the attack hit. Psychic Teleportation: as a Bonus Action, manifest a Psychic Blade, spend and roll one Psionic Energy Die, and throw the blade to an unoccupied space you can see up to 10 times the roll in feet away; you teleport there and the blade vanishes.',
+    mechanics: { homingStrikesDice: 1, homingStrikesExpended: 'only-if-hit', teleportActivation: 'bonus-action' },
+    dice: [
+      { expr: '1 Psionic Die', label: 'Homing Strikes bonus to a missed Psychic Blade attack roll (expended only if it hits)' },
+      { expr: '10 x 1 Psionic Die ft', label: 'Psychic Teleportation distance (Bonus Action)' },
+    ],
     source: phbSub('Soulknife: Soul Blades', 6153),
   },
   {
@@ -1528,10 +1532,11 @@ const ABJURER_FEATURES: ClassFeature[] = [
     source: phbSub('Abjurer: Projected Ward', 7672),
   },
   {
-    // FLAG: the second paragraph (what happens when either spell is cast with a slot) is OCR-garbled, so no mechanics are recorded for it.
+    // The second paragraph (slot not expended on failure) is from the printed PHB (the OCR is garbled, L7680).
     name: 'Spell Breaker',
     level: 10,
-    effect: 'You always have Counterspell and Dispel Magic prepared. You can cast Dispel Magic as a Bonus Action and add your Proficiency Bonus to its ability check.',
+    effect: 'You always have Counterspell and Dispel Magic prepared. You can cast Dispel Magic as a Bonus Action and add your Proficiency Bonus to its ability check. When you cast either spell with a spell slot, the slot is not expended if the spell fails to stop a spell.',
+    mechanics: { dispelMagicActivation: 'bonus-action', dispelMagicCheckBonus: 'proficiency-bonus', slotNotExpendedOnFailure: 'counterspell|dispel-magic' },
     grantedSpells: [{ level: 10, spells: spellIds('Counterspell', 'Dispel Magic'), alwaysPrepared: true }],
     source: phbSub('Abjurer: Spell Breaker', 7676),
   },

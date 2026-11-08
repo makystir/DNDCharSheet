@@ -385,6 +385,9 @@ describe('subclass oracle: catalog matches the golden', () => {
             (wantCounts[Number(lvl)] ?? 0) - (gf.grantedSpells ?? []).filter((x) => x.level === Number(lvl)).reduce((n, x) => n + (x.chosenCount ?? 0), 0),
           );
         }
+        for (const [mk, mv] of Object.entries(gf.mechanics ?? {})) {
+          expect((f.mechanics ?? {})[mk], `${fw}.mechanics.${mk}`).toBe(mv);
+        }
         checkSpellcasting(fw, gf, f);
         if (!g.landSpells || gf.name !== `${g.name} Spells`) {
           expect(f.choiceSpells, `${fw}.choiceSpells (only Circle of the Land Spells has them)`).toBeUndefined();

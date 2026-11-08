@@ -129,6 +129,11 @@ export interface GoldenFeature {
   choices?: GoldenChoice[];
   /** True when the feature is used as a Reaction. */
   reaction?: true;
+  /**
+   * Structured mechanics facts the catalog must carry (each key is pinned to exactly this value;
+   * the catalog may hold other keys). Used where the PHB states a rule no other golden field models.
+   */
+  mechanics?: Record<string, number | string>;
   /** Feature is spent via a Channel Divinity use. */
   channelDivinity?: true;
   /** Feat / Fighting Style grants. */
@@ -1246,8 +1251,8 @@ export const BARBARIAN_BARD_CLERIC_DRUID_GOLDEN: GoldenSubclass[] = [
 ];
 
 // ═══════════════════════════ ROGUE (PHB L5999-6211) ═══════════════════════════
-// FLAG: Soulknife "Soul Blades" (L9, L6153): the OCR text only shows Psychic Teleportation
-// (L6159); the "Homing Strikes" power is in an image (L6157) and is not recorded.
+// NOTE: Soulknife "Soul Blades" (L9, L6153): the OCR (L6157) shows the Homing Strikes power
+// only as an image; its text is taken from the printed PHB (supplied by the user).
 // FLAG: Assassin "Infiltration Expertise" (L9) is named "Expertise" but grants no skill
 // Expertise (Masterful Mimicry + Roving Aim only), so no expertise grant is recorded.
 // FLAG: Arcane Trickster Spellcasting table (L6027) is OCR-damaged ("ll" = 11, merged slot
@@ -1363,7 +1368,14 @@ const ROGUE_GOLDEN: GoldenSubclass[] = [
         name: 'Soul Blades',
         level: 9,
         line: 6153,
-        dice: [{ expr: '10 x 1 Psionic Die ft', label: 'Psychic Teleportation distance (Bonus Action)' }],
+        // Printed PHB (Homing Strikes): on a missed Psychic Blade attack roll, roll one Psionic Energy Die and
+        // add it to the attack roll; the die is expended only if that makes the attack hit.
+        // L6159 (Psychic Teleportation): Bonus Action, expend and roll one die, 10 x roll feet.
+        dice: [
+          { expr: '1 Psionic Die', label: 'Homing Strikes bonus to a missed Psychic Blade attack roll (expended only if it hits)' },
+          { expr: '10 x 1 Psionic Die ft', label: 'Psychic Teleportation distance (Bonus Action)' },
+        ],
+        mechanics: { homingStrikesDice: 1, homingStrikesExpended: 'only-if-hit', teleportActivation: 'bonus-action' },
       },
       {
         name: 'Psychic Veil',
@@ -1737,8 +1749,9 @@ const WARLOCK_GOLDEN: GoldenSubclass[] = [
 // FLAG: the "Illusionist" subclass heading is missing from the OCR (L7756 shows only the
 // tagline "Weave Subtle Spells of Deception"); the name comes from the intro (L7650) and the
 // Wizard summary (L2376 region).
-// FLAG: Abjurer "Spell Breaker" (L7676) second paragraph is OCR-garbled (L7680, about the
-// effect of casting Counterspell/Dispel Magic with a slot); no mechanics recorded for it.
+// NOTE: Abjurer "Spell Breaker" (L7676) second paragraph is OCR-garbled (L7680); its text is
+// taken from the printed PHB (supplied by the user): a slot cast of Counterspell or Dispel Magic
+// is not expended if the spell fails to stop a spell.
 // FLAG: Abjurer "Projected Ward" (L7672) and Diviner "Greater Portent" (L7718) have images
 // after them (L7722-7724); the spoken text is complete enough for names/levels.
 const WIZARD_GOLDEN: GoldenSubclass[] = [
@@ -1767,6 +1780,13 @@ const WIZARD_GOLDEN: GoldenSubclass[] = [
         level: 10,
         line: 7676,
         grantedSpells: [{ level: 10, spells: ['Counterspell', 'Dispel Magic'], mode: 'always-prepared' }],
+        // L7678: Dispel Magic as a Bonus Action; add Proficiency Bonus to its ability check.
+        // Printed PHB: slot not expended when either spell fails to stop a spell.
+        mechanics: {
+          dispelMagicActivation: 'bonus-action',
+          dispelMagicCheckBonus: 'proficiency-bonus',
+          slotNotExpendedOnFailure: 'counterspell|dispel-magic',
+        },
       },
       { name: 'Spell Resistance', level: 14, line: 7682 },
     ],
