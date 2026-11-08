@@ -1,24 +1,45 @@
 import { describe, it, expect } from 'vitest';
 import { createCharacter } from '../../storage/character-store';
-import type { Character, ClassSpellcasting } from '../../types/character';
+import type { Character, ClassChoices, ClassSpellcasting } from '../../types/character';
 import { CLASS_CATALOG } from '../../data/classes';
-import type { ClassData, ClassId } from '../../data/classes';
+import type { ClassData, ClassId, SubclassId } from '../../data/classes';
 import { SPELL_CATALOG } from '../../data/spells';
 import type { SpellId } from '../../data/spells';
 import { effectiveSpellSlots, pactMagicSlotsForClass } from '../spellcasting';
 import { availableReactions } from '../reactions';
-import { REACTION_CATALOG_ORACLE, REACTION_SCENARIOS } from './reactions-golden';
+import { FEAT_CATALOG, getFeat } from '../../data/feats';
+import type { FeatId } from '../../data/feats';
+import { getSpecies } from '../../data/species';
+import type { GiantAncestryId, SpeciesId } from '../../data/species';
+import { getInvocation } from '../../data/invocations';
+import { MANEUVER_LIST } from '../../data/maneuvers';
+import { ALL_REACTION_SCENARIOS, REACTION_CATALOG_ORACLE, SUBCLASS_REACTIONS } from './reactions-golden';
 import type { ReactionScenario } from './reactions-golden';
 
 /** Maps a golden scenario onto a real Character. */
 function buildCharacter(s: ReactionScenario): Character {
   const base = createCharacter('Golden');
-  const classes = s.classes.map((c) => ({ id: c.id as ClassId, level: c.level }));
+  const classes = s.classes.map((c) => ({
+    id: c.id as ClassId,
+    level: c.level,
+    ...(c.subclass ? { subclassId: c.subclass as SubclassId } : {}),
+  }));
   const character: Character = {
     ...base,
     classes,
     level: Math.max(1, classes.reduce((sum, c) => sum + c.level, 0)),
   };
+  if (s.feats) {
+    character.advancement = { feats: s.feats.map((featId) => ({ featId: featId as FeatId, level: 0 })) };
+  }
+  if (s.species) {
+    character.species = {
+      id: s.species.id as SpeciesId,
+      ...(s.species.giantAncestry ? { giantAncestry: s.species.giantAncestry as GiantAncestryId } : {}),
+    };
+  }
+  if (s.classChoices) character.classChoices = s.classChoices as ClassChoices;
+  if (s.resourcesSpent) character.resourcesSpent = s.resourcesSpent;
 
   // Spell selections live under byClass[classId]. Reaction spells go to the
   // first class (a Wizard also keeps its spellbook = prepared + spellbookOnly).
@@ -78,7 +99,7 @@ function buildCharacter(s: ReactionScenario): Character {
 }
 
 describe('availableReactions: golden scenarios', () => {
-  it.each(REACTION_SCENARIOS.map((s) => [s.name, s] as const))('%s', (_name, scenario) => {
+  it.each(ALL_REACTION_SCENARIOS.map((s) => [s.name, s] as const))('%s', (_name, scenario) => {
     const actual = availableReactions(buildCharacter(scenario));
     // Opportunity Attack is always first.
     expect(actual[0].name).toBe('Opportunity Attack');
@@ -113,6 +134,58 @@ describe('reaction catalog oracle', () => {
       expect(feature?.mechanics?.activation).toBeUndefined();
     },
   );
+
+  it('tags exactly the oracle subclass features as reactions (by subclass)', () => {
+    const tagged = classes.flatMap((c) =>
+      c.subclasses.flatMap((sub) =>
+        sub.features
+          .filter((f) => f.mechanics?.activation === 'reaction')
+          .map((f) => `${c.id}/${sub.id}/${f.level}/${f.name}`),
+      ),
+    );
+    const expected = SUBCLASS_REACTIONS.map((s) => `${s.classId}/${s.subclass}/${s.level}/${s.featureName ?? s.name}`);
+    expect([...tagged].sort()).toEqual([...expected].sort());
+  });
+
+  it.each(REACTION_CATALOG_ORACLE.notReactionSubclassFeatures.map((f) => [`${f.subclass}: ${f.name}`, f] as const))(
+    'does not tag %s as a reaction',
+    (_label, { classId, subclass, name }) => {
+      const sub = (CLASS_CATALOG as Record<string, ClassData>)[classId].subclasses.find((s) => s.id === subclass);
+      const feature = sub?.features.find((f) => f.name === name);
+      expect(feature).toBeDefined();
+      expect(feature?.mechanics?.activation).toBeUndefined();
+    },
+  );
+
+  it('tags exactly the oracle feats with reactions', () => {
+    const tagged = Object.values(FEAT_CATALOG)
+      .filter((f) => f.reactions && f.reactions.length > 0)
+      .map((f) => ({ id: f.id, reactions: (f.reactions ?? []).map((r) => r.name) }));
+    const sort = (l: { id: string }[]) => [...l].sort((a, b) => a.id.localeCompare(b.id));
+    expect(sort(tagged)).toEqual(sort(REACTION_CATALOG_ORACLE.feats));
+  });
+
+  it.each(REACTION_CATALOG_ORACLE.notReactionFeats.map((id) => [id] as const))('feat %s carries no reaction tag', (id) => {
+    const feat = getFeat(id);
+    expect(feat).toBeDefined();
+    expect(feat?.reactions).toBeUndefined();
+  });
+
+  it('tags exactly the oracle species options with reactions', () => {
+    const tagged = ['goliath'].flatMap((speciesId) =>
+      (getSpecies(speciesId)?.choices ?? []).flatMap((spec) =>
+        spec.options.filter((o) => o.reaction).map((o) => ({ speciesId, optionId: o.id, name: o.reaction?.name ?? '' })),
+      ),
+    );
+    expect(tagged).toEqual(REACTION_CATALOG_ORACLE.speciesOptions);
+  });
+
+  it('has exactly the oracle reaction maneuvers and invocations', () => {
+    expect(MANEUVER_LIST.filter((m) => m.trigger === 'reaction').map((m) => m.id).sort()).toEqual([...REACTION_CATALOG_ORACLE.maneuvers].sort());
+    for (const { id, name } of REACTION_CATALOG_ORACLE.invocations) {
+      expect(getInvocation(id)?.reaction?.name).toBe(name);
+    }
+  });
 
   it('has exactly the oracle reaction-cast spells', () => {
     const reactionSpells = SPELL_CATALOG.filter((s) => s.castingTime.startsWith('Reaction')).map(

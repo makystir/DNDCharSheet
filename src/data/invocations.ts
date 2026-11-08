@@ -8,7 +8,7 @@
  * invocations-oracle.test.ts.
  */
 
-import type { OwnUses } from './classes';
+import type { OwnUses, ReactionTag } from './classes';
 
 export type InvocationCantripRequirement = 'damage' | 'damage-attack-roll';
 export type InvocationParam = 'cantrip' | 'origin-feat';
@@ -32,12 +32,14 @@ export interface InvocationData {
   summary: string;
   /** Limited-use pool (D1 resource tracking); the tracker id is `warlock.invocation-<id>`. */
   uses?: OwnUses;
+  /** Set when the invocation grants a Reaction (Overview Reactions card); explicit, never derived from `summary`. */
+  reaction?: ReactionTag;
   source: string;
 }
 
 const src = (name: string, line: number): string => `PHB 2024 "${name}" (L${line})`;
 
-type Extra = Partial<Pick<InvocationData, 'requiresInvocation' | 'requiresCantrip' | 'cantripMinRangeFeet' | 'repeatable' | 'param' | 'uses'>>;
+type Extra = Partial<Pick<InvocationData, 'requiresInvocation' | 'requiresCantrip' | 'cantripMinRangeFeet' | 'repeatable' | 'param' | 'uses' | 'reaction'>>;
 const inv = (id: string, name: string, line: number, minLevel: number, summary: string, extra: Extra = {}): InvocationData => ({
   id,
   name,
@@ -79,6 +81,11 @@ const LIST: InvocationData[] = [
   }),
   inv('investment-of-the-chain-master', 'Investment of the Chain Master', 6984, 5, 'Your Find Familiar familiar gains a Fly or Swim Speed, quick attacks, radiant/necrotic damage options, your spell save DC and a Resistance reaction.', {
     requiresInvocation: 'pact-of-the-chain',
+    reaction: {
+      name: 'Investment of the Chain Master: Resistance',
+      summary: 'When your Find Familiar familiar takes damage, grant it Resistance against that damage.',
+      source: 'PHB 2024 "Investment of the Chain Master: Resistance" (L6996)',
+    },
   }),
   inv('lessons-of-the-first-ones', 'Lessons of the First Ones', 6998, 2, 'Gain one Origin feat of your choice. Repeat with a different Origin feat.', {
     repeatable: true,

@@ -48,7 +48,7 @@ describe('OverviewReactions', () => {
 
   it('shows the footer note and the Combat link', () => {
     render(<OverviewReactions character={make({})} />);
-    expect(screen.getByText('Subclass and feat reactions are not listed yet.')).toBeInTheDocument();
+    expect(screen.getByText('Absorb Elements and the Ready action are not listed.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Reaction used? Manage on Combat' })).toHaveAttribute(
       'href',
       '#combat',
@@ -59,6 +59,38 @@ describe('OverviewReactions', () => {
     render(<OverviewReactions character={make({})} />);
     const row = screen.getByText('Uncanny Dodge').closest('li') as HTMLElement;
     expect(within(row).getByText(/Class feature/)).toBeInTheDocument();
+  });
+
+  it('lists subclass, feat, species and class-choice reactions with a label and origin', () => {
+    render(
+      <OverviewReactions
+        character={make({
+          classes: [{ id: 'fighter', level: 3, subclassId: 'battleMaster' }],
+          advancement: { feats: [{ featId: 'shield-master', level: 0 }, { featId: 'interception', level: 0 }] },
+          species: { id: 'goliath', giantAncestry: 'stone' },
+          classChoices: { 'fighter.maneuvers': ['parry'] },
+        })}
+      />,
+    );
+    const tag = (name: string) => (screen.getByText(name).closest('li') as HTMLElement).textContent ?? '';
+    expect(tag('Shield Master: Interpose Shield')).toContain('Feat \u00B7 Shield Master');
+    expect(tag('Interception')).toContain('Fighting Style feat \u00B7 Interception');
+    expect(tag("Stone's Endurance")).toContain('Species \u00B7 Goliath');
+    expect(tag('Maneuver: Parry')).toContain('Class choice \u00B7 Battle Master');
+  });
+
+  it('greys a subclass reaction whose limited-use pool is empty and says why', () => {
+    render(
+      <OverviewReactions
+        character={make({
+          classes: [{ id: 'cleric', level: 3, subclassId: 'light' }],
+          resourcesSpent: { 'cleric.warding-flare': 99 },
+        })}
+      />,
+    );
+    const row = screen.getByText('Warding Flare').closest('li') as HTMLElement;
+    expect(within(row).getByText(/Subclass feature/)).toBeInTheDocument();
+    expect(within(row).getByText('No uses left')).toBeInTheDocument();
   });
 
   it('shows spell entries with their level', () => {

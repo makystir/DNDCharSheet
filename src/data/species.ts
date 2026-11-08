@@ -27,6 +27,7 @@
  */
 
 import type { Ability, SkillId } from '../types/character';
+import type { ReactionTag } from './classes';
 
 /** A creature's size category. Only Small/Medium appear among PHB species. */
 export type CreatureSize = 'small' | 'medium';
@@ -64,6 +65,8 @@ export interface SpeciesChoiceOption {
   id: string;
   label: string;
   note?: string;
+  /** Set when choosing this option grants a Reaction (Overview Reactions card); explicit, never derived from `note`. */
+  reaction?: ReactionTag;
 }
 
 /**
@@ -462,8 +465,26 @@ export const SPECIES_CATALOG = {
           { id: 'fire', label: "Fire's Burn", note: '+1d10 Fire on a hit' },
           { id: 'hill', label: "Hill's Tumble", note: 'Knock a hit target Prone' },
           { id: 'frost', label: "Frost's Chill", note: '+1d6 Cold and −10 ft Speed on a hit' },
-          { id: 'stone', label: "Stone's Endurance", note: 'Reaction: reduce damage by 1d12 + Con' },
-          { id: 'storm', label: "Storm's Thunder", note: 'Reaction: 1d8 Thunder to attacker' },
+          {
+            id: 'stone',
+            label: "Stone's Endurance",
+            note: 'Reaction: reduce damage by 1d12 + Con',
+            reaction: {
+              name: "Stone's Endurance",
+              summary: 'When you take damage, roll 1d12, add your Constitution modifier, and reduce the damage by that total. Proficiency Bonus uses per Long Rest (Giant Ancestry).',
+              source: 'PHB 2024 "Goliath Traits: Giant Ancestry, Stone\'s Endurance" (L8196)',
+            },
+          },
+          {
+            id: 'storm',
+            label: "Storm's Thunder",
+            note: 'Reaction: 1d8 Thunder to attacker',
+            reaction: {
+              name: "Storm's Thunder",
+              summary: 'When you take damage from a creature within 60 feet of you, deal 1d8 Thunder damage to that creature. Proficiency Bonus uses per Long Rest (Giant Ancestry).',
+              source: 'PHB 2024 "Goliath Traits: Giant Ancestry, Storm\'s Thunder" (L8198)',
+            },
+          },
         ],
       },
     ],

@@ -306,7 +306,8 @@ const BARBARIAN_GOLDEN: GoldenSubclass[] = [
         line: 2659,
         uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a use of Rage (no action)' },
       },
-      { name: 'Rage of the Gods', level: 14, line: 2665, uses: { count: 1, recharge: 'long-rest' } },
+      // D2: Revivification (L2673) is a Reaction inside the divine form, so the feature is tagged as one.
+      { name: 'Rage of the Gods', level: 14, line: 2665, reaction: true, uses: { count: 1, recharge: 'long-rest' } },
     ],
   },
 ];
@@ -503,6 +504,7 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         name: 'Guided Strike',
         level: 3,
         line: 3540,
+        reaction: true, // D2: a Reaction when it helps ANOTHER creature (L3542)
         channelDivinity: true,
         spends: 'channel-divinity',
       },
@@ -1037,6 +1039,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         name: 'Living Legend',
         level: 20,
         line: 5199,
+        reaction: true, // D2: the Saving Throw Reroll (L5205) is a Reaction inside the activated form
         uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
       },
     ],

@@ -26,7 +26,7 @@
  */
 
 import type { Ability } from '../types/character';
-import type { OwnUses } from './classes';
+import type { OwnUses, ReactionTag } from './classes';
 
 /** The four feat categories (PHB 2024 "Parts of a Feat", L8356). */
 export type FeatCategory = 'origin' | 'general' | 'fighting-style' | 'epic-boon';
@@ -133,6 +133,8 @@ export interface FeatData {
    * tracker id is `feat:<featId>.<pool>`.
    */
   uses?: OwnUses | OwnUses[];
+  /** Reactions this feat grants (Overview Reactions card); absent = none. Explicit, never derived from `effect`. */
+  reactions?: ReactionTag[];
   /** Line-anchored PHB citation this entry is transcribed from. */
   source: string;
 }
@@ -404,6 +406,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Dexterity by 1 (maximum 20). While holding a Finesse weapon, when a melee attack hits you, you can use your Reaction to add your Proficiency Bonus to your AC against melee attacks until the start of your next turn, possibly causing that attack to miss.',
+    reactions: [
+      {
+        name: 'Defensive Duelist: Parry',
+        summary: 'While holding a Finesse weapon, when a creature hits you with a melee attack, add your Proficiency Bonus to your AC against melee attacks until the start of your next turn, which can make the attack miss.',
+        source: 'PHB 2024 "Defensive Duelist: Parry" (L8652)',
+      },
+    ],
     source: 'PHB 2024 "Defensive Duelist" (L8644)',
   },
   'dual-wielder': {
@@ -661,6 +670,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Strength or Dexterity by 1 (maximum 20). After the Attack action with a Quarterstaff, Spear, or a Heavy and Reach weapon, you can use a Bonus Action for a melee attack with the weapon’s other end (Bludgeoning, d4 damage die). While holding such a weapon, you can use your Reaction to attack a creature that enters your reach.',
+    reactions: [
+      {
+        name: 'Polearm Master: Reactive Strike',
+        summary: 'While holding a Quarterstaff, a Spear, or a Heavy and Reach weapon, make one melee attack against a creature that enters your reach with that weapon.',
+        source: 'PHB 2024 "Polearm Master: Reactive Strike" (L8872)',
+      },
+    ],
     source: 'PHB 2024 "Polearm Master" (L8862)',
   },
   resilient: {
@@ -702,6 +718,14 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Strength or Dexterity by 1 (maximum 20). When a creature within 5 feet takes the Disengage action or hits someone other than you, you can make an Opportunity Attack against it. A creature you hit with an Opportunity Attack has its Speed become 0 for the rest of the turn.',
+    reactions: [
+      {
+        name: 'Sentinel: Guardian',
+        // An Opportunity Attack is made with a Reaction (PHB "Making an Opportunity Attack" L1029).
+        summary: 'Right after a creature within 5 feet takes the Disengage action or hits a target other than you, make an Opportunity Attack against it (an Opportunity Attack uses your Reaction).',
+        source: 'PHB 2024 "Sentinel: Guardian" (L8910)',
+      },
+    ],
     source: 'PHB 2024 "Sentinel" (L8902)',
   },
   'shadow-touched': {
@@ -742,6 +766,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Strength by 1 (maximum 20). Once per turn, after hitting with a Melee weapon as part of the Attack action, you can bash with your equipped Shield: the target makes a Strength save (DC 8 + Strength modifier + Proficiency Bonus) or is pushed 5 feet or knocked Prone (your choice). When a Dexterity save would halve damage, you can use your Reaction to take none on a success while holding a Shield.',
+    reactions: [
+      {
+        name: 'Shield Master: Interpose Shield',
+        summary: 'When an effect lets you make a Dexterity save to take half damage, take no damage if you succeed and are holding a Shield.',
+        source: 'PHB 2024 "Shield Master: Interpose Shield" (L8948)',
+      },
+    ],
     source: 'PHB 2024 "Shield Master" (L8938)',
   },
   'skill-expert': {
@@ -832,6 +863,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Intelligence, Wisdom or Charisma by 1 (maximum 20). You have Advantage on Constitution saves to maintain Concentration. When a creature provokes an Opportunity Attack by leaving your reach, you can use your Reaction to cast a one-action spell targeting only that creature instead. You can perform Somatic components with weapons or a Shield in hand.',
+    reactions: [
+      {
+        name: 'War Caster: Reactive Spell',
+        summary: 'When a creature provokes an Opportunity Attack from you by leaving your reach, cast a spell at it instead; the spell needs a casting time of one action and must target only that creature.',
+        source: 'PHB 2024 "War Caster: Reactive Spell" (L9052)',
+      },
+    ],
     source: 'PHB 2024 "War Caster" (L9042)',
   },
   'weapon-master': {
@@ -907,6 +945,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'When a creature you can see hits another creature within 5 feet of you, you can use your Reaction to reduce the damage by 1d10 + your Proficiency Bonus. You must be holding a Shield or a Simple or Martial weapon.',
+    reactions: [
+      {
+        name: 'Interception',
+        summary: 'When a creature you can see hits another creature within 5 feet of you, reduce the damage by 1d10 plus your Proficiency Bonus. You must hold a Shield or a Simple or Martial weapon.',
+        source: 'PHB 2024 "Interception" (L9094)',
+      },
+    ],
     source: 'PHB 2024 "Interception" (L9092)',
   },
   protection: {
@@ -917,6 +962,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'When a creature you can see attacks a target other than you within 5 feet of you, you can use your Reaction to interpose a Shield you hold. The triggering attack roll and all other attack rolls against that target have Disadvantage until the start of your next turn, as long as you stay within 5 feet of it.',
+    reactions: [
+      {
+        name: 'Protection',
+        summary: 'When a creature you can see attacks a target other than you within 5 feet of you, interpose your Shield (if held) to impose Disadvantage on that attack roll and all other attack rolls against the target until the start of your next turn, if you stay within 5 feet of it.',
+        source: 'PHB 2024 "Protection" (L9100)',
+      },
+    ],
     source: 'PHB 2024 "Protection" (L9096)',
   },
   'thrown-weapon-fighting': {
@@ -1003,6 +1055,13 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     ),
     effect:
       'Increase one ability score by 1 (maximum 30). Choose two of Acid, Cold, Fire, Lightning, Necrotic, Poison, Psychic, Radiant or Thunder to resist; you can change them after each Long Rest. When you take damage of a chosen type, you can use your Reaction to send it at another creature you can see within 60 feet (not behind Total Cover): it makes a Dexterity save (DC 8 + Constitution modifier + Proficiency Bonus) or takes 2d12 + your Constitution modifier damage.',
+    reactions: [
+      {
+        name: 'Boon of Energy Resistance: Energy Redirection',
+        summary: 'When you take damage of a type chosen for Energy Resistances, direct that damage type at another creature you can see within 60 feet (not behind Total Cover): it makes a Dexterity save (DC 8 + Constitution modifier + Proficiency Bonus) or takes 2d12 + your Constitution modifier.',
+        source: 'PHB 2024 "Boon of Energy Resistance: Energy Redirection" (L9160)',
+      },
+    ],
     source: 'PHB 2024 "Boon of Energy Resistance" (L9152)',
   },
   'boon-of-fate': {

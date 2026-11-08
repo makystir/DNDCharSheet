@@ -19,12 +19,18 @@ export interface OverviewReactionsProps {
 const KIND_LABEL: Record<ReactionKind, string> = {
   universal: 'Universal',
   'class-feature': 'Class feature',
+  'subclass-feature': 'Subclass feature',
+  feat: 'Feat',
+  'fighting-style': 'Fighting Style feat',
+  species: 'Species',
+  'class-choice': 'Class choice',
   spell: 'Spell',
 };
 
 const REASON_TEXT: Record<ReactionUnavailable, string> = {
   incapacitated: 'Incapacitated',
   spent: 'Reaction already used',
+  'no-uses': 'No uses left',
   'no-slot': 'No spell slot available',
 };
 
@@ -79,6 +85,7 @@ export function OverviewReactions({ character }: OverviewReactionsProps) {
                 <span className={styles.name}>{entry.name}</span>
                 <span className={styles.tag}>
                   {KIND_LABEL[entry.kind]}
+                  {entry.origin ? ` \u00B7 ${entry.origin}` : ''}
                   {entry.spellLevel !== undefined ? ` \u00B7 Level ${entry.spellLevel}` : ''}
                 </span>
                 {entry.unavailable && (
@@ -90,7 +97,7 @@ export function OverviewReactions({ character }: OverviewReactionsProps) {
           ))}
         </ul>
       )}
-      <p className={styles.note}>Subclass and feat reactions are not listed yet.</p>
+      <p className={styles.note}>Absorb Elements and the Ready action are not listed.</p>
       <OverviewFooter links={[{ href: '#combat', text: 'Reaction used? Manage on Combat' }]} />
     </Card>
   );

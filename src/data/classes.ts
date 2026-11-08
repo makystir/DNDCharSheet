@@ -62,6 +62,13 @@ export interface ClassFeature {
   /** Machine-usable mechanical values where the feature is numeric/mechanical. */
   mechanics?: { [k: string]: number | string | number[] };
   /**
+   * REACTIONS (Overview Reactions card, logic/reactions.ts): a feature is listed as a Reaction ONLY when it
+   * carries `mechanics.activation === 'reaction'` (never derived from effect text). Optional companions:
+   *  - `reactionName`: the entry name when the Reaction is a sub-ability ("Psionic Power: Protective Field").
+   *  - `reactionPool`: the pool id (same class) that taking the Reaction expends a use of, or 'none' when the
+   *    feature's own `uses` only ACTIVATES a form. Absent = the feature's own pool / `spends` link, if any.
+   */
+  /**
    * Marks a feature that is a player choice rather than a static benefit:
    * - 'asi-marker': an Ability Score Improvement row or the level-19 Epic Boon
    *   (a feat choice, never an automatic ability-score change).
@@ -166,6 +173,21 @@ export interface SpendsUses {
 }
 
 export type FeatureUses = OwnUses | SpendsUses;
+
+/**
+ * An EXPLICIT Reaction tag for a non-class-feature source (feat, species option, Eldritch Invocation). The
+ * Overview Reactions card lists these only when the tag is present (never derived from effect text).
+ * Class and subclass features use `mechanics.activation === 'reaction'` instead; maneuvers use their
+ * `trigger: 'reaction'`.
+ */
+export interface ReactionTag {
+  /** The entry name shown on the card, unique across sources ("Shield Master: Interpose Shield"). */
+  name: string;
+  /** One-line paraphrase of the trigger and result. */
+  summary: string;
+  /** Line-anchored PHB citation. */
+  source: string;
+}
 
 /** Psionic Energy Dice (Psi Warrior PHB L4426-4437, Soulknife L6116-6127): count and die by Fighter / Rogue level. */
 const PSIONIC_ENERGY_DICE_USES: OwnUses = {
@@ -440,7 +462,7 @@ const PSI_WARRIOR_FEATURES: ClassFeature[] = [
     name: 'Psionic Power',
     level: 3,
     effect: 'You have Psionic Energy Dice (4d6 at level 3, 6d8 at 5, 8d8 at 9, 8d10 at 11, 10d10 at 13, 12d12 at 17); regain one on a Short Rest and all on a Long Rest. Protective Field: Reaction, spend a die to reduce damage to you or a creature you see within 30 feet by the roll + Intelligence modifier (minimum 1 reduction). Psionic Strike: once per turn after a weapon hit on a target within 30 feet, spend a die for Force damage equal to the roll + Intelligence modifier. Telekinetic Movement: Magic action to move a loose Large-or-smaller object or willing creature up to 30 feet, once per Short or Long Rest unless you spend a die to restore it.',
-    mechanics: { activation: 'reaction', dieL3: 'd6', numberL3: 4, dieL5: 'd8', numberL5: 6, dieL9: 'd8', numberL9: 8, dieL11: 'd10', numberL11: 8, dieL13: 'd10', numberL13: 10, dieL17: 'd12', numberL17: 12 },
+    mechanics: { activation: 'reaction', reactionName: 'Psionic Power: Protective Field', dieL3: 'd6', numberL3: 4, dieL5: 'd8', numberL5: 6, dieL9: 'd8', numberL9: 8, dieL11: 'd10', numberL11: 8, dieL13: 'd10', numberL13: 10, dieL17: 'd12', numberL17: 12 },
     uses: PSIONIC_ENERGY_DICE_USES, // PHB L4426-4437
     dice: [
       { expr: 'Psionic Energy Dice: 4d6 (L3), 6d8 (L5), 8d8 (L9), 8d10 (L11), 10d10 (L13), 12d12 (L17)', label: 'Psionic Energy Dice pool' },
@@ -729,6 +751,8 @@ const GLORY_FEATURES: ClassFeature[] = [
     name: 'Living Legend',
     level: 20,
     effect: 'As a Bonus Action, gain for 10 minutes: Advantage on all Charisma checks; a Reaction to reroll a failed saving throw (you must keep the new roll); and once per turn, turn a missed weapon attack into a hit. Once per Long Rest, or restore it by expending a level 5 spell slot (no action).',
+    // PHB L5205: the Saving Throw Reroll is a Reaction inside the activated form; the own pool only activates it.
+    mechanics: { activation: 'reaction', reactionName: 'Living Legend: Saving Throw Reroll', reactionPool: 'none' },
     uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
     source: phbSub('Oath of Glory: Living Legend', 5199),
   },
@@ -1350,7 +1374,7 @@ const WILD_MAGIC_FEATURES: ClassFeature[] = [
     name: 'Bend Luck',
     level: 6,
     effect: 'Right after another creature you can see rolls the d20 for a D20 Test, use a Reaction and spend 1 Sorcery Point to roll 1d4 and apply it as a bonus or penalty (your choice) to that roll.',
-    mechanics: { activation: 'reaction' },
+    mechanics: { activation: 'reaction', reactionPool: 'sorcery-points' }, // PHB L6713: spends 1 Sorcery Point
     dice: [{ expr: '1d4', label: "Bonus or penalty to another creature's d20 (costs 1 Sorcery Point)" }],
     source: phbSub('Wild Magic Sorcery: Bend Luck', 6711),
   },
@@ -2051,6 +2075,8 @@ export const CLASS_CATALOG = {
             name: 'Rage of the Gods',
             level: 14,
             effect: 'When you activate Rage you can take a divine form for 1 minute (ends at 0 Hit Points): Fly Speed equal to your Speed with hovering; Resistance to Necrotic, Psychic and Radiant damage; and a Reaction to expend a Rage use so a creature within 30 feet that would drop to 0 HP instead is set to HP equal to your Barbarian level. Once per Long Rest.',
+            // PHB L2673: Revivification is a Reaction that expends a use of Rage; the own pool only activates the form.
+            mechanics: { activation: 'reaction', reactionName: 'Rage of the Gods: Revivification', reactionPool: 'rage' },
             uses: { count: 1, recharge: 'long-rest' },
             source: phbSub('Path of the Zealot: Rage of the Gods', 2665),
           },
@@ -2593,7 +2619,7 @@ export const CLASS_CATALOG = {
             name: 'Guided Strike',
             level: 3,
             effect: 'When you or a creature within 30 feet misses with an attack roll, expend a Channel Divinity use to give that roll a +10 bonus. Using it for another creature costs your Reaction.',
-            mechanics: { channelDivinity: 1 },
+            mechanics: { channelDivinity: 1, activation: 'reaction' }, // PHB L3542: a Reaction only when it helps ANOTHER creature
             uses: { spends: 'channel-divinity' },
             source: phbSub('War Domain: Guided Strike', 3540),
           },
