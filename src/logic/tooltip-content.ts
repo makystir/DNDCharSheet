@@ -17,7 +17,7 @@
  * rule 5).
  */
 
-import type { InventoryItem } from '../types/character';
+import type { Character, InventoryItem } from '../types/character';
 import {
   getWeapon,
   WEAPON_PROPERTY_TEXT,
@@ -36,6 +36,9 @@ import {
 import { getEquipment, type EquipmentData } from '../data/equipment';
 import { EXHAUSTION, EXHAUSTION_TRACK, getCondition } from '../data/conditions';
 import { getFeat, type FeatCategory } from '../data/feats';
+import { getInvocation } from '../data/invocations';
+import { entrySubclass, resolveClasses } from './classes';
+import type { ResourceState } from './resources';
 import { ABILITY_NAMES, type Ability } from '../types/character';
 
 /** Structured content for a tooltip popover (same shape as the PWA source). */
@@ -807,4 +810,39 @@ export function resolveFeatTooltip(featId: string): TooltipContent | null {
   }
   sections.push({ label: 'Source', text: feat.source });
   return { title: feat.name, sections };
+}
+/**
+ * Tooltip content for a limited-use feature tracker (D1): the paraphrased effect
+ * of each feature sharing the pool (class and subclass features), the feat
+ * tooltip for a feat, or the invocation summary. Returns null when nothing
+ * resolves (e.g. a stale tracker).
+ */
+export function resolveResourceTooltip(character: Character, state: ResourceState): TooltipContent | null {
+  if (state.sourceKind === 'feat') {
+    const featId = state.ownerKey.slice('feat:'.length).replace(/@\d+$/, '');
+    return resolveFeatTooltip(featId);
+  }
+  if (state.sourceKind === 'invocation') {
+    const id = state.id.slice('warlock.invocation-'.length).replace(/#\d+$/, '');
+    const inv = getInvocation(id);
+    if (!inv) return null;
+    return {
+      title: inv.name,
+      sections: [
+        { label: 'Effect', text: inv.summary },
+        { label: 'Source', text: inv.source },
+      ],
+    };
+  }
+  const owner = resolveClasses(character).find(({ data }) => data.id === state.ownerKey);
+  if (!owner) return null;
+  const subclass = entrySubclass(owner.entry);
+  const features = [...owner.data.features, ...(subclass?.features ?? [])];
+  const sections: { label: string; text: string }[] = [];
+  for (const name of state.featureNames) {
+    const f = features.find((x) => x.name === name && x.level <= owner.entry.level);
+    if (f) sections.push({ label: `${f.name} (level ${f.level})`, text: f.effect });
+  }
+  if (sections.length === 0) return null;
+  return { title: state.name, sections };
 }

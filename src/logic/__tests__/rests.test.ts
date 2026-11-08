@@ -9,11 +9,11 @@ import {
   longRest,
   longRestGapAdvisory,
   longRestHoursRequired,
-  rechargeResources,
   restInterruptOutcome,
   shortRest,
   type RestResult,
 } from '../rests';
+import { rechargeResources } from '../resources';
 import { effectiveHp, effectiveTempHp } from '../hit-points-state';
 import { exhaustionLevelOf, setExhaustion } from '../conditions';
 import {
@@ -270,11 +270,63 @@ describe('golden LONG_REST_CASES', () => {
   });
 });
 
-describe('rechargeResources extension point (D11)', () => {
-  it('returns the very same character for both kinds', () => {
+describe('rechargeResources (D11 / D1)', () => {
+  it('returns the very same character and no recoveries when nothing is tracked', () => {
     const c = createCharacter('T');
-    expect(rechargeResources(c, 'short')).toBe(c);
-    expect(rechargeResources(c, 'long')).toBe(c);
+    for (const kind of ['short', 'long'] as const) {
+      const r = rechargeResources(c, kind);
+      expect(r.character).toBe(c);
+      expect(r.recovered).toEqual([]);
+    }
+  });
+});
+
+describe('resourcesRecovered on RestResult (D1)', () => {
+  // Barbarian 6: Rage max 4 (short-one-long-all, PHB L2454-2459); Fighter 1: Second Wind 2.
+  const barbarian = (): Character => ({
+    ...createCharacter('Rager'),
+    level: 6,
+    classes: [{ id: 'barbarian' as never, level: 6 }],
+    hpMax: 60,
+    resourcesSpent: { 'barbarian.rage': 3 },
+  });
+
+  it('a Short Rest regains exactly one Rage and reports it (remaining before -> after)', () => {
+    const r = shortRest(barbarian(), { rolls: [] });
+    expect(r.outcome).toBe('completed');
+    expect(r.character.resourcesSpent).toEqual({ 'barbarian.rage': 2 });
+    expect(r.resourcesRecovered).toEqual([
+      { id: 'barbarian.rage', name: 'Rage', before: 1, after: 2, max: 4, rule: 'one' },
+    ]);
+  });
+
+  it('a Long Rest regains all Rages, clears the stored entry and reports it', () => {
+    const r = longRest(barbarian());
+    expect(r.character.resourcesSpent).toBeUndefined();
+    expect(r.resourcesRecovered).toEqual([
+      { id: 'barbarian.rage', name: 'Rage', before: 1, after: 4, max: 4, rule: 'all' },
+    ]);
+  });
+
+  it('an interrupted Short Rest recovers nothing and reports nothing', () => {
+    const c = barbarian();
+    const r = shortRest(c, { rolls: [], interrupted: true });
+    expect(r.outcome).toBe('interrupted');
+    expect(r.character).toBe(c);
+    expect(r.resourcesRecovered).toBeUndefined();
+  });
+
+  it('a rejected rest recovers nothing', () => {
+    const r = longRest({ ...barbarian(), currentHp: 0 });
+    expect(r.outcome).toBe('rejected');
+    expect(r.resourcesRecovered).toBeUndefined();
+  });
+
+  it('a completed rest with nothing spent reports an empty list', () => {
+    const c = { ...barbarian() };
+    delete c.resourcesSpent;
+    expect(longRest(c).resourcesRecovered).toEqual([]);
+    expect(shortRest(c, { rolls: [] }).resourcesRecovered).toEqual([]);
   });
 });
 

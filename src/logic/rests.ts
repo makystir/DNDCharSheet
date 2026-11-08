@@ -36,9 +36,10 @@
  * DECISIONS AND INTERPRETATIONS:
  *  - D5: the 16-hour wait is ADVISORY only (longRestGapAdvisory). Nothing here
  *    ever blocks a Long Rest because of it.
- *  - D11: per-class feature recharge (Rage, Channel Divinity, Arcane Recovery,
- *    Magical Cunning, ...) is stage A8. `rechargeResources` is the extension
- *    point; today it returns the character unchanged.
+ *  - D11 / D1: per-use feature recharge (Rage, Channel Divinity, Arcane Recovery,
+ *    Magical Cunning, ...) lives in resources.ts `rechargeResources`, called
+ *    at the end of a COMPLETED short or long rest; the result lists what came
+ *    back in `resourcesRecovered`. Rejected and interrupted rests recover nothing.
  *  - Interpretation (orchestrator-approved): a Long Rest ends Concentration.
  *    The sleeper is Unconscious, which implies Incapacitated, which ends
  *    Concentration ("Concentration: Incapacitated or Dead", L20777).
@@ -49,6 +50,7 @@
 import type { Breakdown, BreakdownComponent } from './breakdown';
 import type { Character } from '../types/character';
 import { abilityModifier } from './abilities';
+import { rechargeResources, type ResourceRecovery } from './resources';
 import { hitDiceTotal, resolveClass } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { exhaustionAfterLongRest, exhaustionLevelOf, setExhaustion } from './conditions';
@@ -89,6 +91,8 @@ export interface RestResult {
   afterBreakdown?: Breakdown;
   /** Long Rest: named before -> after Breakdowns for each figure it changes. */
   longRestBreakdowns?: LongRestBreakdowns;
+  /** Completed rests: limited-use features that regained uses (empty when none). Absent when rejected or interrupted. */
+  resourcesRecovered?: ResourceRecovery[];
 }
 
 export interface LongRestBreakdowns {
@@ -109,17 +113,6 @@ export interface ShortRestOptions {
 export interface LongRestOptions {
   /** Epoch ms from an injected clock. When omitted, lastLongRestAt is left alone. */
   now?: number;
-}
-
-// ─── Extension point (D11) ───────────────────────────────────────────────────
-
-/**
- * Recharge per-class features for a finished rest. Stage A8 plugs in here.
- * Today no class feature is tracked, so the character is returned UNCHANGED.
- */
-export function rechargeResources(character: Character, restKind: RestKind): Character {
-  void restKind;
-  return character;
 }
 
 // ─── Interruption, duration, advisory ────────────────────────────────────────
@@ -261,7 +254,8 @@ export function shortRest(character: Character, options: ShortRestOptions): Rest
     next = { ...next, hitDiceSpent: wholeNonNegative(character.hitDiceSpent) + faces.length };
   }
   next = withoutSlotFields(next, ['pactSlotsExpended']);
-  next = rechargeResources(next, 'short');
+  const shortRecharge = rechargeResources(next, 'short');
+  next = shortRecharge.character;
 
   const note =
     state && hpGained < total
@@ -294,6 +288,7 @@ export function shortRest(character: Character, options: ShortRestOptions): Rest
     breakdown: { total, components, note },
     regainedBreakdown,
     afterBreakdown,
+    resourcesRecovered: shortRecharge.recovered,
   };
 }
 
@@ -331,7 +326,8 @@ export function longRest(character: Character, options: LongRestOptions = {}): R
   next = withoutSlotFields(next, ['slotsExpended', 'pactSlotsExpended', 'mysticArcanaExpended']);
   next = endConcentration(next);
   if (options.now !== undefined && Number.isFinite(options.now)) next.lastLongRestAt = options.now;
-  next = rechargeResources(next, 'long');
+  const longRecharge = rechargeResources(next, 'long');
+  next = longRecharge.character;
   const hpBefore = effectiveHp(character);
   const hpAfter = effectiveHp(next);
   const spentBefore = wholeNonNegative(character.hitDiceSpent);
@@ -371,5 +367,5 @@ export function longRest(character: Character, options: LongRestOptions = {}): R
       ],
     },
   };
-  return { outcome: 'completed', character: next, longRestBreakdowns };
+  return { outcome: 'completed', character: next, longRestBreakdowns, resourcesRecovered: longRecharge.recovered };
 }

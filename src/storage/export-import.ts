@@ -23,6 +23,7 @@
 import type { Character } from '../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../types/character';
 import { sanitizeClassChoices } from '../logic/class-choices';
+import { sanitizeResourcesSpent } from '../logic/resources';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
@@ -201,6 +202,10 @@ export function importFromJSON(json: string): ImportResult {
   const sanitizedChoices = sanitizeClassChoices(migrated.character.classChoices);
   if (sanitizedChoices) migrated.character.classChoices = sanitizedChoices;
   else delete migrated.character.classChoices;
+  // resourcesSpent (D1) is additive-optional and untrusted: bounded integers only.
+  const sanitizedResources = sanitizeResourcesSpent(migrated.character.resourcesSpent);
+  if (sanitizedResources) migrated.character.resourcesSpent = sanitizedResources;
+  else delete migrated.character.resourcesSpent;
 
   // Reset identity so the manager adopts this as a NEW character (never clobber
   // the active one). The store/manager assigns a fresh id + timestamps.

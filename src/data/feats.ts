@@ -26,6 +26,7 @@
  */
 
 import type { Ability } from '../types/character';
+import type { OwnUses } from './classes';
 
 /** The four feat categories (PHB 2024 "Parts of a Feat", L8356). */
 export type FeatCategory = 'origin' | 'general' | 'fighting-style' | 'epic-boon';
@@ -126,8 +127,19 @@ export interface FeatData {
   mechanics: FeatMechanics;
   /** Short PHB-cited paraphrase of the benefit (never verbatim). */
   effect: string;
+  /**
+   * Limited-use pool(s) this feat grants (D1 resource tracking). An array when the feat has more than one
+   * independent pool (Boon of Recovery). Use `featOwnUses` to read it uniformly. `pool` is required here so a
+   * tracker id is `feat:<featId>.<pool>`.
+   */
+  uses?: OwnUses | OwnUses[];
   /** Line-anchored PHB citation this entry is transcribed from. */
   source: string;
+}
+
+/** A feat's limited-use pools as a list (empty when the feat has none). */
+export function featOwnUses(feat: FeatData): OwnUses[] {
+  return feat.uses === undefined ? [] : Array.isArray(feat.uses) ? feat.uses : [feat.uses];
 }
 
 // ─── builders (keep the records below compact and uniform) ───────────────────
@@ -204,6 +216,7 @@ function magicInitiate(list: 'Cleric' | 'Druid' | 'Wizard'): FeatData {
       },
     ),
     effect: `Learn two ${list} cantrips and one level 1 ${list} spell. The level 1 spell is always prepared and can be cast once per Long Rest without a slot (or with a slot). Choose Intelligence, Wisdom or Charisma as the spellcasting ability. You can swap one of the spells for another of the same level when you gain a level. Taking Magic Initiate again requires a different spell list.`,
+    uses: { count: 1, recharge: 'long-rest', pool: 'free-cast' }, // PHB L8506-8512: the level 1 spell once per Long Rest without a slot
     source: 'PHB 2024 "Magic Initiate" (L8506)',
   };
 }
@@ -251,6 +264,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'You have Luck Points equal to your Proficiency Bonus, regained on a Long Rest. Spend 1 to gain Advantage on a d20 for a D20 Test, or to impose Disadvantage on a creature’s d20 attack roll against you.',
+    uses: { count: { by: 'proficiency-bonus' }, recharge: 'long-rest', pool: 'luck-points', unit: ['Luck Point', 'Luck Points'] }, // PHB L8496-8500: Luck Points = Proficiency Bonus (total level)
     source: 'PHB 2024 "Lucky" (L8496)',
   },
   'magic-initiate-cleric': magicInitiate('Cleric'),
@@ -450,6 +464,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     ),
     effect:
       'Increase Intelligence, Wisdom or Charisma by 1 (maximum 20). Choose one level 1 Divination or Enchantment spell. That spell and Misty Step are always prepared, and each can be cast once per Long Rest without a slot (or with a slot). The increased ability is their spellcasting ability.',
+    uses: { count: 1, recharge: 'long-rest', pool: 'free-cast', variants: ['Chosen spell', 'Misty Step'] }, // PHB L8690-8698: each spell once per Long Rest free
     source: 'PHB 2024 "Fey-Touched" (L8690)',
   },
   grappler: {
@@ -548,6 +563,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase Strength or Dexterity by 1 (maximum 20). A creature you damage while it is concentrating has Disadvantage on the save to keep Concentration. If you fail an Intelligence, Wisdom or Charisma saving throw, you can succeed instead; you regain this use after a Short or Long Rest.',
+    uses: { count: 1, recharge: 'short-or-long-rest', pool: 'guarded-mind' }, // PHB L8776-8784
     source: 'PHB 2024 "Mage Slayer" (L8776)',
   },
   'martial-weapon-training': {
@@ -674,6 +690,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     ),
     effect:
       'Increase Intelligence, Wisdom or Charisma by 1 (maximum 20). Choose a number of level 1 spells with the Ritual tag equal to your Proficiency Bonus; they are always prepared and the increased ability is their spellcasting ability. Add another whenever your Proficiency Bonus rises. Once per Long Rest you can cast a prepared Ritual spell at its normal casting time without a slot.',
+    uses: { count: 1, recharge: 'long-rest', pool: 'quick-ritual' }, // PHB L8884-8900
     source: 'PHB 2024 "Ritual Caster" (L8884)',
   },
   sentinel: {
@@ -702,6 +719,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     ),
     effect:
       'Increase Intelligence, Wisdom or Charisma by 1 (maximum 20). Choose one level 1 Illusion or Necromancy spell. That spell and Invisibility are always prepared, and each can be cast once per Long Rest without a slot (or with a slot). The increased ability is their spellcasting ability.',
+    uses: { count: 1, recharge: 'long-rest', pool: 'free-cast', variants: ['Chosen spell', 'Invisibility'] }, // PHB L8914-8922: each spell once per Long Rest free
     source: 'PHB 2024 "Shadow-Touched" (L8914)',
   },
   sharpshooter: {
@@ -802,6 +820,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech({}, { fixed: ['spell:detect-thoughts'] }),
     effect:
       'Increase Intelligence, Wisdom or Charisma by 1 (maximum 20). You can speak telepathically to any creature you can see within 60 feet, in a language you know (it cannot reply telepathically). Detect Thoughts is always prepared; cast it once per Long Rest without a slot or components (or with a slot), using the increased ability.',
+    uses: { count: 1, recharge: 'long-rest', pool: 'detect-thoughts' }, // PHB L9028-9040
     source: 'PHB 2024 "Telepathic" (L9028)',
   },
   'war-caster': {
@@ -995,6 +1014,7 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase one ability score by 1 (maximum 30). When you or a creature within 60 feet succeeds or fails a D20 Test, you can roll 2d4 and apply it as a bonus or penalty to the d20. You regain this use when you roll Initiative or finish a Short or Long Rest.',
+    uses: { count: 1, recharge: 'short-or-long-rest', pool: 'improve-fate', alsoRestoredBy: 'roll Initiative' }, // PHB L9164-9170: Initiative regain is manual
     source: 'PHB 2024 "Boon of Fate" (L9164)',
   },
   'boon-of-fortitude': {
@@ -1028,6 +1048,11 @@ export const FEAT_CATALOG: Record<string, FeatData> = {
     mechanics: mech(),
     effect:
       'Increase one ability score by 1 (maximum 30). Once per Long Rest, when you would drop to 0 Hit Points you can drop to 1 instead and regain Hit Points equal to half your Hit Point maximum. You also have a pool of ten d10s; as a Bonus Action spend dice, roll them and regain that many Hit Points. The pool refills on a Long Rest.',
+    // PHB L9190-9198: Last Stand and Recover Vitality are two separate pools
+    uses: [
+      { count: 1, recharge: 'long-rest', pool: 'last-stand' }, // PHB L9196
+      { count: 10, recharge: 'long-rest', pool: 'recover-vitality', unit: ['die', 'dice'], dieSize: 10 }, // PHB L9198: ten d10s
+    ],
     source: 'PHB 2024 "Boon of Recovery" (L9190)',
   },
   'boon-of-skill': {

@@ -8,6 +8,8 @@
  * invocations-oracle.test.ts.
  */
 
+import type { OwnUses } from './classes';
+
 export type InvocationCantripRequirement = 'damage' | 'damage-attack-roll';
 export type InvocationParam = 'cantrip' | 'origin-feat';
 
@@ -28,12 +30,14 @@ export interface InvocationData {
   param?: InvocationParam;
   /** Paraphrased description. */
   summary: string;
+  /** Limited-use pool (D1 resource tracking); the tracker id is `warlock.invocation-<id>`. */
+  uses?: OwnUses;
   source: string;
 }
 
 const src = (name: string, line: number): string => `PHB 2024 "${name}" (L${line})`;
 
-type Extra = Partial<Pick<InvocationData, 'requiresInvocation' | 'requiresCantrip' | 'cantripMinRangeFeet' | 'repeatable' | 'param'>>;
+type Extra = Partial<Pick<InvocationData, 'requiresInvocation' | 'requiresCantrip' | 'cantripMinRangeFeet' | 'repeatable' | 'param' | 'uses'>>;
 const inv = (id: string, name: string, line: number, minLevel: number, summary: string, extra: Extra = {}): InvocationData => ({
   id,
   name,
@@ -66,9 +70,12 @@ const LIST: InvocationData[] = [
   }),
   inv('fiendish-vigor', 'Fiendish Vigor', 6956, 2, 'Cast False Life on yourself without a slot, always getting the maximum Temporary Hit Points.'),
   inv('gaze-of-two-minds', 'Gaze of Two Minds', 6962, 5, 'Touch a willing creature and perceive through its senses, maintaining the link with Bonus Actions.'),
-  inv('gift-of-the-depths', 'Gift of the Depths', 6968, 5, 'Breathe underwater, gain a Swim Speed equal to your Speed, and cast Water Breathing once per Long Rest for free.'),
+  inv('gift-of-the-depths', 'Gift of the Depths', 6968, 5, 'Breathe underwater, gain a Swim Speed equal to your Speed, and cast Water Breathing once per Long Rest for free.', {
+    uses: { count: 1, recharge: 'long-rest' }, // PHB L6968-6972
+  }),
   inv('gift-of-the-protectors', 'Gift of the Protectors', 6974, 9, 'A page in your Book of Shadows lists names (up to your Charisma modifier) whose bearers drop to 1 Hit Point instead of 0 once per Long Rest.', {
     requiresInvocation: 'pact-of-the-tome',
+    uses: { count: 1, recharge: 'long-rest' }, // PHB L6974-6980: modelled as one use ("until you finish a Long Rest")
   }),
   inv('investment-of-the-chain-master', 'Investment of the Chain Master', 6984, 5, 'Your Find Familiar familiar gains a Fly or Swim Speed, quick attacks, radiant/necrotic damage options, your spell save DC and a Resistance reaction.', {
     requiresInvocation: 'pact-of-the-chain',

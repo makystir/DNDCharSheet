@@ -23,6 +23,7 @@ import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
 import { RestControls } from '../combat/RestControls';
 import { DefenseReadout } from '../combat/DefenseReadout';
 import { SpellSlotSummary } from '../combat/SpellSlotSummary';
+import { ResourcesCard } from '../combat/ResourcesCard';
 import { HouseRuleIndicator } from '../combat/HouseRuleIndicator';
 import { CombatCompactBar } from '../combat/CombatCompactBar';
 import { Swords } from 'lucide-react';
@@ -201,6 +202,7 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
       <ActiveConditions character={character} onChange={onChange} />
       <DeathSavesCard character={character} onChange={onChange} rollRequest={deathSaveRequest} />
       <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
+      <ResourcesCard character={character} onChange={onChange} />
       <SpellSlotSummary character={character} />
       {hitDiceCard}
     </>
@@ -305,6 +307,7 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
           <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
           <ActiveConditions character={character} onChange={onChange} />
           {hitDiceCard}
+          <ResourcesCard character={character} onChange={onChange} />
           <SpellSlotSummary character={character} />
           <WeaponCards character={character} onAttack={openAttack} />
           <UnarmedStrikeCard character={character} onAttack={openAttack} />

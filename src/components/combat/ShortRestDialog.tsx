@@ -12,6 +12,7 @@ import { getDiceEntryMode, type DiceEntryMode } from '../../hooks/useDiceEntryMo
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { RecoveredList } from './RecoveredList';
 import styles from './Rests.module.css';
 
 export interface ShortRestDialogProps {
@@ -97,6 +98,7 @@ export function ShortRestDialog({
     ],
   };
   const hpGained = preview.hpGained ?? 0;
+  const recovered = preview.resourcesRecovered ?? [];
   const hitDiceTotalBreakdown: Breakdown = {
     total,
     components: [{ label: 'Character level', value: total }],
@@ -149,6 +151,7 @@ export function ShortRestDialog({
         : `Short Rest finished: spent ${faces.length} Hit ${faces.length === 1 ? 'Die' : 'Dice'}, regained ${hpGained} Hit Point${hpGained === 1 ? '' : 's'}.`,
     ];
     if (character.spellcasting?.pactSlotsExpended) parts.push('Pact Magic slots restored.');
+    if (recovered.length > 0) parts.push(`Recovered ${recovered.length} limited-use feature${recovered.length === 1 ? '' : 's'}.`);
     onComplete(preview.character, parts.join(' '));
   };
 
@@ -236,6 +239,8 @@ export function ShortRestDialog({
                 </span>
               </div>
             </div>
+
+            {recovered.length > 0 && <RecoveredList recovered={recovered} testId="short-rest-recovered" />}
 
             {faces.length > 0 && (
               <ol className={styles.diceList} aria-label="Hit Dice spent" data-testid="short-rest-dice">

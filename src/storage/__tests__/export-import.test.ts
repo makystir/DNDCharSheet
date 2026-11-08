@@ -245,3 +245,31 @@ describe('classChoices round trip (additive-optional, no version bump)', () => {
     expect(empty.character && 'classChoices' in empty.character).toBe(false);
   });
 });
+
+describe('resourcesSpent round trip (additive-optional, no version bump)', () => {
+  it('survives export then import unchanged, with no CURRENT_VERSION change', () => {
+    const c = makeChar({ resourcesSpent: { 'barbarian.rage': 2, 'feat:lucky.luck-points': 1 } });
+    const result = importFromJSON(exportToJSON(c));
+    expect(result.success).toBe(true);
+    expect(result.character?.resourcesSpent).toEqual({ 'barbarian.rage': 2, 'feat:lucky.luck-points': 1 });
+    expect(result.character?._v).toBe(CURRENT_VERSION);
+  });
+
+  it('sanitises hostile resourcesSpent and drops the field when nothing survives', () => {
+    const hostile = { ...makeChar(), resourcesSpent: { ok: 3, neg: -1, frac: 1.5, str: '2', big: 10000, '': 1, zero: 0 } };
+    const result = importFromJSON(JSON.stringify(hostile));
+    expect(result.success).toBe(true);
+    expect(result.character?.resourcesSpent).toEqual({ ok: 3 });
+    for (const bad of ['hostile', 7, [1, 2], null, { only: -1 }]) {
+      const r = importFromJSON(JSON.stringify({ ...makeChar(), resourcesSpent: bad }));
+      expect(r.success).toBe(true);
+      expect(r.character && 'resourcesSpent' in r.character).toBe(false);
+    }
+  });
+
+  it('leaves an absent field absent', () => {
+    const result = importFromJSON(exportToJSON(makeChar()));
+    expect(result.success).toBe(true);
+    expect(result.character && 'resourcesSpent' in result.character).toBe(false);
+  });
+});

@@ -73,8 +73,13 @@ export interface ClassFeature {
    * oracle can compare VALUES rather than prose). Descriptive text stays in
    * `effect`; these carry only the numbers/lists the feature prints.
    */
-  /** Limited uses: `count` is a number or a short formula ('PB', 'Wis mod (min 1)'). */
-  uses?: { count: number | string; recharge: FeatureRecharge };
+  /**
+   * Limited uses (D1 resource tracking): either an OWN pool (`OwnUses`) or a link that spends a use of
+   * another feature's pool of the same class (`SpendsUses`). Features of one class that share a pool id
+   * are ONE tracker; the effective count / recharge / unit / dieSize / alsoRestoredBy come from the
+   * reached feature with the HIGHEST level that declares them (pool-merge rule).
+   */
+  uses?: FeatureUses;
   /** Dice the feature rolls, e.g. { expr: '1d8', label: 'Rage damage' }. */
   dice?: Array<{ expr: string; label: string }>;
   /** A saving throw DC the feature sets. `dcAbility` 'spellcasting' = the class's spellcasting ability. */
@@ -114,9 +119,62 @@ export interface ClassFeature {
 export type FeatureRecharge =
   | 'short-rest'
   | 'long-rest'
+  /** A Short Rest OR a Long Rest regains ALL uses. */
   | 'short-or-long-rest'
+  /** A Short Rest regains ONE expended use; a Long Rest regains all (Rage, Channel Divinity, Psionic Energy Dice ...). */
+  | 'short-one-long-all'
+  /** Kept for the stated vocabulary; no PHB class / subclass / feat feature uses it. Manual. */
   | 'dawn'
+  /** Manual: no automatic recovery. */
   | 'other';
+
+/** Level table: [owner class level, value from that level on]. */
+export type LevelTable = ReadonlyArray<readonly [level: number, value: number]>;
+
+/** Maximum uses. Every variant resolves to a whole number >= 0. */
+export type UsesCount =
+  /** A fixed number. */
+  | number
+  /** Value of the last row whose level <= the OWNER class level. */
+  | { by: 'class-level'; table: LevelTable }
+  /** `factor * ownerClassLevel + offset`. */
+  | { by: 'class-level-multiple'; factor: number; offset?: number }
+  /** `max(min, modifier of the EFFECTIVE ability score)`. */
+  | { by: 'ability-mod'; ability: Ability; min: number }
+  /** Proficiency Bonus from TOTAL character level (PHB L2092). */
+  | { by: 'proficiency-bonus' };
+
+/** A limited-use feature that owns its pool of uses. */
+export interface OwnUses {
+  count: UsesCount;
+  recharge: FeatureRecharge;
+  /** Pool id; default = slug of the feature name (lower case, apostrophes dropped, other runs -> '-'). */
+  pool?: string;
+  /** N independent single-count instances (Phantasmal Creatures: Summon Beast, Summon Fey); each uses `count`. */
+  variants?: string[];
+  /** Display noun [singular, plural]; default ['use', 'uses']. */
+  unit?: readonly [string, string];
+  /** Die size for dice pools: a number or a table by owner class level. Display only. */
+  dieSize?: number | LevelTable;
+  /** Another way the PHB lets you restore a use. DISPLAY TEXT ONLY in D1 (no automation). */
+  alsoRestoredBy?: string;
+}
+
+/** "Expend a use of <pool>": NOT a tracker; the pool id must exist on the same class. */
+export interface SpendsUses {
+  spends: string;
+}
+
+export type FeatureUses = OwnUses | SpendsUses;
+
+/** Psionic Energy Dice (Psi Warrior PHB L4426-4437, Soulknife L6116-6127): count and die by Fighter / Rogue level. */
+const PSIONIC_ENERGY_DICE_USES: OwnUses = {
+  count: { by: 'class-level', table: [[3, 4], [5, 6], [9, 8], [11, 8], [13, 10], [17, 12]] },
+  recharge: 'short-one-long-all',
+  pool: 'psionic-energy-dice',
+  unit: ['Psionic Energy Die', 'Psionic Energy Dice'],
+  dieSize: [[3, 6], [5, 8], [11, 10], [17, 12]],
+};
 
 /**
  * A subclass: id, name, and its features (each gained at a class level at or
@@ -237,7 +295,7 @@ const BATTLE_MASTER_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'You learn 3 maneuvers (2 more at Fighter levels 7, 10 and 15, and you may swap one whenever you learn new ones). You have 4 Superiority Dice (d8s), a fifth at level 7 and a sixth at level 15, all regained on a Short or Long Rest. A maneuver that forces a save uses DC 8 + your Strength or Dexterity modifier (your choice) + Proficiency Bonus; only one maneuver can be used per attack.',
     mechanics: { maneuversL3: 3, maneuversL7: 5, maneuversL10: 7, maneuversL15: 9, diceL3: 4, diceL7: 5, diceL15: 6, dcAbilityAlt: 'dex' },
-    uses: { count: 4, recharge: 'short-or-long-rest' },
+    uses: { count: { by: 'class-level', table: [[3, 4], [7, 5], [15, 6]] }, recharge: 'short-or-long-rest', pool: 'superiority-dice', unit: ['Superiority Die', 'Superiority Dice'], dieSize: [[3, 8], [10, 10], [18, 12]] }, // PHB L4239-4241, die L4257 / L4263
     dice: [{ expr: '4d8 Superiority Dice (5 at L7, 6 at L15)', label: 'Superiority Dice pool' }],
     saveDc: { dcAbility: 'str', saveAbility: 'str' },
     choices: [{ key: 'maneuvers', count: 3, options: MANEUVER_NAMES }],
@@ -254,7 +312,7 @@ const BATTLE_MASTER_FEATURES: ClassFeature[] = [
     name: 'Know Your Enemy',
     level: 7,
     effect: 'As a Bonus Action, learn whether a creature you can see within 30 feet has any Immunities, Resistances or Vulnerabilities, and which. One use per Long Rest; expend a Superiority Die (no action) to restore it.',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend one Superiority Die (no action)' },
     source: phbSub('Battle Master: Know Your Enemy', 4251),
   },
   {
@@ -383,7 +441,7 @@ const PSI_WARRIOR_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'You have Psionic Energy Dice (4d6 at level 3, 6d8 at 5, 8d8 at 9, 8d10 at 11, 10d10 at 13, 12d12 at 17); regain one on a Short Rest and all on a Long Rest. Protective Field: Reaction, spend a die to reduce damage to you or a creature you see within 30 feet by the roll + Intelligence modifier (minimum 1 reduction). Psionic Strike: once per turn after a weapon hit on a target within 30 feet, spend a die for Force damage equal to the roll + Intelligence modifier. Telekinetic Movement: Magic action to move a loose Large-or-smaller object or willing creature up to 30 feet, once per Short or Long Rest unless you spend a die to restore it.',
     mechanics: { activation: 'reaction', dieL3: 'd6', numberL3: 4, dieL5: 'd8', numberL5: 6, dieL9: 'd8', numberL9: 8, dieL11: 'd10', numberL11: 8, dieL13: 'd10', numberL13: 10, dieL17: 'd12', numberL17: 12 },
-    uses: { count: 4, recharge: 'other' },
+    uses: PSIONIC_ENERGY_DICE_USES, // PHB L4426-4437
     dice: [
       { expr: 'Psionic Energy Dice: 4d6 (L3), 6d8 (L5), 8d8 (L9), 8d10 (L11), 10d10 (L13), 12d12 (L17)', label: 'Psionic Energy Dice pool' },
       { expr: '1 Psionic Die + IntMod (min 1)', label: 'Protective Field damage reduction (Reaction, 30 ft)' },
@@ -395,7 +453,7 @@ const PSI_WARRIOR_FEATURES: ClassFeature[] = [
     name: 'Telekinetic Adept',
     level: 7,
     effect: 'Psi-Powered Leap: Bonus Action for a Fly Speed of twice your Speed until the end of the turn. Telekinetic Thrust: when Psionic Strike deals damage, the target makes a Strength save (DC 8 + Intelligence modifier + Proficiency Bonus) or is knocked Prone or moved up to 10 feet horizontally. The Leap is usable once per Short or Long Rest, restorable by expending a Psionic Energy Die (no action).',
-    uses: { count: 1, recharge: 'short-or-long-rest' },
+    uses: { count: 1, recharge: 'short-or-long-rest', pool: 'psi-powered-leap', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
     saveDc: { dcAbility: 'int', saveAbility: 'str' },
     source: phbSub('Psi Warrior: Telekinetic Adept', 4447),
   },
@@ -409,7 +467,7 @@ const PSI_WARRIOR_FEATURES: ClassFeature[] = [
     name: 'Bulwark of Force',
     level: 15,
     effect: 'As a Bonus Action, choose up to your Intelligence modifier (minimum 1) creatures within 30 feet, yourself included; each has Half Cover for 1 minute or until you are Incapacitated. Once per Long Rest, or restore it by expending a Psionic Energy Die (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
     source: phbSub('Psi Warrior: Bulwark of Force', 4459),
   },
   {
@@ -417,7 +475,7 @@ const PSI_WARRIOR_FEATURES: ClassFeature[] = [
     level: 18,
     effect: 'You always have Telekinesis prepared and can cast it without a slot or components, using Intelligence. While concentrating on it you can make a weapon attack as a Bonus Action each turn. Once per Long Rest this way, or restore it by expending a Psionic Energy Die (no action).',
     grantedSpells: [{ level: 18, spells: spellIds('Telekinesis'), alwaysPrepared: true }],
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
     source: phbSub('Psi Warrior: Telekinetic Master', 4465),
   },
 ];
@@ -454,7 +512,7 @@ const MERCY_FEATURES: ClassFeature[] = [
     name: 'Flurry of Healing and Harm',
     level: 11,
     effect: 'During Flurry of Blows you can replace each strike with Hand of Healing at no Focus Point cost, and use Hand of Harm on a damaging Flurry strike at no Focus Point cost (still once per turn). You can do this a number of times equal to your Wisdom modifier (minimum 1), regained on a Long Rest.',
-    uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
     source: phbSub('Warrior of Mercy: Flurry of Healing and Harm', 4701),
   },
   {
@@ -555,7 +613,7 @@ const OPEN_HAND_FEATURES: ClassFeature[] = [
     name: 'Wholeness of Body',
     level: 6,
     effect: 'As a Bonus Action, roll your Martial Arts die and regain that many Hit Points + your Wisdom modifier (minimum 1 regained). Uses equal your Wisdom modifier (minimum 1), regained on a Long Rest.',
-    uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
     dice: [{ expr: '1 Martial Arts die + WisMod (min 1)', label: 'Hit Points regained (Bonus Action)' }],
     source: phbSub('Warrior of the Open Hand: Wholeness of Body', 4793),
   },
@@ -595,7 +653,7 @@ const DEVOTION_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'When you take the Attack action, expend a Channel Divinity use to imbue a held Melee weapon for 10 minutes (or until you use this again or stop carrying it): add your Charisma modifier (minimum +1) to its attack rolls, its hits can deal Radiant damage instead of the normal type, and it sheds Bright Light 20 feet and Dim Light 20 feet beyond.',
     mechanics: { channelDivinity: 1 },
-    uses: { count: 'Channel Divinity use', recharge: 'other' },
+    uses: { spends: 'channel-divinity' },
     dice: [{ expr: 'ChaMod (min +1)', label: 'Attack roll bonus with the imbued weapon' }],
     source: phbSub('Oath of Devotion: Sacred Weapon', 5123),
   },
@@ -615,7 +673,7 @@ const DEVOTION_FEATURES: ClassFeature[] = [
     name: 'Holy Nimbus',
     level: 20,
     effect: 'As a Bonus Action, empower your Aura of Protection for 10 minutes: you have Advantage on saves forced by Fiends and Undead; enemies starting their turn in the aura take Radiant damage equal to your Charisma modifier + Proficiency Bonus; the aura is sunlight Bright Light. Once per Long Rest, or restore it by expending a level 5 spell slot (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
     dice: [{ expr: 'ChaMod + Prof', label: 'Radiant damage to enemies starting their turn in the aura' }],
     source: phbSub('Oath of Devotion: Holy Nimbus', 5143),
   },
@@ -627,7 +685,7 @@ const GLORY_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'Right after casting Divine Smite, expend a Channel Divinity use to divide Temporary Hit Points equal to 2d8 + your Paladin level among creatures of your choice within 30 feet (you can be included).',
     mechanics: { channelDivinity: 1 },
-    uses: { count: 'Channel Divinity use', recharge: 'other' },
+    uses: { spends: 'channel-divinity' },
     dice: [{ expr: '2d8 + PaladinLevel', label: 'Temporary Hit Points divided among creatures within 30 ft' }],
     source: phbSub('Oath of Glory: Inspiring Smite', 5165),
   },
@@ -649,7 +707,7 @@ const GLORY_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'As a Bonus Action, expend a Channel Divinity use for 1 hour of Advantage on Strength (Athletics) and Dexterity (Acrobatics) checks, with Long and High Jump distance increased by 10 feet (the extra distance costs movement).',
     mechanics: { channelDivinity: 1 },
-    uses: { count: 'Channel Divinity use', recharge: 'other' },
+    uses: { spends: 'channel-divinity' },
     source: phbSub('Oath of Glory: Peerless Athlete', 5183),
   },
   {
@@ -664,14 +722,14 @@ const GLORY_FEATURES: ClassFeature[] = [
     level: 15,
     effect: 'When you or a creature you see within 10 feet is hit by an attack roll, use your Reaction to add your Charisma modifier (minimum +1) to its AC against that attack. If the attack then misses, you can make a weapon attack against the attacker if it is in range. Uses equal your Charisma modifier (minimum 1), regained on a Long Rest.',
     mechanics: { activation: 'reaction' },
-    uses: { count: 'Cha mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'long-rest' },
     source: phbSub('Oath of Glory: Glorious Defense', 5193),
   },
   {
     name: 'Living Legend',
     level: 20,
     effect: 'As a Bonus Action, gain for 10 minutes: Advantage on all Charisma checks; a Reaction to reroll a failed saving throw (you must keep the new roll); and once per turn, turn a missed weapon attack into a hit. Once per Long Rest, or restore it by expending a level 5 spell slot (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
     source: phbSub('Oath of Glory: Living Legend', 5199),
   },
 ];
@@ -683,7 +741,7 @@ const ANCIENTS_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'As a Magic action, expend a Channel Divinity use to conjure spectral vines on creatures of your choice you see within 15 feet. Each makes a Strength save or is Restrained for 1 minute, repeating the save at the end of each of its turns. The save DC is your spell save DC.',
     mechanics: { channelDivinity: 1 },
-    uses: { count: 'Channel Divinity use', recharge: 'other' },
+    uses: { spends: 'channel-divinity' },
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'str' },
     source: phbSub("Oath of the Ancients: Nature's Wrath", 5221),
   },
@@ -718,7 +776,7 @@ const ANCIENTS_FEATURES: ClassFeature[] = [
     name: 'Elder Champion',
     level: 20,
     effect: 'As a Bonus Action, empower your Aura of Protection for 1 minute: you regain 10 Hit Points at the start of each of your turns; enemies in the aura have Disadvantage on saves against your spells and Channel Divinity options; and you can cast action-time spells as a Bonus Action. Once per Long Rest, or restore it by expending a level 5 spell slot (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
     dice: [{ expr: '10', label: 'Hit Points regained at the start of each of your turns' }],
     source: phbSub('Oath of the Ancients: Elder Champion', 5251),
   },
@@ -744,7 +802,7 @@ const VENGEANCE_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'When you take the Attack action, expend a Channel Divinity use to swear enmity against a creature you see within 30 feet: Advantage on attack rolls against it for 1 minute or until you use this again. If it drops to 0 Hit Points you can transfer the vow to another creature within 30 feet (no action).',
     mechanics: { channelDivinity: 1 },
-    uses: { count: 'Channel Divinity use', recharge: 'other' },
+    uses: { spends: 'channel-divinity' },
     source: phbSub('Oath of Vengeance: Vow of Enmity', 5287),
   },
   {
@@ -765,7 +823,7 @@ const VENGEANCE_FEATURES: ClassFeature[] = [
     name: 'Avenging Angel',
     level: 20,
     effect: 'As a Bonus Action, for 10 minutes: you gain spectral wings with a 60-foot Fly Speed and can hover, and enemies starting their turn in your Aura of Protection make a Wisdom save or are Frightened for 1 minute or until they take damage (attacks against a Frightened creature have Advantage). Once per Long Rest, or restore it by expending a level 5 spell slot (no action). The feature prints no save DC.',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 5 spell slot (no action)' },
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'wis' },
     mechanics: { flySpeedFeet: 60 },
     source: phbSub('Oath of Vengeance: Avenging Angel', 5301),
@@ -851,7 +909,7 @@ const FEY_WANDERER_FEATURES: ClassFeature[] = [
     level: 15,
     effect: 'You can cast Misty Step without a spell slot a number of times equal to your Wisdom modifier (minimum 1), regained on a Long Rest. Whenever you cast it you can bring one willing creature within 5 feet of you along to a space within 5 feet of your destination.',
     grantedSpells: [{ level: 15, spells: spellIds('Misty Step'), alwaysPrepared: false }],
-    uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
     source: phbSub('Fey Wanderer: Misty Wanderer', 5757),
   },
 ];
@@ -862,7 +920,7 @@ const GLOOM_STALKER_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'Ambusher\'s Leap: your Speed rises 10 feet until the end of your first turn of each combat. Dreadful Strike: when you hit with a weapon, deal extra 2d6 Psychic damage (once per turn), a number of times equal to your Wisdom modifier (minimum 1) per Long Rest. Initiative Bonus: add your Wisdom modifier to Initiative rolls.',
     mechanics: { speedBonusFeet: 10 },
-    uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
     dice: [{ expr: '2d6 (2d8 at L11)', label: 'Dreadful Strike extra Psychic damage, once per turn' }],
     source: phbSub('Gloom Stalker: Dread Ambusher', 5769),
   },
@@ -1042,7 +1100,7 @@ const SOULKNIFE_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'You have Psionic Energy Dice (4d6 at level 3, 6d8 at 5, 8d8 at 9, 8d10 at 11, 10d10 at 13, 12d12 at 17); regain one on a Short Rest and all on a Long Rest. Psi-Bolstered Knack: after failing an ability check with a skill or tool you are proficient in, roll one die and add it; the die is spent only if the check then succeeds. Psychic Whispers: as a Magic action choose up to your Proficiency Bonus creatures you can see and roll one die; for that many hours you can speak telepathically with them while within 1 mile. The first use after each Long Rest does not spend the die.',
     mechanics: { dieL3: 'd6', numberL3: 4, dieL5: 'd8', numberL5: 6, dieL9: 'd8', numberL9: 8, dieL11: 'd10', numberL11: 8, dieL13: 'd10', numberL13: 10, dieL17: 'd12', numberL17: 12 },
-    uses: { count: 4, recharge: 'other' },
+    uses: PSIONIC_ENERGY_DICE_USES, // PHB L6116-6127
     dice: [
       { expr: 'Psionic Energy Dice: 4d6 (L3), 6d8 (L5), 8d8 (L9), 8d10 (L11), 10d10 (L13), 12d12 (L17)', label: 'Psionic Energy Dice pool' },
       { expr: '1 Psionic Die', label: 'Psi-Bolstered Knack bonus to a failed proficient check (expended only on success)' },
@@ -1077,14 +1135,14 @@ const SOULKNIFE_FEATURES: ClassFeature[] = [
     name: 'Psychic Veil',
     level: 13,
     effect: 'As a Magic action you gain the Invisible condition for 1 hour or until you dismiss it; it ends early right after you damage a creature or force a creature to make a save. Once per Long Rest, or restore it by expending a Psionic Energy Die (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
     source: phbSub('Soulknife: Psychic Veil', 6161),
   },
   {
     name: 'Rend Mind',
     level: 17,
     effect: 'When you deal Sneak Attack damage with your Psychic Blades you can force the target to make a Wisdom save (DC 8 + your Dexterity modifier + Proficiency Bonus). On a failure it is Stunned for 1 minute, repeating the save at the end of each of its turns. Once per Long Rest, or restore it by expending three Psionic Energy Dice (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend three Psionic Energy Dice (no action)' },
     saveDc: { dcAbility: 'dex', saveAbility: 'wis' },
     source: phbSub('Soulknife: Rend Mind', 6167),
   },
@@ -1174,7 +1232,7 @@ const ABERRANT_FEATURES: ClassFeature[] = [
     effect: 'As a Magic action, teleport to an unoccupied space you can see within 120 feet. Each creature within 30 feet of the space you left makes a Strength save against your spell save DC: on a failure it takes 3d10 Force damage and is pulled toward that space; on a success it takes half damage only. Once per Long Rest, or restore it by spending 5 Sorcery Points (no action).',
     dice: [{ expr: '3d10', label: 'Force damage (half on a successful save)' }],
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'str' },
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'spend 5 Sorcery Points (no action)' },
     source: phbSub('Aberrant Sorcery: Warping Implosion', 6581),
   },
 ];
@@ -1197,7 +1255,7 @@ const CLOCKWORK_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'As a Reaction, when a creature you can see within 60 feet is about to roll a d20 with Advantage or Disadvantage, the roll is made without either. You can do this a number of times equal to your Charisma modifier (minimum 1), regaining all uses on a Long Rest.',
     mechanics: { activation: 'reaction' },
-    uses: { count: 'Cha mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'long-rest' },
     source: phbSub('Clockwork Sorcery: Restore Balance', 6620),
   },
   {
@@ -1211,7 +1269,7 @@ const CLOCKWORK_FEATURES: ClassFeature[] = [
     name: 'Trance of Order',
     level: 14,
     effect: 'As a Bonus Action, enter a trance for 1 minute: attack rolls against you cannot have Advantage, and on any D20 Test a d20 result of 9 or lower counts as 10. Once per Long Rest, or restore it by spending 5 Sorcery Points (no action).',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'spend 5 Sorcery Points (no action)' },
     source: phbSub('Clockwork Sorcery: Trance of Order', 6632),
   },
   {
@@ -1219,7 +1277,7 @@ const CLOCKWORK_FEATURES: ClassFeature[] = [
     level: 18,
     effect: 'As a Magic action, summon spirits of order in a 30-foot Cube from you. They restore up to 100 Hit Points divided as you choose among creatures in the Cube, instantly repair damaged objects entirely inside it, and end every spell of level 6 or lower on creatures and objects of your choice there. Once per Long Rest, or restore it by spending 7 Sorcery Points (no action).',
     dice: [{ expr: '100', label: 'Hit Points restored, divided among creatures in the 30-foot Cube' }],
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'spend 7 Sorcery Points (no action)' },
     source: phbSub('Clockwork Sorcery: Clockwork Cavalcade', 6638),
   },
 ];
@@ -1260,7 +1318,7 @@ const DRACONIC_FEATURES: ClassFeature[] = [
     level: 14,
     effect: 'As a Bonus Action, sprout draconic wings for 1 hour (or until dismissed with no action), giving you a Fly Speed of 60 feet. Once per Long Rest, or restore it by spending 3 Sorcery Points (no action).',
     mechanics: { flySpeedFeet: 60 },
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'spend 3 Sorcery Points (no action)' },
     source: phbSub('Draconic Sorcery: Dragon Wings', 6683),
   },
   {
@@ -1285,7 +1343,7 @@ const WILD_MAGIC_FEATURES: ClassFeature[] = [
     name: 'Tides of Chaos',
     level: 3,
     effect: 'You can give yourself Advantage on one D20 Test before rolling. You cannot use this again until you cast a Sorcerer spell with a spell slot or finish a Long Rest; if you cast one before a Long Rest, you automatically roll on the Wild Magic Surge table.',
-    uses: { count: 1, recharge: 'other' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'cast a Sorcerer spell with a spell slot (triggers a Wild Magic Surge)' },
     source: phbSub('Wild Magic Sorcery: Tides of Chaos', 6705),
   },
   {
@@ -1329,7 +1387,7 @@ const ARCHFEY_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'You can cast Misty Step without a spell slot a number of times equal to your Charisma modifier (minimum 1), regaining all uses on a Long Rest. Whenever you cast it you may add an effect. Refreshing Step: you or a creature you can see within 10 feet gains 1d10 Temporary Hit Points after the teleport. Taunting Step: creatures within 5 feet of the space you left make a Wisdom save against your spell save DC or have Disadvantage on attacks against anyone but you until the start of your next turn.',
     grantedSpells: [{ level: 3, spells: spellIds('Misty Step'), alwaysPrepared: false }],
-    uses: { count: 'Cha mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'long-rest' },
     dice: [{ expr: '1d10', label: 'Refreshing Step Temporary Hit Points' }],
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'wis' },
     source: phbSub('Archfey Patron: Steps of the Fey', 7200),
@@ -1348,7 +1406,7 @@ const ARCHFEY_FEATURES: ClassFeature[] = [
     level: 10,
     effect: 'You are immune to the Charmed condition. As a Reaction right after a creature you can see hits you with an attack roll, halve the damage you take (round down) and force the attacker to make a Wisdom save against your spell save DC; on a failure it takes Psychic damage equal to the damage you take. Once per Long Rest, or restore it by expending a Pact Magic spell slot (no action).',
     mechanics: { activation: 'reaction', immuneCondition: 'Charmed' },
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a Pact Magic spell slot (no action)' },
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'wis' },
     source: phbSub('Archfey Patron: Beguiling Defenses', 7220),
   },
@@ -1379,7 +1437,7 @@ const CELESTIAL_FEATURES: ClassFeature[] = [
     name: 'Healing Light',
     level: 3,
     effect: 'You have a pool of d6s equal in number to 1 + your Warlock level. As a Bonus Action, heal yourself or a creature you can see within 60 feet by spending dice from the pool (at most your Charisma modifier, minimum 1, at once) and restoring Hit Points equal to the total rolled. The pool refills on a Long Rest.',
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: { by: 'class-level-multiple', factor: 1, offset: 1 }, recharge: 'long-rest', unit: ['die', 'dice'], dieSize: 6 }, // PHB L7254: 1 + Warlock level d6s
     dice: [{ expr: '(1 + WarlockLevel)d6', label: 'Healing dice pool (spend up to ChaMod, min 1, at once)' }],
     source: phbSub('Celestial Patron: Healing Light', 7252),
   },
@@ -1434,7 +1492,7 @@ const FIEND_FEATURES: ClassFeature[] = [
     level: 6,
     effect: 'When you make an ability check or saving throw, you can add 1d10 to the roll after seeing it but before its effects occur, no more than once per roll. You can do this a number of times equal to your Charisma modifier (minimum 1), regaining all uses on a Long Rest.',
     dice: [{ expr: '1d10', label: 'Bonus to an ability check or saving throw' }],
-    uses: { count: 'Cha mod (min 1)', recharge: 'long-rest' },
+    uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'long-rest' },
     source: phbSub("Fiend Patron: Dark One's Own Luck", 7293),
   },
   {
@@ -1449,7 +1507,7 @@ const FIEND_FEATURES: ClassFeature[] = [
     effect: 'Once per turn when you hit a creature with an attack roll, you can force it to make a Charisma save against your spell save DC. On a failure it is sent through a nightmare landscape, taking 8d10 Psychic damage (none if it is a Fiend) and being Incapacitated until the end of your next turn, when it returns to its space or the nearest free one. Once per Long Rest, or restore it by expending a Pact Magic spell slot (no action).',
     dice: [{ expr: '8d10', label: 'Psychic damage (not to Fiends)' }],
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'cha' },
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a Pact Magic spell slot (no action)' },
     source: phbSub('Fiend Patron: Hurl Through Hell', 7303),
   },
 ];
@@ -1483,7 +1541,7 @@ const GREAT_OLD_ONE_FEATURES: ClassFeature[] = [
     name: 'Clairvoyant Combatant',
     level: 6,
     effect: 'When you form a bond with Awakened Mind you can force the creature to make a Wisdom save against your spell save DC. On a failure, for the duration of the bond it has Disadvantage on attack rolls against you and you have Advantage on attack rolls against it. Once per Short or Long Rest, or restore it by expending a Pact Magic spell slot (no action).',
-    uses: { count: 1, recharge: 'short-or-long-rest' },
+    uses: { count: 1, recharge: 'short-or-long-rest', alsoRestoredBy: 'expend a Pact Magic spell slot (no action)' },
     saveDc: { dcAbility: 'spellcasting', saveAbility: 'wis' },
     source: phbSub('Great Old One Patron: Clairvoyant Combatant', 7340),
   },
@@ -1562,6 +1620,7 @@ const DIVINER_FEATURES: ClassFeature[] = [
     level: 3,
     effect: 'After each Long Rest, roll two d20s and record them as foretelling rolls. Before a D20 Test made by you or a creature you can see, you can replace its roll with one of them, once per turn. Each foretelling roll is used once, and unused ones are lost at your next Long Rest.',
     dice: [{ expr: '2d20 (3d20 at L14 via Greater Portent)', label: 'Foretelling rolls after a Long Rest' }],
+    uses: { count: { by: 'class-level', table: [[3, 2], [14, 3]] }, recharge: 'long-rest', pool: 'portent', unit: ['foretelling roll', 'foretelling rolls'] }, // PHB L7698-7702: two foretelling rolls, three with Greater Portent (L7720)
     source: phbSub('Diviner: Portent', 7698),
   },
   {
@@ -1576,7 +1635,7 @@ const DIVINER_FEATURES: ClassFeature[] = [
     effect: 'You gain Darkvision with a range of 120 feet. As a Bonus Action choose one benefit lasting until you start a Short or Long Rest: Greater Comprehension (read any language) or See Invisibility (cast it without a spell slot). You cannot use this again until a Short or Long Rest.',
     mechanics: { darkvisionFeet: 120 },
     grantedSpells: [{ level: 10, spells: spellIds('See Invisibility'), alwaysPrepared: false }],
-    uses: { count: 1, recharge: 'short-or-long-rest' },
+    uses: { count: 1, recharge: 'short-or-long-rest', pool: 'third-eye' },
     choices: [{ key: 'third-eye', count: 1, options: ['Greater Comprehension', 'See Invisibility'] }],
     source: phbSub('Diviner: The Third Eye', 7708),
   },
@@ -1584,6 +1643,7 @@ const DIVINER_FEATURES: ClassFeature[] = [
     name: 'Greater Portent',
     level: 14,
     effect: 'You roll three d20s instead of two for your Portent feature.',
+    uses: { count: { by: 'class-level', table: [[3, 2], [14, 3]] }, recharge: 'long-rest', pool: 'portent', unit: ['foretelling roll', 'foretelling rolls'] }, // PHB L7718-7720: same pool as Portent
     source: phbSub('Diviner: Greater Portent', 7718),
   },
 ];
@@ -1646,7 +1706,7 @@ const ILLUSIONIST_FEATURES: ClassFeature[] = [
     level: 6,
     effect: 'You always have Summon Beast and Summon Fey prepared. When you cast either you can change its school to Illusion, making the creature spectral, and cast that version without a spell slot, which halves the creature\'s Hit Points. After casting either spell without a slot, you must finish a Long Rest before casting that spell that way again.',
     grantedSpells: [{ level: 6, spells: spellIds('Summon Beast', 'Summon Fey'), alwaysPrepared: true }],
-    uses: { count: 1, recharge: 'long-rest' },
+    uses: { count: 1, recharge: 'long-rest', variants: ['Summon Beast', 'Summon Fey'] },
     source: phbSub('Illusionist: Phantasmal Creatures', 7772),
   },
   {
@@ -1654,7 +1714,7 @@ const ILLUSIONIST_FEATURES: ClassFeature[] = [
     level: 10,
     effect: 'When a creature hits you with an attack roll, use a Reaction to interpose an illusory duplicate so the attack automatically misses and the illusion dissipates. Once per Short or Long Rest, or restore it by expending a level 2+ spell slot (no action).',
     mechanics: { activation: 'reaction' },
-    uses: { count: 1, recharge: 'short-or-long-rest' },
+    uses: { count: 1, recharge: 'short-or-long-rest', alsoRestoredBy: 'expend a level 2+ spell slot (no action)' },
     source: phbSub('Illusionist: Illusory Self', 7776),
   },
   {
@@ -1698,6 +1758,7 @@ export const CLASS_CATALOG = {
         effect:
           'Enter a Rage as a Bonus Action (not in Heavy armor) for bonus Strength damage, Resistance to Bludgeoning/Piercing/Slashing, and Advantage on Strength checks and saves. Limited uses per the Rages column.',
         mechanics: { rageDamage: 2, ragesAtLevel1: 2 },
+        uses: { count: { by: 'class-level', table: [[1, 2], [3, 3], [6, 4], [12, 5], [17, 6]] }, recharge: 'short-one-long-all', unit: ['Rage', 'Rages'] }, // PHB L2424-2428, Rages column L2452-2473
         source: 'PHB 2024 "Barbarian: Rage" (line ~2446)',
       },
       {
@@ -1810,6 +1871,7 @@ export const CLASS_CATALOG = {
         name: 'Persistent Rage',
         level: 15,
         effect: 'Regain all Rage uses on Initiative (once per Long Rest); your Rage lasts 10 minutes without needing to be extended.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L2533: regain all Rage uses on Initiative, once until a Long Rest (the gate is tracked)
         source: 'PHB 2024 "Barbarian: Persistent Rage" (line ~2469)',
       },
       {
@@ -1876,7 +1938,7 @@ export const CLASS_CATALOG = {
             name: 'Intimidating Presence',
             level: 14,
             effect: 'As a Bonus Action, each creature of your choice in a 30-foot Emanation makes a Wisdom save (DC 8 + Str mod + Proficiency Bonus) or is Frightened for 1 minute, repeating the save at the end of each of its turns. One use per Long Rest; expend a use of Rage (no action) to restore it.',
-            uses: { count: 1, recharge: 'long-rest' },
+            uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a use of Rage (no action)' },
             saveDc: { dcAbility: 'str', saveAbility: 'wis' },
             source: phbSub('Path of the Berserker: Intimidating Presence', 2571),
           },
@@ -1950,7 +2012,6 @@ export const CLASS_CATALOG = {
             name: 'Travel Along the Tree',
             level: 14,
             effect: 'When you activate Rage, and as a Bonus Action while Raging, teleport up to 60 feet to an unoccupied space you can see. Once per Rage the range becomes 150 feet and you can bring up to six willing creatures within 10 feet of you.',
-            uses: { count: 1, recharge: 'other' },
             source: phbSub('Path of the World Tree: Travel Along the Tree', 2635),
           },
         ], source: 'PHB 2024 "Barbarian Subclasses" (line ~2553)' },
@@ -1970,21 +2031,20 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'You have a pool of d12s (4, rising to 5 at level 6, 6 at level 12, 7 at level 17). As a Bonus Action, spend dice from the pool, roll them, and regain Hit Points equal to the total. The pool refills on a Long Rest.',
             dice: [{ expr: '4d12 (5 at L6, 6 at L12, 7 at L17)', label: 'Bonus Action healing pool' }],
-            uses: { count: 4, recharge: 'long-rest' },
+            uses: { count: { by: 'class-level', table: [[3, 4], [6, 5], [12, 6], [17, 7]] }, recharge: 'long-rest', unit: ['die', 'dice'], dieSize: 12 }, // PHB L2649-2653: four d12s, +1 at L6/L12/L17
             source: phbSub('Path of the Zealot: Warrior of the Gods', 2647),
           },
           {
             name: 'Fanatical Focus',
             level: 6,
             effect: 'Once per active Rage, when you fail a saving throw you can reroll it with a bonus equal to your Rage Damage bonus, and you must keep the new roll.',
-            uses: { count: 1, recharge: 'other' },
             source: phbSub('Path of the Zealot: Fanatical Focus', 2655),
           },
           {
             name: 'Zealous Presence',
             level: 10,
             effect: 'As a Bonus Action, up to ten other creatures of your choice within 60 feet gain Advantage on attack rolls and saving throws until the start of your next turn. One use per Long Rest; expend a use of Rage (no action) to restore it.',
-            uses: { count: 1, recharge: 'long-rest' },
+            uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a use of Rage (no action)' },
             source: phbSub('Path of the Zealot: Zealous Presence', 2659),
           },
           {
@@ -2024,6 +2084,7 @@ export const CLASS_CATALOG = {
         level: 1,
         effect: 'As a Bonus Action, give a creature within 60 feet a Bardic Inspiration die (added to a later failed D20 Test). Uses equal your Cha mod (minimum 1); the die grows (d6â†’d8â†’d10â†’d12) at levels 5/10/15.',
         mechanics: { die: 'd6', dieAt5: 'd8', dieAt10: 'd10', dieAt15: 'd12' },
+        uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'long-rest' }, // PHB L2729-2737
         source: 'PHB 2024 "Bard: Bardic Inspiration" (line ~2729)',
       },
       {
@@ -2064,6 +2125,7 @@ export const CLASS_CATALOG = {
         name: 'Font of Inspiration',
         level: 5,
         effect: 'Regain all Bardic Inspiration uses on a Short or Long Rest; you can also expend a spell slot (no action) to regain one use.',
+        uses: { count: { by: 'ability-mod', ability: 'cha', min: 1 }, recharge: 'short-or-long-rest', pool: 'bardic-inspiration', alsoRestoredBy: 'expend a spell slot (no action) to regain one expended use (Font of Inspiration, from level 5)' }, // PHB L2818-2822: same pool as Bardic Inspiration
         source: 'PHB 2024 "Bard: Font of Inspiration" (line ~2926)',
       },
       {
@@ -2143,14 +2205,14 @@ export const CLASS_CATALOG = {
             level: 6,
             effect: 'When an enemy you can see ends its turn within 5 feet of you, use your Reaction and expend a Bardic Inspiration use to move up to half your Speed; one ally within 30 feet may then use their Reaction to move up to half their Speed. This movement provokes no Opportunity Attacks.',
             mechanics: { activation: 'reaction' },
-            uses: { count: 'Bardic Inspiration use', recharge: 'other' },
+            uses: { spends: 'bardic-inspiration' },
             source: phbSub('College of Dance: Inspiring Movement', 2999),
           },
           {
             name: 'Tandem Footwork',
             level: 6,
             effect: 'When you roll Initiative (and are not Incapacitated), you can expend a Bardic Inspiration use and roll the die; you and each ally within 30 feet who can see or hear you gain an Initiative bonus equal to the roll.',
-            uses: { count: 'Bardic Inspiration use', recharge: 'other' },
+            uses: { spends: 'bardic-inspiration' },
             source: phbSub('College of Dance: Tandem Footwork', 3005),
           },
           {
@@ -2170,14 +2232,14 @@ export const CLASS_CATALOG = {
             effect: 'Charm Person and Mirror Image are always prepared. Right after you cast an Enchantment or Illusion spell with a spell slot, a creature you can see within 60 feet must make a Wisdom save against your spell save DC or be Charmed or Frightened (your choice) for 1 minute, repeating the save at the end of each of its turns. Once per Long Rest, or restore it by expending a Bardic Inspiration use (no action).',
             grantedSpells: [{ level: 3, spells: spellIds('Charm Person', 'Mirror Image'), alwaysPrepared: true }],
             saveDc: { dcAbility: 'spellcasting', saveAbility: 'wis' },
-            uses: { count: 1, recharge: 'long-rest' },
+            uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend one use of Bardic Inspiration (no action)' },
             source: phbSub('College of Glamour: Beguiling Magic', 3021),
           },
           {
             name: 'Mantle of Inspiration',
             level: 3,
             effect: 'As a Bonus Action, expend a Bardic Inspiration use and roll the die. Up to your Charisma modifier (minimum 1) other creatures within 60 feet each gain Temporary Hit Points equal to twice the roll and can use their Reaction to move up to their Speed without provoking Opportunity Attacks.',
-            uses: { count: 'Bardic Inspiration use', recharge: 'other' },
+            uses: { spends: 'bardic-inspiration' },
             source: phbSub('College of Glamour: Mantle of Inspiration', 3029),
           },
           {
@@ -2185,7 +2247,7 @@ export const CLASS_CATALOG = {
             level: 6,
             effect: 'Command is always prepared. As a Bonus Action, cast Command without a spell slot and take on an unearthly appearance for 1 minute (until your Concentration ends); while it lasts you can cast Command as a Bonus Action without a slot. Creatures Charmed by you automatically fail the save. Once per Long Rest, or restore it by expending a level 3+ spell slot (no action).',
             grantedSpells: [{ level: 6, spells: spellIds('Command'), alwaysPrepared: true }],
-            uses: { count: 1, recharge: 'long-rest' },
+            uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend a level 3+ spell slot (no action)' },
             source: phbSub('College of Glamour: Mantle of Majesty', 3033),
           },
           {
@@ -2213,7 +2275,7 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'When a creature you can see within 60 feet deals damage or succeeds on an ability check or attack roll, use your Reaction and expend a Bardic Inspiration use; roll the die and subtract the result from that roll.',
             mechanics: { activation: 'reaction' },
-            uses: { count: 'Bardic Inspiration use', recharge: 'other' },
+            uses: { spends: 'bardic-inspiration' },
             source: phbSub('College of Lore: Cutting Words', 3061),
           },
           {
@@ -2227,7 +2289,7 @@ export const CLASS_CATALOG = {
             name: 'Peerless Skill',
             level: 14,
             effect: 'When you fail an ability check or attack roll, you can expend a Bardic Inspiration use, roll the die and add it to the d20. If the roll still fails, the use is not expended.',
-            uses: { count: 'Bardic Inspiration use', recharge: 'other' },
+            uses: { spends: 'bardic-inspiration' },
             source: phbSub('College of Lore: Peerless Skill', 3071),
           },
         ], source: 'PHB 2024 "Bard: Bard Subclass" (line ~2809)' },
@@ -2306,6 +2368,7 @@ export const CLASS_CATALOG = {
         level: 2,
         effect: 'Fuel Divine Spark (heal or deal Necrotic/Radiant via a 1d8 + Wis mod) and Turn Undead; limited uses that scale, with the extra d8 growing at levels 7/13/18.',
         mechanics: { usesAtLevel2: 2 },
+        uses: { count: { by: 'class-level', table: [[2, 2], [6, 3], [18, 4]] }, recharge: 'short-one-long-all' }, // PHB L3236-3242, column L3207-3226 (this class's own pool)
         source: 'PHB 2024 "Cleric: Channel Divinity" (line ~3213)',
       },
       {
@@ -2346,6 +2409,7 @@ export const CLASS_CATALOG = {
         name: 'Divine Intervention',
         level: 10,
         effect: 'As a Magic action, cast one Cleric spell of level 5 or lower (no Reaction-cast spells) without a slot or Material components; once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L3268-3270
         source: 'PHB 2024 "Cleric: Divine Intervention" (line ~3233)',
       },
       {
@@ -2411,7 +2475,7 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'As a Magic action, expend a Channel Divinity use to distribute healing equal to five times your Cleric level among Bloodied creatures within 30 feet (you included). It cannot raise a creature above half its Hit Point maximum.',
             mechanics: { channelDivinity: 1 },
-            uses: { count: 'Channel Divinity use', recharge: 'other' },
+            uses: { spends: 'channel-divinity' },
             source: phbSub('Life Domain: Preserve Life', 3432),
           },
           {
@@ -2449,7 +2513,7 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'As a Magic action, expend a Channel Divinity use to emit light in a 30-foot Emanation that dispels magical Darkness there. Creatures of your choice in it make a Constitution save or take 2d10 + your Cleric level Radiant damage (half on a success).',
             mechanics: { channelDivinity: 1 },
-            uses: { count: 'Channel Divinity use', recharge: 'other' },
+            uses: { spends: 'channel-divinity' },
             dice: [{ expr: '2d10 + ClericLevel', label: 'Radiant damage (half on a successful save)' }],
             saveDc: { dcAbility: 'spellcasting', saveAbility: 'con' },
             source: phbSub('Light Domain: Radiance of the Dawn', 3467),
@@ -2459,14 +2523,14 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'When a creature you can see within 30 feet makes an attack roll, use your Reaction to impose Disadvantage on it. Uses equal your Wisdom modifier (minimum 1), regained on a Long Rest.',
             mechanics: { activation: 'reaction' },
-            uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest', pool: 'warding-flare' },
             source: phbSub('Light Domain: Warding Flare', 3471),
           },
           {
             name: 'Improved Warding Flare',
             level: 6,
             effect: 'Warding Flare uses are now regained on a Short or Long Rest, and when you use it you can give the target of the triggering attack Temporary Hit Points equal to 2d6 + your Wisdom modifier.',
-            uses: { count: 'Wis mod (min 1)', recharge: 'short-or-long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'short-or-long-rest', pool: 'warding-flare' },
             dice: [{ expr: '2d6 + WisMod', label: 'Temporary Hit Points for the triggering attack target' }],
             source: phbSub('Light Domain: Improved Warding Flare', 3477),
           },
@@ -2474,7 +2538,7 @@ export const CLASS_CATALOG = {
             name: 'Corona of Light',
             level: 17,
             effect: 'As a Magic action, emit sunlight for 1 minute (or until dismissed): Bright Light in a 60-foot radius and Dim Light for 30 feet more. Enemies in the Bright Light have Disadvantage on saves against Radiance of the Dawn and spells that deal Fire or Radiant damage. Uses equal your Wisdom modifier (minimum 1), regained on a Long Rest.',
-            uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
             source: phbSub('Light Domain: Corona of Light', 3481),
           },
         ], source: 'PHB 2024 "Cleric: Cleric Subclass" (line ~3221)' },
@@ -2493,7 +2557,7 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'As a Bonus Action, expend a Channel Divinity use to create an intangible illusory double within 30 feet for 1 minute (ends if dismissed or you are Incapacitated). You get Advantage on attacks against a creature that can see it when both you and the double are within 5 feet of it, can cast spells as if in its space, and can move it up to 30 feet (within 120 feet of you) as a Bonus Action.',
             mechanics: { channelDivinity: 1 },
-            uses: { count: 'Channel Divinity use', recharge: 'other' },
+            uses: { spends: 'channel-divinity' },
             source: phbSub('Trickery Domain: Invoke Duplicity', 3499),
           },
           {
@@ -2530,7 +2594,7 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'When you or a creature within 30 feet misses with an attack roll, expend a Channel Divinity use to give that roll a +10 bonus. Using it for another creature costs your Reaction.',
             mechanics: { channelDivinity: 1 },
-            uses: { count: 'Channel Divinity use', recharge: 'other' },
+            uses: { spends: 'channel-divinity' },
             source: phbSub('War Domain: Guided Strike', 3540),
           },
           {
@@ -2549,7 +2613,7 @@ export const CLASS_CATALOG = {
             name: 'War Priest',
             level: 3,
             effect: 'As a Bonus Action, make one attack with a weapon or an Unarmed Strike. Uses equal your Wisdom modifier (minimum 1), regained on a Short or Long Rest.',
-            uses: { count: 'Wis mod (min 1)', recharge: 'short-or-long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'short-or-long-rest' },
             source: phbSub('War Domain: War Priest', 3557),
           },
           {
@@ -2557,7 +2621,7 @@ export const CLASS_CATALOG = {
             level: 6,
             effect: 'Expend a Channel Divinity use instead of a spell slot to cast Shield of Faith or Spiritual Weapon. Cast this way it needs no Concentration and lasts 1 minute, ending early if you recast it, are Incapacitated, or die.',
             mechanics: { channelDivinity: 1 },
-            uses: { count: 'Channel Divinity use', recharge: 'other' },
+            uses: { spends: 'channel-divinity' },
             source: phbSub("War Domain: War God's Blessing", 3561),
           },
           {
@@ -2619,6 +2683,7 @@ export const CLASS_CATALOG = {
         level: 2,
         effect: 'As a Bonus Action, shape-shift into a known Beast form for hours equal to half your Druid level; gain Temp HP equal to your level. Uses scale per the Wild Shape column.',
         mechanics: { usesAtLevel2: 2, knownFormsAtLevel2: 4 },
+        uses: { count: { by: 'class-level', table: [[2, 2], [6, 3], [17, 4]] }, recharge: 'short-one-long-all' }, // PHB L3672-3678, column L3637-3656
         source: 'PHB 2024 "Druid: Wild Shape" (line ~3665)',
       },
       {
@@ -2645,6 +2710,7 @@ export const CLASS_CATALOG = {
         name: 'Wild Resurgence',
         level: 5,
         effect: 'Once per turn, if out of Wild Shape uses, expend a spell slot (no action) to regain one; or expend a Wild Shape use (no action) to gain a level 1 slot, once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L3716-3720: limit applies to the Wild Shape -> spell slot direction
         source: 'PHB 2024 "Druid: Wild Resurgence" (line ~3717)',
       },
       {
@@ -2699,6 +2765,7 @@ export const CLASS_CATALOG = {
         name: 'Archdruid',
         level: 20,
         effect: 'Regain a Wild Shape use on Initiative when out; convert Wild Shape uses into a spell slot (2 levels each, once per Long Rest); you age ten times more slowly.',
+        uses: { count: 1, recharge: 'long-rest', pool: 'nature-magician' }, // PHB L3746-3754: Nature Magician, limit applies to the Wild Shape -> spell slot direction
         source: 'PHB 2024 "Druid: Archdruid" (line ~3745)',
       },
     ],
@@ -2745,7 +2812,7 @@ export const CLASS_CATALOG = {
             name: "Land's Aid",
             level: 3,
             effect: 'As a Magic action, expend a Wild Shape use and pick a point within 60 feet. Creatures of your choice in a 10-foot-radius Sphere make a Constitution save against your spell save DC, taking 2d6 Necrotic damage (half on a success), and one creature of your choice there regains 2d6 Hit Points. Damage and healing rise to 3d6 at Druid level 10 and 4d6 at level 14.',
-            uses: { count: 'Wild Shape use', recharge: 'other' },
+            uses: { spends: 'wild-shape' },
             dice: [{ expr: '2d6 (3d6 at L10, 4d6 at L14)', label: 'Necrotic damage; one creature regains the same dice in HP' }],
             saveDc: { dcAbility: 'spellcasting', saveAbility: 'con' },
             source: phbSub("Circle of the Land: Land's Aid", 3896),
@@ -2767,7 +2834,7 @@ export const CLASS_CATALOG = {
             name: "Nature's Sanctuary",
             level: 14,
             effect: 'As a Magic action, expend a Wild Shape use to raise a 15-foot Cube of spectral trees and vines within 120 feet for 1 minute (ends if you are Incapacitated or die). You and allies there have Half Cover and your allies gain your Nature\u2019s Ward Resistance. As a Bonus Action you can move the Cube up to 60 feet.',
-            uses: { count: 'Wild Shape use', recharge: 'other' },
+            uses: { spends: 'wild-shape' },
             source: phbSub("Circle of the Land: Nature's Sanctuary", 3923),
           },
         ], source: 'PHB 2024 "Druid: Druid Subclass" (line ~3713)' },
@@ -2803,7 +2870,7 @@ export const CLASS_CATALOG = {
             name: 'Moonlight Step',
             level: 10,
             effect: 'As a Bonus Action, teleport up to 30 feet to an unoccupied space you can see and gain Advantage on your next attack roll this turn. Uses equal your Wisdom modifier (minimum 1), regained on a Long Rest, or expend a level 2+ spell slot per use to restore it (no action).',
-            uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest', alsoRestoredBy: 'expend a level 2+ spell slot per use (no action)' },
             source: phbSub('Circle of the Moon: Moonlight Step', 3968),
           },
           {
@@ -2835,7 +2902,7 @@ export const CLASS_CATALOG = {
             name: 'Wrath of the Sea',
             level: 3,
             effect: 'As a Bonus Action, expend a Wild Shape use to manifest a 5-foot Emanation of ocean spray for 10 minutes. When you manifest it and as a Bonus Action on later turns, a creature you can see in it must succeed on a Constitution save against your spell save DC or take Cold damage (dice equal to your Wisdom modifier, minimum 1) and, if Large or smaller, be pushed up to 15 feet.',
-            uses: { count: 'Wild Shape use', recharge: 'other' },
+            uses: { spends: 'wild-shape' },
             saveDc: { dcAbility: 'spellcasting', saveAbility: 'con' },
             source: phbSub('Circle of the Sea: Wrath of the Sea', 3999),
           },
@@ -2868,14 +2935,14 @@ export const CLASS_CATALOG = {
             level: 3,
             effect: 'Your Tiny star chart works as a Druid Spellcasting Focus. While holding it you have Guidance and Guiding Bolt prepared and can cast Guiding Bolt without a spell slot a number of times equal to your Wisdom modifier (minimum 1) per Long Rest. A lost map can be replaced with a 1-hour ceremony.',
             grantedSpells: [{ level: 3, spells: spellIds('Guidance', 'Guiding Bolt'), alwaysPrepared: true }],
-            uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
             source: phbSub('Circle of the Stars: Star Map', 4031),
           },
           {
             name: 'Starry Form',
             level: 3,
             effect: 'As a Bonus Action, expend a Wild Shape use to become luminous for 10 minutes instead of shape-shifting, choosing a constellation: Archer (ranged spell attack within 60 feet for 1d8 + Wis mod Radiant, as a Bonus Action each turn), Chalice (when a spell-slot spell restores HP, you or a creature within 30 feet regains 1d8 + Wis mod), or Dragon (treat a d20 roll of 9 or lower as 10 on Intelligence/Wisdom checks and Concentration saves).',
-            uses: { count: 'Wild Shape use', recharge: 'other' },
+            uses: { spends: 'wild-shape' },
             dice: [
               { expr: '1d8 + WisMod (2d8 at L10)', label: 'Archer: Radiant ranged spell attack damage' },
               { expr: '1d8 + WisMod (2d8 at L10)', label: 'Chalice: Hit Points regained' },
@@ -2888,7 +2955,7 @@ export const CLASS_CATALOG = {
             level: 6,
             effect: 'After a Long Rest, roll a die: even gives Weal, odd gives Woe, until your next Long Rest. As a Reaction when a creature you can see within 30 feet is about to make a D20 Test, roll 1d6 and add it (Weal) or subtract it (Woe). Uses equal your Wisdom modifier (minimum 1), regained on a Long Rest.',
             mechanics: { activation: 'reaction' },
-            uses: { count: 'Wis mod (min 1)', recharge: 'long-rest' },
+            uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' },
             dice: [{ expr: '1d6', label: 'Added to (Weal) or subtracted from (Woe) a D20 Test' }],
             choices: [{ key: 'omen', count: 1, options: ['Weal (Even)', 'Woe (Odd)'] }],
             source: phbSub('Circle of the Stars: Cosmic Omen', 4064),
@@ -2945,6 +3012,7 @@ export const CLASS_CATALOG = {
         level: 1,
         effect: 'As a Bonus Action, regain 1d10 + Fighter level Hit Points. Uses scale per the Second Wind column; regain one on a Short Rest, all on a Long Rest.',
         mechanics: { usesAtLevel1: 2 },
+        uses: { count: { by: 'class-level', table: [[1, 2], [4, 3], [10, 4]] }, recharge: 'short-one-long-all' }, // PHB L4114-4120, column L4158-4179
         source: 'PHB 2024 "Fighter: Second Wind" (line ~4112)',
       },
       {
@@ -2959,6 +3027,7 @@ export const CLASS_CATALOG = {
         level: 2,
         effect: 'On your turn, take one extra action (not the Magic action); once per Short or Long Rest. At level 17 you can use it twice per rest but only once per turn.',
         mechanics: { usesAtLevel2: 1 },
+        uses: { count: { by: 'class-level', table: [[2, 1], [17, 2]] }, recharge: 'short-or-long-rest', pool: 'action-surge' }, // PHB L4142-4146, column L4161 / L4176
         source: 'PHB 2024 "Fighter: Action Surge" (line ~4147)',
       },
       {
@@ -3013,6 +3082,7 @@ export const CLASS_CATALOG = {
         level: 9,
         effect: 'When you fail a saving throw, reroll it with a bonus equal to your Fighter level (use the new roll). Uses grow to two at level 13 and three at level 17.',
         mechanics: { usesAtLevel9: 1 },
+        uses: { count: { by: 'class-level', table: [[9, 1], [13, 2], [17, 3]] }, recharge: 'long-rest', pool: 'indomitable' }, // PHB L4195-4199 (one use L9, two L13, three L17)
         source: 'PHB 2024 "Fighter: Indomitable" (line ~4197)',
       },
       {
@@ -3040,6 +3110,7 @@ export const CLASS_CATALOG = {
         level: 13,
         effect: 'Your Indomitable uses increase to two per Long Rest.',
         mechanics: { usesAtLevel13: 2 },
+        uses: { count: { by: 'class-level', table: [[9, 1], [13, 2], [17, 3]] }, recharge: 'long-rest', pool: 'indomitable' }, // PHB L4172: same pool
         source: 'PHB 2024 "Fighter: Indomitable" (line ~4197)',
       },
       {
@@ -3067,6 +3138,7 @@ export const CLASS_CATALOG = {
         level: 17,
         effect: 'Your Action Surge uses increase to two per Short or Long Rest, but you can use it only once on a turn.',
         mechanics: { usesAtLevel17: 2 },
+        uses: { count: { by: 'class-level', table: [[2, 1], [17, 2]] }, recharge: 'short-or-long-rest', pool: 'action-surge' }, // PHB L4176: second use, same pool
         source: 'PHB 2024 "Fighter: Action Surge" (line ~4147)',
       },
       {
@@ -3074,6 +3146,7 @@ export const CLASS_CATALOG = {
         level: 17,
         effect: 'Your Indomitable uses increase to three per Long Rest.',
         mechanics: { usesAtLevel17: 3 },
+        uses: { count: { by: 'class-level', table: [[9, 1], [13, 2], [17, 3]] }, recharge: 'long-rest', pool: 'indomitable' }, // PHB L4176: same pool
         source: 'PHB 2024 "Fighter: Indomitable" (line ~4197)',
       },
       {
@@ -3143,6 +3216,7 @@ export const CLASS_CATALOG = {
         level: 2,
         effect: 'Gain Focus Points (equal to your Monk level) to fuel Flurry of Blows, Patient Defense, and Step of the Wind; regain all on a Short or Long Rest. Save DC is 8 + Wis mod + PB.',
         mechanics: { focusPointsAtLevel2: 2 },
+        uses: { count: { by: 'class-level-multiple', factor: 1 }, recharge: 'short-or-long-rest', pool: 'focus-points', unit: ['Focus Point', 'Focus Points'] }, // PHB L4538, L4569-4571: Focus Points = Monk level
         source: 'PHB 2024 "Monk: Monk\'s Focus" (line ~4540)',
       },
       {
@@ -3156,6 +3230,7 @@ export const CLASS_CATALOG = {
         name: 'Uncanny Metabolism',
         level: 2,
         effect: 'When you roll Initiative, regain all Focus Points and heal your Monk level plus a Martial Arts die; once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L4585-4589
         source: 'PHB 2024 "Monk: Uncanny Metabolism" (line ~4587)',
       },
       {
@@ -3328,6 +3403,7 @@ export const CLASS_CATALOG = {
         level: 1,
         effect: 'A pool of healing equal to five times your Paladin level (refills on a Long Rest); as a Bonus Action, touch a creature to restore HP, or spend 5 to cure the Poisoned condition.',
         mechanics: { poolPerLevel: 5 },
+        uses: { count: { by: 'class-level-multiple', factor: 5 }, recharge: 'long-rest', unit: ['Hit Point', 'Hit Points'] }, // PHB L4851-4857: pool = 5 x Paladin level
         source: 'PHB 2024 "Paladin: Lay On Hands" (line ~4851)',
       },
       {
@@ -3354,6 +3430,7 @@ export const CLASS_CATALOG = {
         name: "Paladin's Smite",
         level: 2,
         effect: 'You always have Divine Smite prepared, and you can cast it once without a spell slot per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest', pool: 'divine-smite-free' }, // PHB L4914-4916: free Divine Smite cast
         source: 'PHB 2024 "Paladin: Paladin\'s Smite" (line ~4905)',
       },
       {
@@ -3361,6 +3438,7 @@ export const CLASS_CATALOG = {
         level: 3,
         effect: 'Channel divine energy for effects starting with Divine Sense. Use twice (regain one on a Short Rest, all on a Long Rest); a third use at level 11. Save DC equals your spell save DC.',
         mechanics: { usesAtLevel3: 2 },
+        uses: { count: { by: 'class-level', table: [[3, 2], [11, 3]] }, recharge: 'short-one-long-all' }, // PHB L4918-4924, column L4873-4894 (this class's own pool)
         source: 'PHB 2024 "Paladin: Channel Divinity" (line ~4909)',
       },
       {
@@ -3388,6 +3466,7 @@ export const CLASS_CATALOG = {
         name: 'Faithful Steed',
         level: 5,
         effect: 'You always have Find Steed prepared, and you can cast it once without a spell slot per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L4938-4942: free Find Steed cast
         source: 'PHB 2024 "Paladin: Faithful Steed" (line ~4933)',
       },
       {
@@ -3501,6 +3580,7 @@ export const CLASS_CATALOG = {
         level: 1,
         effect: 'You always have Hunter\u2019s Mark prepared and can cast it without a spell slot a number of times shown in the Favored Enemy column (regained on a Long Rest).',
         mechanics: { castsAtLevel1: 2 },
+        uses: { count: { by: 'class-level', table: [[1, 2], [5, 3], [9, 4], [13, 5], [17, 6]] }, recharge: 'long-rest' }, // PHB L5373-5375, column L5383-5402 (free Hunter's Mark casts)
         source: 'PHB 2024 "Ranger: Favored Enemy" (line ~5373)',
       },
       {
@@ -3568,6 +3648,7 @@ export const CLASS_CATALOG = {
         name: 'Tireless',
         level: 10,
         effect: 'As a Magic action, give yourself 1d8 + Wis mod Temp HP (minimum 1 Temp HP); uses equal your Wis mod (minimum 1), regained on a Long Rest. A Short Rest reduces your Exhaustion level by 1.',
+        uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest' }, // PHB L5442-5446
         source: 'PHB 2024 "Ranger: Tireless" (line ~5442)',
       },
       {
@@ -3587,6 +3668,7 @@ export const CLASS_CATALOG = {
         name: "Nature's Veil",
         level: 14,
         effect: 'As a Bonus Action, give yourself the Invisible condition until the end of your next turn; uses equal your Wis mod (minimum 1), regained on a Long Rest.',
+        uses: { count: { by: 'ability-mod', ability: 'wis', min: 1 }, recharge: 'long-rest', pool: 'natures-veil' }, // PHB L5454-5458
         source: 'PHB 2024 "Ranger: Nature\'s Veil" (line ~5463)',
       },
       {
@@ -3803,6 +3885,7 @@ export const CLASS_CATALOG = {
         name: 'Stroke of Luck',
         level: 20,
         effect: 'When you fail a D20 Test, you can turn the roll into a 20; once per Short or Long Rest.',
+        uses: { count: 1, recharge: 'short-or-long-rest' }, // PHB L5991-5993
         source: 'PHB 2024 "Rogue: Stroke of Luck" (line ~5981)',
       },
     ],
@@ -3851,6 +3934,7 @@ export const CLASS_CATALOG = {
         level: 1,
         effect: 'As a Bonus Action, for 1 minute raise your Sorcerer spell save DC by 1 and gain Advantage on your Sorcerer spell attack rolls. Use twice per Long Rest.',
         mechanics: { usesAtLevel1: 2 },
+        uses: { count: 2, recharge: 'long-rest' }, // PHB L6308-6315
         source: 'PHB 2024 "Sorcerer: Innate Sorcery" (line ~6301)',
       },
       {
@@ -3858,6 +3942,7 @@ export const CLASS_CATALOG = {
         level: 2,
         effect: 'Gain Sorcery Points (per the table) to fuel effects: convert spell slots into points and points into spell slots (up to level 5). Regain all on a Long Rest.',
         mechanics: { sorceryPointsAtLevel2: 2 },
+        uses: { count: { by: 'class-level-multiple', factor: 1 }, recharge: 'long-rest', pool: 'sorcery-points', unit: ['Sorcery Point', 'Sorcery Points'] }, // PHB L6317-6321: Sorcery Points = Sorcerer level
         source: 'PHB 2024 "Sorcerer: Font of Magic" (line ~6313)',
       },
       {
@@ -3885,6 +3970,7 @@ export const CLASS_CATALOG = {
         name: 'Sorcerous Restoration',
         level: 5,
         effect: 'On a Short Rest, regain expended Sorcery Points up to half your Sorcerer level (round down); once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L6355-6357: only the once-per-Long-Rest gate is tracked
         source: 'PHB 2024 "Sorcerer: Sorcerous Restoration" (line ~6357)',
       },
       {
@@ -3993,6 +4079,7 @@ export const CLASS_CATALOG = {
         name: 'Magical Cunning',
         level: 2,
         effect: 'Perform a 1-minute rite to regain Pact Magic spell slots up to half your maximum (round up); once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L6870-6872: only the once-per-Long-Rest gate is tracked
         source: 'PHB 2024 "Warlock: Magical Cunning" (line ~6881)',
       },
       {
@@ -4020,6 +4107,7 @@ export const CLASS_CATALOG = {
         name: 'Contact Patron',
         level: 9,
         effect: 'You always have Contact Other Plane prepared; cast it to contact your patron without a slot and automatically succeed on its save, once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L6880-6884
         source: 'PHB 2024 "Warlock: Contact Patron" (line ~6895)',
       },
       {
@@ -4127,6 +4215,7 @@ export const CLASS_CATALOG = {
         name: 'Arcane Recovery',
         level: 1,
         effect: 'On a Short Rest, recover expended spell slots totalling up to half your Wizard level (round up), none level 6+; once per Long Rest.',
+        uses: { count: 1, recharge: 'long-rest' }, // PHB L7459-7463: only the once-per-Long-Rest gate is tracked
         source: 'PHB 2024 "Wizard: Arcane Recovery" (line ~7366)',
       },
       {
@@ -4193,6 +4282,7 @@ export const CLASS_CATALOG = {
         name: 'Signature Spells',
         level: 20,
         effect: 'Choose two level 3 spellbook spells as signature spells, each castable once at level 3 without a slot, regained on a rest.',
+        uses: { count: 1, recharge: 'short-or-long-rest', variants: ['Signature Spell 1', 'Signature Spell 2'] }, // PHB L7489-7491
         source: 'PHB 2024 "Wizard: Signature Spells" (line ~7366)',
       },
     ],

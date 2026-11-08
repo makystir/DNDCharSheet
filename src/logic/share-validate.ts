@@ -24,6 +24,7 @@ import type { AbilityScores, Character } from '../types/character';
 import { ABILITIES, BLANK_CHARACTER } from '../types/character';
 import { importFromJSON } from '../storage/export-import';
 import { sanitizeClassChoices } from './class-choices';
+import { sanitizeResourcesSpent } from './resources';
 
 /**
  * Array-valued `Character` fields the viewer may iterate. Each is re-normalised
@@ -117,6 +118,11 @@ export function validateSharedPayload(json: string): ValidateResult {
   const choices = sanitizeClassChoices(c.classChoices);
   if (choices) c.classChoices = choices;
   else delete c.classChoices;
+
+  // resourcesSpent: bounded integer counts only; remove the field if empty.
+  const spent = sanitizeResourcesSpent(c.resourcesSpent);
+  if (spent) c.resourcesSpent = spent;
+  else delete c.resourcesSpent;
 
   return { ok: true, character: c as unknown as Character };
 }

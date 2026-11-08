@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateSharedPayload } from '../share-validate';
+import { decodeSharePayload, encodeSharePayload } from '../share-codec';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../../types/character';
 import type { Character } from '../../types/character';
 
@@ -108,5 +109,33 @@ describe('share-validate classChoices (additive-optional field)', () => {
     const absent = validateSharedPayload(JSON.stringify(validChar()));
     expect(absent.ok).toBe(true);
     if (absent.ok) expect('classChoices' in absent.character).toBe(false);
+  });
+});
+
+describe('share-validate resourcesSpent (additive-optional field)', () => {
+  it('keeps valid counts and strips hostile entries', () => {
+    const payload = { ...validChar(), resourcesSpent: { 'barbarian.rage': 2, bad: -3, worse: 'x', big: 99999 } };
+    const result = validateSharedPayload(JSON.stringify(payload));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.character.resourcesSpent).toEqual({ 'barbarian.rage': 2 });
+  });
+
+  it('removes the field when nothing survives, and leaves absent absent', () => {
+    const junk = validateSharedPayload(JSON.stringify({ ...validChar(), resourcesSpent: ['hostile'] }));
+    expect(junk.ok).toBe(true);
+    if (junk.ok) expect('resourcesSpent' in junk.character).toBe(false);
+    const absent = validateSharedPayload(JSON.stringify(validChar()));
+    expect(absent.ok).toBe(true);
+    if (absent.ok) expect('resourcesSpent' in absent.character).toBe(false);
+  });
+
+  it('round-trips through the share codec unchanged', async () => {
+    const json = JSON.stringify({ ...validChar(), resourcesSpent: { 'fighter.second-wind': 1 } });
+    const decoded = await decodeSharePayload(await encodeSharePayload(json));
+    expect(decoded.ok).toBe(true);
+    if (!decoded.ok) return;
+    const result = validateSharedPayload(decoded.json);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.character.resourcesSpent).toEqual({ 'fighter.second-wind': 1 });
   });
 });

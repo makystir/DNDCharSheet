@@ -731,6 +731,17 @@ export interface Character {
    */
   hitDiceSpent?: number;
   /**
+   * Per-use resource tracking (D1): uses SPENT per tracker, keyed by tracker id
+   * (`<classId>.<pool>`, `feat:<featId>.<pool>`, `warlock.invocation-<id>`; see
+   * logic/resources.ts). Same convention as `hitDiceSpent`: the value is the
+   * number spent, remaining = max - spent (the max is derived from level,
+   * ability scores and data, never stored). Absent / missing key = nothing
+   * spent. Additive-optional: no CURRENT_VERSION bump, no migration; not in
+   * BLANK_CHARACTER. Ids of features the character no longer has are ignored
+   * when read and kept in storage.
+   */
+  resourcesSpent?: Record<string, number>;
+  /**
    * Heroic Inspiration (PHB 2024 "Heroic Inspiration", Docs/PlayersHandbook.md
    * L498-501): a character either has it or not (never more than one). Absent =
    * false. Set manually from the Overview only (the DM awards it); never changed

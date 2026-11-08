@@ -43,6 +43,7 @@ import { OverviewAttacks } from './character/OverviewAttacks';
 import { OverviewSpellcasting } from './character/OverviewSpellcasting';
 import { OverviewConditions } from './character/OverviewConditions';
 import { OverviewReactions } from './character/OverviewReactions';
+import { OverviewResources } from './character/OverviewResources';
 import { OverviewSkills } from './character/OverviewSkills';
 import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
@@ -387,6 +388,7 @@ export function CharacterPage({
               <div className={styles.overviewColumn} data-testid="overview-column-now">
                 <OverviewConditions character={character} />
                 <OverviewReactions character={character} />
+                <OverviewResources character={character} />
                 <OverviewAttacks character={character} />
                 <OverviewSpellcasting character={character} />
               </div>

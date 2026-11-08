@@ -36,6 +36,7 @@ import { effectiveAbilityScores } from './feats';
 import { characterHitPointMaxBreakdown } from './hit-points-state';
 import { reconcileSpellcastingForLevel } from './spellcasting';
 import { bonusFeatSlotLevels } from './bonus-feats';
+import { clampResourcesSpent } from './resources';
 
 // ─── XP thresholds (Character Advancement table, PHB 2024 L1982-2003) ────────
 
@@ -488,6 +489,8 @@ export function applyLevelUp(
     else delete next.spellcasting;
   }
 
+  next = clampResourcesSpent(next);
+
   // Record the per-level HP choice (also appends an 'hp' log entry) …
   next = setLevelHp(next, nextLevel, choice, timestamp);
   // … then the level-up entry (ordered after the HP entry for this level).
@@ -553,6 +556,8 @@ export function applyMulticlassLevel(
     else delete next.spellcasting;
   }
 
+  next = clampResourcesSpent(next);
+
   // The HP gain uses the LEVELED class's Hit Die (PHB 2024 "Gaining a Level").
   const leveledDie = getClass(targetClassId)?.hitDie;
   next = setLevelHp(next, total, choice, timestamp, leveledDie, targetClassId);
@@ -584,7 +589,8 @@ export function setLevel(character: Character, rawLevel: number): Character {
     if (reconciled) next.spellcasting = reconciled;
     else delete next.spellcasting;
   }
-  return next;
+  // De-leveling can lower a maximum: keep stored spent within the new max.
+  return clampResourcesSpent(next);
 }
 
 // ─── XP award (recorded + logged; XP mode only) ──────────────────────────────

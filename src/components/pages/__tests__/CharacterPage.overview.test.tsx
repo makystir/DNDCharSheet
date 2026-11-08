@@ -56,6 +56,7 @@ describe('CharacterPage Overview order', () => {
       'Heroic Inspiration',
       'Conditions & Effects',
       'Reactions',
+      'Resources',
       'Attacks',
       'Spellcasting',
       'Skills & Saves',
@@ -100,6 +101,7 @@ describe('CharacterPage Overview order', () => {
     expect(titlesIn('overview-column-now')).toEqual([
       'Conditions & Effects',
       'Reactions',
+      'Resources',
       'Attacks',
       'Spellcasting',
       'Spell Slots',

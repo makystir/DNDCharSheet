@@ -18,7 +18,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { CLASS_CATALOG, CLASS_LIST } from '../classes';
-import type { ClassFeature, SubclassData } from '../classes';
+import type { ClassFeature, OwnUses, SubclassData } from '../classes';
 import { classFeaturesByLevel, classFeaturesByLevelTagged } from '../../logic/classes';
 import { BLANK_CHARACTER } from '../../types/character';
 import type { Character, ClassEntry } from '../../types/character';
@@ -68,19 +68,61 @@ function catalogSubclasses(cls: GoldenSubclassClass): SubclassData[] {
 
 // ─── projections: golden and catalog reduced to the same comparable shape ───
 
-/** Golden `uses.count` -> catalog `uses.count` spelling. */
-function goldenUseCount(c: NonNullable<GoldenFeature['uses']>['count']): number | string {
-  if (typeof c === 'number') return c;
-  if (typeof c === 'string') {
-    const m: Record<string, string> = {
-      'wild-shape': 'Wild Shape use',
-      'channel-divinity': 'Channel Divinity use',
-      'bardic-inspiration': 'Bardic Inspiration use',
-    };
-    return m[c] ?? `UNMAPPED:${c}`;
-  }
-  const a = c.abilityMod;
-  return `${a.charAt(0).toUpperCase()}${a.slice(1)} mod (min ${c.min})`;
+/** Default pool id: feature name lower-cased, apostrophes dropped, other runs -> '-' (mirrors OwnUses.pool). */
+const slug = (n: string): string => n.toLowerCase().replace(/['\u2019]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const rows = (r: ReadonlyArray<readonly [number, number]>): number[][] => r.map((x) => [x[0], x[1]]);
+const dieOf = (d: number | ReadonlyArray<readonly [number, number]> | undefined): unknown =>
+  d === undefined ? null : typeof d === 'number' ? d : rows(d);
+
+/**
+ * Golden `uses` / `spends` -> the comparable shape: the count spec, recharge, effective pool id, variants,
+ * die size, extra-restore text (display only) or, for a pool-less link, the pool it spends.
+ */
+function goldenUses(g: GoldenFeature): unknown {
+  if (g.spends) return { spends: g.spends };
+  const u = g.uses;
+  if (!u) return null;
+  const count = u.table
+    ? { by: 'class-level', table: rows(u.table) }
+    : u.multiple
+      ? { by: 'class-level-multiple', factor: u.multiple.factor, offset: u.multiple.offset ?? 0 }
+      : typeof u.count === 'number'
+        ? u.count
+        : { by: 'ability-mod', ability: u.count.abilityMod, min: u.count.min };
+  return {
+    count,
+    recharge: u.recharge,
+    pool: u.pool ?? slug(g.name),
+    variants: u.variants ?? null,
+    dieSize: dieOf(u.dieSize),
+    alsoRestoredBy: u.alsoRestoredBy ?? null,
+  };
+}
+
+/** Catalog `uses` reduced to the same shape; a legacy string count or an unknown `by` stays visible and fails the comparison. */
+function catalogUses(f: ClassFeature): unknown {
+  const u = f.uses;
+  if (!u) return null;
+  if ('spends' in u) return { spends: u.spends };
+  const c = u.count;
+  const count =
+    typeof c === 'number'
+      ? c
+      : c.by === 'class-level'
+        ? { by: c.by, table: rows(c.table) }
+        : c.by === 'class-level-multiple'
+          ? { by: c.by, factor: c.factor, offset: c.offset ?? 0 }
+          : c.by === 'ability-mod'
+            ? { by: c.by, ability: c.ability, min: c.min }
+            : c;
+  return {
+    count,
+    recharge: u.recharge,
+    pool: u.pool ?? slug(f.name),
+    variants: u.variants ?? null,
+    dieSize: dieOf(u.dieSize),
+    alsoRestoredBy: u.alsoRestoredBy ?? null,
+  };
 }
 
 /** Golden save DC formula -> catalog `saveDc.dcAbility`. */
@@ -130,7 +172,7 @@ interface Cmp {
 function goldenCmp(g: GoldenFeature): Cmp {
   const p = g.proficiencies;
   return {
-    uses: g.uses ? { count: goldenUseCount(g.uses.count), recharge: g.uses.recharge === 'per-rage' ? 'other' : g.uses.recharge } : null,
+    uses: goldenUses(g),
     save: g.save ? { dc: goldenDcAbility(g.save.dc), save: g.save.save, alt: g.save.dc === '8+StrOrDex+Prof' ? 'dex' : null } : null,
     reaction: g.reaction === true,
     channelDivinity: g.channelDivinity === true,
@@ -172,7 +214,7 @@ function catalogCmp(f: ClassFeature): Cmp {
   const mech = f.mechanics ?? {};
   const fallback = typeof mech.fallbackSaveChoice === 'string' ? mech.fallbackSaveChoice.split('|').sort() : [];
   return {
-    uses: f.uses ? { count: f.uses.count, recharge: f.uses.recharge } : null,
+    uses: catalogUses(f),
     save: f.saveDc
       ? { dc: f.saveDc.dcAbility, save: f.saveDc.saveAbility, alt: typeof mech.dcAbilityAlt === 'string' ? mech.dcAbilityAlt : null }
       : null,
@@ -487,5 +529,21 @@ describe('subclass oracle: classFeaturesByLevel / classFeaturesByLevelTagged', (
 
   it('sanity: helper lists real keys', () => {
     expect(subclassFeatureNames('barbarian', 'berserker').length).toBeGreaterThan(0);
+  });
+});
+
+describe('subclass oracle: spends links', () => {
+  it('every `spends` points at a pool that an own-uses feature of the same class declares', () => {
+    for (const cls of CLASS_LIST) {
+      const all: ClassFeature[] = [...cls.features, ...cls.subclasses.flatMap((s) => s.features)];
+      const pools = new Set(
+        all.flatMap((f) => (f.uses && !('spends' in f.uses) ? [(f.uses as OwnUses).pool ?? slug(f.name)] : [])),
+      );
+      for (const f of all) {
+        if (f.uses && 'spends' in f.uses) {
+          expect(pools.has(f.uses.spends), `${cls.id}/${f.name}@L${f.level}: spends '${f.uses.spends}' has no own-uses pool`).toBe(true);
+        }
+      }
+    }
   });
 });

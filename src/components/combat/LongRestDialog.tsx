@@ -11,6 +11,7 @@ import {
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { RecoveredList } from './RecoveredList';
 import styles from './Rests.module.css';
 
 export interface LongRestDialogProps {
@@ -72,6 +73,7 @@ export function LongRestDialog({
 
   const max = hitPointMaxOf(character);
   const changes = preview.longRestBreakdowns;
+  const recovered = preview.resourcesRecovered ?? [];
   const concentratingOn = character.concentration
     ? (getSpell(character.concentration.spellId)?.name ?? character.concentration.spellId)
     : null;
@@ -83,7 +85,8 @@ export function LongRestDialog({
 
   const handleConfirm = () => {
     if (preview.outcome !== 'completed') return;
-    onComplete(preview.character, 'Long Rest finished. Resources restored.');
+    const n = recovered.length;
+    onComplete(preview.character, `Long Rest finished. Resources restored.${n > 0 ? ` ${n} limited-use feature${n === 1 ? '' : 's'} recovered.` : ''}`);
   };
 
   const blockedText =
@@ -159,6 +162,7 @@ export function LongRestDialog({
               </li>
               <li>Death Saving Throw counters clear</li>
             </ul>
+            {recovered.length > 0 && <RecoveredList recovered={recovered} testId="long-rest-recovered" />}
 
             {advisory && (
               <p className={styles.advisory} role="status" data-testid="long-rest-advisory">

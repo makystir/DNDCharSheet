@@ -84,6 +84,40 @@ afterEach(() => {
   document.body.style.overflow = '';
 });
 
+describe('Recovered limited-use features', () => {
+  const spentFeatures = {
+    'fighter.second-wind': 2,
+    'fighter.action-surge': 1,
+  };
+
+  it('Short Rest lists regain-one and regain-all results and counts them in the message', () => {
+    renderPage({ resourcesSpent: spentFeatures });
+    const dialog = openShortRest();
+    const list = within(dialog).getByTestId('short-rest-recovered');
+    expect(list).toHaveTextContent('Second Wind: 0 -> 1 of 2 (regain one)');
+    expect(list).toHaveTextContent('Action Surge: 0 -> 1 of 1');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Finish Short Rest' }));
+    expect(notify).toHaveBeenCalledWith(expect.stringContaining('Recovered 2 limited-use features.'));
+    expect(latest.resourcesSpent).toEqual({ 'fighter.second-wind': 1 });
+  });
+
+  it('Long Rest lists every recovered feature and mentions the count', () => {
+    renderPage({ resourcesSpent: spentFeatures });
+    const dialog = openLongRest();
+    const list = within(dialog).getByTestId('long-rest-recovered');
+    expect(list).toHaveTextContent('Second Wind: 0 -> 2 of 2');
+    expect(list).toHaveTextContent('Action Surge: 0 -> 1 of 1');
+    fireEvent.click(within(dialog).getByRole('button', { name: /Finish Long Rest|Rest anyway/ }));
+    expect(notify).toHaveBeenCalledWith(expect.stringContaining('2 limited-use features recovered.'));
+    expect(latest.resourcesSpent).toBeUndefined();
+  });
+
+  it('shows no list when nothing is spent', () => {
+    renderPage();
+    expect(within(openShortRest()).queryByTestId('short-rest-recovered')).toBeNull();
+  });
+});
+
 describe('Rest buttons', () => {
   it('sit in the Hit Dice card with rule tooltips', () => {
     renderPage();

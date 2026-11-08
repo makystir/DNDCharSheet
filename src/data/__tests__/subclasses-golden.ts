@@ -43,17 +43,39 @@ export type GoldenRecharge =
   | 'short-rest'
   | 'long-rest'
   | 'short-or-long-rest'
-  | 'per-rage'
+  /** Short Rest regains ONE expended use, Long Rest regains all (Rage, Channel Divinity, Psionic Energy Dice ...). */
+  | 'short-one-long-all'
+  /** Kept for the stated vocabulary; no PHB class/subclass/feat feature uses it. Manual. */
+  | 'dawn'
   | 'other';
 
+/** One row of a level table: [owner class level, value from that level on]. */
+export type GoldenLevelTable = ReadonlyArray<readonly [level: number, value: number]>;
+
 export interface GoldenUses {
-  /** A fixed number, or the ability whose modifier gives the count (min 1). */
-  count: number | { abilityMod: Ability; min: 1 } | 'wild-shape' | 'channel-divinity' | 'bardic-inspiration';
-  /** Whether each use is a spent use of another resource ('wild-shape' etc.) rather than its own pool. */
+  /**
+   * Maximum uses AT THE FEATURE'S OWN LEVEL: a fixed number, or the ability whose modifier gives the
+   * count (min 1). When `table` or `multiple` is present they give the full scaling and `count` is
+   * the value at the feature's own level.
+   */
+  count: number | { abilityMod: Ability; min: 1 };
   recharge: GoldenRecharge;
-  /** Extra way to restore the use, if the PHB gives one. */
+  /** Extra way to restore the use, if the PHB gives one (display text only). */
   alsoRestoredBy?: string;
+  /** Scaling by OWNER CLASS level (PHB class-feature or subclass tables / prose). */
+  table?: GoldenLevelTable;
+  /** Scaling as `factor * ownerClassLevel + offset` (Healing Light = 1 * Warlock level + 1). */
+  multiple?: { factor: number; offset?: number };
+  /** Pool id shared by several features of one class (a later feature that changes an earlier pool). */
+  pool?: string;
+  /** N independent single-use instances (Phantasmal Creatures: Summon Beast, Summon Fey). */
+  variants?: string[];
+  /** Die size for dice pools: fixed, or by owner class level. */
+  dieSize?: number | GoldenLevelTable;
 }
+
+/** A feature that spends a use of another feature's pool (never a tracker of its own). */
+export type GoldenSpends = 'bardic-inspiration' | 'channel-divinity' | 'wild-shape';
 
 export interface GoldenDice {
   /** Dice expression, with a symbolic term where the count scales ('RageDamage' etc.). */
@@ -120,6 +142,8 @@ export interface GoldenFeature {
   /** PHB line of the heading / table. */
   line: number;
   uses?: GoldenUses;
+  /** Spends a use of the named pool of the same class (mutually exclusive with `uses`). */
+  spends?: GoldenSpends;
   dice?: GoldenDice[];
   save?: GoldenSave;
   /** Spells granted by this feature, by class level. */
@@ -167,9 +191,10 @@ export interface GoldenSubclass {
   landSpells?: Record<'arid' | 'polar' | 'temperate' | 'tropical', GoldenSpellGrant[]> & { line: Record<string, number> };
 }
 
-const wisUses = (recharge: GoldenRecharge): GoldenUses => ({
+const wisUses = (recharge: GoldenRecharge, pool?: string): GoldenUses => ({
   count: { abilityMod: 'wis', min: 1 },
   recharge,
+  ...(pool ? { pool } : {}),
 });
 
 // ═══════════════════════════ BARBARIAN (PHB L2551-2670) ═════════════════════
@@ -251,7 +276,7 @@ const BARBARIAN_GOLDEN: GoldenSubclass[] = [
         save: { dc: '8+Str+Prof', save: 'str' },
       },
       { name: 'Battering Roots', level: 10, line: 2631 },
-      { name: 'Travel Along the Tree', level: 14, line: 2635, uses: { count: 1, recharge: 'per-rage' } }, // 150 ft extended teleport (+6 creatures) once per Rage
+      { name: 'Travel Along the Tree', level: 14, line: 2635 }, // 150 ft extended teleport (+6 creatures); once per Rage (L2635-2637) = per-activation limit, NOT a tracker
     ],
   },
   {
@@ -270,11 +295,11 @@ const BARBARIAN_GOLDEN: GoldenSubclass[] = [
         name: 'Warrior of the Gods',
         level: 3,
         line: 2647,
-        // Pool of d12s: 4 at level 3, 5 at 6, 6 at 12, 7 at 17.
+        // Pool of d12s: 4 at level 3, 5 at 6, 6 at 12, 7 at 17 (PHB L2649, L2653). NOTE plan.md section 5 had a constant 4: wrong.
         dice: [{ expr: '4d12 (5 at L6, 6 at L12, 7 at L17)', label: 'Bonus Action healing pool' }],
-        uses: { count: 4, recharge: 'long-rest' },
+        uses: { count: 4, recharge: 'long-rest', table: [[3, 4], [6, 5], [12, 6], [17, 7]], dieSize: 12 }, // L2649-2653
       },
-      { name: 'Fanatical Focus', level: 6, line: 2655, uses: { count: 1, recharge: 'per-rage' } },
+      { name: 'Fanatical Focus', level: 6, line: 2655 }, // Once per active Rage (L2657) = per-activation limit, NOT a tracker
       {
         name: 'Zealous Presence',
         level: 10,
@@ -295,8 +320,8 @@ const BARD_GOLDEN: GoldenSubclass[] = [
     featureCount: 4,
     features: [
       { name: 'Dazzling Footwork', level: 3, line: 2987 },
-      { name: 'Inspiring Movement', level: 6, line: 2999, reaction: true, uses: { count: 'bardic-inspiration', recharge: 'other' } },
-      { name: 'Tandem Footwork', level: 6, line: 3005, uses: { count: 'bardic-inspiration', recharge: 'other' } },
+      { name: 'Inspiring Movement', level: 6, line: 2999, reaction: true, spends: 'bardic-inspiration' },
+      { name: 'Tandem Footwork', level: 6, line: 3005, spends: 'bardic-inspiration' },
       { name: 'Leading Evasion', level: 14, line: 3009 },
     ],
   },
@@ -314,7 +339,7 @@ const BARD_GOLDEN: GoldenSubclass[] = [
         save: { dc: 'spell-save-dc', save: 'wis' },
         uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'expend one use of Bardic Inspiration (no action)' },
       },
-      { name: 'Mantle of Inspiration', level: 3, line: 3029, uses: { count: 'bardic-inspiration', recharge: 'other' } },
+      { name: 'Mantle of Inspiration', level: 3, line: 3029, spends: 'bardic-inspiration' },
       {
         name: 'Mantle of Majesty',
         level: 6,
@@ -338,7 +363,7 @@ const BARD_GOLDEN: GoldenSubclass[] = [
     featureCount: 4,
     features: [
       { name: 'Bonus Proficiencies', level: 3, line: 3057, proficiencies: { skillChoices: 3 } },
-      { name: 'Cutting Words', level: 3, line: 3061, reaction: true, uses: { count: 'bardic-inspiration', recharge: 'other' } },
+      { name: 'Cutting Words', level: 3, line: 3061, reaction: true, spends: 'bardic-inspiration' },
       {
         name: 'Magical Discoveries',
         level: 6,
@@ -346,7 +371,7 @@ const BARD_GOLDEN: GoldenSubclass[] = [
         // Two spells of the player's choice from the Cleric, Druid or Wizard lists.
         grantedSpells: [{ level: 6, spells: [], mode: 'chosen-always-prepared', chosenCount: 2 }],
       },
-      { name: 'Peerless Skill', level: 14, line: 3071, uses: { count: 'bardic-inspiration', recharge: 'other' } },
+      { name: 'Peerless Skill', level: 14, line: 3071, spends: 'bardic-inspiration' },
     ],
   },
   {
@@ -394,7 +419,7 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 3432,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       // FLAG: Light Domain heading is interleaved in the OCR here (see header).
       { name: 'Blessed Healer', level: 6, line: 3436 },
@@ -423,17 +448,17 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 3467,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
         dice: [{ expr: '2d10 + ClericLevel', label: 'Radiant damage (half on a successful save)' }],
         save: { dc: 'spell-save-dc', save: 'con' },
       },
-      { name: 'Warding Flare', level: 3, line: 3471, reaction: true, uses: wisUses('long-rest') },
+      { name: 'Warding Flare', level: 3, line: 3471, reaction: true, uses: wisUses('long-rest', 'warding-flare') },
       {
         name: 'Improved Warding Flare',
         level: 6,
         line: 3477,
         // Warding Flare uses now return on a Short or Long Rest.
-        uses: wisUses('short-or-long-rest'),
+        uses: wisUses('short-or-long-rest', 'warding-flare'), // same pool as Warding Flare (L3471)
         dice: [{ expr: '2d6 + WisMod', label: 'Temporary Hit Points for the triggering attack target' }],
       },
       { name: 'Corona of Light', level: 17, line: 3481, uses: wisUses('long-rest') },
@@ -451,7 +476,7 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 3499,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       {
         name: 'Trickery Domain Spells',
@@ -479,7 +504,7 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 3540,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       {
         name: 'War Domain Spells',
@@ -498,7 +523,7 @@ const CLERIC_GOLDEN: GoldenSubclass[] = [
         level: 6,
         line: 3561,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       { name: 'Avatar of Battle', level: 17, line: 3565 },
     ],
@@ -525,7 +550,7 @@ const DRUID_GOLDEN: GoldenSubclass[] = [
         name: "Land's Aid",
         level: 3,
         line: 3896,
-        uses: { count: 'wild-shape', recharge: 'other' },
+        spends: 'wild-shape',
         // 2d6 at L3, 3d6 at L10, 4d6 at L14; healing is 2d6 (the PHB scales damage and healing together).
         dice: [{ expr: '2d6 (3d6 at L10, 4d6 at L14)', label: 'Necrotic damage; one creature regains the same dice in HP' }],
         save: { dc: 'spell-save-dc', save: 'con' },
@@ -537,7 +562,7 @@ const DRUID_GOLDEN: GoldenSubclass[] = [
         uses: { count: 1, recharge: 'long-rest' },
       },
       { name: "Nature's Ward", level: 10, line: 3908 },
-      { name: "Nature's Sanctuary", level: 14, line: 3923, uses: { count: 'wild-shape', recharge: 'other' } },
+      { name: "Nature's Sanctuary", level: 14, line: 3923, spends: 'wild-shape' },
     ],
     landSpells: {
       line: { arid: 3865, polar: 3871, temperate: 3878, tropical: 3887 },
@@ -623,7 +648,7 @@ const DRUID_GOLDEN: GoldenSubclass[] = [
         name: 'Wrath of the Sea',
         level: 3,
         line: 3999,
-        uses: { count: 'wild-shape', recharge: 'other' },
+        spends: 'wild-shape',
         save: { dc: 'spell-save-dc', save: 'con' },
       },
       { name: 'Aquatic Affinity', level: 6, line: 4005 },
@@ -649,7 +674,7 @@ const DRUID_GOLDEN: GoldenSubclass[] = [
         name: 'Starry Form',
         level: 3,
         line: 4050,
-        uses: { count: 'wild-shape', recharge: 'other' },
+        spends: 'wild-shape',
         dice: [
           { expr: '1d8 + WisMod (2d8 at L10)', label: 'Archer: Radiant ranged spell attack damage' },
           { expr: '1d8 + WisMod (2d8 at L10)', label: 'Chalice: Hit Points regained' },
@@ -694,7 +719,7 @@ const FIGHTER_GOLDEN: GoldenSubclass[] = [
         choices: [{ key: 'maneuvers', count: 3, options: MANEUVER_OPTIONS, countByLevel: { 3: 3, 7: 5, 10: 7, 15: 9 } }],
         // 4 Superiority Dice (d8), 5 at L7, 6 at L15 (L4239-4241); die grows via L10 / L18 features.
         dice: [{ expr: '4d8 Superiority Dice (5 at L7, 6 at L15)', label: 'Superiority Dice pool' }],
-        uses: { count: 4, recharge: 'short-or-long-rest' },
+        uses: { count: 4, recharge: 'short-or-long-rest', pool: 'superiority-dice', table: [[3, 4], [7, 5], [15, 6]], dieSize: [[3, 8], [10, 10], [18, 12]] }, // L4239-4241, die L4257 / L4263
         save: { dc: '8+StrOrDex+Prof', save: 'str' }, // L4243; save type depends on the maneuver (Str, Wis)
       },
       {
@@ -787,7 +812,7 @@ const FIGHTER_GOLDEN: GoldenSubclass[] = [
         line: 4420,
         // Energy Dice table L4426-4433: L3 4xD6, L5 6xD8, L9 8xD8, L11 8xD10, L13 10xD10, L17 12xD12.
         // Regain one die on a Short Rest, all on a Long Rest (L4437).
-        uses: { count: 4, recharge: 'other' },
+        uses: { count: 4, recharge: 'short-one-long-all', pool: 'psionic-energy-dice', table: [[3, 4], [5, 6], [9, 8], [11, 8], [13, 10], [17, 12]], dieSize: [[3, 6], [5, 8], [11, 10], [17, 12]] },
         dice: [
           { expr: 'Psionic Energy Dice: 4d6 (L3), 6d8 (L5), 8d8 (L9), 8d10 (L11), 10d10 (L13), 12d12 (L17)', label: 'Psionic Energy Dice pool' },
           { expr: '1 Psionic Die + IntMod (min 1)', label: 'Protective Field damage reduction (Reaction, 30 ft)' },
@@ -799,7 +824,7 @@ const FIGHTER_GOLDEN: GoldenSubclass[] = [
         name: 'Telekinetic Adept',
         level: 7,
         line: 4447,
-        uses: { count: 1, recharge: 'short-or-long-rest', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
+        uses: { count: 1, recharge: 'short-or-long-rest', pool: 'psi-powered-leap', alsoRestoredBy: 'expend a Psionic Energy Die (no action)' },
         save: { dc: '8+Int+Prof', save: 'str' }, // Telekinetic Thrust
       },
       { name: 'Guarded Mind', level: 10, line: 4455 },
@@ -953,7 +978,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 5123,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
         dice: [{ expr: 'ChaMod (min +1)', label: 'Attack roll bonus with the imbued weapon' }],
       },
       { name: 'Aura of Devotion', level: 7, line: 5135 },
@@ -978,7 +1003,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 5165,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
         dice: [{ expr: '2d8 + PaladinLevel', label: 'Temporary Hit Points divided among creatures within 30 ft' }],
       },
       {
@@ -998,7 +1023,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 5183,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       { name: 'Aura of Alacrity', level: 7, line: 5187 },
       {
@@ -1027,7 +1052,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 5221,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
         save: { dc: 'spell-save-dc', save: 'str' }, // FLAG: the DC is not stated in the feature; spell save DC assumed from Paladin class text
       },
       {
@@ -1082,7 +1107,7 @@ const PALADIN_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 5287,
         channelDivinity: true,
-        uses: { count: 'channel-divinity', recharge: 'other' },
+        spends: 'channel-divinity',
       },
       { name: 'Relentless Avenger', level: 7, line: 5293 },
       { name: 'Soul of Vengeance', level: 15, line: 5297, reaction: true },
@@ -1348,7 +1373,7 @@ const ROGUE_GOLDEN: GoldenSubclass[] = [
         line: 6110,
         // Energy Dice table L6114-6123: L3 4xD6, L5 6xD8, L9 8xD8, L11 8xD10, L13 10xD10, L17 12xD12.
         // Regain one die on a Short Rest, all on a Long Rest (L6127).
-        uses: { count: 4, recharge: 'other' },
+        uses: { count: 4, recharge: 'short-one-long-all', pool: 'psionic-energy-dice', table: [[3, 4], [5, 6], [9, 8], [11, 8], [13, 10], [17, 12]], dieSize: [[3, 6], [5, 8], [11, 10], [17, 12]] },
         dice: [
           { expr: 'Psionic Energy Dice: 4d6 (L3), 6d8 (L5), 8d8 (L9), 8d10 (L11), 10d10 (L13), 12d12 (L17)', label: 'Psionic Energy Dice pool' },
           { expr: '1 Psionic Die', label: 'Psi-Bolstered Knack bonus to a failed proficient check (expended only on success)' },
@@ -1562,7 +1587,7 @@ const SORCERER_GOLDEN: GoldenSubclass[] = [
     featureCount: 5,
     features: [
       { name: 'Wild Magic Surge', level: 3, line: 6699, dice: [{ expr: '1d20 (20 = surge)', label: 'Surge trigger, once per turn' }] },
-      { name: 'Tides of Chaos', level: 3, line: 6705, uses: { count: 1, recharge: 'other' } }, // regained by casting a Sorcerer spell with a slot or a Long Rest
+      { name: 'Tides of Chaos', level: 3, line: 6705, uses: { count: 1, recharge: 'long-rest', alsoRestoredBy: 'cast a Sorcerer spell with a spell slot (triggers a Wild Magic Surge)' } }, // L6707-6709
       {
         name: 'Bend Luck',
         level: 6,
@@ -1650,7 +1675,7 @@ const WARLOCK_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 7252,
         dice: [{ expr: '(1 + WarlockLevel)d6', label: 'Healing dice pool (spend up to ChaMod, min 1, at once)' }],
-        uses: { count: 1, recharge: 'long-rest' }, // pool regains all dice on a Long Rest
+        uses: { count: 4, recharge: 'long-rest', multiple: { factor: 1, offset: 1 }, dieSize: 6 }, // d6s = 1 + Warlock level (L7254); pool regains all on a Long Rest
       },
       { name: 'Radiant Soul', level: 6, line: 7258 },
       {
@@ -1808,6 +1833,8 @@ const WIZARD_GOLDEN: GoldenSubclass[] = [
         level: 3,
         line: 7698,
         dice: [{ expr: '2d20 (3d20 at L14 via Greater Portent)', label: 'Foretelling rolls after a Long Rest' }],
+        // Unused foretelling rolls (2, 3 from Greater Portent) are lost on a Long Rest, which re-rolls them (L7700-7702, L7720).
+        uses: { count: 2, recharge: 'long-rest', pool: 'portent', table: [[3, 2], [14, 3]] },
       },
       { name: 'Expert Divination', level: 6, line: 7704 },
       {
@@ -1815,10 +1842,10 @@ const WIZARD_GOLDEN: GoldenSubclass[] = [
         level: 10,
         line: 7708,
         grantedSpells: [{ level: 10, spells: ['See Invisibility'], mode: 'cast-without-slot' }],
-        uses: { count: 1, recharge: 'short-or-long-rest' },
+        uses: { count: 1, recharge: 'short-or-long-rest', pool: 'third-eye' },
         choices: [{ key: 'third-eye', count: 1, options: ['Greater Comprehension', 'See Invisibility'] }], // Darkvision 120 ft is always granted (L7710)
       },
-      { name: 'Greater Portent', level: 14, line: 7718 },
+      { name: 'Greater Portent', level: 14, line: 7718, uses: { count: 3, recharge: 'long-rest', pool: 'portent', table: [[3, 2], [14, 3]] } }, // same pool as Portent (L7720)
     ],
   },
   {
@@ -1869,7 +1896,7 @@ const WIZARD_GOLDEN: GoldenSubclass[] = [
         grantedSpells: [
           { level: 6, spells: ['Summon Beast', 'Summon Fey'], mode: 'always-prepared' },
         ],
-        uses: { count: 1, recharge: 'long-rest' }, // per spell cast without a slot
+        uses: { count: 1, recharge: 'long-rest', variants: ['Summon Beast', 'Summon Fey'] }, // one free Illusion cast of EACH spell per Long Rest (L7774)
       },
       {
         name: 'Illusory Self',
