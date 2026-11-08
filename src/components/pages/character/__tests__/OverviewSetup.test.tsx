@@ -30,7 +30,7 @@ describe('OverviewSetup', () => {
 
     const rogue: Character = {
       ...createCharacter('Rogue'),
-      classes: [{ id: 'rogue', level: 1, skillChoices: ['stealth', 'acrobatics', 'perception', 'sleight-of-hand'] }],
+      classes: [{ id: 'rogue', level: 1, skillChoices: ['stealth', 'acrobatics', 'perception', 'sleightOfHand'] }],
     };
     render(<OverviewSetup character={rogue} />);
     expect(screen.getByTestId('overview-setup-expertise')).toHaveTextContent('0 of 2');

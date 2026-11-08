@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { CLASS_CATALOG } from '../../data/classes';
+import { CLASS_CATALOG as RAW_CLASS_CATALOG } from '../../data/classes';
+import type { SubclassData } from '../../data/classes';
 import { getSpell } from '../../data/spells';
 import type { ClassEntry } from '../../types/character';
 import { BLANK_CHARACTER } from '../../types/character';
@@ -13,6 +14,8 @@ import { buildFeatures } from '../../components/layout/printLayoutGenerators';
 // Real-catalog wiring checks: subclass-granted spells, subclass spellcasting
 // (Eldritch Knight / Arcane Trickster) and the Champion's extra Fighting Style.
 
+// Widened view of the const catalog so tests can iterate it by string class id.
+const CLASS_CATALOG: Record<string, { subclasses: readonly SubclassData[] }> = RAW_CLASS_CATALOG;
 function entry(id: string, level: number, subclassId?: string): ClassEntry {
   return { id, level, subclassId } as unknown as ClassEntry;
 }

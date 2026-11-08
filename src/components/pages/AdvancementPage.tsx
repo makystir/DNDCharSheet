@@ -47,6 +47,8 @@ import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
 import { AdvancementPlanner } from './advancement/AdvancementPlanner';
 import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
 import { expertiseStatus } from '../../logic/expertise';
+import { LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
+import { languagePicksStatus } from '../../logic/language-picks';
 import {
   ClassChoicesPending,
   ClassChoicesOverNote,
@@ -249,6 +251,8 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const expertise = expertiseStatus(character);
   // Class-feature choices (Metamagic, Invocations, Maneuvers, Divine/Primal Order,
   // ...) and multiclass skill/instrument picks: one pending item per group.
+  // Feature languages owed (Rogue L1 Thieves' Cant, Ranger L2 Deft Explorer): one item.
+  const languagePicks = languagePicksStatus(character);
   const classChoices = choiceStatus(character);
   const pendingClassChoiceCount = classChoices.filter((s) => s.remaining > 0).length;
   const pendingMulticlassCount = pendingMulticlassPicks(character).length;
@@ -264,6 +268,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
     (subclassDue ? 1 : 0) +
     unrecordedHpLevels.length +
     (expertise.remaining > 0 ? 1 : 0) +
+    (languagePicks.remaining > 0 ? 1 : 0) +
     pendingClassChoiceCount +
     pendingMulticlassCount +
     spellPicks.length;
@@ -738,6 +743,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
               </li>
             ))}
             <ExpertisePending character={character} onChange={onChange} status={expertise} />
+            <LanguagePicksPending character={character} onChange={onChange} status={languagePicks} />
             <ClassChoicesPending character={character} onChange={onChange} statuses={classChoices} />
             <MulticlassPicksPending character={character} onChange={onChange} />
             {spellPicks.map((item) => (
@@ -753,6 +759,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
           </ul>
         )}
         <ExpertiseOverNote status={expertise} />
+        <LanguagePicksOverNote status={languagePicks} />
         <ClassChoicesOverNote statuses={classChoices} />
         <MulticlassPicksOverNote character={character} />
       </Card>

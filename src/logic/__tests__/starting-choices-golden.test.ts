@@ -7,8 +7,9 @@ import type { ClassData, ClassId } from '../../data/classes';
 import { SPELL_CATALOG } from '../../data/spells';
 import type { SpellId } from '../../data/spells';
 import { savingThrowProficiency } from '../saving-throws';
-import { pendingSetupChoices, startingChoicesFor } from '../starting-choices';
+import { pendingFeaturePicks, pendingSetupChoices, startingChoicesFor } from '../starting-choices';
 import {
+  FEATURE_PICK_CASES,
   PENDING_SETUP_CASES,
   SAVE_DISPLAY_CASES,
   STARTING_CHOICES,
@@ -190,5 +191,26 @@ describe('pendingSetupChoices: beyond the golden', () => {
       };
       expect(pendingSetupChoices(c).filter((i) => i.kind !== 'class-skills')).toEqual([]);
     }
+  });
+});
+
+describe('FEATURE_PICK_CASES: pendingFeaturePicks', () => {
+  it.each(FEATURE_PICK_CASES.map((c) => [c.name, c] as const))('%s', (_name, c) => {
+    const base = createCharacter('Feature picks');
+    const character: Character = {
+      ...base,
+      level: c.classes.reduce((sum, k) => sum + k.level, 0),
+      classes: c.classes.map((k) => ({ id: k.id as ClassId, level: k.level })),
+      skills: Object.fromEntries(
+        c.expertise.map((name) => [skillIdByName(name), { proficient: true, expertise: true }]),
+      ),
+      languages: { chosen: [], granted: c.languages },
+    };
+    expect(pendingFeaturePicks(character)).toEqual(
+      c.expected.map((e) => ({
+        ...e,
+        ...(e.classId ? { className: CLASS_CATALOG[e.classId as ClassId].name } : {}),
+      })),
+    );
   });
 });

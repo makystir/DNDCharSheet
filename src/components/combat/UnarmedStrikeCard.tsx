@@ -2,6 +2,7 @@ import { Hand, Swords } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { proficiencyBonus } from '../../logic/abilities';
 import { formatSigned } from '../../logic/breakdown';
+import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import { unarmedStrike } from '../../logic/attacks';
 import { effectiveAbilityScores } from '../../logic/feats';
 import { UNARMED_ATTACK_ID } from '../../logic/attack-flow';
@@ -23,6 +24,8 @@ export interface UnarmedStrikeCardProps {
  */
 export function UnarmedStrikeCard({ character, onAttack }: UnarmedStrikeCardProps) {
   const strike = unarmedStrike(effectiveAbilityScores(character), proficiencyBonus(character.level));
+  // Static attack bonus is a D20 Test total: show the Exhaustion penalty (PHB 2024 L21024).
+  const attack = withExhaustion(strike.attack, exhaustionLevelOf(character));
   return (
     <Card>
       <SectionHeader icon={Hand} title="Unarmed Strike" />
@@ -31,8 +34,8 @@ export function UnarmedStrikeCard({ character, onAttack }: UnarmedStrikeCardProp
         <div className={styles.statsLine}>
           <span className={styles.stat}>
             <span className={styles.statLabel}>Attack</span>
-            <CalculatedValue label="Unarmed Strike attack bonus" breakdown={strike.attack} className={styles.valueBtn}>
-              {formatSigned(strike.attack.total)}
+            <CalculatedValue label="Unarmed Strike attack bonus" breakdown={attack} className={styles.valueBtn}>
+              {formatSigned(attack.total)}
             </CalculatedValue>
           </span>
           <span className={styles.stat}>

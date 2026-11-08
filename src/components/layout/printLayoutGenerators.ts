@@ -57,7 +57,7 @@ import {
   entrySubclass,
 } from '../../logic/classes';
 import { knownLanguages } from '../../logic/languages';
-import { activeConditionIds, exhaustionLevelOf } from '../../logic/conditions';
+import { activeConditionIds, exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import { equippedWeapons, weaponAttackProfile, unarmedStrike } from '../../logic/attacks';
 import {
   carryingCapacityBreakdown,
@@ -258,7 +258,7 @@ export function buildCoreStats(character: Character): CoreStat[] {
   const hpMax = characterHitPointMaxBreakdown(character);
   const currentHp = effectiveHp(character);
   const speed = speedBreakdown(character);
-  const initiative = initiativeBreakdown(effScores, character.initiativeBonus);
+  const initiative = initiativeBreakdown(effScores, character.initiativeBonus, exhaustionLevelOf(character));
   const passivePerception = passivePerceptionBreakdown(character);
 
   const hpValue =
@@ -315,7 +315,7 @@ export function buildAttacks(character: Character): AttackRow[] {
       flat === 0 ? profile.damage.dice : `${profile.damage.dice} ${signed(flat)}`;
     rows.push({
       name: inventoryItemName(item),
-      attackBonus: profile.attack.breakdown.total,
+      attackBonus: withExhaustion(profile.attack.breakdown, exhaustionLevelOf(character)).total,
       damage: `${damage} ${weapon.damageType}`,
       proficient: profile.proficiency.proficient,
     });
@@ -324,7 +324,7 @@ export function buildAttacks(character: Character): AttackRow[] {
   const unarmed = unarmedStrike(effectiveAbilityScores(character), proficiencyBonus(character.level));
   rows.push({
     name: 'Unarmed Strike',
-    attackBonus: unarmed.attack.total,
+    attackBonus: withExhaustion(unarmed.attack, exhaustionLevelOf(character)).total,
     damage: `${unarmed.damage.total} bludgeoning`,
     proficient: true,
   });

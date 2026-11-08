@@ -10,6 +10,7 @@ import {
 import { effectiveAbilityScores } from '../../logic/feats';
 import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { characterHitPointMaxBreakdown } from '../../logic/hit-points-state';
+import { exhaustionLevelOf } from '../../logic/conditions';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { speedBreakdown } from '../../logic/species';
@@ -145,7 +146,7 @@ export function SharedCharacterViewer({ encoded }: SharedCharacterViewerProps) {
 
   const acBreakdown = characterArmorClassBreakdown(character);
   const hpBreakdown = characterHitPointMaxBreakdown(character);
-  const initBreakdown = initiativeBreakdown(effScores, character.initiativeBonus);
+  const initBreakdown = initiativeBreakdown(effScores, character.initiativeBonus, exhaustionLevelOf(character));
   const ppBreakdown = passivePerceptionBreakdown(character);
   const speed = speedBreakdown(character);
   const saves = allSavingThrowBreakdowns(character);

@@ -34,7 +34,7 @@ import {
   OWED_GOLDEN,
 } from './class-choice-counts-golden';
 
-function make(classes: Array<{ id: string; level: number; subclassId?: string }>): Character {
+function make(classes: ReadonlyArray<{ id: string; level: number; subclassId?: string }>): Character {
   const c = createCharacter('Choices');
   const total = classes.reduce((s, e) => s + e.level, 0);
   return {

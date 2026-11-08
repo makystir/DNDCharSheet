@@ -1,9 +1,8 @@
 import { ClipboardList } from 'lucide-react';
 import type { Character } from '../../../types/character';
-import { pendingSetupChoices } from '../../../logic/starting-choices';
-import type { PendingItem, PendingKind } from '../../../logic/starting-choices';
+import { pendingFeaturePicks, pendingSetupChoices } from '../../../logic/starting-choices';
+import type { FeaturePickKind, PendingItem, PendingKind } from '../../../logic/starting-choices';
 import { pendingCreationChoices } from '../../../logic/class-choices';
-import { earnedExpertiseGrants, expertiseStatus } from '../../../logic/expertise';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewLinkAnchor } from './OverviewShared';
@@ -18,6 +17,11 @@ const LABEL: Record<PendingKind, string> = {
   cantrips: 'Cantrips',
   spellbook: 'Spellbook spells',
   prepared: 'Prepared spells',
+};
+
+const FEATURE_LABEL: Record<FeaturePickKind, string> = {
+  expertise: 'Expertise skills',
+  languages: 'Feature languages',
 };
 
 /** Where each kind of choice is made. Spell groups live on the Spells page. */
@@ -35,13 +39,11 @@ function destination(kind: PendingKind): { href: string; text: string } {
 export function OverviewSetup({ character }: OverviewSetupProps) {
   const pending = pendingSetupChoices(character);
   // Level-1 class-feature picks (Divine Order, Primal Order, Warlock invocations)
-  // and Rogue Expertise are made on the Advancement page; they are listed here as
-  // link rows only. pendingSetupChoices itself is unchanged.
+  // and the class-feature picks (Expertise, feature languages) are made on the
+  // Advancement page; they are listed here as link rows only.
   const creationChoices = pendingCreationChoices(character);
-  const expertise = expertiseStatus(character);
-  const showExpertise =
-    expertise.remaining > 0 && earnedExpertiseGrants(character).some((e) => e.grant.level === 1);
-  if (pending.length === 0 && creationChoices.length === 0 && !showExpertise) return null;
+  const featurePicks = pendingFeaturePicks(character);
+  if (pending.length === 0 && creationChoices.length === 0 && featurePicks.length === 0) return null;
   return (
     <Card>
       <SectionHeader icon={ClipboardList} title="Finish setting up" />
@@ -76,16 +78,24 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
             <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
           </li>
         ))}
-        {showExpertise && (
-          <li className={styles.row} data-testid="overview-setup-expertise">
-            <span className={styles.label}>Expertise skills</span>
+        {featurePicks.map((item) => (
+          <li
+            key={`${item.kind}-${item.classId ?? ''}`}
+            className={styles.row}
+            data-testid={`overview-setup-${item.kind}`}
+          >
+            <span className={styles.label}>
+              {item.className ? `${item.className} ` : ''}
+              {FEATURE_LABEL[item.kind]}
+            </span>
             <span className={styles.count}>
-              {expertise.chosen} of {expertise.owed}
+              {item.have} of {item.need}
             </span>
             <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
           </li>
-        )}
+        ))}
       </ul>
     </Card>
   );
 }
+

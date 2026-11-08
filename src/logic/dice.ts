@@ -16,7 +16,7 @@
  *    condition, L21024). It appears as its own visible Breakdown component.
  */
 import type { Breakdown, BreakdownComponent } from './breakdown';
-import { exhaustionEffects } from './conditions';
+import { exhaustionD20Component } from './conditions';
 import type { RNG } from './random';
 
 /** How a d20 is rolled (PHB 2024 "Advantage and Disadvantage"). */
@@ -121,14 +121,10 @@ export function d20TestBreakdown(
   exhaustionLevel: number,
   modifiers: BreakdownComponent[] = [],
 ): Breakdown {
-  const exhaustion = exhaustionEffects(exhaustionLevel);
   const components: BreakdownComponent[] = [
     { label: 'd20 roll', value: natural },
     ...modifiers,
-    {
-      label: exhaustion.level === 0 ? 'Exhaustion (none)' : `Exhaustion ${exhaustion.d20Test.total}`,
-      value: exhaustion.d20Test.total,
-    },
+    exhaustionD20Component(exhaustionLevel),
   ];
   return { total: components.reduce((sum, c) => sum + c.value, 0), components };
 }

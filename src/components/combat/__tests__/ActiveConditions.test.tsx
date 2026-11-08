@@ -149,16 +149,18 @@ describe('Active Conditions on the Combat page', () => {
     expect(screen.queryByTestId('active-exhaustion')).toBeNull();
   });
 
-  it('exhaustion penalties are informational: AC and Initiative displays are unchanged', () => {
+  it('exhaustion lowers the Initiative display (a D20 Test, -2 x level) but not AC', () => {
     // Stage A5e: AC renders in both Core Stats and the Defend-mode readout, so
-    // read the first AC trigger (they share one breakdown). Exhaustion changes
-    // neither the static AC nor Initiative display (D1: it is a roll-time note).
+    // read the first AC trigger (they share one breakdown). Exhaustion does not
+    // change AC (not a D20 Test) but does lower the Initiative display.
     const { unmount } = render(<Harness initial={createCharacter('Tester')} />);
     const ac = screen.getAllByRole('button', { name: /Armor Class/ })[0].textContent;
     const init = screen.getByRole('button', { name: /^Initiative/ }).textContent;
     unmount();
     renderPage({ exhaustionLevel: 4 });
     expect(screen.getAllByRole('button', { name: /Armor Class/ })[0].textContent).toBe(ac);
-    expect(screen.getByRole('button', { name: /^Initiative/ }).textContent).toBe(init);
+    // PHB 2024 L21024: Initiative is a Dexterity check (a D20 Test); level 4 = -8.
+    expect(init).toBe('+0');
+    expect(screen.getByRole('button', { name: /^Initiative/ }).textContent).toBe('-8');
   });
 });

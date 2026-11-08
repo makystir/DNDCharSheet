@@ -21,6 +21,9 @@ import { SKILLS } from '../types/character';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
 import { primaryClass, allClasses } from './classes';
+import { EXPERTISE_GRANTS, expertiseStatus } from './expertise';
+import { languagePicksStatus } from './language-picks';
+import { levelOneLanguageClassIds } from './languages';
 import {
   classAlwaysPreparedSpells,
   classCantripListClassIds,
@@ -189,5 +192,54 @@ export function pendingSetupChoices(character: Character): PendingItem[] {
   }
 
   items.push(...perClassItems.cantrips, ...perClassItems.spellbook, ...perClassItems.prepared);
+  return items;
+}
+
+export type FeaturePickKind = 'expertise' | 'languages';
+
+export interface FeaturePickItem {
+  kind: FeaturePickKind;
+  have: number;
+  need: number;
+  /** Class whose level 1 feature opens the item; set for multiclass characters only. */
+  classId?: ClassId;
+  className?: string;
+}
+
+/**
+ * Class-feature picks for the "finish setting up" checklist: Expertise and
+ * feature languages, in that order. Counts come from expertiseStatus
+ * (logic/expertise.ts) and languagePicksStatus (logic/language-picks.ts), the same
+ * functions the Advancement "Choices Pending" list uses, so the two never
+ * disagree.
+ *
+ * Scope is setup: an item is listed only when the character has a LEVEL 1 class
+ * feature that grants the pick (Rogue Expertise, PHB 2024 L5882-5884; Rogue
+ * Thieves' Cant, L5873-5898). Picks from level 2+ features (Bard/Wizard/Ranger
+ * Expertise, Deft Explorer) appear on the Advancement page. The counts are shared
+ * pools, so the item shows pooled have/need. Picks beyond the grant never keep an
+ * item open.
+ */
+export function pendingFeaturePicks(character: Character): FeaturePickItem[] {
+  const items: FeaturePickItem[] = [];
+  const multi = allClasses(character).length >= 2;
+  const label = (classId: string | undefined) => {
+    const data = classId ? getClass(classId) : undefined;
+    return multi && data ? { classId: data.id as ClassId, className: data.name } : {};
+  };
+
+  const expertise = expertiseStatus(character);
+  const expertiseOpener = allClasses(character).find((e) =>
+    EXPERTISE_GRANTS.some((g) => g.classId === e.id && g.level === 1),
+  );
+  if (expertiseOpener && expertise.remaining > 0) {
+    items.push({ kind: 'expertise', have: expertise.chosen, need: expertise.owed, ...label(expertiseOpener.id) });
+  }
+
+  const languages = languagePicksStatus(character);
+  const [languageOpener] = levelOneLanguageClassIds(character);
+  if (languageOpener && languages.remaining > 0) {
+    items.push({ kind: 'languages', have: languages.chosen, need: languages.owed, ...label(languageOpener) });
+  }
   return items;
 }

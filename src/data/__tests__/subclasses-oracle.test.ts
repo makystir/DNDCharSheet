@@ -417,8 +417,8 @@ describe('subclass oracle: catalog matches the golden', () => {
 
 // ─── subclass features flow into the class feature views ─────────────────────
 
-function mkCharacter(classes: ClassEntry[]): Character {
-  return { ...BLANK_CHARACTER, level: classes.reduce((n, c) => n + c.level, 0), classes };
+function mkCharacter(classes: Array<{ id: string; level: number; subclassId?: string }>): Character {
+  return { ...BLANK_CHARACTER, level: classes.reduce((n, c) => n + c.level, 0), classes: classes as unknown as ClassEntry[] };
 }
 
 describe('subclass oracle: classFeaturesByLevel / classFeaturesByLevelTagged', () => {

@@ -349,3 +349,165 @@ export const PENDING_SETUP_CASES: PendingSetupCase[] = [
     expected: [{ kind: 'prepared', have: 0, need: 2 }],
   },
 ];
+
+// ─── "Finish setting up": class-feature picks (pendingFeaturePicks) ──────────
+// Expertise and feature-language picks that a level-1 feature owes. Scope is the
+// SETUP card: an item appears only when the character has reached a LEVEL 1
+// class feature that grants the pick, i.e. Rogue (Expertise L5882-5884 owes two;
+// Thieves' Cant L5873-5898 "plus one other language of your choice" owes one).
+// Bard Expertise (L2794) and Ranger Deft Explorer (L5411-5419) begin at class
+// level 2, Wizard Scholar at 2 (L7465); those picks are listed on the
+// Advancement page, not on the setup card. The counts are POOLS shared across
+// classes (the app does not record which feature a pick came from), so a
+// multiclass character shows the pooled have/need labelled with the class whose
+// LEVEL 1 feature opens the item (Rogue). Order: expertise, then languages,
+// after every spell/skill item. `have` counts valid, distinct picks; picks past
+// the grant are a warning elsewhere and never keep an item open.
+export type FeaturePickKind = 'expertise' | 'languages';
+
+export interface FeaturePickItem {
+  kind: FeaturePickKind;
+  have: number;
+  need: number;
+  /** Class that opens the item (level-1 feature); set for multiclass only. */
+  classId?: string;
+}
+
+export interface FeaturePickCase {
+  name: string;
+  cite: string;
+  classes: { id: string; level: number }[];
+  /** PHB skill names that carry Expertise (the character is proficient in each). */
+  expertise: string[];
+  /** Feature-language picks stored (not Common, not Thieves' Cant). */
+  languages: string[];
+  expected: FeaturePickItem[];
+}
+
+export const FEATURE_PICK_CASES: FeaturePickCase[] = [
+  {
+    name: 'Rogue 1, nothing chosen: two Expertise and one language owed',
+    cite: 'Rogue Expertise L5882-5884; Thieves\' Cant L5873-5898',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: [],
+    languages: [],
+    expected: [
+      { kind: 'expertise', have: 0, need: 2 },
+      { kind: 'languages', have: 0, need: 1 },
+    ],
+  },
+  {
+    name: 'Rogue 1, one Expertise made, no language',
+    cite: 'L5882-5884; L5873-5898',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth'],
+    languages: [],
+    expected: [
+      { kind: 'expertise', have: 1, need: 2 },
+      { kind: 'languages', have: 0, need: 1 },
+    ],
+  },
+  {
+    name: 'Rogue 1, Expertise done, language still owed',
+    cite: 'L5882-5884; L5873-5898',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth', 'Perception'],
+    languages: [],
+    expected: [{ kind: 'languages', have: 0, need: 1 }],
+  },
+  {
+    name: 'Rogue 1, language done, one Expertise owed',
+    cite: 'L5882-5884; L5873-5898',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth'],
+    languages: ['dwarvish'],
+    expected: [{ kind: 'expertise', have: 1, need: 2 }],
+  },
+  {
+    name: 'Rogue 1, complete: nothing pending',
+    cite: 'L5882-5884; L5873-5898',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth', 'Perception'],
+    languages: ['dwarvish'],
+    expected: [],
+  },
+  {
+    name: 'Rogue 1, one too many of each: over-allocation never keeps the card open',
+    cite: 'L5882-5884; L5873-5898 (the grant is two and one)',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth', 'Perception', 'Deception'],
+    languages: ['dwarvish', 'elvish'],
+    expected: [],
+  },
+  {
+    name: 'Rogue 1, a duplicate language pick counts once',
+    cite: 'L5873-5898 ("one other language")',
+    classes: [{ id: 'rogue', level: 1 }],
+    expertise: ['Stealth', 'Perception'],
+    languages: ['dwarvish', 'Dwarvish'],
+    expected: [],
+  },
+  {
+    name: 'Fighter 1: no Expertise or language feature',
+    cite: 'Core Fighter Traits L4094',
+    classes: [{ id: 'fighter', level: 1 }],
+    expertise: [],
+    languages: [],
+    expected: [],
+  },
+  {
+    name: 'Bard 1: Expertise starts at level 2, so nothing on the setup card',
+    cite: 'Bard Expertise L2794',
+    classes: [{ id: 'bard', level: 1 }],
+    expertise: [],
+    languages: [],
+    expected: [],
+  },
+  {
+    name: 'Ranger 1: Deft Explorer starts at level 2, so nothing on the setup card',
+    cite: 'Ranger Deft Explorer L5411-5419',
+    classes: [{ id: 'ranger', level: 1 }],
+    expertise: [],
+    languages: [],
+    expected: [],
+  },
+  {
+    name: 'Bard 2 and Ranger 2: owed, but on the Advancement page, not the setup card',
+    cite: 'L2794; L5411-5419',
+    classes: [
+      { id: 'bard', level: 2 },
+      { id: 'ranger', level: 2 },
+    ],
+    expertise: [],
+    languages: [],
+    expected: [],
+  },
+  {
+    name: 'Wizard 1 / Rogue 1: the Rogue level 1 features owe it, labelled Rogue',
+    cite: 'Multiclassing: features of each class L2106+; Rogue L5873-5898, L5882-5884',
+    classes: [
+      { id: 'wizard', level: 1 },
+      { id: 'rogue', level: 1 },
+    ],
+    expertise: [],
+    languages: [],
+    expected: [
+      { kind: 'expertise', have: 0, need: 2, classId: 'rogue' },
+      { kind: 'languages', have: 0, need: 1, classId: 'rogue' },
+    ],
+  },
+  {
+    name: 'Rogue 1 / Ranger 2: pooled counts (Expertise 2+1, languages 1+2)',
+    cite: 'Rogue L5882-5884, L5873-5898; Ranger L5411-5419',
+    classes: [
+      { id: 'rogue', level: 1 },
+      { id: 'ranger', level: 2 },
+    ],
+    expertise: ['Stealth'],
+    languages: ['dwarvish'],
+    expected: [
+      { kind: 'expertise', have: 1, need: 3, classId: 'rogue' },
+      { kind: 'languages', have: 1, need: 3, classId: 'rogue' },
+    ],
+  },
+];

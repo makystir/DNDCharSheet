@@ -4,6 +4,7 @@ import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { effectiveAbilityScores } from '../../logic/feats';
 import { speedBreakdown } from '../../logic/species';
 import { characterHitPointMaxBreakdown } from '../../logic/hit-points-state';
+import { exhaustionLevelOf } from '../../logic/conditions';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { formatSigned } from '../../logic/breakdown';
@@ -62,7 +63,7 @@ export function DefenseReadout({ character, onChange }: DefenseReadoutProps) {
   const acBreakdown = characterArmorClassBreakdown(character);
 
   const speed = speedBreakdown(character);
-  const initBreakdown = initiativeBreakdown(effectiveScores, character.initiativeBonus);
+  const initBreakdown = initiativeBreakdown(effectiveScores, character.initiativeBonus, exhaustionLevelOf(character));
   const ppBreakdown = passivePerceptionBreakdown(character);
 
   // HP maximum breakdown (read-only mirror; authoritative on Advancement).

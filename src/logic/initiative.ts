@@ -11,22 +11,27 @@
 import type { AbilityScores } from '../types/character';
 import { abilityModifier } from './abilities';
 import type { Breakdown } from './breakdown';
+import { withExhaustion } from './conditions';
 
 /** The Initiative modifier with a breakdown: Dex mod + bonus (default 0). */
 export function initiativeBreakdown(
   scores: AbilityScores,
   initiativeBonus?: number,
+  exhaustionLevel?: number,
 ): Breakdown {
   const dexMod = abilityModifier(scores.dex);
   const bonus =
     initiativeBonus !== undefined && Number.isFinite(initiativeBonus)
       ? initiativeBonus
       : 0;
-  return {
+  const base: Breakdown = {
     total: dexMod + bonus,
     components: [
       { label: 'Dex mod', value: dexMod },
       { label: 'Bonus', value: bonus },
     ],
   };
+  // Exhaustion (PHB 2024 L21024) is added ONLY for the static display total
+  // (pass the level). The roll path omits it and adds the penalty itself.
+  return exhaustionLevel === undefined ? base : withExhaustion(base, exhaustionLevel);
 }

@@ -25,6 +25,7 @@ import { ABILITY_NAMES, SKILLS } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classGrantedSkills } from './classes';
+import { exhaustionLevelOf, withExhaustion } from './conditions';
 import { effectiveAbilityScores, featGrantedExpertise, featGrantedSkills } from './feats';
 
 /** The governing ability of a skill, from the canonical SKILLS table. */
@@ -196,7 +197,13 @@ export function effectiveSkillTraining(
  */
 export function allSkillBreakdowns(
   character: Character,
+  options: { exhaustion?: boolean } = {},
 ): Record<SkillId, Breakdown> {
+  // A skill check is a D20 Test, so the Exhaustion penalty (-2 x level, PHB 2024
+  // "Exhaustion" L21024) is its own component. Roll flows that add Exhaustion
+  // themselves pass `exhaustion: false` so it is counted exactly once.
+  const includeExhaustion = options.exhaustion ?? true;
+  const exhaustionLevel = exhaustionLevelOf(character);
   // Merge species-granted and class-granted skill proficiencies into one label
   // map. On a collision (both grant the same skill) the label names BOTH
   // sources so the tooltip shows every contributor; the Proficiency Bonus is
@@ -215,7 +222,7 @@ export function allSkillBreakdowns(
   }
   const result = {} as Record<SkillId, Breakdown>;
   for (const skill of SKILLS) {
-    result[skill.id] = skillModifierBreakdown(
+    const base = skillModifierBreakdown(
       effectiveAbilityScores(character),
       character.level,
       skill.id,
@@ -225,6 +232,7 @@ export function allSkillBreakdowns(
       })(),
       granted[skill.id],
     );
+    result[skill.id] = includeExhaustion ? withExhaustion(base, exhaustionLevel) : base;
   }
   return result;
 }

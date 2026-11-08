@@ -288,7 +288,7 @@ function classify(
     const takenLevels = new Set<number>();
     for (const entry of entries) {
       const spell = entry.length > 0 ? getSpell(entry) : undefined;
-      if (!spell || !book.includes(entry) || !spellChoiceEligible(key, spell.level, spell.castingTime)) {
+      if (!spell || !(book as readonly string[]).includes(entry) || !spellChoiceEligible(key, spell.level, spell.castingTime)) {
         invalid.push(entry);
       } else if (seen.has(entry)) {
         duplicates.push(entry);

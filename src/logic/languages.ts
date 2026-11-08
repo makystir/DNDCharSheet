@@ -141,6 +141,23 @@ export function featureLanguageGrants(
 }
 
 /**
+ * The class ids whose LEVEL 1 feature grants a "choose N" language (today Rogue
+ * "Thieves' Cant", PHB 2024 L5873-5898), for characters that have that class.
+ * Used by the setup checklist, which only lists level-1 features.
+ */
+export function levelOneLanguageClassIds(character: Character): string[] {
+  const ids: string[] = [];
+  for (const { entry, data } of resolveClasses(character)) {
+    const grants = data.features.some((f) => {
+      const grant = FEATURE_LANGUAGE_GRANTS[f.name];
+      return grant !== undefined && grant.chooseCount > 0 && f.level === 1 && entry.level >= 1;
+    });
+    if (grants) ids.push(entry.id);
+  }
+  return ids;
+}
+
+/**
  * Whether a set of feature "choose N" language picks is valid for the
  * character's class/level: at most `chooseCount` picks, none Common, none a
  * fixed auto-grant id (those are automatic, not a pick), and no duplicates. A

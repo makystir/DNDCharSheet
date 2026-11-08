@@ -29,7 +29,7 @@ import {
   isConditionId,
   type ConditionId,
 } from '../data/conditions';
-import type { Breakdown } from './breakdown';
+import type { Breakdown, BreakdownComponent } from './breakdown';
 
 /** A condition id that is stored in `Character.conditions` (everything but Exhaustion). */
 export type TrackedConditionId = ActiveCondition['id'];
@@ -99,6 +99,35 @@ export function exhaustionEffects(rawLevel: number): ExhaustionEffects {
     },
     fatal: level >= EXHAUSTION.deathLevel,
   };
+}
+
+/**
+ * The Exhaustion component of a D20 Test (PHB 2024 "Exhaustion" L21024: the roll
+ * is reduced by 2 x level). Always produced, even at level 0, so the tooltip
+ * shows every factor. Single source of the label used by `d20TestBreakdown`.
+ */
+export function exhaustionD20Component(rawLevel: number): BreakdownComponent {
+  const effects = exhaustionEffects(rawLevel);
+  return {
+    label: effects.level === 0 ? 'Exhaustion (none)' : `Exhaustion ${effects.d20Test.total}`,
+    value: effects.d20Test.total,
+  };
+}
+
+/**
+ * A copy of a static D20-Test modifier Breakdown with the Exhaustion penalty
+ * appended as its own labelled component (PHB 2024 L21024). For DISPLAY totals
+ * only: roll flows add Exhaustion themselves via `d20TestBreakdown`, so they must
+ * consume the un-penalised Breakdown (the penalty is counted exactly once).
+ */
+export function withExhaustion(breakdown: Breakdown, rawLevel: number): Breakdown {
+  const component = exhaustionD20Component(rawLevel);
+  const next: Breakdown = {
+    total: breakdown.total + component.value,
+    components: [...breakdown.components, component],
+  };
+  if (breakdown.note !== undefined) next.note = breakdown.note;
+  return next;
 }
 
 // ── Array-level seam (apply / remove / has) ────────────────────────────────

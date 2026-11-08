@@ -11,8 +11,8 @@ import { formatSigned, type Breakdown } from '../../logic/breakdown';
 import { abilityScoreBreakdown, effectiveAbilityScores } from '../../logic/feats';
 import { savingThrowProficiency } from '../../logic/saving-throws';
 import { effectiveSkillTraining } from '../../logic/skills';
-import { pendingSetupChoices } from '../../logic/starting-choices';
-import type { PendingItem } from '../../logic/starting-choices';
+import { pendingFeaturePicks, pendingSetupChoices } from '../../logic/starting-choices';
+import type { FeaturePickItem, PendingItem } from '../../logic/starting-choices';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './CreationWizard.module.css';
 
@@ -21,11 +21,13 @@ export interface ReviewStepProps {
   character: Character;
 }
 
-const PENDING_LABEL: Record<PendingItem['kind'], string> = {
+const PENDING_LABEL: Record<PendingItem['kind'] | FeaturePickItem['kind'], string> = {
   'class-skills': 'class skills',
   cantrips: 'cantrips',
   spellbook: 'spellbook spells',
   prepared: 'prepared spells',
+  expertise: 'Expertise skills',
+  languages: 'feature languages',
 };
 
 const spellNames = (ids: SpellId[] | undefined): string =>
@@ -41,7 +43,10 @@ export function ReviewStep({ character }: ReviewStepProps) {
   const species = getSpecies(character.species?.id);
   const background = getBackground(character.backgroundSelection?.id);
   const scores = effectiveAbilityScores(character);
-  const pending = pendingSetupChoices(character);
+  const pending: (PendingItem | FeaturePickItem)[] = [
+    ...pendingSetupChoices(character),
+    ...pendingFeaturePicks(character),
+  ];
 
   const savingThrows = ABILITIES.filter((a) => savingThrowProficiency(character, a).proficient);
   const skills = SKILLS.map((s) => ({ skill: s, training: effectiveSkillTraining(character, s.id) })).filter(
@@ -143,3 +148,4 @@ export function ReviewStep({ character }: ReviewStepProps) {
     </div>
   );
 }
+

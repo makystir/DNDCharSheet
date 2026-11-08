@@ -132,7 +132,8 @@ function judge(
  * proficiency when proficient), straight from savingThrowBreakdown (D7).
  */
 export function constitutionSaveBreakdown(character: Character): Breakdown {
-  return allSavingThrowBreakdowns(character).con;
+  // Un-penalised: the roll adds Exhaustion itself (counted exactly once).
+  return allSavingThrowBreakdowns(character, { exhaustion: false }).con;
 }
 
 /**

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Lock, Swords } from 'lucide-react';
 import type { Character } from '../../types/character';
 import type { MasteryProperty } from '../../data/weapons';
 import { proficiencyBonus } from '../../logic/abilities';
 import { formatSigned } from '../../logic/breakdown';
+import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import { equippedWeapons, weaponAttackProfile, type EquippedWeapon } from '../../logic/attacks';
 import { grazeDamage, itemMasteryStatus, toppleDc } from '../../logic/weapon-mastery';
 import {
@@ -117,7 +118,9 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
     const isTwoHanded = canTwoHand && twoHanded[item.id] === true;
     const profile = weaponAttackProfile(character, item, { twoHanded: isTwoHanded });
     if (!profile) return null;
-    const { attack, damage } = profile;
+    const { damage } = profile;
+    // Static attack bonus is a D20 Test total: show the Exhaustion penalty (PHB 2024 L21024).
+    const attackBreakdown = withExhaustion(profile.attack.breakdown, exhaustionLevelOf(character));
     const chips = resolveWeaponPropertyChips(weapon);
 
     const stats = (
@@ -126,10 +129,10 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
           <span className={styles.statLabel}>Attack</span>
           <CalculatedValue
             label={`${weapon.name} attack bonus`}
-            breakdown={attack.breakdown}
+            breakdown={attackBreakdown}
             className={styles.valueBtn}
           >
-            {formatSigned(attack.breakdown.total)}
+            {formatSigned(attackBreakdown.total)}
           </CalculatedValue>
         </span>
         <span className={styles.stat}>
@@ -178,7 +181,7 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
           <span className={styles.name}>{weapon.name}</span>
           <div className={styles.statsLine}>
             {stats}
-            {renderMastery(entry, attack.abilityMod)}
+            {renderMastery(entry, profile.attack.abilityMod)}
             {attackButton}
           </div>
           {proficiencyNote}
@@ -207,7 +210,7 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
               </span>
             ),
           )}
-          {renderMastery(entry, attack.abilityMod)}
+          {renderMastery(entry, profile.attack.abilityMod)}
         </div>
         {proficiencyNote}
       </li>

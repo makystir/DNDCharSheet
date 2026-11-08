@@ -26,6 +26,7 @@ import type { ClassId } from '../data/classes';
 import { getClass } from '../data/classes';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
+import { exhaustionLevelOf, withExhaustion } from './conditions';
 import { allClasses, entrySubclass, primaryClass, resolveClass } from './classes';
 import { extraCantripLabel, extraCantrips } from './class-choice-effects';
 import { effectiveAbilityScores } from './feats';
@@ -125,13 +126,17 @@ export function spellAttackBreakdown(character: Character): Breakdown | undefine
   if (ability === undefined) return undefined;
   const pb = proficiencyBonus(character.level);
   const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
-  return {
-    total: pb + mod,
-    components: [
-      { label: 'Proficiency', value: pb },
-      { label: `${ABILITY_NAMES[ability]} mod`, value: mod },
-    ],
-  };
+  // A spell attack roll is a D20 Test: Exhaustion (PHB 2024 L21024) is its own component.
+  return withExhaustion(
+    {
+      total: pb + mod,
+      components: [
+        { label: 'Proficiency', value: pb },
+        { label: `${ABILITY_NAMES[ability]} mod`, value: mod },
+      ],
+    },
+    exhaustionLevelOf(character),
+  );
 }
 
 /**
@@ -851,13 +856,17 @@ export function classSpellAttackBreakdown(
   const pb = proficiencyBonus(character.level);
   const mod = abilityModifier(effectiveAbilityScores(character)[ability]);
   const className = getClass(entry.id)?.name ?? entry.id;
-  return {
-    total: pb + mod,
-    components: [
-      { label: 'Proficiency', value: pb },
-      { label: `${className} ${ABILITY_NAMES[ability]} mod`, value: mod },
-    ],
-  };
+  // A spell attack roll is a D20 Test: Exhaustion (PHB 2024 L21024) is its own component.
+  return withExhaustion(
+    {
+      total: pb + mod,
+      components: [
+        { label: 'Proficiency', value: pb },
+        { label: `${className} ${ABILITY_NAMES[ability]} mod`, value: mod },
+      ],
+    },
+    exhaustionLevelOf(character),
+  );
 }
 
 /**

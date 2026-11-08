@@ -14,6 +14,7 @@ import { ABILITIES, ABILITY_NAMES } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classSaveProficiencies, resolveClass } from './classes';
+import { exhaustionLevelOf, withExhaustion } from './conditions';
 import { effectiveAbilityScores, featGrantedSaves } from './feats';
 
 /** The saving-throw modifier: abilityMod + (proficient ? PB : 0). */
@@ -108,19 +109,26 @@ export function savingThrowProficiency(
  */
 export function allSavingThrowBreakdowns(
   character: Character,
+  options: { exhaustion?: boolean } = {},
 ): Record<Ability, Breakdown> {
+  // A saving throw is a D20 Test: the Exhaustion penalty (-2 x level, PHB 2024
+  // "Exhaustion" L21024) is its own component. Roll flows that add Exhaustion
+  // themselves pass `exhaustion: false` so it is counted exactly once.
+  const includeExhaustion = options.exhaustion ?? true;
+  const exhaustionLevel = exhaustionLevelOf(character);
   const classGranted = classSaveProficiencies(character);
   const featGranted = featGrantedSaves(character);
   const result = {} as Record<Ability, Breakdown>;
   for (const ability of ABILITIES) {
     const proficient = character.saveProficiencies?.[ability] ?? false;
-    result[ability] = savingThrowBreakdown(
+    const base = savingThrowBreakdown(
       effectiveAbilityScores(character),
       character.level,
       ability,
       proficient,
       classGranted[ability] ?? featGranted[ability],
     );
+    result[ability] = includeExhaustion ? withExhaustion(base, exhaustionLevel) : base;
   }
   return result;
 }
