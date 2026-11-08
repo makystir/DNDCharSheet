@@ -244,7 +244,7 @@ describe('CharacterPage', () => {
       ).toBe('');
       // Speed/Darkvision are derived tiles in the Overview vitals strip (not the species card).
       expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('30 ft');
-      expect(screen.getByRole('button', { name: /Darkvision/ })).toHaveTextContent(
+      expect(screen.getByRole('button', { name: /^Darkvision:/ })).toHaveTextContent(
         'None',
       );
     });
@@ -262,7 +262,7 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('button', { name: /Speed/ })).toHaveTextContent('35 ft');
       renderPage({ species: { id: 'elf', elvenLineage: 'drow' } }, 'identity');
       expect(
-        screen.getAllByRole('button', { name: /Darkvision/ }).at(-1),
+        screen.getAllByRole('button', { name: /^Darkvision:/ }).at(-1),
       ).toHaveTextContent('120 ft');
     });
 
@@ -538,13 +538,13 @@ describe('CharacterPage', () => {
       // Perception, Proficiency Bonus, Darkvision, Hit Dice).
       renderPage({ level: 3, classes: [{ id: 'fighter', level: 3 }] }, 'identity');
       for (const name of [
-        /Armor Class/,
+        /^Armor Class:/,
         /Hit Point Maximum/,
-        /Initiative/,
+        /^Initiative:/,
         /Speed/,
-        /Passive Perception/,
+        /^Passive Perception:/,
         /Proficiency Bonus/,
-        /Darkvision/,
+        /^Darkvision:/,
         /Hit Dice remaining/,
       ]) {
         expect(screen.getByRole('button', { name })).toBeInTheDocument();

@@ -135,6 +135,6 @@ describe('OverviewVitals tiles', () => {
 
   it('shows Darkvision None when the species grants none', () => {
     render(<OverviewVitals character={make({})} />);
-    expect(text(/Darkvision/)).toBe('None');
+    expect(text(/^Darkvision:/)).toBe('None');
   });
 });

@@ -5,7 +5,8 @@ import { ALIGNMENTS } from '../../../types/character';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { EditableField } from '../../shared/EditableField';
-import { ContentTooltip } from '../../shared/ContentTooltip';
+import { ContentTooltip, MaybeContentTooltip } from '../../shared/ContentTooltip';
+import { resolveBackgroundTooltip } from '../../../logic/tooltip-content';
 import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
@@ -489,7 +490,10 @@ export function PersonalDetailsSection({
                     )}
                     {selectedBackground && (
                       <span className={styles.backgroundSelection} data-testid="pd-selected-background">
-                        Selected background: {selectedBackground.name}
+                        Selected background:{' '}
+                        <MaybeContentTooltip content={resolveBackgroundTooltip(selectedBackground.id)}>
+                          {selectedBackground.name}
+                        </MaybeContentTooltip>
                       </span>
                     )}
                   </div>

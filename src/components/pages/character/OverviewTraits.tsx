@@ -10,6 +10,15 @@ import { speciesTraits } from '../../../logic/species';
 import { knownLanguages } from '../../../logic/languages';
 import { formatLanguage } from '../sheet-helpers';
 import { Card } from '../../shared/Card';
+import { MaybeContentTooltip } from '../../shared/ContentTooltip';
+import {
+  resolveClassFeatureTooltip,
+  resolveFeatTooltip,
+  resolveLanguageTooltip,
+  resolveSpeciesTraitTooltip,
+} from '../../../logic/tooltip-content';
+import { getClass } from '../../../data/classes';
+import { resolveSpecies } from '../../../logic/species';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
@@ -87,7 +96,14 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
       <div className={styles.body} role="region" aria-labelledby={titleId} hidden={!expanded}>
         <p className={styles.languages} data-testid="overview-languages">
           <span className={styles.groupTitle}>Languages</span>
-          <span>{languages.map(formatLanguage).join(', ')}</span>
+          <span>
+            {languages.map((id, i) => (
+              <span key={id}>
+                {i > 0 && ', '}
+                <MaybeContentTooltip content={resolveLanguageTooltip(id)}>{formatLanguage(id)}</MaybeContentTooltip>
+              </span>
+            ))}
+          </span>
         </p>
         <div className={styles.groups}>
           <section className={styles.group} aria-label="Species traits">
@@ -98,7 +114,13 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
               <ul className={styles.list}>
                 {traits.map((trait) => (
                   <li key={trait.name} className={styles.item} data-testid="overview-species-trait">
-                    <span className={styles.name}>{trait.name}</span>
+                    <span className={styles.name}>
+                      <MaybeContentTooltip
+                        content={resolveSpeciesTraitTooltip(trait, resolveSpecies(character)?.name)}
+                      >
+                        {trait.name}
+                      </MaybeContentTooltip>
+                    </span>
                     <ExpandableText text={trait.effect} />
                   </li>
                 ))}
@@ -122,7 +144,9 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
                       data-testid="overview-feat"
                     >
                       <span className={styles.name}>
-                        {feat?.name ?? selection.featId}
+                        <MaybeContentTooltip content={resolveFeatTooltip(selection.featId)}>
+                          {feat?.name ?? selection.featId}
+                        </MaybeContentTooltip>
                         <span className={styles.tag}>
                           {selection.level === 0 ? 'Origin (Background)' : 'Feat'}
                         </span>
@@ -152,7 +176,13 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
               <ul className={styles.list}>
                 {features.map(({ feature, classId, subclassName }) => (
                   <li key={`${classId}-${subclassName ?? ''}-${feature.name}-${feature.level}`} className={styles.line}>
-                    <span className={styles.name}>{feature.name}</span>
+                    <span className={styles.name}>
+                      <MaybeContentTooltip
+                        content={resolveClassFeatureTooltip(feature, getClass(classId)?.name)}
+                      >
+                        {feature.name}
+                      </MaybeContentTooltip>
+                    </span>
                     <span className={styles.muted}>{subclassName ? `${subclassName}, ` : ''}Level {feature.level}</span>
                   </li>
                 ))}

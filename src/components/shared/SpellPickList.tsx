@@ -2,6 +2,7 @@ import { Sparkles } from 'lucide-react';
 import type { CatalogSpell, SpellId } from '../../data/spells';
 import { SCHOOL_LABELS } from './spellSchoolLabels';
 import { ContentTooltip } from './ContentTooltip';
+import { resolveSpellTooltip } from '../../logic/tooltip-content';
 import { EmptyState } from './EmptyState';
 import styles from './SpellPickList.module.css';
 
@@ -100,7 +101,7 @@ export function SpellPickList({
                 {s.ritual && <span className={styles.tag}>Ritual</span>}
                 <ContentTooltip
                   className={styles.detailsTrigger}
-                  content={{
+                  content={resolveSpellTooltip(s.id) ?? {
                     title: s.name,
                     sections: [
                       {

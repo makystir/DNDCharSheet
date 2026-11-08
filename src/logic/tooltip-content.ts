@@ -39,7 +39,14 @@ import { getFeat, type FeatCategory } from '../data/feats';
 import { getInvocation } from '../data/invocations';
 import { entrySubclass, resolveClasses } from './classes';
 import type { ResourceState } from './resources';
-import { ABILITY_NAMES, type Ability } from '../types/character';
+import { ABILITY_NAMES, SKILLS, type Ability, type SkillId } from '../types/character';
+import { ABILITY_INFO, SKILL_INFO, LANGUAGE_INFO, VITAL_INFO, type VitalId } from '../data/rules-text';
+import { getSpell, type SpellData } from '../data/spells';
+import { getBackground } from '../data/backgrounds';
+import { effectiveSkillTraining } from './skills';
+import { savingThrowProficiency } from './saving-throws';
+import type { ClassFeature } from '../data/classes';
+import type { SpeciesTrait } from '../data/species';
 
 /** Structured content for a tooltip popover (same shape as the PWA source). */
 export interface TooltipContent {
@@ -845,4 +852,147 @@ export function resolveResourceTooltip(character: Character, state: ResourceStat
   }
   if (sections.length === 0) return null;
   return { title: state.name, sections };
+}
+
+// ─── Skills, abilities, saving throws, spells, features, backgrounds, languages ───
+
+/**
+ * Tooltip for an ability score: what it measures, what its saving throw resists
+ * and which skills use it (PHB 2024 Ability Descriptions / Saving Throw Examples).
+ */
+export function resolveAbilityTooltip(ability: Ability): TooltipContent {
+  const info = ABILITY_INFO[ability];
+  const skills = SKILLS.filter((s) => s.ability === ability).map((s) => s.name);
+  const sections: { label: string; text: string }[] = [
+    { label: 'Measures', text: info.measures },
+    { label: 'Saving throw', text: `Make this save to: ${info.saveTo.charAt(0).toLowerCase()}${info.saveTo.slice(1)}.` },
+  ];
+  if (skills.length > 0) sections.push({ label: 'Skills', text: skills.join(', ') });
+  sections.push({ label: 'Source', text: info.source });
+  return { title: ABILITY_NAMES[ability], sections };
+}
+
+/**
+ * Tooltip for a skill: its governing ability and example uses. With a character,
+ * also the character's training (proficient / Expertise and where it comes from).
+ * PHB 2024 Skills table (L535-554).
+ */
+export function resolveSkillTooltip(skillId: SkillId, character?: Character): TooltipContent | null {
+  const skill = SKILLS.find((s) => s.id === skillId);
+  if (!skill) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: 'Ability', text: ABILITY_NAMES[skill.ability] },
+    { label: 'Example uses', text: SKILL_INFO[skillId].uses },
+  ];
+  if (character) {
+    const t = effectiveSkillTraining(character, skillId);
+    const status = t.expertise ? 'Expertise (Proficiency Bonus counted twice)' : t.proficient ? 'Proficient' : 'Not proficient';
+    sections.push({ label: 'Your training', text: t.sourceLabel ? `${status}: ${t.sourceLabel}` : status });
+  }
+  sections.push({ label: 'Source', text: 'PHB 2024 Skills table (L535)' });
+  return { title: `${skill.name} (${ABILITY_NAMES[skill.ability]})`, sections };
+}
+
+/**
+ * Tooltip for a saving throw: what that ability's save is used for and, with a
+ * character, whether they are proficient in it (PHB 2024 Saving Throws, L403-419).
+ */
+export function resolveSaveTooltip(ability: Ability, character?: Character): TooltipContent {
+  const info = ABILITY_INFO[ability];
+  const sections: { label: string; text: string }[] = [
+    { label: 'Use', text: `Make this save to: ${info.saveTo.charAt(0).toLowerCase()}${info.saveTo.slice(1)}.` },
+  ];
+  if (character) {
+    const p = savingThrowProficiency(character, ability);
+    const how = p.source === 'class' ? ` (${p.classLabel ?? 'class'})` : p.source === 'feat' ? ' (feat)' : p.source === 'manual' ? ' (marked manually)' : '';
+    sections.push({ label: 'Your training', text: p.proficient ? `Proficient${how}: add your Proficiency Bonus.` : 'Not proficient.' });
+  }
+  sections.push({ label: 'Source', text: 'PHB 2024 Saving Throw Examples (L412)' });
+  return { title: `${ABILITY_NAMES[ability]} saving throw`, sections };
+}
+
+/**
+ * Tooltip for a spell: level and school, casting time, range, components,
+ * duration (with Concentration / Ritual) and the catalog's short description.
+ */
+export function resolveSpellTooltip(spellId: string): TooltipContent | null {
+  const spell: SpellData | undefined = getSpell(spellId);
+  if (!spell) return null;
+  const comps = [spell.components.verbal ? 'V' : '', spell.components.somatic ? 'S' : '', spell.components.material ? 'M' : '']
+    .filter(Boolean)
+    .join(', ');
+  const materials = spell.components.material ? ` (${spell.components.material})` : '';
+  const school = spell.school.charAt(0).toUpperCase() + spell.school.slice(1);
+  const level = spell.level === 0 ? `Cantrip, ${school}` : `Level ${spell.level} ${school}`;
+  const flags = [spell.concentration ? 'Concentration' : '', spell.ritual ? 'Ritual' : ''].filter(Boolean).join(', ');
+  const sections: { label: string; text: string }[] = [
+    { label: 'Level', text: level },
+    { label: 'Casting time', text: spell.castingTime },
+    { label: 'Range', text: spell.range },
+    { label: 'Components', text: `${comps || 'None'}${materials}` },
+    { label: 'Duration', text: spell.duration },
+  ];
+  if (flags) sections.push({ label: 'Tags', text: flags });
+  sections.push({ label: 'Effect', text: spell.description });
+  return { title: spell.name, sections };
+}
+
+/** Tooltip for a class or subclass feature (paraphrased effect from the catalog). */
+export function resolveClassFeatureTooltip(feature: ClassFeature, origin?: string): TooltipContent {
+  const sections: { label: string; text: string }[] = [];
+  sections.push({ label: 'Gained', text: `${origin ? `${origin}, ` : ''}level ${feature.level}` });
+  sections.push({ label: 'Effect', text: feature.effect });
+  if (feature.source) sections.push({ label: 'Source', text: feature.source });
+  return { title: feature.name, sections };
+}
+
+/** Tooltip for a species trait (paraphrased effect from the catalog). */
+export function resolveSpeciesTraitTooltip(trait: SpeciesTrait, speciesName?: string): TooltipContent {
+  const sections: { label: string; text: string }[] = [];
+  if (speciesName) sections.push({ label: 'Species', text: speciesName });
+  sections.push({ label: 'Effect', text: trait.effect });
+  if (trait.source) sections.push({ label: 'Source', text: trait.source });
+  return { title: trait.name, sections };
+}
+
+/** Tooltip for a background: its grants plus the catalog's short description. */
+export function resolveBackgroundTooltip(backgroundId: string | undefined): TooltipContent | null {
+  const bg = getBackground(backgroundId);
+  if (!bg) return null;
+  const skillNames = bg.skills.map((id) => SKILLS.find((s) => s.id === id)?.name ?? id).join(', ');
+  const feat = getFeat(bg.originFeatId);
+  return {
+    title: bg.name,
+    sections: [
+      { label: 'Ability scores', text: bg.abilities.map((a) => ABILITY_NAMES[a]).join(', ') },
+      { label: 'Skill proficiencies', text: skillNames },
+      { label: 'Tool proficiency', text: bg.tool.label },
+      { label: 'Origin feat', text: feat?.name ?? bg.originFeatId },
+      { label: 'About', text: bg.description },
+      { label: 'Source', text: bg.source },
+    ],
+  };
+}
+
+/** Tooltip for a language id (e.g. 'elvish'): its origin and whether it is standard or rare. */
+export function resolveLanguageTooltip(languageId: string): TooltipContent | null {
+  const info = LANGUAGE_INFO[languageId];
+  if (!info) return null;
+  return {
+    title: info.name,
+    sections: [
+      { label: 'Origin', text: info.origin },
+      { label: 'Kind', text: info.kind === 'standard' ? 'Standard language' : 'Rare language' },
+      { label: 'Source', text: 'PHB 2024 Standard and Rare Languages tables (L1631)' },
+    ],
+  };
+}
+
+/** Tooltip for an Overview vitals label (what the stat means; its calculation stays in the breakdown tooltip). */
+export function resolveVitalTooltip(id: VitalId): TooltipContent {
+  const info = VITAL_INFO[id];
+  const sections: { label: string; text: string }[] = [{ label: 'What it is', text: info.text }];
+  if (info.formula) sections.push({ label: 'Formula', text: info.formula });
+  sections.push({ label: 'Source', text: info.source });
+  return { title: info.title, sections };
 }

@@ -21,6 +21,9 @@ import { darkvisionBreakdown, speedBreakdown } from '../../../logic/species';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { MaybeContentTooltip } from '../../shared/ContentTooltip';
+import { resolveVitalTooltip } from '../../../logic/tooltip-content';
+import type { VitalId } from '../../../data/rules-text';
 import styles from './OverviewVitals.module.css';
 
 export interface OverviewVitalsProps {
@@ -35,12 +38,22 @@ interface TileProps {
   /** Extra line under the value. */
   sub?: ReactNode;
   testId?: string;
+  /** Which vital this tile shows, for the content tooltip on its label. */
+  hint?: VitalId;
 }
 
-function Tile({ label, children, manage, sub, testId }: TileProps) {
+function Tile({ label, children, manage, sub, testId, hint }: TileProps) {
   return (
     <div className={styles.tile} data-testid={testId}>
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label}>
+        {hint ? (
+          <MaybeContentTooltip content={resolveVitalTooltip(hint)} ariaLabel={`About ${label}`}>
+            {label}
+          </MaybeContentTooltip>
+        ) : (
+          label
+        )}
+      </span>
       <span className={styles.value}>
         {children}
       </span>
@@ -103,7 +116,7 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
         >
           {character.level}
         </Tile>
-        <Tile label="Armor Class" manage={combatLink}>
+        <Tile label="Armor Class" hint="armorClass" manage={combatLink}>
           <CalculatedValue label="Armor Class" breakdown={ac} />
         </Tile>
         <Tile
@@ -145,7 +158,7 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
             '—'
           )}
         </Tile>
-        <Tile label="Initiative" manage={combatLink}>
+        <Tile label="Initiative" hint="initiative" manage={combatLink}>
           <CalculatedValue label="Initiative" breakdown={initiative}>
             {formatSigned(initiative.total)}
           </CalculatedValue>
@@ -155,7 +168,7 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
             {speed.total} ft
           </CalculatedValue>
         </Tile>
-        <Tile label="Passive Perception">
+        <Tile label="Passive Perception" hint="passivePerception">
           <CalculatedValue label="Passive Perception" breakdown={passivePerception} />
         </Tile>
         <Tile label="Proficiency Bonus">
@@ -163,13 +176,14 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
             {formatSigned(proficiency.total)}
           </CalculatedValue>
         </Tile>
-        <Tile label="Darkvision">
+        <Tile label="Darkvision" hint="darkvision">
           <CalculatedValue label="Darkvision" breakdown={darkvision}>
             {darkvision.total > 0 ? `${darkvision.total} ft` : 'None'}
           </CalculatedValue>
         </Tile>
         <Tile
           label="Hit Dice"
+          hint="hitDice"
           manage={combatLink}
           testId="vital-hit-dice"
           sub={

@@ -7,10 +7,28 @@ import {
   isReactionSpent,
 } from '../../../logic/reactions';
 import type { ReactionEntry, ReactionKind, ReactionUnavailable } from '../../../logic/reactions';
+import type { TooltipContent } from '../../../logic/tooltip-content';
 import { Card } from '../../shared/Card';
+import { MaybeContentTooltip } from '../../shared/ContentTooltip';
+import { resolveSpellTooltip } from '../../../logic/tooltip-content';
+import { SPELL_CATALOG } from '../../../data/spells';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewEmpty, OverviewFooter } from './OverviewShared';
 import styles from './OverviewReactions.module.css';
+
+/** Tooltip for a reaction: the full spell tooltip for spells, else its origin, effect and source. */
+function reactionTooltip(entry: ReactionEntry): TooltipContent | null {
+  if (entry.kind === 'spell') {
+    const spell = SPELL_CATALOG.find((s) => s.name === entry.name);
+    const tip = spell ? resolveSpellTooltip(spell.id) : null;
+    if (tip) return tip;
+  }
+  const sections: TooltipContent['sections'] = [];
+  if (entry.origin) sections.push({ label: 'From', text: entry.origin });
+  sections.push({ label: 'Effect', text: entry.summary });
+  if (entry.source) sections.push({ label: 'Source', text: entry.source });
+  return { title: entry.name, sections };
+}
 
 export interface OverviewReactionsProps {
   character: Character;
@@ -82,7 +100,9 @@ export function OverviewReactions({ character }: OverviewReactionsProps) {
               data-testid="overview-reaction"
             >
               <span className={styles.head}>
-                <span className={styles.name}>{entry.name}</span>
+                <span className={styles.name}>
+                  <MaybeContentTooltip content={reactionTooltip(entry)}>{entry.name}</MaybeContentTooltip>
+                </span>
                 <span className={styles.tag}>
                   {KIND_LABEL[entry.kind]}
                   {entry.origin ? ` \u00B7 ${entry.origin}` : ''}

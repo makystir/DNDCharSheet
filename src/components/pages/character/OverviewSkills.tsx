@@ -9,6 +9,8 @@ import { usePersistedExpanded } from '../../../hooks/usePersistedExpanded';
 import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SectionHeader } from '../../shared/SectionHeader';
+import { MaybeContentTooltip } from '../../shared/ContentTooltip';
+import { resolveSaveTooltip, resolveSkillTooltip } from '../../../logic/tooltip-content';
 import { OverviewFooter } from './OverviewShared';
 import styles from './OverviewSkills.module.css';
 
@@ -61,7 +63,14 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
                 className={`${styles.chip} ${proficient ? styles.trained : ''}`}
                 data-testid={`overview-save-${ability}`}
               >
-                <span className={styles.chipName}>{ABILITY_ABBR[ability]}</span>
+                <span className={styles.chipName}>
+                  <MaybeContentTooltip
+                    content={resolveSaveTooltip(ability, character)}
+                    ariaLabel={`About ${ABILITY_NAMES[ability]} saving throw`}
+                  >
+                    {ABILITY_ABBR[ability]}
+                  </MaybeContentTooltip>
+                </span>
                 <CalculatedValue label={`${ABILITY_NAMES[ability]} Save`} breakdown={breakdown}>
                   {formatSigned(breakdown.total)}
                 </CalculatedValue>
@@ -91,7 +100,12 @@ export function OverviewSkills({ character }: OverviewSkillsProps) {
                 data-testid={`overview-skill-${skill.id}`}
               >
                 <span className={styles.name}>
-                  {skill.name}
+                  <MaybeContentTooltip
+                    content={resolveSkillTooltip(skill.id, character)}
+                    ariaLabel={`About ${skill.name}`}
+                  >
+                    {skill.name}
+                  </MaybeContentTooltip>
                   <span className={styles.ability}> ({ABILITY_ABBR[skill.ability]})</span>
                 </span>
                 {/* Fixed-width marker slot keeps every modifier at the same x. */}

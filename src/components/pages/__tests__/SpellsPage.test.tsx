@@ -154,7 +154,10 @@ describe('SpellsPage — always-prepared feature spells', () => {
     expect(huntersMark).toBeChecked();
     expect(huntersMark).toBeDisabled();
     // The always-prepared note names it.
-    expect(screen.getByText(/Always prepared.*Hunter.s Mark/i)).toBeInTheDocument();
+    // The names are tooltip triggers now, so match on the paragraph's combined text.
+    expect(
+      screen.getByText((_, el) => el?.tagName === 'P' && /Always prepared.*Hunter.s Mark/i.test(el.textContent ?? '')),
+    ).toBeInTheDocument();
     // The discretionary prepared count excludes it (starts at 0 of the cap).
     expect(screen.getByRole('button', { name: /Prepared chosen/ })).toHaveTextContent('0');
     // Clicking the locked row does not write it into the prepared set.

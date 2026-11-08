@@ -23,13 +23,13 @@ describe('derived totals survive the page split', () => {
     // Proficiency Bonus, Darkvision and Hit Dice.
     render(<CharacterPage character={character} onChange={vi.fn()} subTab="identity" />);
     for (const name of [
-      /Armor Class/,
+      /^Armor Class:/,
       /Hit Point Maximum/,
-      /Initiative/,
+      /^Initiative:/,
       /Speed/,
-      /Passive Perception/,
+      /^Passive Perception:/,
       /Proficiency Bonus/,
-      /Darkvision/,
+      /^Darkvision:/,
       /Hit Dice remaining/,
     ]) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument();
@@ -67,10 +67,10 @@ describe('derived totals survive the page split', () => {
 
     // P2: AC, Initiative, Passive Perception and HP max now live together in the
     // ONE consolidated Defenses & Combat Stats panel (DefenseReadout).
-    expect(screen.getAllByRole('button', { name: /Armor Class/ }).length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: /Initiative/ })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Armor Class:/ }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /^Initiative:/ })).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Passive Perception/ }),
+      screen.getByRole('button', { name: /^Passive Perception:/ }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Hit Point Maximum/ }),

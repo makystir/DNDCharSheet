@@ -11,6 +11,12 @@ export interface ContentTooltipProps {
   children: ReactNode;
   /** Optional extra className for the trigger element. */
   className?: string;
+  /**
+   * Accessible name for the trigger. Defaults to the visible text. Set it (e.g.
+   * "About Armor Class") where a CalculatedValue trigger with the same visible
+   * label sits beside it, so the two buttons have distinct names.
+   */
+  ariaLabel?: string;
 }
 
 /**
@@ -23,7 +29,7 @@ export interface ContentTooltipProps {
  * TooltipContent sections instead of a numeric Breakdown, so weapon/armor/item
  * cards and property chips can surface the A1 catalog descriptions.
  */
-export function ContentTooltip({ content, children, className }: ContentTooltipProps) {
+export function ContentTooltip({ content, children, className, ariaLabel }: ContentTooltipProps) {
   const [triggerEl, setTriggerEl] = useState<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const tooltipId = useId();
@@ -39,6 +45,7 @@ export function ContentTooltip({ content, children, className }: ContentTooltipP
         type="button"
         className={`${styles.trigger}${className ? ` ${className}` : ''}`}
         aria-describedby={open ? tooltipId : undefined}
+        aria-label={ariaLabel}
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}
@@ -60,5 +67,27 @@ export function ContentTooltip({ content, children, className }: ContentTooltipP
         </Tooltip>
       )}
     </>
+  );
+}
+
+export interface MaybeContentTooltipProps {
+  /** Resolver output, or null/undefined when there is no content for this item. */
+  content: TooltipContent | null | undefined;
+  children: ReactNode;
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * ContentTooltip that degrades to plain children when a resolver returned no
+ * content (content-tooltips steering: "return null to omit"), so call sites can
+ * pass a resolver result directly without branching.
+ */
+export function MaybeContentTooltip({ content, children, className, ariaLabel }: MaybeContentTooltipProps) {
+  if (!content) return <>{children}</>;
+  return (
+    <ContentTooltip content={content} className={className} ariaLabel={ariaLabel}>
+      {children}
+    </ContentTooltip>
   );
 }

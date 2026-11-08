@@ -35,7 +35,7 @@ describe('OverviewSkills', () => {
     }
     for (const ability of ABILITIES) {
       const chip = screen.getByTestId(`overview-save-${ability}`);
-      const button = within(chip).getByRole('button');
+      const button = within(chip).getByRole('button', { name: /Save:/ });
       expect(button.textContent).toBe(formatSigned(saves[ability].total));
     }
   });
@@ -114,10 +114,26 @@ describe('OverviewSkills', () => {
     const tab = allSkillBreakdowns(character);
     for (const skill of SKILLS) {
       const row = screen.getByTestId(`overview-skill-${skill.id}`);
-      const shown = within(row).getByRole('button').textContent;
+      const shown = within(row).getByRole('button', { name: /Check:/ }).textContent;
       expect(shown).toBe(formatSigned(tab[skill.id].total));
       const training = getSkillTraining(character, skill.id);
       expect(Boolean(within(row).queryByRole('img'))).toBe(Boolean(training.proficient));
     }
+  });
+});
+
+describe('OverviewSkills content tooltips', () => {
+  it('opens a skill tooltip with its ability, example uses and the character\u2019s training', () => {
+    render(<OverviewSkills character={character} />);
+    fireEvent.click(screen.getByRole('button', { name: 'About Acrobatics' }));
+    expect(screen.getByText('Acrobatics (Dexterity)')).toBeInTheDocument();
+    expect(screen.getByText(/Stay on your feet in a tricky situation/)).toBeInTheDocument();
+    expect(screen.getByText('Your training')).toBeInTheDocument();
+  });
+
+  it('opens a saving throw tooltip describing what the save is for', () => {
+    render(<OverviewSkills character={character} />);
+    fireEvent.click(screen.getByRole('button', { name: 'About Dexterity saving throw' }));
+    expect(screen.getByText(/dodge out of harm.s way/i)).toBeInTheDocument();
   });
 });

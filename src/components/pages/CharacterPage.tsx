@@ -33,6 +33,8 @@ import type { ClassData } from '../../data/classes';
 import type { ClassEntry, SpeciesSelection } from '../../types/character';
 import { useEffect, useState } from 'react';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { resolveAbilityTooltip, resolveSaveTooltip, resolveSkillTooltip } from '../../logic/tooltip-content';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
@@ -420,8 +422,13 @@ export function CharacterPage({
             const scoreBreakdown = abilityScoreBreakdown(character, ability);
             return (
               <div key={ability} className={styles.abilityCard}>
-                <span className={styles.abilityName} title={ABILITY_NAMES[ability]}>
-                  {ABILITY_ABBR[ability]}
+                <span className={styles.abilityName}>
+                  <MaybeContentTooltip
+                    content={resolveAbilityTooltip(ability)}
+                    ariaLabel={`About ${ABILITY_NAMES[ability]}`}
+                  >
+                    {ABILITY_ABBR[ability]}
+                  </MaybeContentTooltip>
                 </span>
                 <span className={styles.abilityMod}>
                   <CalculatedValue
@@ -480,7 +487,12 @@ export function CharacterPage({
               return (
                 <li key={ability} className={styles.statRow}>
                   <span className={styles.statName}>
-                    {ABILITY_NAMES[ability]}
+                    <MaybeContentTooltip
+                      content={resolveSaveTooltip(ability, character)}
+                      ariaLabel={`About ${ABILITY_NAMES[ability]} saving throw`}
+                    >
+                      {ABILITY_NAMES[ability]}
+                    </MaybeContentTooltip>
                     {fromClass && (
                       <span className={styles.saveSource}>from {profInfo.classLabel} (class)</span>
                     )}
@@ -527,7 +539,12 @@ export function CharacterPage({
               return (
                 <li key={skill.id} className={styles.statRow}>
                   <span className={styles.statName}>
-                    {skill.name}{' '}
+                    <MaybeContentTooltip
+                      content={resolveSkillTooltip(skill.id, character)}
+                      ariaLabel={`About ${skill.name}`}
+                    >
+                      {skill.name}
+                    </MaybeContentTooltip>{' '}
                     <span className={styles.statAbility}>
                       ({ABILITY_ABBR[skill.ability]})
                     </span>

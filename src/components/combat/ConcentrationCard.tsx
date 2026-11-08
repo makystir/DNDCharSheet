@@ -3,10 +3,10 @@ import { Brain } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { getSpell } from '../../data/spells';
 import { endConcentration } from '../../logic/concentration';
-import { resolveRestRuleTooltip } from '../../logic/tooltip-content';
+import { resolveRestRuleTooltip, resolveSpellTooltip } from '../../logic/tooltip-content';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
-import { ContentTooltip } from '../shared/ContentTooltip';
+import { ContentTooltip, MaybeContentTooltip } from '../shared/ContentTooltip';
 import styles from './Concentration.module.css';
 
 export interface ConcentrationCardProps {
@@ -68,7 +68,11 @@ export function ConcentrationCard({ character, onChange, onNotify }: Concentrati
               <span className={styles.chipLabel}>
                 {tip ? <ContentTooltip content={tip}>Concentrating on</ContentTooltip> : 'Concentrating on'}
               </span>
-              <span className={styles.spellName}>{name}</span>
+              <span className={styles.spellName}>
+                <MaybeContentTooltip content={spellId ? resolveSpellTooltip(spellId) : null}>
+                  {name}
+                </MaybeContentTooltip>
+              </span>
             </span>
             <button type="button" className={styles.endBtn} onClick={handleEnd}>
               End Concentration

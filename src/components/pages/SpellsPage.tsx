@@ -59,6 +59,8 @@ import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EmptyState } from '../shared/EmptyState';
 import { SpellPickList } from '../shared/SpellPickList';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { resolveSpellTooltip } from '../../logic/tooltip-content';
 import { SCHOOL_LABELS } from '../shared/spellSchoolLabels';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
@@ -95,6 +97,20 @@ const CASTER_KIND_LABELS = {
   third: 'Third caster',
   pact: 'Pact Magic',
 } as const;
+
+/** Comma-separated spell names, each with its spell tooltip (content-tooltips steering). */
+function SpellNameList({ ids }: { ids: readonly string[] }) {
+  return (
+    <>
+      {ids.map((id, i) => (
+        <span key={id}>
+          {i > 0 && ', '}
+          <MaybeContentTooltip content={resolveSpellTooltip(id)}>{getSpell(id)?.name ?? id}</MaybeContentTooltip>
+        </span>
+      ))}
+    </>
+  );
+}
 
 function spellLevelLabel(level: number): string {
   return level === 0 ? 'Cantrips' : `Level ${level}`;
@@ -874,9 +890,7 @@ export function SpellsPage({
                 <p className={styles.capLabel}>
                   Always prepared (from class features, not counted against the
                   cap):{' '}
-                  {alwaysPrepared
-                    .map((id) => getSpell(id)?.name ?? id)
-                    .join(', ')}
+                  <SpellNameList ids={alwaysPrepared} />
                   .
                 </p>
               )}
@@ -1256,7 +1270,7 @@ function PreparedClassSection({
           {alwaysPrepared.length > 0 && (
             <p className={styles.capLabel}>
               Always prepared (from class features, not counted against the cap):{' '}
-              {alwaysPrepared.map((id) => getSpell(id)?.name ?? id).join(', ')}.
+              <SpellNameList ids={alwaysPrepared} />.
             </p>
           )}
           {preparableSpells.length > 0 || alwaysPrepared.length > 0 ? (
