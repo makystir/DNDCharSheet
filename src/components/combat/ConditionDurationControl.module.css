@@ -1,0 +1,71 @@
+/* Structured condition duration editor (Stage E). */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.current,
+.setter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.value {
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.none {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.input {
+  min-height: 36px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.9rem;
+}
+input.input[type='number'] {
+  width: 90px;
+}
+.btn {
+  min-height: 36px;
+  padding: 4px 12px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+@media (hover: none), (max-width: 767px) {
+  .btn,
+  .input {
+    min-height: 44px;
+  }
+}

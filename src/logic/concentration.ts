@@ -38,6 +38,7 @@ import type { SpellId } from '../data/spells';
 import type { Character } from '../types/character';
 import { effectiveConditionIds, lifeStatus } from './hit-points-state';
 import { exhaustionLevelOf, impliedConditions } from './conditions';
+import { expireOnConcentrationEnd } from './condition-duration';
 import { d20TestBreakdown } from './dice';
 import { allSavingThrowBreakdowns } from './saving-throws';
 
@@ -173,7 +174,9 @@ export function endConcentration(character: Character): Character {
   if (!character.concentration) return character;
   const { concentration: _removed, ...rest } = character;
   void _removed;
-  return rest;
+  // Stage E: conditions whose structured duration is "while concentrating" end
+  // with the Concentration (PHB "Concentration", L20767-20777).
+  return expireOnConcentrationEnd(rest);
 }
 
 /**
@@ -202,7 +205,8 @@ export function startConcentration(
   if (!requiresConcentration) return { character };
   const previous = character.concentration?.spellId;
   const next: Character = { ...character, concentration: { spellId } };
+  // Stage E: the previous effect ended, so its Concentration-linked conditions end.
   return previous !== undefined && previous !== spellId
-    ? { character: next, endedPrevious: previous }
+    ? { character: expireOnConcentrationEnd(next), endedPrevious: previous }
     : { character: next };
 }

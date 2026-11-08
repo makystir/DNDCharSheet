@@ -12,6 +12,7 @@ import {
 import { getSpell } from '../../../data/spells';
 import { exhaustionEffects, exhaustionLevelOf, impliedConditions } from '../../../logic/conditions';
 import { attackerConditionSuggestions } from '../../../logic/attacks';
+import { describeDuration, durationBreakdown } from '../../../logic/condition-duration';
 import {
   derivedConditionIds,
   effectiveConditionIds,
@@ -62,6 +63,23 @@ export function OverviewConditions({ character }: OverviewConditionsProps) {
   const suggestions = attackerConditionSuggestions(character);
   const isEmpty = ids.length === 0 && exhaustion === 0;
 
+  // Stage E: the structured duration, read-only here (edited on Combat only).
+  const durationOf = (id: ConditionId) => (character.conditions ?? []).find((c) => c.id === id)?.duration;
+  const durationText = (id: ConditionId): string | null => describeDuration(durationOf(id));
+  const durationNode = (id: ConditionId) => {
+    const duration = durationOf(id);
+    const text = describeDuration(duration);
+    const breakdown = durationBreakdown(duration);
+    if (!text) return null;
+    return breakdown ? (
+      <CalculatedValue label={`${getCondition(id)?.name ?? id} remaining rounds`} breakdown={breakdown}>
+        {text}
+      </CalculatedValue>
+    ) : (
+      text
+    );
+  };
+
   const attackLine = (side: 'advantage' | 'disadvantage'): string | null => {
     const names = suggestions
       .filter((s) => s.side === side)
@@ -102,6 +120,11 @@ export function OverviewConditions({ character }: OverviewConditionsProps) {
                   )}
                 </span>
                 {origin && <span className={styles.origin}>{origin}</span>}
+                {durationText(id) && (
+                  <span className={styles.origin} data-testid={`overview-duration-${id}`}>
+                    Duration: {durationNode(id)}
+                  </span>
+                )}
                 <div className={styles.effects}>
                   {effects.slice(0, VISIBLE_EFFECTS).map((e) => (
                     <p key={e} className={styles.effect}>

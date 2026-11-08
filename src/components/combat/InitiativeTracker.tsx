@@ -2,7 +2,9 @@ import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronUp, Dices, Timer, X } from 'lucide-react';
 import type { Character } from '../../types/character';
+import { getCondition } from '../../data/conditions';
 import { exhaustionLevelOf } from '../../logic/conditions';
+import { advanceCombatTurn } from '../../logic/condition-duration';
 import {
   activeCombatant,
   addCombatant,
@@ -168,12 +170,18 @@ export function InitiativeTracker({ character, onChange }: InitiativeTrackerProp
 
   const handleAdvance = (direction: 'next' | 'previous') => {
     if (!combat) return;
-    const next = advanceTurn(combat, direction);
-    if (next === combat) return;
+    // Stage E: a new round also ticks the timed condition durations.
+    const advanced = advanceCombatTurn(character, direction);
+    const next = advanced.character.combat;
+    if (!next || advanced.character === character) return;
     const who = activeCombatant(next);
+    const ended =
+      advanced.expired.length > 0
+        ? ` Ended: ${advanced.expired.map((id) => getCondition(id)?.name ?? id).join(', ')}.`
+        : '';
     commit(
-      { ...character, combat: next },
-      `Round ${next.round}. ${who ? `${who.name}'s turn.` : 'No combatants.'}`,
+      advanced.character,
+      `Round ${next.round}. ${who ? `${who.name}'s turn.` : 'No combatants.'}${ended}`,
     );
   };
 

@@ -27,6 +27,7 @@ import { AddButton } from '../shared/AddButton';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { ConditionPicker } from './ConditionPicker';
+import { ConditionDurationControl } from './ConditionDurationControl';
 import styles from './ActiveConditions.module.css';
 
 export interface ActiveConditionsProps {
@@ -127,6 +128,7 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
                   </div>
                 </div>
                 {implied && <span className={styles.implied}>{implied}</span>}
+                <ConditionDurationControl character={character} condition={cond} onChange={onChange} />
                 <label className={styles.endsLabel}>
                   Ends / note
                   <input

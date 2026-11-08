@@ -24,6 +24,7 @@ import type { Character } from '../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../types/character';
 import { sanitizeClassChoices } from '../logic/class-choices';
 import { sanitizeResourcesSpent } from '../logic/resources';
+import { isConcentrating, sanitizeConditionDurations } from '../logic/condition-duration';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
@@ -207,6 +208,14 @@ export function importFromJSON(json: string): ImportResult {
   if (sanitizedResources) migrated.character.resourcesSpent = sanitizedResources;
   else delete migrated.character.resourcesSpent;
 
+  // Condition durations (Stage E) are additive-optional and untrusted: only the
+  // `duration` of each entry is validated; legacy free-text entries are untouched.
+  if (Array.isArray(migrated.character.conditions)) {
+    migrated.character.conditions = sanitizeConditionDurations(
+      migrated.character.conditions,
+      isConcentrating(migrated.character.concentration),
+    ) as Character['conditions'];
+  }
   // Reset identity so the manager adopts this as a NEW character (never clobber
   // the active one). The store/manager assigns a fresh id + timestamps.
   const character: Character = {

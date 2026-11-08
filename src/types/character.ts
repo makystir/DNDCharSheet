@@ -414,13 +414,38 @@ export interface InventoryItem {
  * One active condition on a character (Stage A4). `id` is a PHB condition id
  * other than Exhaustion (Exhaustion uses `Character.exhaustionLevel`). `note`
  * is a free-text source label; `ends` is a free-text note on how/when it ends
- * (rounds, save-ends, until a rest). D&D durations are heterogeneous, so a
- * richer duration model is deliberately deferred.
+ * (rounds, save-ends, until a rest) and stays available as the label/notes
+ * field. `duration` (Stage E) is an additive-optional STRUCTURED duration that
+ * can tick down and expire; absent = the free-text-only behaviour of older saves.
  */
 export interface ActiveCondition {
   id: Exclude<ConditionId, 'exhaustion'>;
   note?: string;
   ends?: string;
+  duration?: ConditionDuration;
+}
+
+/**
+ * Structured duration of one active condition (Stage E bookkeeping; the PHB has
+ * no generic condition duration, L1210-1212). `rounds`, `minutes` and `hours`
+ * are TIMED: `rounds` is the REMAINING count in combat rounds (1 minute = 10
+ * rounds, 1 hour = 600; the kind only chooses the display unit). `short-rest`
+ * and `long-rest` end when that rest completes; `concentration` ends with the
+ * character's Concentration; `manual` never expires by itself.
+ */
+export type ConditionDurationKind =
+  | 'rounds'
+  | 'minutes'
+  | 'hours'
+  | 'short-rest'
+  | 'long-rest'
+  | 'concentration'
+  | 'manual';
+
+export interface ConditionDuration {
+  kind: ConditionDurationKind;
+  /** Remaining rounds; present (integer >= 1) only for the timed kinds. */
+  rounds?: number;
 }
 
 /**
@@ -465,6 +490,12 @@ export interface CombatState {
   inCombat: boolean;
   /** Round number, starting at 1. */
   round: number;
+  /**
+   * Highest round whose start already ticked the condition timers (Stage E
+   * bookkeeping), so stepping back and forward over one boundary ticks once.
+   * Optional and additive; absent means "the current round".
+   */
+  tickedThroughRound?: number;
   /** Roster in Initiative order (highest first; ties in the user's chosen order). */
   combatants: Combatant[];
   /** Index into `combatants` of the combatant whose turn it is. */

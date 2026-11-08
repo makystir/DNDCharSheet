@@ -55,6 +55,7 @@ import { hitDiceTotal, resolveClass } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { exhaustionAfterLongRest, exhaustionLevelOf, setExhaustion } from './conditions';
 import { endConcentration } from './concentration';
+import { expireOnRest } from './condition-duration';
 import {
   applyHealing,
   effectiveHp,
@@ -256,6 +257,8 @@ export function shortRest(character: Character, options: ShortRestOptions): Rest
   next = withoutSlotFields(next, ['pactSlotsExpended']);
   const shortRecharge = rechargeResources(next, 'short');
   next = shortRecharge.character;
+  // Stage E: a completed Short Rest ends "until a Short Rest" durations only.
+  next = expireOnRest(next, 'short');
 
   const note =
     state && hpGained < total
@@ -328,6 +331,8 @@ export function longRest(character: Character, options: LongRestOptions = {}): R
   if (options.now !== undefined && Number.isFinite(options.now)) next.lastLongRestAt = options.now;
   const longRecharge = rechargeResources(next, 'long');
   next = longRecharge.character;
+  // Stage E: a completed Long Rest ends "until a Short/Long Rest" durations.
+  next = expireOnRest(next, 'long');
   const hpBefore = effectiveHp(character);
   const hpAfter = effectiveHp(next);
   const spentBefore = wholeNonNegative(character.hitDiceSpent);
