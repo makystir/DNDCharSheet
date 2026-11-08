@@ -12,8 +12,15 @@
  */
 
 import type { Ability, Character, ClassEntry, SkillId } from '../types/character';
-import type { ClassData, ClassFeature, HitDie, SubclassData } from '../data/classes';
+import type {
+  ClassData,
+  ClassFeature,
+  HitDie,
+  SubclassData,
+  WeaponProficiencyRule,
+} from '../data/classes';
 import { getClass } from '../data/classes';
+import { choiceGrantedProficiencies, choiceGrantedSkills } from './class-choice-effects';
 
 /**
  * Every class entry resolved against the catalog, in stored order (the first is
@@ -82,6 +89,48 @@ export function resolveSubclass(character: Character): SubclassData | undefined 
 }
 
 /**
+ * The subclass chosen on ONE class entry, or undefined when none is chosen, the
+ * id is unknown, or the entry's own class level is below the class's
+ * subclassLevel. Works for any entry, primary or multiclass (PHB 2024: a
+ * subclass is gained at that class's subclass level).
+ */
+export function entrySubclass(entry: ClassEntry): SubclassData | undefined {
+  const data = getClass(entry.id);
+  if (!data || entry.subclassId === undefined) return undefined;
+  if (entry.level < data.subclassLevel) return undefined;
+  return data.subclasses.find((s) => s.id === entry.subclassId);
+}
+
+/**
+ * Every resolved subclass across ALL of the character's class entries (not just
+ * the primary), in stored class order. {@link resolveSubclass} reads only the
+ * primary class; multiclass characters use this to surface a subclass chosen on
+ * a non-primary class.
+ */
+export function resolveSubclasses(
+  character: Character,
+): Array<{ entry: ClassEntry; data: ClassData; subclass: SubclassData }> {
+  return resolveClasses(character).flatMap(({ entry, data }) => {
+    const subclass = entrySubclass(entry);
+    return subclass ? [{ entry, data, subclass }] : [];
+  });
+}
+
+/**
+ * The class's own features plus the features of the subclass recorded on the
+ * entry (NOT level-gated: callers gate by the class level they need). A
+ * recorded-but-not-yet-reached subclass still contributes so lookahead
+ * (next-level preview) can see it; every subclass feature level is at or above
+ * the class's subclassLevel, so an unreached id never shows early.
+ */
+function entryFeatures(entry: ClassEntry, data: ClassData): ClassFeature[] {
+  const sub = entry.subclassId
+    ? data.subclasses.find((s) => s.id === entry.subclassId)
+    : undefined;
+  return sub ? [...data.features, ...sub.features] : data.features;
+}
+
+/**
  * The class save-proficiency abilities, keyed by Ability with a source label
  * (e.g. 'Barbarian (class)'). Empty when no class is selected.
  *
@@ -127,6 +176,10 @@ export function classGrantedSkills(
       if (result[skillId] === undefined) result[skillId] = label;
     }
   }
+  // Skills granted by class-feature choices (Primal Knowledge, Student of War, ...).
+  for (const [skillId, label] of Object.entries(choiceGrantedSkills(character))) {
+    if (result[skillId as SkillId] === undefined) result[skillId as SkillId] = label;
+  }
   return result;
 }
 
@@ -169,7 +222,31 @@ export function classProficiencies(character: Character): {
       for (const t of mc.tools) pushUnique(tools, multiclassToolLabel(t));
     }
   }
+  // Class-feature choices (Divine/Primal Order, Student of War, Bard instrument).
+  const chosen = choiceGrantedProficiencies(character);
+  for (const a of chosen.armor) pushUnique(armor, a);
+  for (const w of chosen.weapons) pushUnique(weapons, w);
+  for (const t of chosen.tools) pushUnique(tools, t);
   return { armor, weapons, tools };
+}
+
+/**
+ * Structured weapon-proficiency rules, one per class entry, in stored order.
+ * PHB 2024 "Multiclassing: Proficiencies" (L2104-2106): the INITIAL class grants
+ * its full Core Traits weapon proficiencies; a NON-INITIAL class grants only what
+ * its "As a Multiclass Character" entry lists, which for weapons is Martial
+ * weapons (Barbarian L2405, Fighter L4135, Paladin L4843, Ranger L5362) and
+ * nothing for the other classes. `source` is the class name for tooltips.
+ */
+export function weaponProficiencyRules(
+  character: Character,
+): Array<{ rule: WeaponProficiencyRule; className: string }> {
+  return resolveClasses(character).map(({ data, initial }) => ({
+    className: data.name,
+    rule: initial
+      ? data.weaponProficiency
+      : { simple: false, martial: data.multiclassProficiencies.martialWeapons },
+  }));
 }
 
 /** A display label for a multiclass tool/instrument CHOICE marker. */
@@ -205,7 +282,7 @@ export function classFeaturesByLevel(
   // themselves. For a single-class character this is exactly that one class's
   // features grouped by level (the whole list, byte-identical to before).
   const sorted = classes
-    .flatMap(({ data }) => data.features)
+    .flatMap(({ entry, data }) => entryFeatures(entry, data))
     .sort((a, b) => a.level - b.level);
   for (const feature of sorted) {
     const bucket = result.get(feature.level);
@@ -213,6 +290,15 @@ export function classFeaturesByLevel(
     else result.set(feature.level, [feature]);
   }
   return result;
+}
+
+/** A class (or subclass) feature tagged with its source class and, if any, subclass. */
+export interface TaggedClassFeature {
+  feature: ClassFeature;
+  classId: string;
+  className: string;
+  /** Present when the feature comes from the chosen subclass. */
+  subclassName?: string;
 }
 
 /**
@@ -225,14 +311,27 @@ export function classFeaturesByLevel(
  */
 export function classFeaturesByLevelTagged(
   character: Character,
-): Map<number, Array<{ feature: ClassFeature; classId: string; className: string }>> {
-  const result = new Map<number, Array<{ feature: ClassFeature; classId: string; className: string }>>();
+): Map<number, Array<TaggedClassFeature>> {
+  const result = new Map<number, Array<TaggedClassFeature>>();
   const tagged = resolveClasses(character)
-    .flatMap(({ entry, data }) =>
-      data.features
-        .filter((f) => f.level <= entry.level)
-        .map((feature) => ({ feature, classId: data.id, className: data.name })),
-    )
+    .flatMap(({ entry, data }) => {
+      const subclass = entrySubclass(entry);
+      return [
+        ...data.features
+          .filter((f) => f.level <= entry.level)
+          .map((feature): TaggedClassFeature => ({ feature, classId: data.id, className: data.name })),
+        ...(subclass?.features ?? [])
+          .filter((f) => f.level <= entry.level)
+          .map(
+            (feature): TaggedClassFeature => ({
+              feature,
+              classId: data.id,
+              className: data.name,
+              subclassName: subclass?.name,
+            }),
+          ),
+      ];
+    })
     .sort((a, b) => a.feature.level - b.feature.level);
   for (const item of tagged) {
     const bucket = result.get(item.feature.level);

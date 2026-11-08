@@ -1,0 +1,121 @@
+/* Class-feature choice pickers: Advancement "Choices Pending" items and the Class Choices card. */
+.item {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+}
+.legend {
+  padding: 0 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  color: var(--text-primary);
+}
+.optionDisabled {
+  color: var(--text-secondary);
+}
+.reason {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.hint {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.warning {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+}
+.addRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.addInput {
+  min-height: 28px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sectionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.count {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+.removeBtn {
+  min-width: 28px;
+  min-height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.link {
+  color: var(--accent-gold);
+}
+@media (hover: none), (max-width: 767px) {
+  .option,
+  .removeBtn {
+    min-height: 44px;
+  }
+}

@@ -26,7 +26,8 @@ import type { ClassId } from '../data/classes';
 import { getClass } from '../data/classes';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
-import { allClasses, primaryClass, resolveClass } from './classes';
+import { allClasses, entrySubclass, primaryClass, resolveClass } from './classes';
+import { extraCantripLabel, extraCantrips } from './class-choice-effects';
 import { effectiveAbilityScores } from './feats';
 import { getSpell } from '../data/spells';
 import type { SpellId } from '../data/spells';
@@ -189,7 +190,7 @@ export function cantripsKnown(character: Character): number {
   const cls = resolveClass(character);
   if (!cls) return 0;
   const table = CANTRIPS_KNOWN[cls.id as keyof typeof CANTRIPS_KNOWN];
-  return table?.[character.level] ?? 0;
+  return (table?.[character.level] ?? 0) + extraCantrips(character, cls.id);
 }
 
 /**
@@ -203,11 +204,11 @@ export function cantripsKnownBreakdown(character: Character): Breakdown | undefi
   const cls = resolveClass(character);
   if (!cls) return undefined;
   const table = CANTRIPS_KNOWN[cls.id as keyof typeof CANTRIPS_KNOWN];
-  const total = table?.[character.level] ?? 0;
-  return {
-    total,
-    components: [{ label: `${cls.name} level ${character.level} (Cantrips)`, value: total }],
-  };
+  const base = table?.[character.level] ?? 0;
+  const extra = extraCantrips(character, cls.id);
+  const components = [{ label: `${cls.name} level ${character.level} (Cantrips)`, value: base }];
+  if (extra !== 0) components.push({ label: extraCantripLabel(character, cls.id) ?? 'Class feature choice', value: extra });
+  return { total: base + extra, components };
 }
 
 /**
@@ -417,6 +418,19 @@ export function classAlwaysPreparedSpells(entry: ClassEntry): SpellId[] {
   for (const [id, grantedAt] of forClass) {
     if (entry.level >= grantedAt && getSpell(id)) ids.push(id);
   }
+  // Subclass-granted always-prepared spells (domain / oath / circle / patron
+  // lists): read from the structured `grantedSpells` of the chosen subclass's
+  // features, gated at this entry's own class level. Unknown catalog ids are
+  // skipped (getSpell guard), duplicates are dropped.
+  for (const feature of entrySubclass(entry)?.features ?? []) {
+    for (const grant of feature.grantedSpells ?? []) {
+      if (!grant.alwaysPrepared || entry.level < grant.level) continue;
+      for (const spellId of grant.spells) {
+        const id = spellId as SpellId;
+        if (getSpell(id) && !ids.includes(id)) ids.push(id);
+      }
+    }
+  }
   return ids;
 }
 
@@ -528,7 +542,7 @@ export function reconcileSpellcastingForLevel(
     for (const [classId, perClass] of Object.entries(sc.byClass)) {
       const entry = entriesById.get(classId as ClassId);
       if (!entry || !perClass) continue; // class no longer present → drop.
-      const reconciled = reconcilePerClass(entry, perClass);
+      const reconciled = reconcilePerClass(entry, perClass, extraCantrips(character, entry.id));
       if (Object.keys(reconciled).length > 0) nextByClass[classId as ClassId] = reconciled;
     }
     if (Object.keys(nextByClass).length > 0) next.byClass = nextByClass;
@@ -852,10 +866,10 @@ export function classSpellAttackBreakdown(
  * 2024 per-class "Cantrips" column). The count is per class; cantrip SCALING is
  * by total level (unchanged, L2127).
  */
-export function classCantripsKnown(entry: ClassEntry): number {
+export function classCantripsKnown(entry: ClassEntry, bonus = 0): number {
   if (!entryIsSpellcaster(entry)) return 0;
   const table = CANTRIPS_KNOWN[entry.id as keyof typeof CANTRIPS_KNOWN];
-  return table?.[entry.level] ?? 0;
+  return (table?.[entry.level] ?? 0) + bonus;
 }
 
 /**
@@ -876,15 +890,17 @@ export function classPreparedCount(entry: ClassEntry): number {
  * zero total (Paladin/Ranger have no cantrips) still returns a breakdown so the
  * cap can show a tooltip (calculated-totals steering).
  */
-export function classCantripsKnownBreakdown(entry: ClassEntry): Breakdown | undefined {
+export function classCantripsKnownBreakdown(
+  entry: ClassEntry,
+  bonus?: { label: string; value: number },
+): Breakdown | undefined {
   if (!entryIsSpellcaster(entry)) return undefined;
   const className = getClass(entry.id)?.name ?? entry.id;
   const table = CANTRIPS_KNOWN[entry.id as keyof typeof CANTRIPS_KNOWN];
-  const total = table?.[entry.level] ?? 0;
-  return {
-    total,
-    components: [{ label: `${className} level ${entry.level} (Cantrips)`, value: total }],
-  };
+  const base = table?.[entry.level] ?? 0;
+  const components = [{ label: `${className} level ${entry.level} (Cantrips)`, value: base }];
+  if (bonus && bonus.value !== 0) components.push({ label: bonus.label, value: bonus.value });
+  return { total: base + (bonus?.value ?? 0), components };
 }
 
 /**
@@ -1051,9 +1067,10 @@ export function classRequiredCantrips(entry: ClassEntry): SpellId[] {
 function reconcilePerClass(
   entry: ClassEntry,
   perClass: ClassSpellcasting,
+  cantripBonus = 0,
 ): ClassSpellcasting {
   const topLevel = classMaxPreparedLevel(entry);
-  const cantripCap = classCantripsKnown(entry);
+  const cantripCap = classCantripsKnown(entry, cantripBonus);
   const preparedCap = classPreparedCount(entry);
   const required = classRequiredCantrips(entry);
   const preparedLists = new Set(classSpellListClassIds(entry));
@@ -1107,7 +1124,7 @@ export function perClassSpellcasting(character: Character): ClassSpellcastingSum
       ability,
       saveDc,
       attack,
-      cantripsKnown: classCantripsKnown(entry),
+      cantripsKnown: classCantripsKnown(entry, extraCantrips(character, entry.id)),
       preparedCount: classPreparedCount(entry),
       maxPreparedLevel: classMaxPreparedLevel(entry),
     });

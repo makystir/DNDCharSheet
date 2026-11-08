@@ -27,8 +27,8 @@ import type { Character, InventoryItem } from '../types/character';
 import { getWeapon, type MasteryProperty, type WeaponData } from '../data/weapons';
 import { getClass } from '../data/classes';
 import { CLASS_MASTERY_RULES } from '../data/weapon-mastery';
-import { primaryClass, resolveClass } from './classes';
-import { classProficientWithWeapon } from './attacks';
+import { allClasses, resolveClass } from './classes';
+import { characterProficientWithWeapon, classProficientWithWeapon } from './attacks';
 import type { Breakdown } from './breakdown';
 import { resolveWeapon } from './weapons';
 
@@ -80,8 +80,43 @@ const LOCK_TEXT: Record<MasteryLockReason, string> = {
   'over-cap': 'You have chosen more weapons than your level allows; this one is past the limit.',
 };
 
-function classLevel(character: Character): number {
-  return primaryClass(character)?.level ?? character.level;
+/**
+ * The Weapon Mastery cap across ALL of the character's classes: the sum of each
+ * class's own count at that class's own level (PHB 2024 "Multiclassing": you gain the
+ * features of each class you take levels in, and Weapon Mastery is a level 1 feature
+ * of Barbarian, Fighter, Paladin, Ranger and Rogue).
+ * AMBIGUITY (flagged): the PHB does not say whether the counts of two classes add up
+ * or whether weapons are assigned per class. This sums the counts and treats the
+ * single flat list as shared; the app cannot enforce a per-class share of it.
+ * A character with no class entries has a cap of 0.
+ */
+export function characterMasteryCap(character: Character): number {
+  return allClasses(character).reduce((sum, entry) => sum + masteryCount(entry.id, entry.level), 0);
+}
+
+/** Per-class parts of {@link characterMasteryCap}; the components sum to the total. */
+export function masteryCapBreakdown(character: Character): Breakdown {
+  const components = allClasses(character).map((entry) => ({
+    label: `${getClass(entry.id)?.name ?? entry.id} level ${entry.level} Weapon Mastery`,
+    value: masteryCount(entry.id, entry.level),
+  }));
+  return { total: components.reduce((sum, c) => sum + c.value, 0), components };
+}
+
+/** Whether ANY of the character's Weapon Mastery classes lets it choose this weapon. */
+export function masteryEligibleForCharacter(character: Character, weapon: WeaponData): boolean {
+  return allClasses(character).some((entry) => {
+    if (masteryCount(entry.id, entry.level) <= 0) return false;
+    // Paladin / Ranger / Rogue: "weapons of your choice with which you have
+    // proficiency" (PHB 2024 L4904, L5406, L5902) is the CHARACTER's proficiency
+    // across all classes (initial class full set + multiclass grants), not just
+    // the class that owns the Weapon Mastery feature.
+    if (Object.hasOwn(CLASS_MASTERY_RULES, entry.id) &&
+        CLASS_MASTERY_RULES[entry.id as keyof typeof CLASS_MASTERY_RULES].eligibility === 'proficient') {
+      return characterProficientWithWeapon(character, weapon);
+    }
+    return masteryEligible(entry.id, weapon);
+  });
 }
 
 function uniqueChosen(character: Character): string[] {
@@ -96,7 +131,7 @@ export function masteryChoices(character: Character): {
   overCap: string[];
   slotsLeft: number;
 } {
-  const cap = masteryCount(primaryClass(character)?.id, classLevel(character));
+  const cap = characterMasteryCap(character);
   const chosen = uniqueChosen(character);
   return {
     cap,
@@ -109,8 +144,7 @@ export function masteryChoices(character: Character): {
 
 /** Whether the mastery of one weapon kind (catalog id) is usable (D8). */
 export function weaponMasteryStatus(character: Character, weaponId: string): MasteryStatus {
-  const classId = primaryClass(character)?.id;
-  const cap = masteryCount(classId, classLevel(character));
+  const cap = characterMasteryCap(character);
   const locked = (reason: MasteryLockReason): MasteryStatus => ({ usable: false, reason, explanation: LOCK_TEXT[reason], cap });
   if (!resolveClass(character)) return locked('no-class');
   if (cap === 0) return locked('no-feature');
@@ -118,7 +152,7 @@ export function weaponMasteryStatus(character: Character, weaponId: string): Mas
   const index = chosen.indexOf(weaponId);
   if (index < 0) return locked('not-chosen');
   const weapon = getWeapon(weaponId);
-  if (!weapon || !masteryEligible(classId, weapon)) return locked('not-eligible');
+  if (!weapon || !masteryEligibleForCharacter(character, weapon)) return locked('not-eligible');
   if (index >= cap) return locked('over-cap');
   return { usable: true, explanation: 'Unlocked by your Weapon Mastery feature.', cap };
 }
@@ -126,7 +160,7 @@ export function weaponMasteryStatus(character: Character, weaponId: string): Mas
 /** The same check for an inventory weapon item (custom weapons are locked: no catalog kind). */
 export function itemMasteryStatus(character: Character, item: InventoryItem): MasteryStatus {
   const weapon = resolveWeapon(item);
-  if (!weapon) return { usable: false, reason: 'not-chosen', explanation: LOCK_TEXT['not-chosen'], cap: masteryCount(primaryClass(character)?.id, classLevel(character)) };
+  if (!weapon) return { usable: false, reason: 'not-chosen', explanation: LOCK_TEXT['not-chosen'], cap: characterMasteryCap(character) };
   return weaponMasteryStatus(character, weapon.id);
 }
 
@@ -138,13 +172,12 @@ export interface ChooseMasteryResult {
 
 /** Choose a weapon kind for Weapon Mastery. Never mutates; rejects ineligible or over-cap picks. */
 export function chooseWeaponMastery(character: Character, weaponId: string): ChooseMasteryResult {
-  const classId = primaryClass(character)?.id;
   if (!resolveClass(character)) return { character, ok: false, reason: 'no-class' };
-  const cap = masteryCount(classId, classLevel(character));
+  const cap = characterMasteryCap(character);
   if (cap === 0) return { character, ok: false, reason: 'no-feature' };
   const weapon = getWeapon(weaponId);
   if (!weapon) return { character, ok: false, reason: 'unknown-weapon' };
-  if (!masteryEligible(classId, weapon)) return { character, ok: false, reason: 'not-eligible' };
+  if (!masteryEligibleForCharacter(character, weapon)) return { character, ok: false, reason: 'not-eligible' };
   const chosen = uniqueChosen(character);
   if (chosen.includes(weaponId)) return { character, ok: false, reason: 'already-chosen' };
   if (chosen.length >= cap) return { character, ok: false, reason: 'list-full' };

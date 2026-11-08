@@ -20,11 +20,14 @@
  * return a Breakdown (calculated-totals steering).
  */
 
-import type { Ability, AbilityScores, Character, FeatSelection } from '../types/character';
-import { ABILITIES, ABILITY_NAMES } from '../types/character';
-import { FEAT_CATALOG, getFeat, type FeatData } from '../data/feats';
+import type { Ability, AbilityScores, Character, FeatSelection, SkillId } from '../types/character';
+import { ABILITIES, ABILITY_NAMES, SKILLS } from '../types/character';
+import { FEAT_CATALOG, allFeats, getFeat, type FeatArmorTraining, type FeatData } from '../data/feats';
+import { getClass } from '../data/classes';
 import type { Breakdown, BreakdownComponent } from './breakdown';
 import { clampLevel } from './abilities';
+import { allClasses, classProficiencies, entrySubclass } from './classes';
+import { anySpellcaster, spellcastingClasses } from './spellcasting';
 
 // ─── The feat increases recorded on a character ─────────────────────────────
 
@@ -164,14 +167,193 @@ export function isAsiAllocationValid(
   return { valid: true };
 }
 
+// ─── Feat ability-increase validity (allowed abilities and amounts) ──────────
+
+/** Why a feat's recorded ability increase is not legal. */
+export type FeatIncreaseInvalidReason =
+  | 'unknown-feat'
+  | 'no-increase'
+  | 'wrong-ability'
+  | 'wrong-amount'
+  | 'save-proficient';
+
+export interface FeatIncreaseResult {
+  valid: boolean;
+  reason?: FeatIncreaseInvalidReason;
+}
+
+/**
+ * Whether `increases` is a legal ability increase for `featId`, by the feat's
+ * printed shape: 'fixed' = exactly +1 to its one ability (e.g. Actor Cha, PHB
+ * L8584 Athlete lists Str or Dex); 'choose-one' / 'epic-boon' = exactly +1 to
+ * ONE of the listed abilities (Epic Boon L9124+); 'asi' = the Ability Score
+ * Improvement shapes (+2 / +1 +1, L8558); a feat with no increase takes none.
+ * Resilient (L8874-8880) may only raise an ability in which the character lacks
+ * saving throw proficiency: pass `hasSaveProficiency` to enforce that (kept as
+ * a callback because saving-throws.ts already imports this module).
+ */
+export function validateFeatIncrease(
+  featId: string,
+  increases: Partial<Record<Ability, number>> | undefined,
+  hasSaveProficiency?: (ability: Ability) => boolean,
+): FeatIncreaseResult {
+  const feat = getFeat(featId);
+  if (!feat) return { valid: false, reason: 'unknown-feat' };
+  const entries = ABILITIES.map((a) => [a, increases?.[a] ?? 0] as const).filter(([, v]) => v !== 0);
+  const inc = feat.abilityIncrease;
+
+  if (!inc) {
+    return entries.length === 0 ? { valid: true } : { valid: false, reason: 'no-increase' };
+  }
+  if (inc.kind === 'asi') {
+    const r = isAsiAllocationValid(increases ?? {}, {});
+    return r.valid ? { valid: true } : { valid: false, reason: 'wrong-amount' };
+  }
+
+  const allowed: Ability[] = inc.kind === 'fixed' ? [inc.ability] : inc.abilities;
+  if (entries.some(([a]) => !allowed.includes(a))) return { valid: false, reason: 'wrong-ability' };
+  if (entries.length !== 1 || entries[0][1] !== inc.amount) {
+    return { valid: false, reason: 'wrong-amount' };
+  }
+  if (feat.mechanics.grants.saveProficiencyChoice && hasSaveProficiency?.(entries[0][0])) {
+    return { valid: false, reason: 'save-proficient' };
+  }
+  return { valid: true };
+}
+
 // ─── Feat prerequisites ──────────────────────────────────────────────────────
 
 /** Why a feat cannot be taken (the picker surfaces the reason). */
-export type FeatBlockReason = 'level' | 'ability' | 'already-taken';
+export type FeatBlockReason =
+  | 'level'
+  | 'ability'
+  | 'armor-training'
+  | 'spellcasting'
+  | 'fighting-style'
+  | 'already-taken';
 
 export interface CanTakeFeatResult {
   ok: boolean;
   reason?: FeatBlockReason;
+}
+
+/**
+ * The armor training the character has: class training (initial class in full,
+ * later classes only their multiclass subset — classProficiencies) plus training
+ * granted by feats already taken (Lightly/Moderately/Heavily Armored list it in
+ * `mechanics.fixed` as 'armor-training:<kind>'). PHB 2024 "Lightly Armored",
+ * "Moderately Armored", "Heavily Armored" (L8768, L8806, L8728).
+ */
+export function armorTrainings(character: Character): Set<FeatArmorTraining> {
+  const have = new Set<FeatArmorTraining>();
+  for (const label of classProficiencies(character).armor) {
+    const lower = label.toLowerCase();
+    if (lower.includes('light')) have.add('light');
+    if (lower.includes('medium')) have.add('medium');
+    if (lower.includes('heavy')) have.add('heavy');
+    if (lower.includes('shield')) have.add('shield');
+  }
+  // PHB 2024 Bard "College of Valor" level 3 Martial Training (L3091): training
+  // with Medium armor and Shields. (Cleric Protector / Druid Warden training is
+  // an unrecorded level-1 choice, so it cannot be derived here.)
+  for (const entry of allClasses(character)) {
+    if (entry.id === 'bard' && entry.subclassId === 'valor' && entry.level >= 3) {
+      have.add('medium');
+      have.add('shield');
+    }
+  }
+  for (const selection of characterFeats(character)) {
+    for (const tag of getFeat(selection.featId)?.mechanics.fixed ?? []) {
+      if (tag.startsWith('armor-training:')) {
+        have.add(tag.slice('armor-training:'.length) as FeatArmorTraining);
+      }
+    }
+  }
+  return have;
+}
+
+// ─── Fighting Style feature (Fighter 1, Paladin 2, Ranger 2) ─────────────────
+
+/** One class that grants a Fighting Style feat, and the pick made for it (if any). */
+export interface FightingStyleSlot {
+  classId: string;
+  className: string;
+  /**
+   * Unique slot key, stored as `grantedBy` on the pick: the class id for the
+   * class's own Fighting Style feature, `<classId>:subclass` for a subclass
+   * feature that grants an additional Fighting Style (e.g. Champion).
+   */
+  key: string;
+  /** Present for a subclass-granted slot: the subclass feature's name. */
+  subclassFeature?: string;
+  /** The class level at which the Fighting Style feature is gained. */
+  featureLevel: number;
+  /** The Fighting Style selection recorded for this class, or undefined. */
+  filled?: FeatSelection;
+}
+
+/**
+ * The classes whose Fighting Style feature the character has reached, read from
+ * the class data (feature named "Fighting Style": Fighter 1, Paladin 2, Ranger
+ * 2 — PHB 2024 class feature tables). Multiclass-aware: each class level counts
+ * at its own class level. A chosen subclass feature flagged
+ * `grantsFightingStyle` (the Champion's "Additional Fighting Style") adds a
+ * second slot for that class once its class level is reached.
+ */
+export function fightingStyleSlots(character: Character): FightingStyleSlot[] {
+  const slots: FightingStyleSlot[] = [];
+  const feats = characterFeats(character);
+  for (const entry of allClasses(character)) {
+    const data = getClass(entry.id);
+    const feature = data?.features.find((f) => f.name === 'Fighting Style' && f.level <= entry.level);
+    if (data && feature) {
+      slots.push({
+        classId: entry.id,
+        className: data.name,
+        key: entry.id,
+        featureLevel: feature.level,
+        filled: feats.find((f) => f.grantedBy === entry.id),
+      });
+    }
+    const extra = data
+      ? entrySubclass(entry)?.features.find((f) => f.grantsFightingStyle && f.level <= entry.level)
+      : undefined;
+    if (data && extra) {
+      const key = `${entry.id}:subclass`;
+      slots.push({
+        classId: entry.id,
+        className: data.name,
+        key,
+        subclassFeature: extra.name,
+        featureLevel: extra.level,
+        filled: feats.find((f) => f.grantedBy === key),
+      });
+    }
+  }
+  return slots;
+}
+
+/** Display label for a Fighting Style pick's `grantedBy` key (class or subclass slot). */
+function grantedByLabel(grantedBy: string): string {
+  const [classId, suffix] = grantedBy.split(':');
+  const name = getClass(classId)?.name ?? grantedBy;
+  return suffix === 'subclass' ? `${name} subclass` : name;
+}
+
+/** Whether any class the character has grants the Fighting Style feature. */
+export function hasFightingStyleFeature(character: Character): boolean {
+  return fightingStyleSlots(character).length > 0;
+}
+
+/**
+ * The Fighting Style feats the character may pick through the class feature:
+ * all Fighting Style feats not yet taken, or [] without the feature.
+ */
+export function fightingStyleOptions(character: Character): FeatData[] {
+  if (!hasFightingStyleFeature(character)) return [];
+  return allFeats().filter(
+    (f) => f.category === 'fighting-style' && canTakeFeat(character, f.id).ok,
+  );
 }
 
 /**
@@ -206,6 +388,32 @@ export function canTakeFeat(character: Character, featId: string): CanTakeFeatRe
         return { ok: false, reason: 'ability' };
       }
     }
+  }
+
+  // PHB 2024: "A or B 13+" — at least one listed ability must reach the minimum.
+  if (prereq?.abilityAnyOf) {
+    const scores = effectiveAbilityScores(character);
+    const { abilities, min } = prereq.abilityAnyOf;
+    if (!abilities.some((a) => scores[a] >= min)) return { ok: false, reason: 'ability' };
+  }
+
+  // PHB 2024: "<Light|Medium|Heavy> Armor Training" / "Shield Training".
+  if (prereq?.armorTraining && !armorTrainings(character).has(prereq.armorTraining)) {
+    return { ok: false, reason: 'armor-training' };
+  }
+
+  // PHB 2024: "Spellcasting or Pact Magic Feature" / "Spellcasting Feature".
+  // The latter (Boon of Spell Recall) excludes Pact Magic as printed.
+  if (prereq?.spellcasting === 'spellcasting-or-pact-magic' && !anySpellcaster(character)) {
+    return { ok: false, reason: 'spellcasting' };
+  }
+  if (prereq?.spellcasting === 'spellcasting' && spellcastingClasses(character).length === 0) {
+    return { ok: false, reason: 'spellcasting' };
+  }
+
+  // PHB 2024: "Fighting Style Feature" (Fighter 1, Paladin 2, Ranger 2).
+  if (prereq?.fightingStyleFeature && !hasFightingStyleFeature(character)) {
+    return { ok: false, reason: 'fighting-style' };
   }
 
   // PHB 2024 "Parts of a Feat": a feat can be taken only once unless repeatable.
@@ -270,10 +478,17 @@ export function applyFeat(
   const feat = getFeat(selection.featId);
   const name = feat?.name ?? selection.featId;
   const increaseText = formatIncreases(selection.abilityIncreases);
+  // A class-feature feat (Fighting Style) fills no asi-marker slot (level 0), so
+  // it is logged at the character's level under the granting class.
+  const grantedBy = selection.grantedBy;
+  const logLevel = grantedBy ? character.level : selection.level;
+  const prefix = grantedBy
+    ? `Level ${logLevel}: ${grantedByLabel(grantedBy)} Fighting Style`
+    : `Level ${selection.level}`;
   const detail =
     increaseText.length > 0
-      ? `Level ${selection.level}: took ${name} (${increaseText})`
-      : `Level ${selection.level}: took ${name}`;
+      ? `${prefix}: took ${name} (${increaseText})`
+      : `${prefix}: took ${name}`;
 
   const log = character.advancement?.log ?? [];
   return {
@@ -283,10 +498,32 @@ export function applyFeat(
       feats,
       log: [
         ...log,
-        { timestamp, kind: 'feat', level: selection.level, detail },
+        { timestamp, kind: 'feat', level: logLevel, detail },
       ],
     },
   };
+}
+
+/**
+ * Take a Fighting Style feat through a class's Fighting Style feature (Fighter
+ * 1, Paladin 2, Ranger 2). Replaces any earlier pick for the same class (PHB
+ * 2024 lets a Fighter swap it on gaining a Fighter level) and returns a new
+ * Character. The selection is stored at the sentinel `level: 0` with
+ * `grantedBy` set, so it never binds to an ASI slot. Callers gate with
+ * canTakeFeat / fightingStyleOptions first; an unknown class, a class without
+ * the feature, or a non-Fighting-Style feat returns the character unchanged.
+ */
+export function applyFightingStyle(
+  character: Character,
+  slotKey: string,
+  featId: string,
+  timestamp: number,
+): Character {
+  const slot = fightingStyleSlots(character).find((s) => s.key === slotKey);
+  const feat = getFeat(featId);
+  if (!slot || feat?.category !== 'fighting-style') return character;
+  const base = slot.filled ? removeFeat(character, 0, timestamp, slot.filled.featId) : character;
+  return applyFeat(base, { featId, level: 0, grantedBy: slot.key }, timestamp);
 }
 
 /**
@@ -322,8 +559,10 @@ export function removeFeat(
       {
         timestamp,
         kind: 'feat' as const,
-        level: slotLevel,
-        detail: `Level ${slotLevel}: removed ${name}`,
+        level: removed.grantedBy ? character.level : slotLevel,
+        detail: removed.grantedBy
+          ? `Level ${character.level}: removed ${grantedByLabel(removed.grantedBy)} Fighting Style ${name}`
+          : `Level ${slotLevel}: removed ${name}`,
       },
     ],
   };
@@ -343,6 +582,69 @@ function formatIncreases(
     }
   }
   return parts.join(', ');
+}
+
+// ─── Feat-granted skill, Expertise and save proficiencies (derived) ──────────
+
+/**
+ * Skill proficiencies granted by feats, keyed by SkillId with a source label.
+ * DERIVED from advancement.feats[] (never stored on character.skills), so
+ * removing a feat reverts it cleanly. Sources: the player's `choices.skills`
+ * (Skilled, Skill Expert, Keen Mind, Observant) and Boon of Skill's proficiency
+ * in all skills (PHB 2024 L8532, L8950, L8758, L8828, L9200). The level-0
+ * background selection is skipped: background skills are already merged into
+ * `character.skills` by applyBackground.
+ */
+export function featGrantedSkills(character: Character): Partial<Record<SkillId, string>> {
+  const result: Partial<Record<SkillId, string>> = {};
+  for (const selection of characterFeats(character)) {
+    if (selection.level === 0) continue;
+    const feat = getFeat(selection.featId);
+    const label = `${feat?.name ?? selection.featId} (feat)`;
+    if (feat?.mechanics.grants.allSkills) {
+      for (const skill of SKILLS) if (result[skill.id] === undefined) result[skill.id] = label;
+    }
+    for (const id of selection.choices?.skills ?? []) {
+      if (result[id] === undefined) result[id] = label;
+    }
+  }
+  return result;
+}
+
+/**
+ * Skills in which feats grant Expertise (Skill Expert, Keen Mind, Observant,
+ * Boon of Skill — the player's `choices.expertise`). Derived like
+ * featGrantedSkills; Expertise still counts only on an effectively proficient
+ * skill (skills.ts), as the PHB 2024 glossary requires.
+ */
+export function featGrantedExpertise(character: Character): SkillId[] {
+  const result: SkillId[] = [];
+  for (const selection of characterFeats(character)) {
+    if (selection.level === 0) continue;
+    for (const id of selection.choices?.expertise ?? []) {
+      if (!result.includes(id)) result.push(id);
+    }
+  }
+  return result;
+}
+
+/**
+ * Saving-throw proficiencies granted by feats: Resilient grants proficiency in
+ * the ability it increased (PHB 2024 "Resilient" L8874). Keyed by Ability with
+ * a source label; derived from the recorded ability increase.
+ */
+export function featGrantedSaves(character: Character): Partial<Record<Ability, string>> {
+  const result: Partial<Record<Ability, string>> = {};
+  for (const selection of characterFeats(character)) {
+    const feat = getFeat(selection.featId);
+    if (!feat?.mechanics.grants.saveProficiencyChoice) continue;
+    for (const ability of ABILITIES) {
+      if ((selection.abilityIncreases?.[ability] ?? 0) > 0 && result[ability] === undefined) {
+        result[ability] = `${feat.name} (feat)`;
+      }
+    }
+  }
+  return result;
 }
 
 // Reference FEAT_CATALOG so a tree-shake never drops the catalog this module

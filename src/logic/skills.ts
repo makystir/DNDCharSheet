@@ -25,7 +25,7 @@ import { ABILITY_NAMES, SKILLS } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classGrantedSkills } from './classes';
-import { effectiveAbilityScores } from './feats';
+import { effectiveAbilityScores, featGrantedExpertise, featGrantedSkills } from './feats';
 
 /** The governing ability of a skill, from the canonical SKILLS table. */
 function skillAbility(skillId: SkillId): Ability {
@@ -141,7 +141,7 @@ export interface EffectiveSkillTraining {
   proficient: boolean;
   expertise: boolean;
   /** 'class' / 'species' = granted (cannot be toggled off); 'manual' = stored flag. */
-  source: 'class' | 'species' | 'manual' | null;
+  source: 'class' | 'species' | 'feat' | 'manual' | null;
   /** e.g. 'Wizard (class)' or 'Human (species)'; both are joined with ' / '. */
   sourceLabel?: string;
 }
@@ -161,19 +161,27 @@ export function effectiveSkillTraining(
   const stored = getSkillTraining(character, skillId);
   const speciesLabel = speciesGrantedSkills(character)[skillId];
   const classLabel = classGrantedSkills(character)[skillId];
-  const proficient = stored.proficient || speciesLabel !== undefined || classLabel !== undefined;
-  const expertise = proficient && (stored.expertise ?? false);
+  // Feat grants (Skilled, Skill Expert, Keen Mind, Observant, Boon of Skill) and
+  // feat Expertise are derived from advancement.feats[] (logic/feats.ts).
+  const featLabel = featGrantedSkills(character)[skillId];
+  const proficient =
+    stored.proficient || speciesLabel !== undefined || classLabel !== undefined || featLabel !== undefined;
+  const expertise =
+    proficient && ((stored.expertise ?? false) || featGrantedExpertise(character).includes(skillId));
   const labels: string[] = [];
   if (speciesLabel !== undefined) labels.push(`${speciesLabel.split(':')[0]} (species)`);
   if (classLabel !== undefined) labels.push(classLabel);
+  if (featLabel !== undefined) labels.push(featLabel);
   const source: EffectiveSkillTraining['source'] =
     classLabel !== undefined
       ? 'class'
       : speciesLabel !== undefined
         ? 'species'
-        : stored.proficient
-          ? 'manual'
-          : null;
+        : featLabel !== undefined
+          ? 'feat'
+          : stored.proficient
+            ? 'manual'
+            : null;
   return {
     proficient,
     expertise,
@@ -195,13 +203,15 @@ export function allSkillBreakdowns(
   // still added once by skillModifierBreakdown (PB multiplied only once).
   const speciesGranted = speciesGrantedSkills(character);
   const classGranted = classGrantedSkills(character);
+  const featGranted = featGrantedSkills(character);
+  const featExpertise = featGrantedExpertise(character);
   const granted: Partial<Record<SkillId, string>> = { ...speciesGranted };
   for (const skill of SKILLS) {
-    const classLabel = classGranted[skill.id];
-    if (classLabel === undefined) continue;
-    const speciesLabel = granted[skill.id];
-    granted[skill.id] =
-      speciesLabel === undefined ? classLabel : `${speciesLabel} / ${classLabel}`;
+    for (const extra of [classGranted[skill.id], featGranted[skill.id]]) {
+      if (extra === undefined) continue;
+      const existing = granted[skill.id];
+      granted[skill.id] = existing === undefined ? extra : `${existing} / ${extra}`;
+    }
   }
   const result = {} as Record<SkillId, Breakdown>;
   for (const skill of SKILLS) {
@@ -209,7 +219,10 @@ export function allSkillBreakdowns(
       effectiveAbilityScores(character),
       character.level,
       skill.id,
-      getSkillTraining(character, skill.id),
+      (() => {
+        const stored = getSkillTraining(character, skill.id);
+        return featExpertise.includes(skill.id) ? { ...stored, expertise: true } : stored;
+      })(),
       granted[skill.id],
     );
   }

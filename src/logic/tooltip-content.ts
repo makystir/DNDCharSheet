@@ -772,6 +772,17 @@ function featPrerequisiteText(feat: ReturnType<typeof getFeat>): string | null {
       if (min !== undefined) parts.push(`${ABILITY_NAMES[ability]} ${min}+`);
     }
   }
+  if (prereq.abilityAnyOf) {
+    const names = prereq.abilityAnyOf.abilities.map((a) => ABILITY_NAMES[a]).join(' or ');
+    parts.push(`${names} ${prereq.abilityAnyOf.min}+`);
+  }
+  if (prereq.armorTraining) {
+    const kind = prereq.armorTraining;
+    parts.push(kind === 'shield' ? 'Shield Training' : `${kind.charAt(0).toUpperCase()}${kind.slice(1)} Armor Training`);
+  }
+  if (prereq.spellcasting === 'spellcasting-or-pact-magic') parts.push('Spellcasting or Pact Magic feature');
+  if (prereq.spellcasting === 'spellcasting') parts.push('Spellcasting feature');
+  if (prereq.fightingStyleFeature) parts.push('Fighting Style feature');
   if (prereq.note) parts.push(prereq.note);
   return parts.length > 0 ? parts.join(', ') : null;
 }

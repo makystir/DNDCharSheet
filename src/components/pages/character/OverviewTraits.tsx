@@ -150,10 +150,10 @@ export function OverviewTraits({ character }: OverviewTraitsProps) {
               <OverviewEmpty text="No class selected" />
             ) : (
               <ul className={styles.list}>
-                {features.map(({ feature, classId }) => (
-                  <li key={`${classId}-${feature.name}-${feature.level}`} className={styles.line}>
+                {features.map(({ feature, classId, subclassName }) => (
+                  <li key={`${classId}-${subclassName ?? ''}-${feature.name}-${feature.level}`} className={styles.line}>
                     <span className={styles.name}>{feature.name}</span>
-                    <span className={styles.muted}>Level {feature.level}</span>
+                    <span className={styles.muted}>{subclassName ? `${subclassName}, ` : ''}Level {feature.level}</span>
                   </li>
                 ))}
               </ul>

@@ -239,6 +239,12 @@ export interface HitPointClassEntry {
   hitDie: HitDie;
   /** The character's level in THIS class (>= 1). */
   level: number;
+  /**
+   * Rolled Hit Die faces for levels gained in THIS class (each replaces one
+   * fixed level of this class; extras beyond the class's countable levels are
+   * ignored). Absent/empty = all fixed.
+   */
+  rolledFaces?: number[];
 }
 
 /** Options for {@link multiclassHitPointMaxBreakdown}. */
@@ -293,15 +299,24 @@ export function multiclassHitPointMaxBreakdown(
   // For the initial class that is its levels 2..L; for every other class it is
   // ALL of its levels (their first level is NOT the character's level 1).
   for (let i = 0; i < classes.length; i += 1) {
-    const { hitDie, level } = classes[i];
+    const { hitDie, level, rolledFaces } = classes[i];
     const fixedPerLevel = hitDie / 2 + 1; // PHB "Fixed Hit Points by Class".
     const perLevel = Math.max(1, fixedPerLevel + conMod); // min-1 floor per level.
     const levelsCounted = i === 0 ? Math.max(0, level - 1) : Math.max(0, level);
     if (levelsCounted > 0) {
-      const value = perLevel * levelsCounted;
+      // Rolled levels (PHB "Gaining a Level", L2013-2014): face + Con, min 1,
+      // replacing one fixed level each; never more than the levels counted.
+      const rolled = (rolledFaces ?? []).slice(0, levelsCounted);
+      const rolledValue = rolled.reduce((s, face) => s + Math.max(1, face + conMod), 0);
+      const fixedCount = levelsCounted - rolled.length;
+      const value = perLevel * fixedCount + rolledValue;
       total += value;
+      const prefix = i === 0 ? 'Levels 2-L' : 'Levels';
       components.push({
-        label: `${i === 0 ? 'Levels 2-L' : 'Levels'} (d${hitDie} fixed ${perLevel}×${levelsCounted})`,
+        label:
+          rolled.length > 0
+            ? `${prefix} (d${hitDie}: ${fixedCount} fixed ${perLevel} + ${rolled.length} rolled)`
+            : `${prefix} (d${hitDie} fixed ${perLevel}×${levelsCounted})`,
         value,
       });
     }

@@ -14,6 +14,7 @@
  */
 
 import type { Ability, Character, ClassEntry, SkillId } from '../types/character';
+import { extraCantrips } from './class-choice-effects';
 import { getClass } from '../data/classes';
 import type { ClassId } from '../data/classes';
 import { SKILLS } from '../types/character';
@@ -145,7 +146,7 @@ export function pendingSetupChoices(character: Character): PendingItem[] {
     };
 
     // Cantrips (required ones, e.g. Arcane Trickster's Mage Hand, always count).
-    const cantripNeed = classCantripsKnown(entry);
+    const cantripNeed = classCantripsKnown(entry, extraCantrips(character, entry.id));
     if (cantripNeed > 0) {
       const required = classRequiredCantrips(entry);
       const picks = [...required, ...(stored.cantrips ?? [])];

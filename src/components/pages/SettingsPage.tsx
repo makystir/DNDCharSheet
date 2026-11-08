@@ -70,6 +70,12 @@ export function SettingsPage({
       ...character,
       houseRules: { ...character.houseRules, allowIllegalMulticlass: on },
     });
+  const bonusFeatsAfter20 = character.houseRules?.bonusFeatsAfter20 ?? false;
+  const setBonusFeatsAfter20 = (on: boolean) =>
+    onChange({
+      ...character,
+      houseRules: { ...character.houseRules, bonusFeatsAfter20: on },
+    });
   return (
     <div className={styles.page}>
       <Card>
@@ -157,6 +163,26 @@ export function SettingsPage({
               onChange={(e) => setAllowIllegalMulticlass(e.target.checked)}
             />
             <span>{allowIllegalMulticlass ? 'On' : 'Off'}</span>
+          </label>
+        </div>
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>Bonus Feats at Level 20</span>
+            <span className={styles.settingHint}>
+              A level 20 character in XP mode gains one feat for every 30,000 XP
+              above 355,000 XP (PHB 2024 "Bonus Feats at Level 20" sidebar). An
+              optional DM approach, not a default rule; off by default. Slots
+              appear under Feats on the Advancement tab.
+            </span>
+          </span>
+          <label className={styles.toggleControl}>
+            <input
+              type="checkbox"
+              checked={bonusFeatsAfter20}
+              aria-label="Bonus feats after level 20 (house rule)"
+              onChange={(e) => setBonusFeatsAfter20(e.target.checked)}
+            />
+            <span>{bonusFeatsAfter20 ? 'On' : 'Off'}</span>
           </label>
         </div>
       </Card>

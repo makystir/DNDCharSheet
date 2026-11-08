@@ -16,6 +16,26 @@ describe('OverviewSetup', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('lists level-1 class-feature picks and Rogue Expertise as links to Advancement', () => {
+    const cleric: Character = {
+      ...createCharacter('Cleric'),
+      classes: [{ id: 'cleric', level: 1, skillChoices: ['history', 'insight'] }],
+    };
+    const { unmount } = render(<OverviewSetup character={cleric} />);
+    const order = screen.getByTestId('overview-setup-choice-cleric.divineOrder');
+    expect(order).toHaveTextContent('Divine Order');
+    expect(order).toHaveTextContent('0 of 1');
+    expect(within(order).getByRole('link')).toHaveAttribute('href', '#advancement');
+    unmount();
+
+    const rogue: Character = {
+      ...createCharacter('Rogue'),
+      classes: [{ id: 'rogue', level: 1, skillChoices: ['stealth', 'acrobatics', 'perception', 'sleight-of-hand'] }],
+    };
+    render(<OverviewSetup character={rogue} />);
+    expect(screen.getByTestId('overview-setup-expertise')).toHaveTextContent('0 of 2');
+  });
+
   it('renders nothing without a class', () => {
     const { container } = render(<OverviewSetup character={createCharacter('None')} />);
     expect(container).toBeEmptyDOMElement();

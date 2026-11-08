@@ -2,6 +2,8 @@ import { ClipboardList } from 'lucide-react';
 import type { Character } from '../../../types/character';
 import { pendingSetupChoices } from '../../../logic/starting-choices';
 import type { PendingItem, PendingKind } from '../../../logic/starting-choices';
+import { pendingCreationChoices } from '../../../logic/class-choices';
+import { earnedExpertiseGrants, expertiseStatus } from '../../../logic/expertise';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewLinkAnchor } from './OverviewShared';
@@ -32,7 +34,14 @@ function destination(kind: PendingKind): { href: string; text: string } {
  */
 export function OverviewSetup({ character }: OverviewSetupProps) {
   const pending = pendingSetupChoices(character);
-  if (pending.length === 0) return null;
+  // Level-1 class-feature picks (Divine Order, Primal Order, Warlock invocations)
+  // and Rogue Expertise are made on the Advancement page; they are listed here as
+  // link rows only. pendingSetupChoices itself is unchanged.
+  const creationChoices = pendingCreationChoices(character);
+  const expertise = expertiseStatus(character);
+  const showExpertise =
+    expertise.remaining > 0 && earnedExpertiseGrants(character).some((e) => e.grant.level === 1);
+  if (pending.length === 0 && creationChoices.length === 0 && !showExpertise) return null;
   return (
     <Card>
       <SectionHeader icon={ClipboardList} title="Finish setting up" />
@@ -58,6 +67,24 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
             </li>
           );
         })}
+        {creationChoices.map((choice) => (
+          <li key={choice.key} className={styles.row} data-testid={`overview-setup-choice-${choice.key}`}>
+            <span className={styles.label}>{choice.label}</span>
+            <span className={styles.count}>
+              {choice.chosen} of {choice.owed}
+            </span>
+            <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
+          </li>
+        ))}
+        {showExpertise && (
+          <li className={styles.row} data-testid="overview-setup-expertise">
+            <span className={styles.label}>Expertise skills</span>
+            <span className={styles.count}>
+              {expertise.chosen} of {expertise.owed}
+            </span>
+            <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
+          </li>
+        )}
       </ul>
     </Card>
   );

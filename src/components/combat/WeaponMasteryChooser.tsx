@@ -9,7 +9,8 @@ import {
   masteryChoices,
   removeWeaponMastery,
   weaponMasteryStatus,
-  masteryEligible,
+  masteryCapBreakdown,
+  masteryEligibleForCharacter,
   type ChooseMasteryResult,
 } from '../../logic/weapon-mastery';
 import {
@@ -56,10 +57,8 @@ export function WeaponMasteryChooser({ character, onChange }: WeaponMasteryChoos
   const ruleTip = resolveAttackRuleTooltip('weapon-mastery');
   const title = ruleTip ? <ContentTooltip content={ruleTip}>Weapon Mastery</ContentTooltip> : 'Weapon Mastery';
 
-  const capBreakdown: Breakdown = {
-    total: cap,
-    components: [{ label: `${klass?.name ?? 'Class'} level ${character.level} Weapon Mastery`, value: cap }],
-  };
+  // Per-class counts (zero-count classes included so every contribution is visible).
+  const capBreakdown: Breakdown = masteryCapBreakdown(character);
 
   if (!klass || cap === 0) {
     const status = weaponMasteryStatus(character, '');
@@ -76,7 +75,7 @@ export function WeaponMasteryChooser({ character, onChange }: WeaponMasteryChoos
     );
   }
 
-  const eligible = WEAPON_LIST.filter((w) => !chosen.includes(w.id) && masteryEligible(klass.id, w));
+  const eligible = WEAPON_LIST.filter((w) => !chosen.includes(w.id) && masteryEligibleForCharacter(character, w));
 
   const handleAdd = () => {
     if (!pick) return;

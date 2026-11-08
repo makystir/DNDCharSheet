@@ -168,6 +168,32 @@ export interface SpeciesSelection {
   skillfulSkill?: SkillId;
 }
 
+/** A class-feature choice group (see {@link ClassChoices}). */
+export type ClassChoiceKey =
+  | 'sorcerer.metamagic'
+  | 'warlock.invocations'
+  | 'fighter.maneuvers'
+  | 'cleric.divineOrder'
+  | 'cleric.blessedStrikes'
+  | 'druid.primalOrder'
+  | 'druid.elementalFury'
+  | 'barbarian.primalKnowledge'
+  | 'barbarian.aspectOfTheWilds'
+  | 'fighter.studentOfWarSkill'
+  | 'fighter.studentOfWarTool'
+  | 'bard.loreSkills'
+  | 'bard.multiclassInstrument'
+  | 'ranger.glamourSkill'
+  | 'ranger.huntersPrey'
+  | 'ranger.defensiveTactics'
+  | 'ranger.primalCompanion'
+  | 'sorcerer.elementalAffinity'
+  | 'wizard.spellMastery'
+  | 'wizard.signatureSpells';
+
+/** Chosen option ids per choice group. Single-pick groups hold 0 or 1 ids. */
+export type ClassChoices = Partial<Record<ClassChoiceKey, string[]>>;
+
 /**
  * One class a character has levels in (PHB 2024 "Multiclassing"). In 2024 a
  * class sets the Hit Die, save proficiencies, armor/weapon/tool proficiencies, a
@@ -301,6 +327,16 @@ export interface HouseRules {
    * (M4); NO behaviour is wired to it this stage. Absent = off (RAW).
    */
   allowIllegalMulticlass?: boolean;
+  /**
+   * When true, a level 20 character in XP leveling mode gains one bonus feat for
+   * every 30,000 XP above 355,000 XP.
+   *
+   * RULES-COMPLIANCE NOTE (rule 4): this is NOT the default rules-as-written
+   * behaviour. PHB 2024 "Bonus Feats at Level 20" (Docs/PlayersHandbook.md
+   * L2029-2031) is an optional approach a DM may use; it is an OPT-IN house rule
+   * that is OFF by default. Absent = off (no bonus feat slots).
+   */
+  bonusFeatsAfter20?: boolean;
 }
 
 /**
@@ -485,6 +521,12 @@ export interface AdvancementLogEntry {
 export interface LevelUpRecord {
   /** The level this record is for (2..20). */
   level: number;
+  /**
+   * The class the level was gained in (PHB 2024 "Gaining a Level" / "Multiclassing:
+   * Hit Points": the Hit Die is that class's). Absent on legacy records, which
+   * are read as the initial class.
+   */
+  classId?: string;
   /** The HP choice taken this level. Absent = not recorded (HP as computed). */
   hp?: { mode: 'fixed' | 'rolled'; value: number };
 }
@@ -514,6 +556,12 @@ export interface FeatSelection {
   abilityIncreases?: Partial<Record<Ability, number>>;
   /** Feat-granted skill/expertise/tool choices, for auditability (A6b: simple grants). */
   choices?: { skills?: SkillId[]; expertise?: SkillId[]; tools?: string[]; notes?: string };
+  /**
+   * The class id whose Fighting Style feature granted this feat (Fighter,
+   * Paladin, Ranger). Such a selection is stored at `level: 0` (no ASI slot).
+   * Absent for ASI-slot and background feats.
+   */
+  grantedBy?: string;
 }
 
 /**
@@ -789,6 +837,14 @@ export interface Character {
    * convention as the other Stage-A fields). PHB 2024 "Gaining a Level".
    */
   advancement?: AdvancementState;
+  /**
+   * Class-feature CHOICES (Metamagic, Eldritch Invocations, Maneuvers, Divine /
+   * Primal Order, ...): the chosen option ids per choice group. Absent = nothing
+   * chosen. Additive-optional; no CURRENT_VERSION bump and no migration (same
+   * convention as `weaponMasteries` / `languages`). Counts owed come from
+   * logic/class-choices.ts; over-allocation is a warning, never a block.
+   */
+  classChoices?: ClassChoices;
 
   // ── Stage 7: Personal Details (identity / roleplay) ────────────────────────
   // Additive-optional, free-text identity fields. NONE is a game mechanic or

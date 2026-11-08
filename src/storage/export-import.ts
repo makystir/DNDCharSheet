@@ -22,6 +22,7 @@
 
 import type { Character } from '../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../types/character';
+import { sanitizeClassChoices } from '../logic/class-choices';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
@@ -194,6 +195,12 @@ export function importFromJSON(json: string): ImportResult {
   if (!migrated.success) {
     return { success: false, error: migrated.error };
   }
+
+  // classChoices is additive-optional and untrusted here: keep only known keys
+  // with string-array values (drops the field entirely when nothing survives).
+  const sanitizedChoices = sanitizeClassChoices(migrated.character.classChoices);
+  if (sanitizedChoices) migrated.character.classChoices = sanitizedChoices;
+  else delete migrated.character.classChoices;
 
   // Reset identity so the manager adopts this as a NEW character (never clobber
   // the active one). The store/manager assigns a fresh id + timestamps.

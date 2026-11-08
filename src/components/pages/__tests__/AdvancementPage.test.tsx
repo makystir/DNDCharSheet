@@ -313,3 +313,46 @@ describe('AdvancementPage — multiclass add-a-class (M4)', () => {
     expect(screen.queryByRole('button', { name: 'Add level (roll HP)' })).not.toBeInTheDocument();
   });
 });
+
+describe('AdvancementPage Expertise', () => {
+  it('lists owed Expertise in Choices Pending and records picks on the skill', () => {
+    const { get } = renderStateful({
+      level: 1,
+      classes: [{ id: 'rogue', level: 1 }],
+      skills: { stealth: { proficient: true }, perception: { proficient: true } },
+    });
+    const pending = screen.getByTestId('pending-expertise');
+    expect(pending).toHaveTextContent('Choose 2 more Expertise skills');
+    fireEvent.click(within(pending).getByRole('checkbox', { name: 'Stealth' }));
+    expect(get().skills?.stealth?.expertise).toBe(true);
+    expect(screen.getByTestId('pending-expertise')).toHaveTextContent('Choose 1 more Expertise skill ');
+    fireEvent.click(within(screen.getByTestId('pending-expertise')).getByRole('checkbox', { name: 'Perception' }));
+    expect(screen.queryByTestId('pending-expertise')).toBeNull();
+  });
+
+  it('shows a non-blocking note when more Expertise is marked than granted', () => {
+    renderStateful({
+      level: 1,
+      classes: [{ id: 'rogue', level: 1 }],
+      skills: {
+        stealth: { proficient: true, expertise: true },
+        perception: { proficient: true, expertise: true },
+        insight: { proficient: true, expertise: true },
+      },
+    });
+    expect(screen.queryByTestId('pending-expertise')).toBeNull();
+    expect(screen.getByTestId('expertise-over-note')).toBeInTheDocument();
+  });
+});
+describe('AdvancementPage class-feature choices', () => {
+  it('counts owed class choices in Choices Pending and shows the Class Choices card', () => {
+    renderStateful({ level: 2, classes: [{ id: 'sorcerer', level: 2 }] });
+    expect(screen.getByRole('heading', { name: /Choices Pending \(4\)/ })).toBeInTheDocument(); // Metamagic + unrecorded level-2 HP + Sorcerer cantrips + prepared spells (Spells page)
+    expect(screen.getByRole('heading', { name: /Class Choices \(1\)/ })).toBeInTheDocument();
+    const item = screen.getByTestId('pending-choice-sorcerer.metamagic');
+    fireEvent.click(within(item).getByRole('checkbox', { name: 'Careful Spell' }));
+    fireEvent.click(within(screen.getByTestId('pending-choice-sorcerer.metamagic')).getByRole('checkbox', { name: 'Quickened Spell' }));
+    expect(screen.queryByTestId('pending-choice-sorcerer.metamagic')).toBeNull();
+    expect(screen.getByRole('heading', { name: /Choices Pending \(3\)/ })).toBeInTheDocument();
+  });
+});

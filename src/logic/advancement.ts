@@ -35,6 +35,7 @@ import { classFeaturesByLevel, resolveClass, resolveClasses } from './classes';
 import { effectiveAbilityScores } from './feats';
 import { characterHitPointMaxBreakdown } from './hit-points-state';
 import { reconcileSpellcastingForLevel } from './spellcasting';
+import { bonusFeatSlotLevels } from './bonus-feats';
 
 // ─── XP thresholds (Character Advancement table, PHB 2024 L1982-2003) ────────
 
@@ -165,6 +166,9 @@ export function featSlotLevels(character: Character): number[] {
       }
     }
   }
+  // Opt-in house rule (PHB 2024 "Bonus Feats at Level 20"): synthetic levels 21+.
+  // Empty unless the rule is on, so default output is unchanged.
+  levels.push(...bonusFeatSlotLevels(character));
   return levels.sort((a, b) => a - b);
 }
 
@@ -332,6 +336,12 @@ export function setLevelHp(
    * behaviour is unchanged.
    */
   hitDieOverride?: HitDie,
+  /**
+   * The class the level was gained in, stored on the record so multiclass HP can
+   * attribute it to that class's Hit Die. Absent = keep the existing record's
+   * classId (a correction), else the record is read as the initial class.
+   */
+  classId?: string,
 ): Character {
   const targetLevel = clampLevel(level);
   const cls = resolveClass(character);
@@ -348,9 +358,14 @@ export function setLevelHp(
         ? choice.face ?? 0
         : hitDie / 2 + 1;
 
-  const record = { level: targetLevel, hp: { mode: choice.mode, value: hitDicePortion } };
-
   const existingLevels = character.advancement?.levels ?? [];
+  const recordClassId = classId ?? existingLevels.find((l) => l.level === targetLevel)?.classId;
+  const record = {
+    level: targetLevel,
+    ...(recordClassId !== undefined ? { classId: recordClassId } : {}),
+    hp: { mode: choice.mode, value: hitDicePortion },
+  };
+
   const levels = existingLevels.filter((l) => l.level !== targetLevel);
   levels.push(record);
   levels.sort((a, b) => a.level - b.level);
@@ -403,7 +418,10 @@ export function hitPointMaxWithAdvancement(character: Character): Breakdown {
   const rolledRecords = levels.filter(
     (l) => l.level >= 2 && l.hp?.mode === 'rolled' && Number.isFinite(l.hp.value),
   );
-  if (cls === undefined || rolledRecords.length === 0) {
+  // Multiclass: the per-class model in characterHitPointMaxBreakdown reads the
+  // records itself (each rolled level uses the Hit Die of the class it was
+  // gained in; unrecorded levels use that class's fixed value).
+  if (cls === undefined || rolledRecords.length === 0 || resolveClasses(character).length >= 2) {
     return characterHitPointMaxBreakdown(character);
   }
 
@@ -537,7 +555,7 @@ export function applyMulticlassLevel(
 
   // The HP gain uses the LEVELED class's Hit Die (PHB 2024 "Gaining a Level").
   const leveledDie = getClass(targetClassId)?.hitDie;
-  next = setLevelHp(next, total, choice, timestamp, leveledDie);
+  next = setLevelHp(next, total, choice, timestamp, leveledDie, targetClassId);
 
   // The level-up log entry names the class that gained the level.
   const className = getClass(targetClassId)?.name ?? targetClassId;

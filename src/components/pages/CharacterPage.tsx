@@ -299,6 +299,10 @@ export function CharacterPage({
   const selectedClass: ClassData | undefined = resolveClass(character);
   const classProfs = classProficiencies(character);
   const featuresByLevel = classFeaturesByLevel(character);
+  // Single-class view: the chosen subclass, so its rows can be labelled.
+  const singleSubclass = selectedClass?.subclasses.find(
+    (s) => s.id === allClasses(character)[0]?.subclassId,
+  );
   // The class's starting skill-choice list ('any' means every skill is
   // eligible — PHB 2024 Core <Class> Traits: Skill Proficiencies).
   const classSkillOptions =
@@ -330,7 +334,10 @@ export function CharacterPage({
       ? data.subclasses.find((s) => s.id === entry.subclassId)
       : undefined;
     const byLevel = new Map<number, typeof data.features>();
-    for (const feature of [...data.features].sort((a, b) => a.level - b.level)) {
+    // Class features plus the chosen subclass's features (both gated at THIS
+    // class's level; sort is stable so class rows precede subclass rows).
+    const reachable = [...data.features, ...(subclass?.features ?? [])];
+    for (const feature of reachable.sort((a, b) => a.level - b.level)) {
       if (feature.level > entry.level) continue;
       const bucket = byLevel.get(feature.level);
       if (bucket) bucket.push(feature);
@@ -467,6 +474,7 @@ export function CharacterPage({
               // such as feats.
               const profInfo = savingThrowProficiency(character, ability);
               const fromClass = profInfo.source === 'class';
+              const fromFeat = profInfo.source === 'feat';
               return (
                 <li key={ability} className={styles.statRow}>
                   <span className={styles.statName}>
@@ -474,6 +482,7 @@ export function CharacterPage({
                     {fromClass && (
                       <span className={styles.saveSource}>from {profInfo.classLabel} (class)</span>
                     )}
+                    {fromFeat && <span className={styles.saveSource}>from Resilient (feat)</span>}
                   </span>
                   <label className={styles.checkboxCell}>
                     <input
@@ -511,7 +520,8 @@ export function CharacterPage({
               const training = effectiveSkillTraining(character, skill.id);
               const proficient = training.proficient;
               const expertise = training.expertise;
-              const granted = training.source === 'class' || training.source === 'species';
+              const granted =
+                training.source === 'class' || training.source === 'species' || training.source === 'feat';
               return (
                 <li key={skill.id} className={styles.statRow}>
                   <span className={styles.statName}>
@@ -668,6 +678,9 @@ export function CharacterPage({
                         {feature.name}
                         {feature.kind === 'asi-marker' && (
                           <span className={styles.featureTag}> — take ASI or feat</span>
+                        )}
+                        {singleSubclass?.features.includes(feature) && (
+                          <span className={styles.featureTag}> — {singleSubclass.name}</span>
                         )}
                       </span>
                       <span className={styles.featureEffect}>{feature.effect}</span>

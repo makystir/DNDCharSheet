@@ -57,8 +57,8 @@ export interface TrancheFeatRow {
     | { kind: 'choose-one'; amount: 2; max: 20 }   // ASI option A
     | { kind: 'choose-two'; amount: 1; max: 20 }    // ASI option B
     | { kind: 'fixed'; ability: Ability; amount: 1; max: 20 }       // e.g. Actor +1 Cha
-    | { kind: 'choose-one'; amount: 1; max: 20 }    // e.g. Resilient +1 to a chosen ability
-    | { kind: 'epic-boon'; amount: 1; max: 30 };    // Epic Boon +1 to max 30
+    | { kind: 'choose-one'; abilities: Ability[]; amount: 1; max: 20 }    // e.g. Resilient +1 to a chosen ability
+    | { kind: 'epic-boon'; abilities: Ability[]; amount: 1; max: 30 };    // Epic Boon +1 to max 30
   cite: string;
 }
 
@@ -77,9 +77,9 @@ export const TRANCHE_FEATS: TrancheFeatRow[] = [
   { id: 'tough', name: 'Tough', category: 'origin', repeatable: false, cite: 'PHB 2024 L8550' },
   // General feats with a clean Ability Score Increase.
   { id: 'actor', name: 'Actor', category: 'general', repeatable: false, minLevel: 4, abilityMin: { cha: 13 }, abilityIncrease: { kind: 'fixed', ability: 'cha', amount: 1, max: 20 }, cite: 'PHB 2024 L8568' },
-  { id: 'resilient', name: 'Resilient', category: 'general', repeatable: false, minLevel: 4, abilityIncrease: { kind: 'choose-one', amount: 1, max: 20 }, cite: 'PHB 2024 L8874' },
+  { id: 'resilient', name: 'Resilient', category: 'general', repeatable: false, minLevel: 4, abilityIncrease: { kind: 'choose-one', abilities: ['str', 'dex', 'con', 'int', 'wis', 'cha'], amount: 1, max: 20 }, cite: 'PHB 2024 L8874' },
   // An Epic Boon (level 19+, +1 to max 30).
-  { id: 'boon-of-combat-prowess', name: 'Boon of Combat Prowess', category: 'epic-boon', repeatable: false, minLevel: 19, abilityIncrease: { kind: 'epic-boon', amount: 1, max: 30 }, cite: 'PHB 2024 L9126' },
+  { id: 'boon-of-combat-prowess', name: 'Boon of Combat Prowess', category: 'epic-boon', repeatable: false, minLevel: 19, abilityIncrease: { kind: 'epic-boon', abilities: ['str', 'dex', 'con', 'int', 'wis', 'cha'], amount: 1, max: 30 }, cite: 'PHB 2024 L9130' },
 ];
 
 // ─── Catalog oracle (A4-style; applied to the real FEAT_CATALOG) ─────────────

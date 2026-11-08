@@ -85,3 +85,28 @@ describe('share-validate', () => {
     if (nan.ok) expect(nan.character.level).toBe(1);
   });
 });
+
+describe('share-validate classChoices (additive-optional field)', () => {
+  it('keeps valid choices and strips junk keys, wrong shapes and bad entries', () => {
+    const payload = {
+      ...validChar(),
+      classChoices: {
+        'sorcerer.metamagic': ['careful-spell', 7, ''],
+        'bogus.key': ['x'],
+        'warlock.invocations': 'nope',
+      },
+    };
+    const result = validateSharedPayload(JSON.stringify(payload));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.character.classChoices).toEqual({ 'sorcerer.metamagic': ['careful-spell'] });
+  });
+
+  it('removes the field when nothing survives, and leaves absent absent', () => {
+    const junk = validateSharedPayload(JSON.stringify({ ...validChar(), classChoices: 'hostile' }));
+    expect(junk.ok).toBe(true);
+    if (junk.ok) expect('classChoices' in junk.character).toBe(false);
+    const absent = validateSharedPayload(JSON.stringify(validChar()));
+    expect(absent.ok).toBe(true);
+    if (absent.ok) expect('classChoices' in absent.character).toBe(false);
+  });
+});

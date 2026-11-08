@@ -14,7 +14,7 @@ import { ABILITIES, ABILITY_NAMES } from '../types/character';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown } from './breakdown';
 import { classSaveProficiencies, resolveClass } from './classes';
-import { effectiveAbilityScores } from './feats';
+import { effectiveAbilityScores, featGrantedSaves } from './feats';
 
 /** The saving-throw modifier: abilityMod + (proficient ? PB : 0). */
 export function savingThrowModifier(
@@ -66,7 +66,7 @@ export function savingThrowBreakdown(
 export interface SaveProficiencyInfo {
   proficient: boolean;
   /** 'class' = granted by the initial class; 'manual' = the player's own tick. */
-  source: 'class' | 'manual' | null;
+  source: 'class' | 'feat' | 'manual' | null;
   /** Class name when source is 'class', e.g. 'Wizard'. */
   classLabel?: string;
 }
@@ -89,6 +89,10 @@ export function savingThrowProficiency(
       classLabel: resolveClass(character)?.name,
     };
   }
+  // Resilient grants proficiency in the ability it increased (PHB 2024 L8874).
+  if (featGrantedSaves(character)[ability] !== undefined) {
+    return { proficient: true, source: 'feat' };
+  }
   if (character.saveProficiencies?.[ability]) {
     return { proficient: true, source: 'manual' };
   }
@@ -106,6 +110,7 @@ export function allSavingThrowBreakdowns(
   character: Character,
 ): Record<Ability, Breakdown> {
   const classGranted = classSaveProficiencies(character);
+  const featGranted = featGrantedSaves(character);
   const result = {} as Record<Ability, Breakdown>;
   for (const ability of ABILITIES) {
     const proficient = character.saveProficiencies?.[ability] ?? false;
@@ -114,7 +119,7 @@ export function allSavingThrowBreakdowns(
       character.level,
       ability,
       proficient,
-      classGranted[ability],
+      classGranted[ability] ?? featGranted[ability],
     );
   }
   return result;

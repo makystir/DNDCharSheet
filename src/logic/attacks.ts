@@ -40,7 +40,7 @@ import { getCondition } from '../data/conditions';
 import { getEquipment } from '../data/equipment';
 import { abilityModifier, proficiencyBonus } from './abilities';
 import type { Breakdown, BreakdownComponent } from './breakdown';
-import { resolveClass } from './classes';
+import { resolveClass, weaponProficiencyRules } from './classes';
 import { exhaustionLevelOf } from './conditions';
 import { effectiveAbilityScores } from './feats';
 import {
@@ -54,6 +54,7 @@ import {
 import { effectiveConditionIds } from './hit-points-state';
 import type { RNG } from './random';
 import { resolveWeapon } from './weapons';
+import { choiceGrantsMartialWeapons } from './class-choice-effects';
 
 // ─── Proficiency ─────────────────────────────────────────────────────────────
 
@@ -109,14 +110,38 @@ export function weaponProficiency(character: Character, item: InventoryItem): We
       reason: 'No class is selected, so no weapon proficiency is known. Choose a class or mark the item proficient.',
     };
   }
-  const proficient = classProficientWithWeapon(cls.weaponProficiency, weapon);
+  // PHB 2024 "Multiclassing: Proficiencies" (L2104-2106): the initial class's full
+  // weapon proficiencies plus each other class's reduced multiclass set.
+  const granting = weaponProficiencyRules(character).find((r) => classProficientWithWeapon(r.rule, weapon));
+  const proficient = granting !== undefined;
+  // Cleric Protector / Druid Warden grant Martial weapon proficiency (PHB 2024
+  // L3232, L3668).
+  if (!proficient && choiceGrantsMartialWeapons(character)) {
+    return {
+      proficient: true,
+      source: 'class',
+      reason: 'Your Divine Order / Primal Order grants proficiency with Martial weapons.',
+    };
+  }
   return {
     proficient,
     source: 'class',
     reason: proficient
-      ? `${cls.name} is proficient with this weapon.`
+      ? `${granting.className} is proficient with this weapon.`
       : `${cls.name} is not proficient with this weapon.`,
   };
+}
+
+/**
+ * Whether the character, across ALL classes, is proficient with a catalog weapon
+ * (class proficiencies only: no item override, no Divine/Primal Order grant, which
+ * the item-level {@link weaponProficiency} layers on top).
+ */
+export function characterProficientWithWeapon(character: Character, weapon: WeaponData): boolean {
+  return (
+    weaponProficiencyRules(character).some((r) => classProficientWithWeapon(r.rule, weapon)) ||
+    choiceGrantsMartialWeapons(character)
+  );
 }
 
 /** True when the character is proficient with the weapon item. */

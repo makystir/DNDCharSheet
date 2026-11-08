@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Award, Trash2 } from 'lucide-react';
 import type { Ability, Character, FeatSelection } from '../../../types/character';
 import { ABILITIES, ABILITY_ABBR } from '../../../types/character';
-import { getFeat } from '../../../data/feats';
+import { getFeat, type FeatData } from '../../../data/feats';
 import {
   applyFeat,
   removeFeat,
@@ -36,6 +36,18 @@ function increaseSummary(increases: Partial<Record<Ability, number>> | undefined
     }
   }
   return parts.join(', ');
+}
+
+/** Whether a feat needs skill / tool / Expertise picks before it can be applied. */
+function featNeedsPicks(feat: FeatData): boolean {
+  const g = feat.mechanics.grants;
+  return (
+    g.skills > 0 ||
+    g.tools > 0 ||
+    g.skillsOrTools > 0 ||
+    g.expertise > 0 ||
+    feat.mechanics.choices.some((c) => c.key === 'skill-proficiency-or-expertise')
+  );
 }
 
 /**
@@ -92,7 +104,7 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
       feat !== undefined &&
       ((inc !== undefined && inc.kind !== 'fixed') ||
         fixedClamped ||
-        (feat.grants?.skills ?? 0) > 0);
+        featNeedsPicks(feat));
     if (needsAllocation) {
       setAllocating({ level, featId });
       return;
@@ -125,9 +137,13 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
           const content = feat ? resolveFeatTooltip(feat.id) : null;
           const summary = filled ? increaseSummary(filled.abilityIncreases) : '';
           const skillNames = filled?.choices?.skills ?? [];
+          const expertiseNames = filled?.choices?.expertise ?? [];
+          const toolNames = filled?.choices?.tools ?? [];
           return (
             <li key={level} className={styles.slot}>
-              <span className={styles.slotLevel}>Level {level}</span>
+              <span className={styles.slotLevel}>
+                {level > 20 ? `Bonus feat (XP) ${level - 20}` : `Level ${level}`}
+              </span>
               {filled && feat ? (
                 <div className={styles.filled}>
                   <span className={styles.featName}>
@@ -140,6 +156,12 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
                   {summary && <span className={styles.summary}>{summary}</span>}
                   {skillNames.length > 0 && (
                     <span className={styles.summary}>Skills: {skillNames.join(', ')}</span>
+                  )}
+                  {expertiseNames.length > 0 && (
+                    <span className={styles.summary}>Expertise: {expertiseNames.join(', ')}</span>
+                  )}
+                  {toolNames.length > 0 && (
+                    <span className={styles.summary}>Tools: {toolNames.join(', ')}</span>
                   )}
                   <button
                     type="button"
@@ -176,6 +198,7 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
       {allocating !== null && allocatingFeat !== undefined && (
         <FeatAllocationDialog
           effectiveBefore={effectiveBefore}
+          character={character}
           feat={allocatingFeat}
           slotLevel={allocating.level}
           onConfirm={handleAllocationConfirm}

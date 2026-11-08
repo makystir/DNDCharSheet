@@ -206,12 +206,13 @@ describe('CLASS_CATALOG', () => {
     }
   });
 
-  it.each(EXPECTED_IDS)('%s lists four subclasses by name with empty features', (id) => {
+  it.each(EXPECTED_IDS)('%s lists four subclasses by name with features at or above the subclass level', (id) => {
     const c = getClass(id)!;
     expect(c.subclasses.length).toBe(4);
     for (const sub of c.subclasses) {
       expect(sub.name.trim().length).toBeGreaterThan(0);
-      expect(sub.features).toEqual([]);
+      expect(sub.features.length).toBeGreaterThan(0);
+      for (const feature of sub.features) expect(feature.level).toBeGreaterThanOrEqual(c.subclassLevel);
     }
   });
 

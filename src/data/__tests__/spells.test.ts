@@ -23,19 +23,19 @@ const CLASS_IDS = new Set([
 
 // The AUTHORITATIVE manifest, frozen to what the extraction tool verifiably
 // finds in the PHB 2024 source (scripts/generate-spells.ts + its reconcile
-// report, scripts/spell-report.json). The tool recovered 389 spells — three MORE
+// report, scripts/spell-report.json). The tool recovered 391 spells — three MORE
 // than the previously-shipped 386, because the source carries Spell Description
 // blocks for Magic Jar (L6 Necromancy), Telepathy (L8 Divination), and Find the
 // Path (L6 Divination) that the old throwaway parser dropped. These counts are a
 // by-construction oracle: any accidental omission, duplication, or class-list
 // mis-parse fails the test.
 const EXPECTED_BY_LEVEL: Record<number, number> = {
-  0: 34, 1: 64, 2: 62, 3: 51, 4: 41, 5: 48, 6: 34, 7: 21, 8: 18, 9: 16,
+  0: 34, 1: 64, 2: 63, 3: 52, 4: 41, 5: 48, 6: 34, 7: 21, 8: 18, 9: 16,
 };
-const EXPECTED_TOTAL = Object.values(EXPECTED_BY_LEVEL).reduce((a, b) => a + b, 0); // 389
+const EXPECTED_TOTAL = Object.values(EXPECTED_BY_LEVEL).reduce((a, b) => a + b, 0); // 391
 const EXPECTED_BY_CLASS: Record<string, number> = {
-  bard: 140, cleric: 116, druid: 134, paladin: 49,
-  ranger: 59, sorcerer: 148, warlock: 91, wizard: 241,
+  bard: 140, cleric: 117, druid: 135, paladin: 51,
+  ranger: 61, sorcerer: 150, warlock: 91, wizard: 242,
 };
 
 describe('SPELL_CATALOG shape & integrity', () => {

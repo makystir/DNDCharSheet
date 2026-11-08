@@ -199,7 +199,21 @@ export function characterHitPointMaxBreakdown(character: Character): Breakdown {
   if (classes.length >= 2) {
     return multiclassHitPointMaxBreakdown({
       scores,
-      classes: classes.map(({ entry, data }) => ({ hitDie: data.hitDie, level: entry.level })),
+      classes: classes.map(({ entry, data }) => ({
+        hitDie: data.hitDie,
+        level: entry.level,
+        // Rolled per-level records, attributed to the class the level was gained
+        // in (legacy records without a classId read as the initial class).
+        rolledFaces: (character.advancement?.levels ?? [])
+          .filter(
+            (l) =>
+              l.level >= 2 &&
+              l.hp?.mode === 'rolled' &&
+              Number.isFinite(l.hp.value) &&
+              (l.classId ?? classes[0].data.id) === data.id,
+          )
+          .map((l) => l.hp!.value),
+      })),
       hpMax: character.hpMax,
       hpPerLevel,
     });

@@ -40,10 +40,23 @@ import {
   type HpChoice,
   type LevelingMode,
 } from '../../logic/advancement';
-import { featSlotAssignments } from '../../logic/feats';
+import { featSlotAssignments, fightingStyleSlots } from '../../logic/feats';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
+import { FightingStyleSection } from './advancement/FightingStyleSection';
 import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
 import { AdvancementPlanner } from './advancement/AdvancementPlanner';
+import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
+import { expertiseStatus } from '../../logic/expertise';
+import {
+  ClassChoicesPending,
+  ClassChoicesOverNote,
+  ClassChoicesSection,
+  MulticlassPicksOverNote,
+  MulticlassPicksPending,
+} from './advancement/ClassChoicesPending';
+import { choiceStatus } from '../../logic/class-choices';
+import { pendingMulticlassPicks } from '../../logic/multiclass-picks';
+import { pendingSpellPicks, spellPickLabel } from '../../logic/spell-picks-pending';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
 
@@ -231,7 +244,29 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   for (let l = 2; l <= level; l += 1) {
     if (!recordedHpLevels.has(l)) unrecordedHpLevels.push(l);
   }
-  const pendingCount = unfilledFeatLevels.length + (subclassDue ? 1 : 0) + unrecordedHpLevels.length;
+  // Expertise owed by class features (Bard, Ranger, Rogue, Wizard) but not yet
+  // chosen counts as one pending item (the picker is rendered inline below).
+  const expertise = expertiseStatus(character);
+  // Class-feature choices (Metamagic, Invocations, Maneuvers, Divine/Primal Order,
+  // ...) and multiclass skill/instrument picks: one pending item per group.
+  const classChoices = choiceStatus(character);
+  const pendingClassChoiceCount = classChoices.filter((s) => s.remaining > 0).length;
+  const pendingMulticlassCount = pendingMulticlassPicks(character).length;
+  // Newly owed spell picks (cantrips, spellbook, prepared, Mystic Arcanum): one item
+  // each, made on the Spells page. Same source as the Overview "Finish setting up" card.
+  const spellPicks = pendingSpellPicks(character);
+  // A class with the Fighting Style feature (Fighter 1, Paladin 2, Ranger 2) that
+  // has not picked its Fighting Style feat yet is one pending choice per class.
+  const unfilledFightingStyles = fightingStyleSlots(character).filter((s) => s.filled === undefined);
+  const pendingCount =
+    unfilledFightingStyles.length +
+    unfilledFeatLevels.length +
+    (subclassDue ? 1 : 0) +
+    unrecordedHpLevels.length +
+    (expertise.remaining > 0 ? 1 : 0) +
+    pendingClassChoiceCount +
+    pendingMulticlassCount +
+    spellPicks.length;
 
   return (
     <div className={styles.page}>
@@ -665,8 +700,19 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       {/* ── Advancement Planner (read-only upcoming milestones + preview) ───── */}
       <AdvancementPlanner character={character} />
 
+      {/* ── Fighting Style (Fighter 1, Paladin 2, Ranger 2) ─────────────────── */}
+      <FightingStyleSection character={character} onChange={onChange} now={now} />
+
       {/* ── Feats & Ability Score Improvements ──────────────────────────────── */}
       <FeatSlotsSection character={character} onChange={onChange} now={now} />
+
+      {/* ── Class choices (Metamagic, Invocations, Maneuvers, orders, ...) ──── */}
+      {classChoices.length > 0 && (
+        <Card>
+          <SectionHeader icon={ScrollText} title={`Class Choices (${classChoices.length})`} />
+          <ClassChoicesSection character={character} onChange={onChange} statuses={classChoices} />
+        </Card>
+      )}
 
       {/* ── Choices pending ─────────────────────────────────────────────────── */}
       <Card>
@@ -676,6 +722,11 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         ) : (
           <ul className={styles.pendingList}>
             {subclassDue && <li className={styles.pendingItem}>Subclass not chosen (due at level {cls?.subclassLevel})</li>}
+            {unfilledFightingStyles.map((s) => (
+              <li key={`fighting-style-${s.key}`} className={styles.pendingItem}>
+                Fighting Style feat not chosen ({s.className})
+              </li>
+            ))}
             {unfilledFeatLevels.map((l) => (
               <li key={`feat-${l}`} className={styles.pendingItem}>
                 Feat not chosen for level {l}
@@ -686,8 +737,24 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 Hit Points not recorded for level {l} (using the fixed value)
               </li>
             ))}
+            <ExpertisePending character={character} onChange={onChange} status={expertise} />
+            <ClassChoicesPending character={character} onChange={onChange} statuses={classChoices} />
+            <MulticlassPicksPending character={character} onChange={onChange} />
+            {spellPicks.map((item) => (
+              <li
+                key={`spell-${item.kind}-${item.className ?? ''}-${item.spellLevel ?? ''}`}
+                className={styles.pendingItem}
+                data-testid={`pending-spell-${item.kind}${item.spellLevel ? `-${item.spellLevel}` : ''}`}
+              >
+                {spellPickLabel(item)}: {item.have} of {item.need} chosen.{' '}
+                <a href="#spells">Choose on Spells</a>
+              </li>
+            ))}
           </ul>
         )}
+        <ExpertiseOverNote status={expertise} />
+        <ClassChoicesOverNote statuses={classChoices} />
+        <MulticlassPicksOverNote character={character} />
       </Card>
 
       {/* ── Audit log ───────────────────────────────────────────────────────── */}

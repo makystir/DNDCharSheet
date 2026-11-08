@@ -225,3 +225,23 @@ describe('export/import round-trip (character + portrait)', () => {
     expect('portrait' in parsed).toBe(false);
   });
 });
+
+describe('classChoices round trip (additive-optional, no version bump)', () => {
+  it('survives export then import, sanitised, with no CURRENT_VERSION change', () => {
+    const c = makeChar({ classChoices: { 'warlock.invocations': ['pact-of-the-blade', 'agonizing-blast#fire-bolt'] } });
+    const result = importFromJSON(exportToJSON(c));
+    expect(result.success).toBe(true);
+    expect(result.character?.classChoices).toEqual({ 'warlock.invocations': ['pact-of-the-blade', 'agonizing-blast#fire-bolt'] });
+    expect(result.character?._v).toBe(CURRENT_VERSION);
+  });
+
+  it('strips hostile classChoices on import and drops the field when empty', () => {
+    const hostile = { ...makeChar(), classChoices: { 'nope': ['x'], 'sorcerer.metamagic': [1, 'careful-spell'] } };
+    const result = importFromJSON(JSON.stringify(hostile));
+    expect(result.success).toBe(true);
+    expect(result.character?.classChoices).toEqual({ 'sorcerer.metamagic': ['careful-spell'] });
+    const empty = importFromJSON(JSON.stringify({ ...makeChar(), classChoices: { nope: [] } }));
+    expect(empty.success).toBe(true);
+    expect(empty.character && 'classChoices' in empty.character).toBe(false);
+  });
+});

@@ -54,6 +54,7 @@ import {
   allClasses,
   resolveClass,
   resolveClasses,
+  entrySubclass,
 } from '../../logic/classes';
 import { knownLanguages } from '../../logic/languages';
 import { activeConditionIds, exhaustionLevelOf } from '../../logic/conditions';
@@ -473,6 +474,17 @@ export function buildFeatures(character: Character): FeatureRow[] {
       rows.push({
         name: feature.name,
         source: `${data.name} ${feature.level}`,
+        detail: feature.effect,
+      });
+    }
+    // The chosen subclass's features reached at this class's level.
+    const subclass = entrySubclass(entry);
+    for (const feature of [...(subclass?.features ?? [])]
+      .filter((f) => f.level <= entry.level)
+      .sort((a, b) => a.level - b.level)) {
+      rows.push({
+        name: feature.name,
+        source: `${data.name} (${subclass?.name}) ${feature.level}`,
         detail: feature.effect,
       });
     }

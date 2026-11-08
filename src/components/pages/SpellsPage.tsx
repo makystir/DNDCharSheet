@@ -1,3 +1,4 @@
+import { extraCantripLabel, extraCantrips } from '../../logic/class-choice-effects';
 import { useEffect, useMemo, useState } from 'react';
 import { Sparkles, BookOpen } from 'lucide-react';
 import type {
@@ -1061,9 +1062,13 @@ function PreparedClassSection({
   const sc: SpellcastingState = character.spellcasting ?? {};
   const perClass: ClassSpellcasting = sc.byClass?.[entry.id] ?? {};
 
-  const cantripCap = classCantripsKnown(entry);
+  const orderCantrips = extraCantrips(character, entry.id);
+  const cantripCap = classCantripsKnown(entry, orderCantrips);
   const preparedCap = classPreparedCount(entry);
-  const cantripCapBreakdown = classCantripsKnownBreakdown(entry);
+  const cantripCapBreakdown = classCantripsKnownBreakdown(entry, {
+    label: extraCantripLabel(character, entry.id) ?? 'Class feature choice',
+    value: orderCantrips,
+  });
   const preparedCapBreakdown = classPreparedCountBreakdown(entry);
   const topSpellLevel = classMaxPreparedLevel(entry);
   const usesSpellbook = classUsesSpellbook(entry);
