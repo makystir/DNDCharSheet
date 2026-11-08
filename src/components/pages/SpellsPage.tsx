@@ -47,7 +47,11 @@ import {
   classSpellListClassIds,
   classCantripListClassIds,
   classUsesSpellbook,
+  illegalSpellSelections,
+  isSpellLegalForEntry,
+  removeIllegalSpellSelections,
 } from '../../logic/spellcasting';
+import type { IllegalSpellSelection } from '../../logic/spellcasting';
 import { getClass } from '../../data/classes';
 import { SPELLCASTING_DESCRIPTORS } from '../../data/spell-progression';
 import { getSpell, spellsForClass } from '../../data/spells';
@@ -98,6 +102,32 @@ const CASTER_KIND_LABELS = {
   pact: 'Pact Magic',
 } as const;
 
+/**
+ * Warns when the sheet holds spell picks that are not on the class's spell list
+ * (an import, an older save, or a class/subclass change can leave them). They are
+ * ignored in the counts and can be removed in one click.
+ */
+function IllegalSpellsNotice({
+  selections,
+  onRemove,
+}: {
+  selections: readonly IllegalSpellSelection[];
+  onRemove: () => void;
+}) {
+  const names = [...new Set(selections.map((s) => getSpell(s.id)?.name ?? s.id))];
+  return (
+    <Card>
+      <p className={styles.capLabel} role="alert" data-testid="illegal-spells-notice">
+        {selections.length} selected {selections.length === 1 ? 'spell is' : 'spells are'} not on your
+        class&apos;s spell list and {selections.length === 1 ? "doesn't" : "don't"} count toward your picks:{' '}
+        {names.join(', ')}.{' '}
+        <button type="button" className={styles.removeBtn} onClick={onRemove}>
+          Remove {selections.length === 1 ? 'it' : 'them'}
+        </button>
+      </p>
+    </Card>
+  );
+}
 /** Comma-separated spell names, each with its spell tooltip (content-tooltips steering). */
 function SpellNameList({ ids }: { ids: readonly string[] }) {
   return (
@@ -271,7 +301,8 @@ export function SpellsPage({
   // PRIMARY class's bucket and routes edits back under it (byte-identical to the
   // pre-M5 flow); a MULTICLASS character uses PreparedClassSection instead, one
   // per caster class, each scoped to byClass[entry.id].
-  const primaryId = primaryClass(character)?.id;
+  const primaryEntry = primaryClass(character);
+  const primaryId = primaryEntry?.id;
   const perClass: ClassSpellcasting = (primaryId ? sc.byClass?.[primaryId] : undefined) ?? {};
 
   // Leveled spells a class/subclass feature makes ALWAYS prepared (Ranger's
@@ -283,9 +314,20 @@ export function SpellsPage({
   // The player's discretionary prepared spells: stored prepared minus any that
   // are always-prepared (so a feature spell previously picked by hand no longer
   // eats a slot of the cap).
+  // Selections that are not legal for the class (see illegalSpellSelections) are
+  // ignored here so they cannot silently eat the cap; the notice above offers to
+  // remove them.
+  const illegalSelections = useMemo(() => illegalSpellSelections(character), [character]);
+  const illegalKeys = useMemo(
+    () => new Set(illegalSelections.filter((i) => i.classId === primaryId).map((i) => `${i.kind}:${i.id}`)),
+    [illegalSelections, primaryId],
+  );
   const chosenPrepared = useMemo(
-    () => (perClass.prepared ?? []).filter((id) => !alwaysPrepared.includes(id)),
-    [perClass.prepared, alwaysPrepared],
+    () =>
+      (perClass.prepared ?? []).filter(
+        (id) => !alwaysPrepared.includes(id) && !illegalKeys.has(`prepared:${id}`),
+      ),
+    [perClass.prepared, alwaysPrepared, illegalKeys],
   );
 
   // Cantrips the character must know and cannot replace (Arcane Trickster's
@@ -294,10 +336,10 @@ export function SpellsPage({
   // before the user makes any selection — without forcing a write on mount.
   const required = useMemo(() => requiredCantrips(character), [character]);
   const chosenCantrips = useMemo(() => {
-    const stored = perClass.cantrips ?? [];
+    const stored = (perClass.cantrips ?? []).filter((id) => !illegalKeys.has(`cantrip:${id}`));
     const missing = required.filter((id) => !stored.includes(id));
     return missing.length > 0 ? [...missing, ...stored] : stored;
-  }, [perClass.cantrips, required]);
+  }, [perClass.cantrips, required, illegalKeys]);
 
   // The leveled spell list(s) the character prepares/browses from: the Wizard
   // list for EK/AT, and the Bard/Cleric/Druid/Wizard union for a level-10+ Bard
@@ -343,6 +385,7 @@ export function SpellsPage({
 
   const toggleCantrip = (id: SpellId, checked: boolean) => {
     if (checked) {
+      if (!primaryEntry || !isSpellLegalForEntry(character, primaryEntry, 'cantrip', id)) return; // only the class cantrip list
       if (chosenCantrips.includes(id)) return;
       // Cap at the known-cantrips count (PHB 2024 "Cantrips" column).
       if (chosenCantrips.length >= cantripCap) return;
@@ -359,6 +402,7 @@ export function SpellsPage({
     // and never occupy the cap (PHB 2024 per-class spellcasting text).
     if (alwaysPrepared.includes(id)) return;
     if (checked) {
+      if (!primaryEntry || !isSpellLegalForEntry(character, primaryEntry, 'prepared', id)) return; // only the class spell list
       if (chosenPrepared.includes(id)) return;
       // Cap at the prepared-count (PHB 2024 "Prepared Spells" column).
       if (chosenPrepared.length >= preparedCap) return;
@@ -390,6 +434,7 @@ export function SpellsPage({
   const toggleSpellbook = (id: SpellId, checked: boolean) => {
     const book = perClass.spellbook ?? [];
     if (checked) {
+      if (!primaryEntry || !isSpellLegalForEntry(character, primaryEntry, 'spellbook', id)) return; // only the class spell list
       if (book.includes(id)) return;
       patchSpellcasting({ spellbook: [...book, id] });
     } else {
@@ -517,6 +562,12 @@ export function SpellsPage({
         }}
       />
 
+      {illegalSelections.length > 0 && (
+        <IllegalSpellsNotice
+          selections={illegalSelections}
+          onRemove={() => onChange(removeIllegalSpellSelections(character))}
+        />
+      )}
       {activeSubTab === 'summary' && (
         <Card>
           <div className={styles.summaryGrid}>
@@ -1090,15 +1141,26 @@ function PreparedClassSection({
   const alwaysPrepared = useMemo(() => classAlwaysPreparedSpells(entry, character), [entry, character]);
   const required = useMemo(() => classRequiredCantrips(entry), [entry]);
 
+  // Selections that are not legal for the class (see illegalSpellSelections) are
+  // ignored here so they cannot silently eat the cap; the notice above offers to
+  // remove them.
+  const illegalSelections = useMemo(() => illegalSpellSelections(character), [character]);
+  const illegalKeys = useMemo(
+    () => new Set(illegalSelections.filter((i) => i.classId === entry.id).map((i) => `${i.kind}:${i.id}`)),
+    [illegalSelections, entry.id],
+  );
   const chosenPrepared = useMemo(
-    () => (perClass.prepared ?? []).filter((id) => !alwaysPrepared.includes(id)),
-    [perClass.prepared, alwaysPrepared],
+    () =>
+      (perClass.prepared ?? []).filter(
+        (id) => !alwaysPrepared.includes(id) && !illegalKeys.has(`prepared:${id}`),
+      ),
+    [perClass.prepared, alwaysPrepared, illegalKeys],
   );
   const chosenCantrips = useMemo(() => {
-    const stored = perClass.cantrips ?? [];
+    const stored = (perClass.cantrips ?? []).filter((id) => !illegalKeys.has(`cantrip:${id}`));
     const missing = required.filter((id) => !stored.includes(id));
     return missing.length > 0 ? [...missing, ...stored] : stored;
-  }, [perClass.cantrips, required]);
+  }, [perClass.cantrips, required, illegalKeys]);
 
   const listKey = classSpellListClassIds(entry).join(',');
   const classSpells = useMemo(
@@ -1148,6 +1210,7 @@ function PreparedClassSection({
 
   const toggleCantrip = (id: SpellId, checked: boolean) => {
     if (checked) {
+      if (!isSpellLegalForEntry(character, entry, 'cantrip', id)) return; // only this class's cantrip list
       if (chosenCantrips.includes(id)) return;
       if (chosenCantrips.length >= cantripCap) return;
       patchPerClass({ cantrips: [...chosenCantrips, id] });
@@ -1160,6 +1223,7 @@ function PreparedClassSection({
   const togglePrepared = (id: SpellId, checked: boolean) => {
     if (alwaysPrepared.includes(id)) return;
     if (checked) {
+      if (!isSpellLegalForEntry(character, entry, 'prepared', id)) return; // only this class's spell list
       if (chosenPrepared.includes(id)) return;
       if (chosenPrepared.length >= preparedCap) return;
       patchPerClass({ prepared: [...chosenPrepared, id] });
@@ -1171,6 +1235,7 @@ function PreparedClassSection({
   const toggleSpellbook = (id: SpellId, checked: boolean) => {
     const book = perClass.spellbook ?? [];
     if (checked) {
+      if (!isSpellLegalForEntry(character, entry, 'spellbook', id)) return; // only this class's spell list
       if (book.includes(id)) return;
       patchPerClass({ spellbook: [...book, id] });
     } else {

@@ -320,3 +320,53 @@ describe('SpellsPage — Browse filtering', () => {
     expect(screen.getByText('Fire Bolt')).toBeInTheDocument();
   });
 });
+
+describe('SpellsPage — class spell list legality', () => {
+  const clericWithStray: Partial<Character> = {
+    level: 1,
+    classes: [{ id: 'cleric', level: 1 }],
+    spellcasting: {
+      byClass: {
+        // Fireball is a Wizard/Sorcerer spell: not on the Cleric list and above level 1.
+        cleric: { cantrips: ['sacred-flame', 'fire-bolt'], prepared: ['cure-wounds', 'fireball'] },
+      },
+    },
+  };
+
+  it('warns about picks that are not on the class list and ignores them in the counts', () => {
+    renderStatefulPage(clericWithStray);
+    const notice = screen.getByTestId('illegal-spells-notice');
+    expect(notice).toHaveTextContent('2 selected spells are not on your class');
+    expect(notice).toHaveTextContent('Fireball');
+    expect(notice).toHaveTextContent('Fire Bolt');
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    // Only Cure Wounds counts as prepared; Fireball is ignored.
+    expect(screen.getByRole('button', { name: /Prepared chosen/ })).toHaveTextContent('1');
+    expect(screen.getByRole('button', { name: /Cantrips chosen/ })).toHaveTextContent('1');
+  });
+
+  it('removes the illegal picks in one click and keeps the legal ones', () => {
+    const { onChange } = renderStatefulPage(clericWithStray);
+    fireEvent.click(screen.getByRole('button', { name: /^Remove them/ }));
+    const next = onChange.mock.calls.at(-1)![0] as Character;
+    expect(next.spellcasting?.byClass?.cleric).toEqual({ cantrips: ['sacred-flame'], prepared: ['cure-wounds'] });
+    expect(screen.queryByTestId('illegal-spells-notice')).toBeNull();
+  });
+
+  it('shows no notice when every pick is on the class list', () => {
+    renderStatefulPage({
+      level: 1,
+      classes: [{ id: 'cleric', level: 1 }],
+      spellcasting: { byClass: { cleric: { cantrips: ['sacred-flame'], prepared: ['bless'] } } },
+    });
+    expect(screen.queryByTestId('illegal-spells-notice')).toBeNull();
+  });
+
+  it('offers only Cleric-list spells in the Prepared tab', () => {
+    renderStatefulPage({ level: 1, classes: [{ id: 'cleric', level: 1 }] });
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    expect(screen.queryByRole('checkbox', { name: /Fireball/ })).toBeNull();
+    expect(screen.queryByRole('checkbox', { name: /Magic Missile/ })).toBeNull();
+    expect(screen.getByRole('checkbox', { name: /^Bless/ })).toBeInTheDocument();
+  });
+});

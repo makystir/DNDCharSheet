@@ -356,3 +356,25 @@ describe('AdvancementPage class-feature choices', () => {
     expect(screen.getByRole('heading', { name: /Choices Pending \(3\)/ })).toBeInTheDocument();
   });
 });
+
+describe('AdvancementPage spell legality', () => {
+  it('lists spell picks that are not on the class list as a pending item', () => {
+    renderStateful({
+      level: 1,
+      classes: [{ id: 'cleric', level: 1 }],
+      spellcasting: { byClass: { cleric: { cantrips: ['sacred-flame'], prepared: ['fireball'] } } },
+    });
+    const item = screen.getByTestId('pending-illegal-spells');
+    expect(item).toHaveTextContent('1 selected spell is not on your class');
+    expect(item).toHaveTextContent('Fireball');
+  });
+
+  it('shows no illegal-spell item when every pick is on the class list', () => {
+    renderStateful({
+      level: 1,
+      classes: [{ id: 'cleric', level: 1 }],
+      spellcasting: { byClass: { cleric: { cantrips: ['sacred-flame'], prepared: ['bless'] } } },
+    });
+    expect(screen.queryByTestId('pending-illegal-spells')).toBeNull();
+  });
+});

@@ -1274,3 +1274,113 @@ export function canCastPreparedSpell(character: Character, spellLevel: number): 
     availablePactPool(character),
   );
 }
+
+
+// ─── Spell-selection legality (class spell lists) ──────────────────────────────
+//
+// A character may only SELECT spells their class can cast: cantrips from the
+// class's cantrip list, level 1+ spells from the class's spell list (widened by
+// the Bard's Magical Secrets from Bard 10, PHB 2024 L2830), of a level they have
+// slots for, and a spellbook caster (Wizard) prepares only from its spellbook
+// (L7445). Spells a feature makes always prepared are exempt (they are derived,
+// and may sit outside the class list, e.g. domain or oath spells). The pickers
+// only offer legal spells; this check also catches selections that reached the
+// save another way (an import, an older version, a subclass or class change).
+
+/** One stored spell selection that is not legal for its class. */
+export interface IllegalSpellSelection {
+  /** The byClass bucket the selection is stored under. */
+  classId: string;
+  kind: 'cantrip' | 'prepared' | 'spellbook';
+  id: SpellId;
+}
+
+/** The legality predicates for one caster class entry (see the block comment above). */
+function spellLegalityFor(character: Character, entry: ClassEntry) {
+  const topLevel = classMaxPreparedLevel(entry);
+  const leveledLists = new Set(classSpellListClassIds(entry));
+  const cantripLists = new Set(classCantripListClassIds(entry));
+  const required = classRequiredCantrips(entry);
+  const always = classAlwaysPreparedSpells(entry, character);
+  const onLists = (id: SpellId, lists: Set<string>) =>
+    getSpell(id)?.classes.some((c) => lists.has(c)) ?? false;
+  return {
+    always,
+    usesBook: classUsesSpellbook(entry),
+    cantrip: (id: SpellId) =>
+      required.includes(id) || (getSpell(id)?.level === 0 && onLists(id, cantripLists)),
+    leveled: (id: SpellId) => {
+      const spell = getSpell(id);
+      return spell !== undefined && spell.level >= 1 && spell.level <= topLevel && onLists(id, leveledLists);
+    },
+  };
+}
+
+/**
+ * Whether a spell may be selected as a cantrip, a spellbook entry or a prepared
+ * spell for ONE class entry. The pickers offer only these; the Spells page and the
+ * creation wizard also call this before writing a selection.
+ */
+export function isSpellLegalForEntry(
+  character: Character,
+  entry: ClassEntry,
+  kind: IllegalSpellSelection['kind'],
+  id: SpellId,
+): boolean {
+  if (!entryIsSpellcaster(entry)) return false;
+  const legal = spellLegalityFor(character, entry);
+  if (kind === 'cantrip') return legal.cantrip(id);
+  if (kind === 'spellbook') return legal.leveled(id);
+  if (legal.always.includes(id)) return true;
+  const book = character.spellcasting?.byClass?.[entry.id]?.spellbook ?? [];
+  return legal.leveled(id) && (!legal.usesBook || book.includes(id));
+}
+
+/** Every stored cantrip / prepared / spellbook entry that is not legal for its class. */
+export function illegalSpellSelections(character: Character): IllegalSpellSelection[] {
+  const byClass = character.spellcasting?.byClass ?? {};
+  const out: IllegalSpellSelection[] = [];
+  for (const [classId, bucket] of Object.entries(byClass)) {
+    if (!bucket) continue;
+    const entry = allClasses(character).find((e) => e.id === classId);
+    const ids = (kind: IllegalSpellSelection['kind'], list: readonly SpellId[] | undefined) =>
+      (list ?? []).forEach((id) => out.push({ classId, kind, id }));
+    // A bucket for a class the character no longer has, or that no longer casts.
+    if (!entry || !entryIsSpellcaster(entry)) {
+      ids('cantrip', bucket.cantrips);
+      ids('prepared', bucket.prepared);
+      ids('spellbook', bucket.spellbook);
+      continue;
+    }
+    for (const id of bucket.cantrips ?? []) {
+      if (!isSpellLegalForEntry(character, entry, 'cantrip', id)) out.push({ classId, kind: 'cantrip', id });
+    }
+    for (const id of bucket.spellbook ?? []) {
+      if (!isSpellLegalForEntry(character, entry, 'spellbook', id)) out.push({ classId, kind: 'spellbook', id });
+    }
+    for (const id of bucket.prepared ?? []) {
+      if (!isSpellLegalForEntry(character, entry, 'prepared', id)) out.push({ classId, kind: 'prepared', id });
+    }
+  }
+  return out;
+}
+/** The character with every illegal stored spell selection removed (never mutates). */
+export function removeIllegalSpellSelections(character: Character): Character {
+  const illegal = illegalSpellSelections(character);
+  if (illegal.length === 0 || !character.spellcasting?.byClass) return character;
+  const bad = (classId: string, kind: IllegalSpellSelection['kind'], id: SpellId) =>
+    illegal.some((i) => i.classId === classId && i.kind === kind && i.id === id);
+  const byClass: NonNullable<SpellcastingState['byClass']> = {};
+  for (const [classId, bucket] of Object.entries(character.spellcasting.byClass)) {
+    if (!bucket) continue;
+    const next: ClassSpellcasting = {};
+    const cantrips = (bucket.cantrips ?? []).filter((id) => !bad(classId, 'cantrip', id));
+    const spellbook = (bucket.spellbook ?? []).filter((id) => !bad(classId, 'spellbook', id));
+    const prepared = (bucket.prepared ?? []).filter((id) => !bad(classId, 'prepared', id));
+    if (cantrips.length > 0) next.cantrips = cantrips;
+    if (spellbook.length > 0) next.spellbook = spellbook;
+    if (prepared.length > 0) next.prepared = prepared;
+    if (Object.keys(next).length > 0) byClass[classId as keyof typeof byClass] = next;
+  }
+  return { ...character, spellcasting: { ...character.spellcasting, byClass } };
+}

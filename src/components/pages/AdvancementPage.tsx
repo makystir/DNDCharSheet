@@ -59,6 +59,8 @@ import {
 import { choiceStatus } from '../../logic/class-choices';
 import { pendingMulticlassPicks } from '../../logic/multiclass-picks';
 import { pendingSpellPicks, spellPickLabel } from '../../logic/spell-picks-pending';
+import { illegalSpellSelections } from '../../logic/spellcasting';
+import { getSpell } from '../../data/spells';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
 
@@ -259,6 +261,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // Newly owed spell picks (cantrips, spellbook, prepared, Mystic Arcanum): one item
   // each, made on the Spells page. Same source as the Overview "Finish setting up" card.
   const spellPicks = pendingSpellPicks(character);
+  // Spell picks stored on the sheet that are not on the class's spell list (an import,
+  // an older save, a class or subclass change). Fixed on the Spells page.
+  const illegalSpells = illegalSpellSelections(character);
   // A class with the Fighting Style feature (Fighter 1, Paladin 2, Ranger 2) that
   // has not picked its Fighting Style feat yet is one pending choice per class.
   const unfilledFightingStyles = fightingStyleSlots(character).filter((s) => s.filled === undefined);
@@ -271,7 +276,8 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
     (languagePicks.remaining > 0 ? 1 : 0) +
     pendingClassChoiceCount +
     pendingMulticlassCount +
-    spellPicks.length;
+    spellPicks.length +
+    (illegalSpells.length > 0 ? 1 : 0);
 
   return (
     <div className={styles.page}>
@@ -756,6 +762,14 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 <a href="#spells">Choose on Spells</a>
               </li>
             ))}
+            {illegalSpells.length > 0 && (
+              <li className={styles.pendingItem} data-testid="pending-illegal-spells">
+                {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
+                class&apos;s spell list:{' '}
+                {[...new Set(illegalSpells.map((s) => getSpell(s.id)?.name ?? s.id))].join(', ')}.{' '}
+                <a href="#spells">Review on Spells</a>
+              </li>
+            )}
           </ul>
         )}
         <ExpertiseOverNote status={expertise} />

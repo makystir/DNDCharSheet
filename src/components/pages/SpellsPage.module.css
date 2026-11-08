@@ -187,3 +187,23 @@
   font-size: 0.82rem;
   color: var(--text-primary);
 }
+
+/* One-click clean-up of spell picks that are not on the class list. */
+.removeBtn {
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.removeBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+@media (hover: none), (max-width: 767px) {
+  .removeBtn {
+    min-height: 44px;
+  }
+}

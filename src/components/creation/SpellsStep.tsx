@@ -42,6 +42,7 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
 
   const toggleCantrip = (id: SpellId, checked: boolean) => {
     if (checked) {
+      if (!pools.cantrips.some((s) => s.id === id)) return; // only the class cantrip list
       if (cantrips.includes(id) || cantrips.length >= choices.cantrips) return;
       onChange({ ...value, cantrips: [...cantrips, id] });
     } else {
@@ -53,6 +54,7 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
   const toggleBook = (id: SpellId, checked: boolean) => {
     const cap = choices.spellbook ?? 0;
     if (checked) {
+      if (!pools.leveled.some((s) => s.id === id)) return; // only the class spell list
       if (book.includes(id) || book.length >= cap) return;
       onChange({ ...value, spellbook: [...book, id] });
     } else {
@@ -68,6 +70,8 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
   const togglePrepared = (id: SpellId, checked: boolean) => {
     if (always.includes(id)) return;
     if (checked) {
+      // Only the class spell list; a spellbook caster prepares only from its book.
+      if (!pools.leveled.some((s) => s.id === id) || (usesBook && !book.includes(id))) return;
       if (prepared.includes(id) || prepared.length >= choices.prepared) return;
       onChange({ ...value, prepared: [...prepared, id] });
     } else {

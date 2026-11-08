@@ -479,10 +479,20 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       const pools = startingSpellPools(classId);
       const always = pools?.alwaysPrepared ?? [];
       const required = pools?.required ?? [];
-      const stored = spellPicks.cantrips ?? [];
+      // Whatever was picked, keep only spells the class can cast: its cantrip list
+      // and level 1 list, and for a spellbook caster only prepared spells that are
+      // in the book (picks are reset on a class change, this is the last guard).
+      const cantripIds = new Set(pools?.cantrips.map((s) => s.id) ?? []);
+      const leveledIds = new Set(pools?.leveled.map((s) => s.id) ?? []);
+      const stored = (spellPicks.cantrips ?? []).filter((id) => cantripIds.has(id));
       const cantrips = [...required.filter((id) => !stored.includes(id)), ...stored];
-      const spellbook = spellPicks.spellbook ?? [];
-      const prepared = (spellPicks.prepared ?? []).filter((id) => !always.includes(id));
+      const spellbook = (spellPicks.spellbook ?? []).filter((id) => leveledIds.has(id));
+      const prepared = (spellPicks.prepared ?? []).filter(
+        (id) =>
+          !always.includes(id) &&
+          leveledIds.has(id) &&
+          (startingChoicesFor(classId)?.spells?.spellbook == null || spellbook.includes(id)),
+      );
       const picks: ClassSpellcasting = {
         ...(cantrips.length > 0 ? { cantrips } : {}),
         ...(spellbook.length > 0 ? { spellbook } : {}),
