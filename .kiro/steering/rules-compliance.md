@@ -6,12 +6,13 @@ All game mechanics, calculations, data, and logic in this application MUST compl
 
 ## Authoritative Sources
 
-Reference these documents (in priority order) when implementing or modifying any game logic. The first is present in the project today; add the others and update the paths as you obtain them:
+Reference these documents (in priority order) when implementing or modifying any game logic. The first four are present in the project today (all in `Docs/`); add the others and update the paths as you obtain them:
 
-1. #[[file:Docs/PlayersHandbook.md]] — Player's Handbook (2024) — character build, rules glossary, spells (highest authority for player-facing mechanics)
-2. Dungeon Master's Guide (2024) — DM-facing rules, magic items, optional/variant rules — *(add to the project and link here when available)*
-3. Monster Manual (2024) — stat blocks, creature rules — *(add to the project and link here when available)*
-4. Sage Advice Compendium / official errata (overrides the core books where they conflict) — *(add to the project and link here when available)*
+1. #[[file:Docs/PlayersHandbook.md]] — Player's Handbook (2024) — character build, rules glossary, spells, Appendix B creature stat blocks (highest authority for player-facing mechanics)
+2. #[[file:Docs/DungeonMastersGuide.md]] — Dungeon Master's Guide (2024, first printing November 2024) — DM-facing rules, magic items, NPC party members and the optional Loyalty rule, Bastions and their hirelings, optional/variant rules
+3. #[[file:Docs/TashasCauldronOfEverything.md]] — Tasha's Cauldron of Everything (2020) — a **2014-edition (5e) supplement**: Sidekicks (Expert / Spellcaster / Warrior), optional class features, Artificer creatures. Where it overlaps the 2024 books (for example the Ranger's Primal Companion), the 2024 book wins and Tasha's is NOT used. Its content is usable only where it is explicitly compatible with 2024 rules, must be marked with a `Tasha's 2020 (5e, 2014 rules)` comment citing the section, and any compatibility doubt must be flagged to the user (rule 3 below). Its optional rules (such as Sidekicks) are opt-in house rules (rule 4 below).
+4. #[[file:Docs/DnD 5e 2024 Monster Manual Alternate Cover.md]] — Monster Manual (2024) — stat blocks, creature rules, NPC stat blocks (the DMG tells DMs to take NPC party members from it). The scan is badly OCR-damaged (mangled headings, scrambled stat block grids): treat it like the PHB tables, cross-check every number, and the printed pages are in `Docs/DnD 5e 2024 Monster Manual Alternate Cover.pdf` (390 pages; printed page = PDF page - 3; its text layer is garbled, so render the page to an image with PyMuPDF and read the image). Ask the user only when a value cannot be read reliably from the page image, rather than guessing.
+5. Sage Advice Compendium / official errata (overrides the core books where they conflict) — *(add to the project and link here when available)*
 
 > When you add a reference document, place it in the project and update this list with a `#[[file:<path>]]` link so it is pulled into context automatically. Keep the priority order above.
 
