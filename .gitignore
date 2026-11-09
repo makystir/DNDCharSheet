@@ -54,3 +54,5 @@ Thumbs.db
 Docs/
 *.pdf
 *.PDF
+
+/.vitest/
