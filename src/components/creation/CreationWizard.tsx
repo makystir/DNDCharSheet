@@ -13,6 +13,7 @@ import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesId } from '../../data/species';
 import { BACKGROUND_LIST, getBackground } from '../../data/backgrounds';
 import type { BackgroundId } from '../../data/backgrounds';
+import { BackgroundDetails } from './BackgroundDetails';
 import { createCharacter } from '../../storage/character-store';
 import { abilityModifier } from '../../logic/abilities';
 import {
@@ -613,6 +614,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           </option>
         ))}
       </select>
+
+      <BackgroundDetails selected={background} onChoose={selectBackground} />
 
       {/* Background-fit hint (DETERMINISTIC advisor; a nudge only — does NOT
           restrict the pick). Lists the backgrounds that boost the chosen class's

@@ -286,9 +286,9 @@ describe('CreationWizard Skills step', () => {
     expect(screen.getByRole('heading', { name: /Step 3: Skills/ })).toBeInTheDocument();
     const panel = screen.getByRole('region', { name: 'Granted automatically' });
     expect(within(panel).getByText(/You don.t choose these/)).toBeInTheDocument();
-    expect(within(panel).getByText(/Saving throws \(Fighter\): Strength & Constitution/)).toBeInTheDocument();
-    expect(within(panel).getByText(/Background skills \(Acolyte\): Insight & Religion/)).toBeInTheDocument();
-    expect(within(panel).getByText(/Origin feat: Magic Initiate/)).toBeInTheDocument();
+    expect(panel.textContent).toMatch(/Saving throws \(Fighter\):\s*Strength & Constitution/);
+    expect(panel.textContent).toMatch(/Background skills \(Acolyte\):\s*Insight & Religion/);
+    expect(panel.textContent).toMatch(/Origin feat:\s*Magic Initiate/);
   });
 
   it('enforces the class skill cap and shows a live counter', () => {

@@ -6,6 +6,12 @@ import type { BackgroundId } from '../../data/backgrounds';
 import { getFeat } from '../../data/feats';
 import type { SpeciesId } from '../../data/species';
 import { speciesGrantedSkills } from '../../logic/skills';
+import {
+  resolveFeatTooltip,
+  resolveSaveTooltip,
+  resolveSkillTooltip,
+} from '../../logic/tooltip-content';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import styles from './CreationWizard.module.css';
 
 export interface SkillsStepProps {
@@ -78,7 +84,14 @@ export function SkillsStep({
         <ul className={styles.grantedList}>
           <li>
             Saving throws ({cls.name}):{' '}
-            {savingThrows.map((a) => ABILITY_NAMES[a]).join(' & ')}
+            {savingThrows.map((a, i) => (
+              <span key={a}>
+                {i > 0 && ' & '}
+                <MaybeContentTooltip content={resolveSaveTooltip(a)} ariaLabel={`About ${ABILITY_NAMES[a]} saving throw`}>
+                  {ABILITY_NAMES[a]}
+                </MaybeContentTooltip>
+              </span>
+            ))}
           </li>
           {cls.armorTraining.length > 0 && <li>Armor training: {cls.armorTraining.join(', ')}</li>}
           {cls.weaponProficiencies.length > 0 && (
@@ -88,13 +101,28 @@ export function SkillsStep({
           {background && (
             <li>
               Background skills ({background.name}):{' '}
-              {background.skills.map((s) => SKILL_NAME[s]).join(' & ')}
+              {background.skills.map((s, i) => (
+                <span key={s}>
+                  {i > 0 && ' & '}
+                  <MaybeContentTooltip content={resolveSkillTooltip(s)} ariaLabel={`About ${SKILL_NAME[s]}`}>
+                    {SKILL_NAME[s]}
+                  </MaybeContentTooltip>
+                </span>
+              ))}
             </li>
           )}
-          {background && feat && <li>Origin feat: {feat.name}</li>}
+          {background && feat && <li>
+              Origin feat:{' '}
+              <MaybeContentTooltip content={resolveFeatTooltip(feat.id)} ariaLabel={`About ${feat.name}`}>
+                {feat.name}
+              </MaybeContentTooltip>
+            </li>}
           {Object.entries(speciesSkills).map(([skill, label]) => (
             <li key={skill}>
-              Species skill ({label}): {SKILL_NAME[skill as SkillId]}
+              Species skill ({label}):{' '}
+              <MaybeContentTooltip content={resolveSkillTooltip(skill as SkillId)} ariaLabel={`About ${SKILL_NAME[skill as SkillId]}`}>
+                {SKILL_NAME[skill as SkillId]}
+              </MaybeContentTooltip>
             </li>
           ))}
         </ul>
@@ -128,7 +156,7 @@ export function SkillsStep({
                     aria-label={SKILL_NAME[skill]}
                     onChange={(e) => toggle(skill, e.target.checked)}
                   />
-                  {SKILL_NAME[skill]} <span className={styles.skillAbility}>({abilityAbbr})</span>
+                  <MaybeContentTooltip content={resolveSkillTooltip(skill)} ariaLabel={`About ${SKILL_NAME[skill]}`}>{SKILL_NAME[skill]}</MaybeContentTooltip>{' '}<span className={styles.skillAbility}>({abilityAbbr})</span>
                 </label>
                 {source !== undefined && (
                   <span className={styles.skillNote}>
