@@ -46,3 +46,20 @@ describe('HelpPopover', () => {
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 });
+
+describe('HelpPopover autoShow={false}', () => {
+  it('stays closed on first render and opens only when the ? button is clicked', () => {
+    render(
+      <HelpPopover concept={CONCEPT} autoShow={false}>
+        Manual help text.
+      </HelpPopover>,
+    );
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Help:/ }));
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Manual help text.');
+    // Opening by hand does not count as a dismissal; closing it does.
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Help:/ }));
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+});

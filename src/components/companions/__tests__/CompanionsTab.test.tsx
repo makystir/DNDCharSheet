@@ -23,6 +23,15 @@ function expand(name: RegExp | string) {
   fireEvent.click(screen.getByRole('button', { name }));
 }
 
+describe('CompanionsTab: help popover', () => {
+  it('does not open its help popover on load; the ? button opens it', () => {
+    // localStorage is cleared, so a first-visit hint would have auto-opened.
+    renderTab(plainCharacter());
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Help: companions-tab/ }));
+    expect(screen.getByRole('tooltip')).toHaveTextContent(/Track permanent companions here/);
+  });
+});
 describe('CompanionsTab: add and remove', () => {
   it('adds a companion through the creation dialog', () => {
     const latest = { current: plainCharacter() };

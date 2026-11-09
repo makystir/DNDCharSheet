@@ -74,7 +74,7 @@ export function CompanionsTab({ character, onChange, undo }: CompanionsTabProps)
           title={
             <span className={styles.titleRow}>
               Companions
-              <HelpPopover concept="companions-tab">{getHelpContent('companions-tab')}</HelpPopover>
+              <HelpPopover concept="companions-tab" autoShow={false}>{getHelpContent('companions-tab')}</HelpPopover>
             </span>
           }
           action={

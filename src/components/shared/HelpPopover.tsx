@@ -10,6 +10,12 @@ import { incrementDismissCount, isSuppressed } from './helpPopoverStorage';
 export interface HelpPopoverProps {
   concept: string; // concept ID for localStorage key
   children: string; // help text content (max 280 chars)
+  /**
+   * Open on first render until dismissed 3 times (an onboarding hint). Default true.
+   * Set false for help that should only open when the user clicks the ? button, so it
+   * never covers page content on load.
+   */
+  autoShow?: boolean;
 }
 
 /** Estimated popover box used to decide flip/clamp before it is measured. */
@@ -44,7 +50,7 @@ function computePosition(trigger: HTMLElement): { top: number; left: number } {
   return { top, left };
 }
 
-export function HelpPopover({ concept, children }: HelpPopoverProps) {
+export function HelpPopover({ concept, children, autoShow = true }: HelpPopoverProps) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -55,11 +61,11 @@ export function HelpPopover({ concept, children }: HelpPopoverProps) {
   // Intentional setState-in-effect: reads suppression state from an external
   // store on mount and opens the popover once accordingly.
   useEffect(() => {
-    if (!autoShowedRef.current && !isSuppressed(concept)) {
+    if (autoShow && !autoShowedRef.current && !isSuppressed(concept)) {
       autoShowedRef.current = true;
       setOpen(true);
     }
-  }, [concept]);
+  }, [concept, autoShow]);
 
   // Position the popover (in a portal) whenever it opens, and keep it anchored on
   // scroll/resize. Positioning from the trigger's live rect means it is never
