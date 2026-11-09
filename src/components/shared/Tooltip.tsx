@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import styles from './Tooltip.module.css';
 
@@ -11,42 +11,61 @@ export interface TooltipProps {
   id: string;
 }
 
-function computePosition(anchorEl: HTMLElement): { top: number; left: number } {
+interface Placement {
+  top: number;
+  left: number;
+  /** Set when neither side has room for the whole tooltip, so it scrolls instead of covering the anchor. */
+  maxHeight?: number;
+}
+
+/**
+ * Place the tooltip beside its anchor using the tooltip's MEASURED size. It goes
+ * below the anchor when it fits, otherwise above, otherwise on the side with more
+ * room with a capped height. It must never overlap the anchor: a tooltip that sits
+ * under the cursor steals the hover, hides, and reappears in a rapid flicker.
+ */
+function computePlacement(anchorEl: HTMLElement, width: number, height: number): Placement {
   const rect = anchorEl.getBoundingClientRect();
   const margin = 8;
   const gap = 6;
-  const tooltipEstWidth = 280;
-  const tooltipEstHeight = 200;
+  const spaceBelow = window.innerHeight - rect.bottom - gap - margin;
+  const spaceAbove = rect.top - gap - margin;
 
-  // Vertical: prefer below, flip above if not enough space
   let top: number;
-  const spaceBelow = window.innerHeight - rect.bottom;
-  if (spaceBelow >= tooltipEstHeight + gap) {
+  let maxHeight: number | undefined;
+  if (height <= spaceBelow) {
     top = rect.bottom + gap;
+  } else if (height <= spaceAbove) {
+    top = rect.top - gap - height;
+  } else if (spaceBelow >= spaceAbove) {
+    top = rect.bottom + gap;
+    maxHeight = Math.max(spaceBelow, 80);
   } else {
-    top = rect.top - tooltipEstHeight - gap;
-    if (top < margin) top = margin;
+    maxHeight = Math.max(spaceAbove, 80);
+    top = rect.top - gap - maxHeight;
   }
 
-  // Horizontal: center on anchor, clamp to viewport
-  let left = rect.left + rect.width / 2 - tooltipEstWidth / 2;
-  left = Math.max(margin, Math.min(left, window.innerWidth - tooltipEstWidth - margin));
-
-  return { top, left };
+  // Horizontal: center on the anchor, clamp to the viewport.
+  let left = rect.left + rect.width / 2 - width / 2;
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+  return { top, left, ...(maxHeight !== undefined ? { maxHeight } : {}) };
 }
 
 export function Tooltip({ anchorEl, title, children, onClose, id }: TooltipProps) {
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<{ top: number; left: number }>(() => computePosition(anchorEl));
 
-  // Recompute position when anchor changes.
-  // Intentional setState-in-effect: repositions relative to an external DOM
-  // anchor element when it changes.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPosition(computePosition(anchorEl));
-  }, [anchorEl]);
-
+  // Position from the real rendered size before the browser paints (no flash at the
+  // wrong spot). Written straight to the element, not through state, so a re-render
+  // can never overwrite the measured placement with a stale estimate.
+  useLayoutEffect(() => {
+    const el = tooltipRef.current;
+    if (!el) return;
+    el.style.maxHeight = '';
+    const placement = computePlacement(anchorEl, el.offsetWidth, el.offsetHeight);
+    el.style.top = `${placement.top}px`;
+    el.style.left = `${placement.left}px`;
+    if (placement.maxHeight !== undefined) el.style.maxHeight = `${placement.maxHeight}px`;
+  }, [anchorEl, title, children]);
   // Auto-focus on mount
   useEffect(() => {
     tooltipRef.current?.focus();
@@ -88,7 +107,6 @@ export function Tooltip({ anchorEl, title, children, onClose, id }: TooltipProps
       role="tooltip"
       tabIndex={-1}
       className={styles.tooltip}
-      style={{ top: position.top, left: position.left }}
     >
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{children}</div>

@@ -11,6 +11,15 @@
   box-shadow: 0 4px 16px var(--shadow);
   padding: 12px;
   outline: none;
+  /* Position is set by Tooltip.tsx from the measured size; scroll if it must be capped. */
+  overflow-y: auto;
+}
+/* On hover devices the tooltip never captures the pointer, so it can't steal the hover from its
+   trigger. Touch keeps it interactive (tap inside keeps it open, tap outside closes it). */
+@media (hover: hover) and (pointer: fine) {
+  .tooltip {
+    pointer-events: none;
+  }
 }
 
 .title {
