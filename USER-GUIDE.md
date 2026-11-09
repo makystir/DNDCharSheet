@@ -146,8 +146,19 @@ Choose an **alignment** (a rough description of your character's moral outlook) 
 
 ### Step 7: Equipment
 
-Choose your starting equipment from your background: **Equipment Package** (a set list of gear plus some gold) or **50 GP** to spend yourself. The Inventory page is where you add and manage weapons, armor and other gear afterward.
+In the 2024 rules, both your **class** and your **background** give you starting equipment, and any coins you get can be spent on gear right away. This step has four parts:
 
+1. **Class equipment.** Pick a package (for example "Package A"), or take the gold instead. The Fighter has two packages plus a gold option. If a package says "choose one" (a Monk picks a tool or instrument, for example), choose it from the list.
+2. **Background equipment.** Take the **Equipment Package** or **50 GP**.
+3. **Buy your own gear.** Your gold from both choices above is your budget. Browse **Weapons**, **Armor** and **Gear**, search by name, and use **+** and **−** to buy or return items. Prices are the book prices. **Gold left** updates as you go, and you can hover over it to see how it was worked out.
+
+4. **Trinket.** You can roll once on the Trinkets table (a d100) for a free, Tiny keepsake, such as a mummified goblin hand or a crystal that glows in moonlight. It has no use in the rules. It's just a bit of mystery to inspire your character's story. You can also pick one from the list if your DM allows.
+
+A gold-only choice gives you the biggest budget. A package gives you a ready-made kit and a little spare gold to spend.
+
+**Warnings about gear you may not use well.** If you buy something your class probably can't use properly, the app tells you. For example, a Wizard buying armor gets a warning that they aren't trained with it, and that wearing armor without training gives Disadvantage on Strength and Dexterity tests and stops spellcasting. A Rogue buying a Greatsword is told they won't add their Proficiency Bonus to its attacks. You'll also see a note for Heavy weapons or armor your Strength can't handle. These are only warnings. You can still buy the item, because a feat, a species trait or your DM's ruling might make it work.
+
+Armor and a shield you are trained in are worn automatically when you finish. You can change what you're wearing on the Inventory page.
 ### Step 8: Review
 
 A summary of everything you picked. Anything still unfinished is listed here. When you're happy, confirm and the wizard creates your character and takes you to the sheet.

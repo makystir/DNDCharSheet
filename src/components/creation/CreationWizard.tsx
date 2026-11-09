@@ -11,9 +11,22 @@ import { CLASS_LIST } from '../../data/classes';
 import type { ClassId } from '../../data/classes';
 import { SPECIES_LIST, getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec, SpeciesId } from '../../data/species';
-import { BACKGROUND_LIST, getBackground } from '../../data/backgrounds';
+import { BACKGROUND_LIST, BACKGROUND_OPTION_B_GOLD, getBackground } from '../../data/backgrounds';
 import type { BackgroundId } from '../../data/backgrounds';
 import { BackgroundDetails } from './BackgroundDetails';
+import { EquipmentStep } from './EquipmentStep';
+import {
+  cartCopper,
+  cartItems,
+  classEquipmentOptions,
+  grantStartingEquipment,
+  newItemId,
+  resolveOptionItems,
+  startingBudgetCopper,
+  trimCartToBudget,
+  trinketItem,
+} from '../../logic/starting-equipment';
+import type { Cart, ClassOptionId } from '../../logic/starting-equipment';
 import { createCharacter } from '../../storage/character-store';
 import { abilityModifier } from '../../logic/abilities';
 import {
@@ -183,6 +196,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // Step 5: Equipment.
   const [equipmentChoice, setEquipmentChoice] = useState<EquipmentChoice>('A');
+  // Class equipment: the lettered option, the player's picks for any 'choose a
+  // type' item, and the gear bought with the starting gold.
+  const [classOption, setClassOption] = useState<ClassOptionId>('A');
+  const [classPicks, setClassPicks] = useState<Record<string, string>>({});
+  const [cart, setCart] = useState<Cart>({});
+  // Free trinket: its d100 result (1-100), or null for none.
+  const [trinketRoll, setTrinketRoll] = useState<number | null>(null);
 
   const background = getBackground(backgroundId || undefined);
   const species = getSpecies(speciesId || undefined);
@@ -226,6 +246,12 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     [allocation],
   );
 
+  // Scores as they will be after the background bonus; used for equipment advice.
+  const effectiveScores = useMemo<Record<Ability, number>>(() => {
+    const scores = { ...resolvedScores };
+    for (const { ability, amount } of allocationList) scores[ability] += amount;
+    return scores;
+  }, [resolvedScores, allocationList]);
   const allocationValid =
     background !== undefined &&
     isBackgroundAbilityAllocationValid(background.abilities, allocationList);
@@ -276,10 +302,38 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // ─── Step 1 handlers ─────────────────────────────────────────────────────
 
+  // Starting gold available to spend: the class option's gold + the background's.
+  const budgetFor = (
+    option: ClassOptionId,
+    bgId: BackgroundId | '',
+    bgChoice: EquipmentChoice,
+  ): number => {
+    const classGold = classEquipmentOptions(classId).find((o) => o.id === option)?.goldGp ?? 0;
+    const bg = getBackground(bgId || undefined);
+    const bgGold = !bg ? 0 : bgChoice === 'A' ? bg.equipment.packageGold : BACKGROUND_OPTION_B_GOLD;
+    return startingBudgetCopper(classGold, bgGold);
+  };
   const selectBackground = (id: BackgroundId) => {
     setBackgroundId(id);
     setAllocation({});
     setToolProficiency('');
+    // A different background changes the gold; drop purchases that no longer fit.
+    setCart((c) => trimCartToBudget(c, budgetFor(classOption, id, equipmentChoice)));
+  };
+  const chooseClassOption = (option: ClassOptionId) => {
+    setClassOption(option);
+    setCart((c) => trimCartToBudget(c, budgetFor(option, backgroundId, equipmentChoice)));
+  };
+  const chooseBackgroundEquipment = (choice: EquipmentChoice) => {
+    setEquipmentChoice(choice);
+    setCart((c) => trimCartToBudget(c, budgetFor(classOption, backgroundId, choice)));
+  };
+  const changeCart = (key: string, delta: number) => {
+    setCart((c) => {
+      const next = { ...c, [key]: Math.max(0, (c[key] ?? 0) + delta) };
+      if (next[key] === 0) delete next[key];
+      return next;
+    });
   };
 
   const setAllocationAmount = (ability: Ability, amount: number) => {
@@ -472,6 +526,23 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       character.createdAt,
     );
 
+    // Class starting equipment (the lettered option), plus anything bought with
+    // the starting gold. PHB 2024 "Choose Starting Equipment".
+    const classEquip = classEquipmentOptions(classId).find((o) => o.id === classOption);
+    if (classEquip) {
+      const granted = resolveOptionItems(classEquip, classPicks);
+      const bought = cartItems(cart, newItemId);
+      character = grantStartingEquipment(character, {
+        items: [...granted.items, ...bought],
+        goldGp: classEquip.goldGp,
+        spentCopper: cartCopper(cart),
+      });
+    }
+
+    // The free trinket (PHB 2024 "Trinkets"): a Tiny keepsake with no price.
+    const trinket = trinketItem(trinketRoll);
+    if (trinket) character = { ...character, inventory: [...(character.inventory ?? []), trinket] };
+
     // Starting spells, stored exactly as the Spells page stores them
     // (byClass[classId] = { cantrips, prepared, spellbook }); nothing else in
     // spellcasting is touched. Always-prepared feature spells are derived, never
@@ -552,6 +623,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           setSkillChoices([]);
           // Spell picks belong to the class list; reset on change.
           setSpellPicks({});
+          // Starting equipment belongs to the class too.
+          setClassOption('A');
+          setClassPicks({});
+          setCart({});
         }}
       >
         <option value="">— Select a Class —</option>
@@ -1186,36 +1261,23 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const renderEquipmentStep = () => (
     <div className={styles.stepBody}>
       <h2 className={styles.stepTitle}>Step {stepNumber('equipment')}: Equipment</h2>
-      {background ? (
-        <>
-          <p className={styles.hint}>Choose your starting equipment (PHB 2024 "Parts of a Background").</p>
-          <SegmentedControl
-            ariaLabel="Equipment choice"
-            options={[
-              { value: 'A', label: 'Equipment Package' },
-              { value: 'B', label: '50 GP' },
-            ]}
-            value={equipmentChoice}
-            onChange={(v) => setEquipmentChoice(v as EquipmentChoice)}
-          />
-          {equipmentChoice === 'A' ? (
-            <ul className={styles.pkgList}>
-              {background.equipment.packageItems.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-              <li>{background.equipment.packageGold} GP</li>
-            </ul>
-          ) : (
-            <p className={styles.hint}>Take 50 GP instead of the package.</p>
-          )}
-        </>
-      ) : (
-        <p className={styles.hint}>Select a background first.</p>
-      )}
+      <EquipmentStep
+        classId={classId}
+        background={background}
+        classOption={classOption}
+        onClassOption={chooseClassOption}
+        classPicks={classPicks}
+        onClassPick={(entry, name) => setClassPicks((p) => ({ ...p, [entry]: name }))}
+        backgroundChoice={equipmentChoice}
+        onBackgroundChoice={chooseBackgroundEquipment}
+        cart={cart}
+        onCartChange={changeCart}
+        trinketRoll={trinketRoll}
+        onTrinketRoll={setTrinketRoll}
+        scores={effectiveScores}
+      />
     </div>
-  );
-
-  const renderSkillsStep = () => (
+  );  const renderSkillsStep = () => (
     <div className={styles.stepBody}>
       <h2 className={styles.stepTitle}>Step {stepNumber('skills')}: Skills</h2>
       <SkillsStep

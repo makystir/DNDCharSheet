@@ -35,6 +35,13 @@ import {
   type NameGender,
 } from '../data/name-tables';
 import { standardArray } from './ability-score-generation';
+import {
+  classEquipmentOptions,
+  grantStartingEquipment,
+  resolveOptionItems,
+  trinketItem,
+} from './starting-equipment';
+import { rollTrinket } from '../data/trinkets';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
 import { pick, type RNG } from './random';
 import { speciesGrantedSkills } from './skills';
@@ -308,6 +315,23 @@ export function generateRandomCharacter(
   if (startingSpells) {
     character = { ...character, spellcasting: { byClass: { [classId]: startingSpells } } };
   }
+
+  // Class starting equipment, option A (the gear package), drawn after every other
+  // draw so earlier seeded results are unchanged. PHB 2024 "Choose Starting
+  // Equipment": the class provides equipment as well as the background.
+  const packageA = classEquipmentOptions(classId).find((o) => o.id === 'A');
+  if (packageA) {
+    const granted = resolveOptionItems(packageA, {}, rng);
+    character = grantStartingEquipment(character, {
+      items: granted.items,
+      goldGp: packageA.goldGp,
+      spentCopper: 0,
+    });
+  }
+
+  // One free trinket (PHB 2024 "Trinkets"), the very last draw.
+  const trinket = trinketItem(rollTrinket(rng).roll);
+  if (trinket) character = { ...character, inventory: [...(character.inventory ?? []), trinket] };
 
   return { ...character, abilityGenMethod: 'standard-array' };
 }
