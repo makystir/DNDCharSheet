@@ -25,6 +25,7 @@ import { CalculatedValue } from '../../shared/CalculatedValue';
 import { ContentTooltip } from '../../shared/ContentTooltip';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewEmpty, OverviewFooter } from './OverviewShared';
+import { SpellName } from '../../shared/SpellName';
 import styles from './OverviewConditions.module.css';
 
 export interface OverviewConditionsProps {
@@ -175,7 +176,7 @@ export function OverviewConditions({ character }: OverviewConditionsProps) {
 
       {concentrationSpell && (
         <p className={styles.concentration} data-testid="overview-concentration">
-          Concentrating: {concentrationSpell}
+          Concentrating: <SpellName id={character.concentration?.spellId ?? ''} />
         </p>
       )}
 

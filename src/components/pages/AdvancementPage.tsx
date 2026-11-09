@@ -60,7 +60,7 @@ import { choiceStatus } from '../../logic/class-choices';
 import { pendingMulticlassPicks } from '../../logic/multiclass-picks';
 import { pendingSpellPicks, spellPickLabel } from '../../logic/spell-picks-pending';
 import { illegalSpellSelections } from '../../logic/spellcasting';
-import { getSpell } from '../../data/spells';
+import { SpellNameList } from '../shared/SpellName';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
 
@@ -766,7 +766,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
               <li className={styles.pendingItem} data-testid="pending-illegal-spells">
                 {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
                 class&apos;s spell list:{' '}
-                {[...new Set(illegalSpells.map((s) => getSpell(s.id)?.name ?? s.id))].join(', ')}.{' '}
+                <SpellNameList ids={[...new Set(illegalSpells.map((s) => s.id))]} />.{' '}
                 <a href="#spells">Review on Spells</a>
               </li>
             )}

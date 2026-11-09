@@ -1,6 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { Character } from '../../types/character';
-import { getSpell } from '../../data/spells';
 import { characterHitPointMaxBreakdown, hitPointMaxOf } from '../../logic/hit-points-state';
 import {
   longRest,
@@ -12,6 +11,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { RecoveredList } from './RecoveredList';
+import { SpellName } from '../shared/SpellName';
 import styles from './Rests.module.css';
 
 export interface LongRestDialogProps {
@@ -74,9 +74,6 @@ export function LongRestDialog({
   const max = hitPointMaxOf(character);
   const changes = preview.longRestBreakdowns;
   const recovered = preview.resourcesRecovered ?? [];
-  const concentratingOn = character.concentration
-    ? (getSpell(character.concentration.spellId)?.name ?? character.concentration.spellId)
-    : null;
 
   const hours = parseCount(hoursRaw);
   const interruptions = parseCount(interruptionsRaw);
@@ -158,7 +155,13 @@ export function LongRestDialog({
               <li>Spell slots, including Pact Magic slots and Mystic Arcanum uses</li>
               <li>
                 Concentration ends
-                {concentratingOn ? ` (you are concentrating on ${concentratingOn})` : ' (you are not concentrating)'}
+                {character.concentration ? (
+            <>
+              {' '}(you are concentrating on <SpellName id={character.concentration.spellId} />)
+            </>
+          ) : (
+            ' (you are not concentrating)'
+          )}
               </li>
               <li>Death Saving Throw counters clear</li>
             </ul>

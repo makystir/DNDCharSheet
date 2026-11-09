@@ -11,6 +11,7 @@ import {
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { RollPrompt, type RollPromptResult } from '../shared/RollPrompt';
+import { SpellName } from '../shared/SpellName';
 import styles from './Concentration.module.css';
 
 export interface ConcentrationCheckPromptProps {
@@ -81,7 +82,7 @@ export function ConcentrationCheckPrompt({
         <CalculatedValue label="Concentration save DC" breakdown={check.breakdown} />
       </p>
       <p className={styles.promptText}>
-        Concentrating on {name}. Damage taken: {damage}. A success keeps the spell; a failure ends it.
+        Concentrating on <SpellName id={spellId} />. Damage taken: {damage}. A success keeps the spell; a failure ends it.
       </p>
       <div className={styles.promptActions}>
         <button ref={rollRef} type="button" className={styles.actionBtn} onClick={() => setRolling(true)}>

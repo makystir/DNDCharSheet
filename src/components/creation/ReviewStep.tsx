@@ -3,7 +3,6 @@ import { ABILITIES, ABILITY_NAMES, SKILLS } from '../../types/character';
 import { getClass } from '../../data/classes';
 import { getSpecies } from '../../data/species';
 import { getBackground } from '../../data/backgrounds';
-import { getSpell } from '../../data/spells';
 import type { SpellId } from '../../data/spells';
 import { primaryClass } from '../../logic/classes';
 import { abilityModifier } from '../../logic/abilities';
@@ -14,6 +13,7 @@ import { effectiveSkillTraining } from '../../logic/skills';
 import { pendingFeaturePicks, pendingSetupChoices } from '../../logic/starting-choices';
 import type { FeaturePickItem, PendingItem } from '../../logic/starting-choices';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { SpellNameList } from '../shared/SpellName';
 import styles from './CreationWizard.module.css';
 
 export interface ReviewStepProps {
@@ -30,8 +30,6 @@ const PENDING_LABEL: Record<PendingItem['kind'] | FeaturePickItem['kind'], strin
   languages: 'feature languages',
 };
 
-const spellNames = (ids: SpellId[] | undefined): string =>
-  (ids ?? []).map((id) => getSpell(id)?.name ?? id).join(', ');
 
 /**
  * Wizard "Review" step: a read-only summary of everything chosen so far, plus
@@ -120,7 +118,7 @@ export function ReviewStep({ character }: ReviewStepProps) {
           <ul className={styles.grantedList} aria-label="Spells chosen">
             {spellGroups.map((g) => (
               <li key={g.label}>
-                {g.label}: {spellNames(g.ids)}
+                {g.label}: <SpellNameList ids={g.ids ?? []} />
               </li>
             ))}
           </ul>

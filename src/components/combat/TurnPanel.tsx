@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { Footprints } from 'lucide-react';
 import type { Character } from '../../types/character';
-import { getSpell } from '../../data/spells';
 import { speedBreakdown } from '../../logic/species';
 import { isCharacterTurn } from '../../logic/initiative-order';
 import {
@@ -19,6 +18,7 @@ import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
+import { SpellName } from '../shared/SpellName';
 import styles from './Initiative.module.css';
 
 export interface TurnPanelProps {
@@ -120,7 +120,7 @@ export function TurnPanel({ character, onChange, onRollDeathSave }: TurnPanelPro
 
         {ownTurn && spellId && (
           <p className={styles.reminder} data-testid="concentration-reminder">
-            You are concentrating on {getSpell(spellId)?.name ?? spellId}.
+            You are concentrating on <SpellName id={spellId} />.
           </p>
         )}
 

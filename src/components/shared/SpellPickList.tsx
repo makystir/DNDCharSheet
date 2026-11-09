@@ -2,6 +2,7 @@ import { Sparkles } from 'lucide-react';
 import type { CatalogSpell, SpellId } from '../../data/spells';
 import { SCHOOL_LABELS } from './spellSchoolLabels';
 import { ContentTooltip } from './ContentTooltip';
+import { SpellName } from './SpellName';
 import { resolveSpellTooltip } from '../../logic/tooltip-content';
 import { EmptyState } from './EmptyState';
 import styles from './SpellPickList.module.css';
@@ -80,7 +81,7 @@ export function SpellPickList({
                 onChange={(e) => onToggle(s.id, e.target.checked)}
               />
               <span className={styles.pickName}>
-                {s.name}
+                <SpellName id={s.id} />
                 {locked && <span className={styles.pickLevel}> · {lockedLabel}</span>}
                 {showLevel && <span className={styles.pickLevel}> · L{s.level}</span>}
                 {/* Cross-pool castability (PHB 2024 L2168): only annotated when

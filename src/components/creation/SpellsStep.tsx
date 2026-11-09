@@ -6,6 +6,7 @@ import { getClass } from '../../data/classes';
 import { startingChoicesFor } from '../../logic/starting-choices';
 import { startingSpellPools } from '../../logic/starting-spells';
 import { SpellPickList } from '../shared/SpellPickList';
+import { SpellNameList } from '../shared/SpellName';
 import styles from './CreationWizard.module.css';
 
 export interface SpellsStepProps {
@@ -152,7 +153,7 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
           {always.length > 0 && (
             <p className={styles.hint}>
               Always prepared (from class features, not counted):{' '}
-              {always.map((id) => getSpell(id)?.name ?? id).join(', ')}.
+              <SpellNameList ids={always} />.
             </p>
           )}
           {usesBook && book.length === 0 ? (

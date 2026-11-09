@@ -63,8 +63,7 @@ import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EmptyState } from '../shared/EmptyState';
 import { SpellPickList } from '../shared/SpellPickList';
-import { MaybeContentTooltip } from '../shared/ContentTooltip';
-import { resolveSpellTooltip } from '../../logic/tooltip-content';
+import { SpellName, SpellNameList } from '../shared/SpellName';
 import { SCHOOL_LABELS } from '../shared/spellSchoolLabels';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
@@ -114,13 +113,13 @@ function IllegalSpellsNotice({
   selections: readonly IllegalSpellSelection[];
   onRemove: () => void;
 }) {
-  const names = [...new Set(selections.map((s) => getSpell(s.id)?.name ?? s.id))];
+  const ids = [...new Set(selections.map((s) => s.id))];
   return (
     <Card>
       <p className={styles.capLabel} role="alert" data-testid="illegal-spells-notice">
         {selections.length} selected {selections.length === 1 ? 'spell is' : 'spells are'} not on your
         class&apos;s spell list and {selections.length === 1 ? "doesn't" : "don't"} count toward your picks:{' '}
-        {names.join(', ')}.{' '}
+        <SpellNameList ids={ids} />.{' '}
         <button type="button" className={styles.removeBtn} onClick={onRemove}>
           Remove {selections.length === 1 ? 'it' : 'them'}
         </button>
@@ -128,20 +127,6 @@ function IllegalSpellsNotice({
     </Card>
   );
 }
-/** Comma-separated spell names, each with its spell tooltip (content-tooltips steering). */
-function SpellNameList({ ids }: { ids: readonly string[] }) {
-  return (
-    <>
-      {ids.map((id, i) => (
-        <span key={id}>
-          {i > 0 && ', '}
-          <MaybeContentTooltip content={resolveSpellTooltip(id)}>{getSpell(id)?.name ?? id}</MaybeContentTooltip>
-        </span>
-      ))}
-    </>
-  );
-}
-
 function spellLevelLabel(level: number): string {
   return level === 0 ? 'Cantrips' : `Level ${level}`;
 }
@@ -1074,7 +1059,9 @@ export function SpellsPage({
                 <ul className={styles.browseList} aria-label={`${spellLevelLabel(lvl)} spells`}>
                   {spells.map((s) => (
                     <li key={s.id} className={styles.browseRow}>
-                      <span className={styles.browseName}>{s.name}</span>
+                      <span className={styles.browseName}>
+                          <SpellName id={s.id} />
+                        </span>
                       <span className={styles.browseMeta}>
                         {SCHOOL_LABELS[s.school]} · {s.castingTime} · {s.range}
                         {s.concentration ? ' · Concentration' : ''}
