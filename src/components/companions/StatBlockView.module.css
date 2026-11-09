@@ -1,0 +1,152 @@
+/* 2024 stat block layout. Tokens only. */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  overflow-wrap: anywhere;
+}
+.subtitle {
+  margin: 0;
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.vitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+}
+.vital {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.vital dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.vital dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.abilities {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+.abilities th,
+.abilities td {
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+.abilities thead th {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.abilities tbody th {
+  font-weight: 600;
+}
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lineLabel {
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+.lineValue {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+.featureSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.featureHeading {
+  margin: 0;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-strong);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+}
+.featureList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.feature {
+  min-width: 0;
+  color: var(--text-primary);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.featureName {
+  font-weight: 700;
+  font-style: italic;
+}
+.featureText {
+  color: var(--text-primary);
+}
+.derivedLines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 2px;
+}
+.derived {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 767px) {
+  .block {
+    padding: 10px;
+  }
+}

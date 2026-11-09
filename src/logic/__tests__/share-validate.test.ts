@@ -139,3 +139,45 @@ describe('share-validate resourcesSpent (additive-optional field)', () => {
     if (result.ok) expect(result.character.resourcesSpent).toEqual({ 'fighter.second-wind': 1 });
   });
 });
+describe('share-validate companions fields (additive-optional)', () => {
+  it('keeps valid records and strips hostile ones', () => {
+    const payload = {
+      ...validChar(),
+      companions: [
+        { id: 'c1', creatureId: 'wolf', origin: 'pet' },
+        { id: 'c2', creatureId: 'not-a-creature', origin: 'pet' },
+      ],
+      hirelings: [{ id: 'h1', name: 'Mara', kind: 'untrained', units: 4 }, { id: 'h2', name: 'Bad', kind: 'nope', units: 1 }],
+      mounts: 'hostile',
+      loyaltyMaxOverride: -4,
+    };
+    const result = validateSharedPayload(JSON.stringify(payload));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.character.companions).toEqual([{ id: 'c1', creatureId: 'wolf', origin: 'pet' }]);
+    expect(result.character.hirelings).toEqual([{ id: 'h1', name: 'Mara', kind: 'untrained', units: 4 }]);
+    expect('mounts' in result.character).toBe(false);
+    expect('loyaltyMaxOverride' in result.character).toBe(false);
+  });
+
+  it('caps oversized lists and leaves absent fields absent', () => {
+    const many = Array.from({ length: 40 }, (_, i) => ({ id: `h${i}`, name: 'H', kind: 'skilled', units: 1 }));
+    const big = validateSharedPayload(JSON.stringify({ ...validChar(), hirelings: many }));
+    expect(big.ok).toBe(true);
+    if (big.ok) expect(big.character.hirelings).toHaveLength(30);
+    const absent = validateSharedPayload(JSON.stringify(validChar()));
+    expect(absent.ok).toBe(true);
+    if (absent.ok) for (const k of ['companions', 'mounts', 'hirelings', 'npcPartyMembers', 'sidekicks']) expect(k in absent.character).toBe(false);
+  });
+
+  it('round-trips through the share codec unchanged', async () => {
+    const hireling = { id: 'h1', name: 'Mara', kind: 'skilled', units: 2 };
+    const json = JSON.stringify({ ...validChar(), hirelings: [hireling] });
+    const decoded = await decodeSharePayload(await encodeSharePayload(json));
+    expect(decoded.ok).toBe(true);
+    if (!decoded.ok) return;
+    const result = validateSharedPayload(decoded.json);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.character.hirelings).toEqual([hireling]);
+  });
+});

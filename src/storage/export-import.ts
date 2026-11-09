@@ -24,6 +24,7 @@ import type { Character } from '../types/character';
 import { BLANK_CHARACTER, CURRENT_VERSION } from '../types/character';
 import { sanitizeClassChoices } from '../logic/class-choices';
 import { sanitizeResourcesSpent } from '../logic/resources';
+import { sanitizeCompanionsState } from '../logic/companions-sanitize';
 import { isConcentrating, sanitizeConditionDurations } from '../logic/condition-duration';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
@@ -207,6 +208,9 @@ export function importFromJSON(json: string): ImportResult {
   const sanitizedResources = sanitizeResourcesSpent(migrated.character.resourcesSpent);
   if (sanitizedResources) migrated.character.resourcesSpent = sanitizedResources;
   else delete migrated.character.resourcesSpent;
+  // Companions page fields are additive-optional and untrusted: bounded shapes,
+  // unknown creature ids dropped, array lengths capped.
+  sanitizeCompanionsState(migrated.character);
 
   // Condition durations (Stage E) are additive-optional and untrusted: only the
   // `duration` of each entry is validated; legacy free-text entries are untouched.

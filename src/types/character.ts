@@ -54,6 +54,13 @@ import type { CurrencyAmount } from '../logic/currency';
 // the dice engine's notion of Advantage / Disadvantage.
 import type { D20Mode } from '../logic/dice';
 
+// Companions page record types (additive-optional Character fields). Type-only
+// imports of the catalog/logic keys so the persisted records and the catalogs
+// cannot drift.
+import type { CreatureSize as CatalogCreatureSize } from '../data/creatures';
+import type { SidekickClassId } from '../data/sidekicks';
+import type { HirelingKind } from '../logic/companions';
+
 /** The six abilities, in the canonical PHB order. PHB 2024 "Ability Scores". */
 export const ABILITIES = [
   'str',
@@ -338,6 +345,195 @@ export interface HouseRules {
    * that is OFF by default. Absent = off (no bonus feat slots).
    */
   bonusFeatsAfter20?: boolean;
+  /**
+   * When true, the Companions page offers Tasha's Sidekicks (Expert, Spellcaster,
+   * Warrior).
+   *
+   * RULES-COMPLIANCE NOTE (rule 3 / rule 4): Sidekicks are an optional
+   * supplement from Tasha's Cauldron of Everything (2020), "Sidekicks"
+   * (Docs/TashasCauldronOfEverything.md), a 2014-edition (5e) book. They are
+   * NOT part of the 2024 rules, so this is an OPT-IN house rule that is OFF by
+   * default and the UI marks them "Tasha's 2020 (5e, 2014 rules)". Absent = off.
+   */
+  sidekicks?: boolean;
+  /**
+   * When true, hirelings and NPC party members on the Companions page track a
+   * Loyalty Score (0-20).
+   *
+   * RULES-COMPLIANCE NOTE (rule 4): Loyalty is an optional rule in the Dungeon
+   * Master's Guide 2024, "Loyalty" (Docs/DungeonMastersGuide.md L3572-3586). It
+   * is an OPT-IN house rule that is OFF by default. Absent = off.
+   */
+  loyalty?: boolean;
+}
+
+// ─── Companions page records (additive-optional; no CURRENT_VERSION bump) ─────
+
+/**
+ * Shared tracking fields of every creature the Companions page tracks (HP, temp
+ * HP, conditions, notes). Edited only on the Companions page. Absent `hp` = at
+ * the maximum and follows it (same convention as `Character.currentHp`).
+ */
+export interface TrackedCreature {
+  /** Current HP; absent = at maximum. PHB 2024 "Hit Points" (L1073-1079). */
+  hp?: number;
+  /** Temporary Hit Points; absent = 0. They do not stack (L1179-1193). */
+  tempHp?: number;
+  /** Active conditions (ids from the condition catalog, no durations). */
+  conditions?: ActiveCondition[];
+  /** Exhaustion level 0..6; absent = 0. */
+  exhaustionLevel?: number;
+  notes?: string;
+}
+
+/** How a companion came to the character. */
+export type CompanionOrigin =
+  | 'primal-companion'
+  | 'find-familiar'
+  | 'pact-of-the-chain'
+  | 'wild-companion'
+  | 'find-steed'
+  | 'animate-dead'
+  | 'pet';
+
+/** Celestial / Fey / Fiend type choice for a familiar or the Otherworldly Steed. */
+export type CompanionSpiritType = 'Celestial' | 'Fey' | 'Fiend';
+
+/**
+ * A permanent creature companion. Stats are NEVER stored: they are read from the
+ * creature catalog (and the owner's live level, Wisdom and spellcasting for the
+ * Primal Companion and the Otherworldly Steed).
+ */
+export interface CompanionRecord extends TrackedCreature {
+  /** Instance id. */
+  id: string;
+  /** CREATURE_CATALOG key; an unknown id drops the record on import. */
+  creatureId: string;
+  origin: CompanionOrigin;
+  nickname?: string;
+  /** True = dismissed (kept but inactive); absent = active. */
+  dismissed?: boolean;
+  /** The actual maximum when it differs from the printed average (e.g. rolled). */
+  hpMaxOverride?: number;
+  /** Find Steed: level of the spell slot used (2-9). */
+  spellSlotLevel?: number;
+  /** Find Steed: creature type chosen on the cast. */
+  steedType?: CompanionSpiritType;
+  /** Find Familiar / Pact of the Chain: creature type chosen. */
+  familiarType?: CompanionSpiritType;
+  /** Find Steed: id of the character's class entry whose spellcasting supplies attack and DC. */
+  castingClassId?: string;
+}
+
+/** Saddle kinds (PHB 2024 "Mounts and Vehicles" equipment, L10388). */
+export type SaddleKind = 'none' | 'riding' | 'military' | 'exotic';
+
+/** A mount or pack animal. */
+export interface MountRecord {
+  id: string;
+  /** CREATURE_CATALOG key; an unknown id drops the record on import. */
+  creatureId: string;
+  nickname?: string;
+  /** Weight carried, in pounds. */
+  carriedLb?: number;
+  saddle?: SaddleKind;
+  /** ARMOR_CATALOG key of armor bought as barding. */
+  bardingArmorId?: string;
+  /** Custom barding base armor: normal cost and weight (before the barding multipliers). */
+  bardingCustom?: { costGp: number; weightLb: number };
+  pullsVehicle?: boolean;
+  /** Weight of the vehicle this animal helps pull (lb). */
+  vehicleWeightLb?: number;
+  notes?: string;
+}
+
+/** A user-typed named stat block entry (trait, action, bonus action or reaction). */
+export interface NamedStatEntry {
+  name: string;
+  description: string;
+}
+
+/**
+ * A fully user-entered stat block for a hireling or NPC party member. The PHB
+ * gives hirelings no statistics and the Monster Manual holds the NPC stat
+ * blocks, so nothing here is pre-filled from the book.
+ */
+export interface CustomStatBlock {
+  size?: CatalogCreatureSize;
+  creatureType?: string;
+  alignment?: string;
+  ac?: number;
+  initiativeMod?: number;
+  hpMax?: number;
+  speed?: string;
+  abilities?: Partial<Record<Ability, number>>;
+  saveProficiencies?: Ability[];
+  proficiencyBonus?: number;
+  skills?: string;
+  senses?: string;
+  languages?: string;
+  resistances?: string;
+  immunities?: string;
+  vulnerabilities?: string;
+  cr?: string;
+  xp?: number;
+  traits?: NamedStatEntry[];
+  actions?: NamedStatEntry[];
+  bonusActions?: NamedStatEntry[];
+  reactions?: NamedStatEntry[];
+}
+
+/** A hireling (PHB 2024 services table, L10523-10533). */
+export interface HirelingRecord extends TrackedCreature {
+  id: string;
+  name: string;
+  kind: HirelingKind;
+  /** Days (skilled, untrained) or miles (messenger). */
+  units: number;
+  /** Copper pieces per unit the user actually pays (the table pay is a minimum). */
+  customRateCp?: number;
+  stats?: CustomStatBlock;
+  /** Loyalty Score 0-20, used only when the loyalty house rule is on. */
+  loyalty?: number;
+}
+
+/** An NPC party member (DMG 2024 L833, L3553-3560). */
+export interface NpcPartyMemberRecord extends TrackedCreature {
+  id: string;
+  name: string;
+  role?: string;
+  stats?: CustomStatBlock;
+  /** Loyalty Score 0-20, used only when the loyalty house rule is on. */
+  loyalty?: number;
+}
+
+/** One recorded sidekick level-up. */
+export interface SidekickLevelUp {
+  /** The new level reached (2-20). */
+  level: number;
+  /** The Hit Die roll entered (or rolled). */
+  roll: number;
+  /** Hit points gained (computed by the helper at the time). */
+  hpGained: number;
+}
+
+/** A Tasha's sidekick (2014 rules; only with the `sidekicks` house rule). */
+export interface SidekickRecord extends TrackedCreature {
+  id: string;
+  /** CREATURE_CATALOG key; an unknown id drops the record on import. */
+  creatureId: string;
+  nickname?: string;
+  classId: SidekickClassId;
+  /** Sidekick level 1-20. */
+  level: number;
+  /** User-entered maximum HP at the start level. */
+  baseHpMax: number;
+  levelUps: SidekickLevelUp[];
+  martialRole?: 'Attacker' | 'Defender';
+  spellcastingRole?: 'Mage' | 'Healer' | 'Prodigy';
+  deathSaves?: { successes: number; failures: number };
+  stable?: boolean;
+  dead?: boolean;
 }
 
 /**
@@ -772,6 +968,25 @@ export interface Character {
    * when read and kept in storage.
    */
   resourcesSpent?: Record<string, number>;
+  /**
+   * Permanent creature companions (Companions page). Additive-optional; no
+   * CURRENT_VERSION bump; not in BLANK_CHARACTER. Sanitized on import and share
+   * (logic/companions-sanitize.ts). Temporary summons are deliberately not tracked.
+   */
+  companions?: CompanionRecord[];
+  /** Mounts and pack animals (Companions page). Additive-optional; no `_v` bump. */
+  mounts?: MountRecord[];
+  /** Hirelings (Companions page). Additive-optional; no `_v` bump. */
+  hirelings?: HirelingRecord[];
+  /** NPC party members (Companions page). Additive-optional; no `_v` bump. */
+  npcPartyMembers?: NpcPartyMemberRecord[];
+  /** Tasha's sidekicks (Companions page, house rule). Additive-optional; no `_v` bump. */
+  sidekicks?: SidekickRecord[];
+  /**
+   * Party-wide Loyalty maximum override, an integer 0-20 (DMG 2024 L3578). Absent
+   * = this character's Charisma score. Additive-optional; no `_v` bump.
+   */
+  loyaltyMaxOverride?: number;
   /**
    * Heroic Inspiration (PHB 2024 "Heroic Inspiration", Docs/PlayersHandbook.md
    * L498-501): a character either has it or not (never more than one). Absent =

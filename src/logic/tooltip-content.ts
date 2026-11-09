@@ -47,6 +47,10 @@ import { effectiveSkillTraining } from './skills';
 import { savingThrowProficiency } from './saving-throws';
 import type { ClassFeature } from '../data/classes';
 import type { SpeciesTrait } from '../data/species';
+import { CREATURE_CATALOG } from '../data/creatures';
+import { SIDEKICK_CLASS_IDS, getSidekickClass } from '../data/sidekicks';
+import type { SidekickClassId } from '../data/sidekicks';
+import { sidekickFeatureDice, sidekickFeatureUses } from './sidekick';
 
 /** Structured content for a tooltip popover (same shape as the PWA source). */
 export interface TooltipContent {
@@ -995,4 +999,399 @@ export function resolveVitalTooltip(id: VitalId): TooltipContent {
   if (info.formula) sections.push({ label: 'Formula', text: info.formula });
   sections.push({ label: 'Source', text: info.source });
   return { title: info.title, sections };
+}
+
+// --- Companions page (creatures, sidekick features, house rules) --------------
+
+const CREATURE_USE_TEXT: Record<string, string> = {
+  'primal-companion':
+    'A Beast Master Ranger\'s Primal Companion. Its AC, Hit Points, attack and damage scale with the Ranger\'s level, Wisdom modifier and Proficiency Bonus.',
+  familiar: 'A familiar form (Find Familiar, Pact of the Chain or Wild Companion).',
+  steed: 'A steed. The Otherworldly Steed scales with the level of the Find Steed spell slot.',
+  animal: 'A Beast that can be kept as a pet, mount or pack animal.',
+  undead: 'An undead servant (Animate Dead). Whether it counts as a permanent companion is an open point.',
+};
+
+/**
+ * Tooltip for a creature from the catalog: what it is, how it is used and where
+ * its stat block is printed. Returns null for an unknown id.
+ */
+export function resolveCreatureTooltip(creatureId: string): TooltipContent | null {
+  if (!Object.hasOwn(CREATURE_CATALOG, creatureId)) return null;
+  const c = CREATURE_CATALOG[creatureId];
+  const kind = [c.size, c.creatureType, c.subtype ? `(${c.subtype})` : null].filter(Boolean).join(' ');
+  const sections: { label: string; text: string }[] = [];
+  if (kind) sections.push({ label: 'Creature', text: c.alignment ? `${kind}, ${c.alignment}` : kind });
+  if (c.challenge.cr !== null) {
+    const xp = c.challenge.xp !== null ? ` (${c.challenge.xp} XP)` : '';
+    sections.push({ label: 'Challenge Rating', text: `${c.challenge.cr}${xp}` });
+  }
+  sections.push({ label: 'Used as', text: CREATURE_USE_TEXT[c.kind] ?? 'A creature companion.' });
+  if (c.mountTable) {
+    sections.push({
+      label: 'Mount',
+      text: `Carrying capacity ${c.mountTable.carryingCapacityLb} lb, cost ${c.mountTable.costGp} GP (Mounts and Other Animals table).`,
+    });
+  }
+  const page = c.source.printedPage !== undefined ? `, printed page ${c.source.printedPage}` : '';
+  const line = c.source.line !== undefined ? ` (Docs/PlayersHandbook.md L${c.source.line})` : '';
+  sections.push({ label: 'Source', text: `${c.source.book}, ${c.source.section}${page}${line}` });
+  return { title: c.name, sections };
+}
+
+/**
+ * Tooltip for a Tasha's sidekick class feature, optionally at a given sidekick
+ * level (shows the uses and dice in force at that level). Always marked
+ * "Tasha's 2020 (5e, 2014 rules)". Returns null for an unknown class or feature.
+ */
+export function resolveSidekickFeatureTooltip(classId: string, featureId: string, level?: number): TooltipContent | null {
+  if (!(SIDEKICK_CLASS_IDS as readonly string[]).includes(classId)) return null;
+  const cls = getSidekickClass(classId as SidekickClassId);
+  const feature = cls.features.find((f) => f.id === featureId);
+  if (!feature) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: 'Effect', text: feature.summary },
+    { label: 'Gained', text: `${cls.name} level ${feature.level}` },
+  ];
+  const activation: Record<typeof feature.activation, string> = {
+    passive: 'Always on',
+    'bonus-action': 'Bonus action',
+    reaction: 'Reaction',
+    special: 'See the feature',
+  };
+  sections.push({ label: 'Activation', text: activation[feature.activation] });
+  if (feature.recharge) {
+    sections.push({
+      label: 'Recharge',
+      text: feature.recharge === 'long-rest' ? 'Long rest' : 'Short or long rest',
+    });
+  }
+  if (level !== undefined && Number.isInteger(level) && level >= 1 && level <= 20) {
+    const uses = sidekickFeatureUses(feature, level);
+    const dice = sidekickFeatureDice(feature, level);
+    if (uses !== null) sections.push({ label: `Uses at level ${level}`, text: String(uses) });
+    if (dice !== null) sections.push({ label: `Dice at level ${level}`, text: dice });
+  }
+  sections.push({
+    label: 'Source',
+    text: `${feature.source.edition}: ${feature.source.book}, ${feature.source.section} (Docs/TashasCauldronOfEverything.md L${feature.source.lines[0]}-${feature.source.lines[1]})`,
+  });
+  return { title: feature.name, sections };
+}
+
+/** House rules of the Companions page that have a Settings tooltip. */
+export const COMPANION_HOUSE_RULE_KEYS = ['sidekicks', 'loyalty'] as const;
+
+export type CompanionHouseRuleKey = (typeof COMPANION_HOUSE_RULE_KEYS)[number];
+
+const COMPANION_HOUSE_RULE_TOOLTIPS: Record<CompanionHouseRuleKey, TooltipContent> = {
+  sidekicks: {
+    title: "Sidekicks (Tasha's 2020, 5e / 2014 rules)",
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A sidekick is a creature with a challenge rating of 1/2 or lower that gains an Expert, Spellcaster or Warrior class and levels up with the group. Adds a Sidekicks tab to the Companions page.',
+      },
+      {
+        label: 'Edition',
+        text: "Tasha's 2020 (5e, 2014 rules). Not part of the 2024 rules, so it is an opt-in house rule and off by default.",
+      },
+      { label: 'Source', text: "Tasha's Cauldron of Everything, \"Sidekicks\" (Docs/TashasCauldronOfEverything.md L6917-7275)" },
+    ],
+  },
+  loyalty: {
+    title: 'Loyalty (DMG 2024)',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'An NPC party member gets a Loyalty Score from 0 to 20 (this app also offers it for hirelings). It starts at half the highest Charisma in the party (round down) and never exceeds that number. Helping or treating them well raises it; abuse lowers it.',
+      },
+      {
+        label: 'Meaning',
+        text: 'At 10 or more they risk anything for the party; 1 to 9 they are tenuously faithful; at 0 they no longer act in the party\'s interest.',
+      },
+      {
+        label: 'Edition',
+        text: 'Optional rule in the 2024 Dungeon Master\'s Guide, so it is an opt-in house rule and off by default.',
+      },
+      { label: 'Source', text: 'DMG 2024 "Loyalty" (Docs/DungeonMastersGuide.md L3572-3586)' },
+    ],
+  },
+};
+
+/** Tooltip for a Companions house-rule toggle (Settings). Null for an unknown key. */
+export function resolveCompanionHouseRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(COMPANION_HOUSE_RULE_TOOLTIPS, key) ? COMPANION_HOUSE_RULE_TOOLTIPS[key as CompanionHouseRuleKey] : null;
+}
+
+/** Stat block sections a creature feature can live in. */
+export type CreatureFeatureSection = 'traits' | 'actions' | 'bonusActions' | 'reactions';
+
+const CREATURE_FEATURE_SECTION_LABELS: Record<CreatureFeatureSection, string> = {
+  traits: 'Trait',
+  actions: 'Action',
+  bonusActions: 'Bonus Action',
+  reactions: 'Reaction',
+};
+
+/**
+ * Tooltip for a trait, action, bonus action or reaction of a catalog creature
+ * (the catalog's paraphrased description plus usage). Returns null for an
+ * unknown creature or feature name.
+ */
+export function resolveCreatureFeatureTooltip(
+  creatureId: string,
+  section: CreatureFeatureSection,
+  featureName: string,
+): TooltipContent | null {
+  if (!Object.hasOwn(CREATURE_CATALOG, creatureId)) return null;
+  const creature = CREATURE_CATALOG[creatureId];
+  const list = creature[section] ?? [];
+  const feature = list.find((f) => f.name === featureName);
+  if (!feature || !feature.description) return null;
+  const sections: { label: string; text: string }[] = [
+    { label: CREATURE_FEATURE_SECTION_LABELS[section], text: feature.description },
+  ];
+  if (feature.usage) sections.push({ label: 'Usage', text: feature.usage });
+  sections.push({ label: 'Creature', text: creature.name });
+  return { title: feature.name, sections };
+}
+
+/** Keys of the descriptive rule tooltips shown on the Companions page. */
+export const COMPANION_RULE_TOOLTIP_KEYS = [
+  'familiar-zero-hp',
+  'wild-companion',
+  'primal-revival',
+  'steed-zero-hp',
+  'monster-death',
+  'mounted-combat',
+  'mount-dismount',
+  'controlled-mount',
+  'carrying-capacity',
+  'vehicle-pull',
+  'barding',
+  'saddles',
+  'hireling-services',
+  'npc-party-cr',
+  'loyalty-score',
+  'loyalty-bands',
+  'sidekick-edition',
+  'sidekick-stat-adjustment',
+] as const;
+
+export type CompanionRuleTooltipKey = (typeof COMPANION_RULE_TOOLTIP_KEYS)[number];
+
+const COMPANION_RULE_TOOLTIPS: Record<CompanionRuleTooltipKey, TooltipContent> = {
+  'familiar-zero-hp': {
+    title: 'A familiar at 0 Hit Points',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'When the familiar drops to 0 Hit Points it disappears and reappears after you cast Find Familiar again. It leaves behind anything it was wearing or carrying. You can also dismiss it to a pocket dimension, or forever.',
+      },
+      { label: 'Source', text: 'PHB 2024, Find Familiar, "Disappearance of the Familiar" (Docs/PlayersHandbook.md L13127)' },
+    ],
+  },
+  'wild-companion': {
+    title: 'Wild Companion familiar',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A familiar summoned with Wild Companion is Fey and disappears when you finish a Long Rest. At 0 Hit Points it disappears like any familiar.',
+      },
+      { label: 'Source', text: 'PHB 2024, Druid, "Level 2: Wild Companion" (Docs/PlayersHandbook.md L3704-3708)' },
+    ],
+  },
+  'primal-revival': {
+    title: 'A Primal Companion at 0 Hit Points',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'If the beast died within the last hour, you can take a Magic action to touch it and expend a spell slot. It returns to life after 1 minute with all its Hit Points restored. After a Long Rest you can summon a different primal beast, and the old one vanishes.',
+      },
+      { label: 'Source', text: 'PHB 2024, Ranger: Beast Master, "Primal Companion" (Docs/PlayersHandbook.md L5589)' },
+    ],
+  },
+  'steed-zero-hp': {
+    title: 'An Otherworldly Steed at 0 Hit Points',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'The steed disappears if it drops to 0 Hit Points or if you die. It leaves behind anything it was wearing or carrying. If you cast Find Steed again, you decide whether to summon the same steed or a different one.',
+      },
+      { label: 'Source', text: 'PHB 2024, Find Steed, "Disappearance of the Steed" (Docs/PlayersHandbook.md L13147)' },
+    ],
+  },
+  'monster-death': {
+    title: 'A creature at 0 Hit Points',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A monster dies the instant it drops to 0 Hit Points, although the DM can ignore this for an individual monster and treat it like a character.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Instant Death" (Docs/PlayersHandbook.md L1139-1140)' },
+    ],
+  },
+  'mounted-combat': {
+    title: 'Mounted combat',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A willing creature that is at least one size larger than its rider and has an appropriate anatomy can serve as a mount.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Mounted Combat" (Docs/PlayersHandbook.md L1031-1033)' },
+    ],
+  },
+  'mount-dismount': {
+    title: 'Mounting and dismounting',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'During your move you can mount a creature within 5 feet of you or dismount. Doing so costs movement equal to half your Speed, rounded down. At Speed 30 that is 15 feet.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Mounting and Dismounting" (Docs/PlayersHandbook.md L1035-1037)' },
+    ],
+  },
+  'controlled-mount': {
+    title: 'Controlling a mount',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'You can control a mount only if it has been trained to accept a rider (domesticated horses, mules and similar creatures are). A controlled mount takes your Initiative, moves as you direct on your turn, and can only Dash, Disengage or Dodge. It can move and act on the turn you mount it.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Controlling a Mount" (Docs/PlayersHandbook.md L1039-1043)' },
+    ],
+  },
+  'carrying-capacity': {
+    title: 'Carrying capacity of an animal',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'The Mounts and Other Animals table lists the carrying capacity of common mounts and pack animals. For other animals this app derives Strength x the size multiplier from the Carrying Capacity table (an extension of the character rule). The Mule counts as one size larger (Beast of Burden); its table value already includes that step.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Mounts and Other Animals" (Docs/PlayersHandbook.md L10390-10401); "Carrying Capacity" (L20792-20800)' },
+    ],
+  },
+  'vehicle-pull': {
+    title: 'Animals pulling a vehicle',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'An animal pulling a carriage, cart, chariot, sled or wagon can move weight up to five times its base carrying capacity, including the weight of the vehicle. If several animals pull the same vehicle, add their carrying capacities together.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Tack, Harness, and Drawn Vehicles" (Docs/PlayersHandbook.md L10378)' },
+    ],
+  },
+  barding: {
+    title: 'Barding',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Barding is armor designed for a mount. Any armor on the Armor table can be bought as barding. It costs four times the normal cost and weighs twice as much.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Barding" (Docs/PlayersHandbook.md L10382-10384)' },
+    ],
+  },
+  saddles: {
+    title: 'Saddles',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'A saddle comes with a bit, a bridle, reins and other needed equipment. A Military Saddle gives Advantage on any ability check you make to remain mounted. An Exotic Saddle is required to ride an aquatic or a flying mount.',
+      },
+      { label: 'Source', text: 'PHB 2024, "Saddles" (Docs/PlayersHandbook.md L10386-10388)' },
+    ],
+  },
+  'hireling-services': {
+    title: 'Hirelings',
+    sections: [
+      {
+        label: 'Rule',
+        text: 'Skilled hirelings do a service that involves a proficiency (a mercenary, artisan or scribe). The pay on the Hirelings table is a minimum; some experts want more. Untrained hirelings (laborers, porters) need no proficiency. Skilled 2 GP per day, untrained 2 SP per day, messenger 2 CP per mile.',
+      },
+      { label: 'Stat block', text: 'The PHB gives hirelings no statistics, so none are filled in. Enter a Monster Manual stat block by hand if you want one.' },
+      { label: 'Source', text: 'PHB 2024, "Hirelings" (Docs/PlayersHandbook.md L10523-10533)' },
+    ],
+  },
+  'npc-party-cr': {
+    title: 'NPC party members',
+    sections: [
+      {
+        label: 'Rule',
+        text: "Use a Monster Manual stat block whose Challenge Rating is no higher than half the characters' level, so the NPC does not overshadow the player characters. These NPCs don't gain Experience Points and don't become more powerful. This app warns about a higher CR but never blocks it.",
+      },
+      { label: 'Source', text: 'DMG 2024, "NPCs as Party Members" (Docs/DungeonMastersGuide.md L3553-3557)' },
+    ],
+  },
+  'loyalty-score': {
+    title: 'Loyalty Score',
+    sections: [
+      {
+        label: 'Rule',
+        text: "Loyalty is measured from 0 to 20. The maximum is the highest Charisma score in the party (this sheet uses this character's score unless you override it) and the starting score is half that. It rises by 1d4 when the NPC is helped with a personal goal or treated particularly well, falls by 1d4 when the party acts against its alignment or personality, and falls by 2d4 when it is abused, misled or endangered for selfish reasons. It never drops below 0 or rises above the maximum.",
+      },
+      { label: 'Interpretation', text: 'A Charisma above 20 is capped at the 0-20 scale. Half the maximum rounds down. The DMG writes Loyalty for NPC party members only; using it for hirelings is an extension in this app.' },
+      { label: 'Source', text: 'DMG 2024, "Loyalty" (Docs/DungeonMastersGuide.md L3572-3582)' },
+    ],
+  },
+  'loyalty-bands': {
+    title: 'Meaning of Loyalty',
+    sections: [
+      { label: '10 or higher', text: 'Risks anything to help fellow party members.' },
+      { label: '1 to 9', text: 'Tenuously faithful to the party.' },
+      { label: '0', text: "No longer acts in the party's best interests. The NPC leaves the party or secretly works against it." },
+      { label: 'Interpretation', text: 'The book says "10 or higher" and "between 1 and 10", so 10 overlaps. This app treats 10 as "risks anything".' },
+      { label: 'Source', text: 'DMG 2024, "Loyalty" (Docs/DungeonMastersGuide.md L3584)' },
+    ],
+  },
+  'sidekick-edition': {
+    title: "Sidekicks (Tasha's 2020, 5e / 2014 rules)",
+    sections: [
+      {
+        label: 'Edition',
+        text: "Sidekicks come from Tasha's Cauldron of Everything (2020), a 2014-edition supplement, and are an optional DM rule. They are shown only while the Sidekicks house rule is on.",
+      },
+      {
+        label: 'Level',
+        text: "A sidekick's level equals the average level of the group and rises when that average rises. The book does not say how to round, so this app rounds down. You enter the party level yourself (single-character sheet).",
+      },
+      { label: 'Source', text: "Tasha's Cauldron of Everything, \"Sidekicks\" (Docs/TashasCauldronOfEverything.md L6927-6952)" },
+    ],
+  },
+  'sidekick-stat-adjustment': {
+    title: "Sidekick proficiency bonus adjustment (Tasha's 2020, 5e / 2014 rules)",
+    sections: [
+      {
+        label: 'Rule',
+        text: "Each time the sidekick's proficiency bonus rises by 1, add 1 to the attack roll bonus of every attack and 1 to every saving throw DC in its stat block. Shown here relative to the proficiency bonus printed in the stat block.",
+      },
+      {
+        label: 'Interpretation',
+        text: 'The rule does not mention saving throw or skill bonuses, so those are not adjusted.',
+      },
+      { label: 'Source', text: "Tasha's Cauldron of Everything, \"Sidekicks\" (Docs/TashasCauldronOfEverything.md L6964)" },
+    ],
+  },
+};
+
+/** Tooltip for a Companions-page rule note. Null for an unknown key. */
+export function resolveCompanionRuleTooltip(key: string): TooltipContent | null {
+  return Object.hasOwn(COMPANION_RULE_TOOLTIPS, key) ? COMPANION_RULE_TOOLTIPS[key as CompanionRuleTooltipKey] : null;
+}
+
+/** Which rule note explains 0 HP for a companion origin. */
+export function zeroHpRuleKeyForOrigin(origin: string): CompanionRuleTooltipKey {
+  switch (origin) {
+    case 'find-familiar':
+    case 'pact-of-the-chain':
+      return 'familiar-zero-hp';
+    case 'wild-companion':
+      return 'wild-companion';
+    case 'primal-companion':
+      return 'primal-revival';
+    case 'find-steed':
+      return 'steed-zero-hp';
+    default:
+      return 'monster-death';
+  }
 }

@@ -1,0 +1,42 @@
+.titleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+}
+.addBtn:hover:not(:disabled) {
+  background: var(--border-strong);
+  color: var(--bg-primary);
+}
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.addBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .addBtn {
+    min-height: 44px;
+  }
+}

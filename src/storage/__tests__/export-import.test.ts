@@ -273,3 +273,57 @@ describe('resourcesSpent round trip (additive-optional, no version bump)', () =>
     expect(result.character && 'resourcesSpent' in result.character).toBe(false);
   });
 });
+describe('companions fields round trip (additive-optional, no version bump)', () => {
+  const companion = { id: 'c1', creatureId: 'wolf', origin: 'pet', nickname: 'Fang', hp: 5 };
+
+  it('survives export then import unchanged, with no CURRENT_VERSION change', () => {
+    const c = makeChar({
+      companions: [companion as never],
+      mounts: [{ id: 'm1', creatureId: 'mule', carriedLb: 100 }],
+      hirelings: [{ id: 'h1', name: 'Mara', kind: 'skilled', units: 3 }],
+      npcPartyMembers: [{ id: 'n1', name: 'Scout' }],
+      loyaltyMaxOverride: 12,
+      houseRules: { sidekicks: true, loyalty: true },
+    });
+    const result = importFromJSON(exportToJSON(c));
+    expect(result.success).toBe(true);
+    expect(result.character?.companions).toEqual([companion]);
+    expect(result.character?.mounts).toHaveLength(1);
+    expect(result.character?.hirelings?.[0].units).toBe(3);
+    expect(result.character?.npcPartyMembers?.[0].name).toBe('Scout');
+    expect(result.character?.loyaltyMaxOverride).toBe(12);
+    expect(result.character?.houseRules).toMatchObject({ sidekicks: true, loyalty: true });
+    expect(result.character?._v).toBe(CURRENT_VERSION);
+  });
+
+  it('drops unknown creature ids, bad shapes and out-of-range numbers', () => {
+    const hostile = {
+      ...makeChar(),
+      companions: [companion, { ...companion, id: 'c2', creatureId: 'unicorn-lord' }, 'junk'],
+      mounts: 'hostile',
+      hirelings: [{ id: 'h', name: 'H', kind: 'skilled', units: -9, customRateCp: 1e12 }],
+      sidekicks: [{ id: 's', creatureId: 'wolf', classId: 'warrior', level: 99, baseHpMax: 5 }],
+      loyaltyMaxOverride: 500,
+    };
+    const result = importFromJSON(JSON.stringify(hostile));
+    expect(result.success).toBe(true);
+    expect(result.character?.companions).toEqual([companion]);
+    expect(result.character && 'mounts' in result.character).toBe(false);
+    expect(result.character?.hirelings).toEqual([{ id: 'h', name: 'H', kind: 'skilled', units: 0 }]);
+    expect(result.character && 'sidekicks' in result.character).toBe(false);
+    expect(result.character && 'loyaltyMaxOverride' in result.character).toBe(false);
+  });
+
+  it('caps the companion list at 20', () => {
+    const many = Array.from({ length: 25 }, (_, i) => ({ ...companion, id: `c${i}` }));
+    const result = importFromJSON(JSON.stringify({ ...makeChar(), companions: many }));
+    expect(result.character?.companions).toHaveLength(20);
+  });
+
+  it('leaves absent fields absent', () => {
+    const result = importFromJSON(exportToJSON(makeChar()));
+    for (const key of ['companions', 'mounts', 'hirelings', 'npcPartyMembers', 'sidekicks', 'loyaltyMaxOverride']) {
+      expect(result.character && key in result.character).toBe(false);
+    }
+  });
+});

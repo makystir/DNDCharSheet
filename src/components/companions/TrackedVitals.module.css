@@ -1,0 +1,159 @@
+/* HP / temp HP / conditions block shared by the Companions page cards.
+ * Presentation mirrors the WFRP HirelingCard wound bar; tokens only. */
+.vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hpRow,
+.conditionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.hpLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.track {
+  flex: 1;
+  min-width: 80px;
+  height: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  transition: width 150ms ease;
+}
+.hpCount {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.tempChip,
+.zeroChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  border: 1px solid var(--border-strong);
+  color: var(--accent-gold);
+  background: var(--bg-tertiary);
+}
+.zeroChip {
+  color: var(--text-primary);
+  border-color: var(--accent-red);
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.amount {
+  width: 90px;
+  min-height: 44px;
+  padding: 4px 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+.btn,
+.btnDamage {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+}
+.btnDamage {
+  color: var(--text-primary);
+  border-color: var(--accent-red);
+}
+.btn:hover:not(:disabled),
+.btnDamage:hover:not(:disabled) {
+  background: var(--border-strong);
+}
+.btn:disabled,
+.btnDamage:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn:focus-visible,
+.btnDamage:focus-visible,
+.amount:focus-visible,
+.removeBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 44px;
+}
+.badgeName {
+  color: inherit;
+}
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.fatal {
+  margin: 0;
+  color: var(--accent-red);
+  font-size: 0.85rem;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .btn,
+  .btnDamage,
+  .amount,
+  .badge {
+    min-height: 44px;
+  }
+  .removeBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

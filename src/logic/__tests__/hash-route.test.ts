@@ -55,6 +55,11 @@ describe('hash-route', () => {
     });
   });
 
+  it('parses the Companions page with a sub-tab', () => {
+    expect(parseHash('#companions/mounts')).toEqual({ page: 'companions', subTab: 'mounts' });
+    expect(formatHash('companions', 'hirelings')).toBe('#companions/hirelings');
+  });
+
   it('discards the sub-tab segment when the page is invalid', () => {
     expect(parseHash('#bogus/foo')).toEqual({ page: 'character', subTab: null });
   });

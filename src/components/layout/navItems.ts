@@ -1,4 +1,4 @@
-import { User, Swords, Sparkles, Settings, Backpack, TrendingUp } from 'lucide-react';
+import { User, Swords, Sparkles, Settings, Backpack, TrendingUp, PawPrint } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { anySpellcaster } from '../../logic/spellcasting';
@@ -15,6 +15,7 @@ export type PageSection =
   | 'inventory'
   | 'spells'
   | 'advancement'
+  | 'companions'
   | 'settings';
 
 export interface NavItem {
@@ -93,6 +94,18 @@ export const NAV_ITEMS: NavItem[] = [
     icon: TrendingUp,
     shortcut: '6',
     subTabHint: 'Level · Hit Points · Next level · Log',
+  },
+  // Companions: an UNCONDITIONAL top-level tab (permanent creature companions,
+  // mounts, hirelings and NPC party members; any character may keep a pet or hire
+  // help, so no predicate). Keyed '7', the next free number key, so every existing
+  // tab keeps its shortcut (same stable-shortcut convention as Inventory '5' and
+  // Advancement '6'). Do NOT renumber. Modelled on the WFRP app's Retinue page.
+  {
+    id: 'companions',
+    label: 'Companions',
+    icon: PawPrint,
+    shortcut: '7',
+    subTabHint: 'Companions · Mounts · Hirelings · NPC Party',
   },
   { id: 'settings', label: 'Settings', icon: Settings, shortcut: '3' },
 ];

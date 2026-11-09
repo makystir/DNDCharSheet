@@ -47,3 +47,26 @@ describe('SettingsPage — variant encumbrance house-rule toggle', () => {
     expect(screen.getByLabelText('Enable variant encumbrance (house rule)')).toBeChecked();
   });
 });
+
+describe('SettingsPage: Companions house-rule toggles', () => {
+  it('Sidekicks and Loyalty are off by default and cite their books', () => {
+    renderStateful();
+    expect(screen.getByLabelText('Sidekicks (house rule)')).not.toBeChecked();
+    expect(screen.getByLabelText('Loyalty (house rule)')).not.toBeChecked();
+    expect(screen.getByText(/Docs\/TashasCauldronOfEverything\.md L6917-7275/)).toBeInTheDocument();
+    expect(screen.getByText(/Docs\/DungeonMastersGuide\.md L3572-3586/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sidekicks \(Tasha's 2020, 5e \/ 2014 rules\)/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Loyalty \(DMG 2024\)/ })).toBeInTheDocument();
+  });
+
+  it('each toggle persists its own houseRules flag without touching the other', () => {
+    const { get } = renderStateful();
+    fireEvent.click(screen.getByLabelText('Sidekicks (house rule)'));
+    expect(get().houseRules?.sidekicks).toBe(true);
+    expect(get().houseRules?.loyalty).toBeUndefined();
+    fireEvent.click(screen.getByLabelText('Loyalty (house rule)'));
+    expect(get().houseRules).toMatchObject({ sidekicks: true, loyalty: true });
+    fireEvent.click(screen.getByLabelText('Sidekicks (house rule)'));
+    expect(get().houseRules).toMatchObject({ sidekicks: false, loyalty: true });
+  });
+});

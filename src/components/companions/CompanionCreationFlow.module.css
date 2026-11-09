@@ -1,0 +1,102 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay);
+  z-index: 1100;
+  padding: 16px;
+}
+.dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 32px var(--shadow);
+}
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.control {
+  min-height: 44px;
+  padding: 6px 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.control:focus-visible,
+.cancelBtn:focus-visible,
+.confirmBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+.warning {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--accent-red);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.cancelBtn,
+.confirmBtn {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+}
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.confirmBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-strong);
+  color: var(--accent-gold);
+}
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .control,
+  .cancelBtn,
+  .confirmBtn {
+    min-height: 44px;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}

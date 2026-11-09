@@ -9,6 +9,7 @@ export const VALID_PAGES = [
   'inventory',
   'spells',
   'advancement',
+  'companions',
   'settings',
 ] as const;
 
@@ -27,6 +28,7 @@ export type ValidPage = (typeof VALID_PAGES)[number];
 export const PAGE_DEFAULT_SUBTABS: Partial<Record<ValidPage, string>> = {
   character: 'identity',
   spells: 'summary',
+  companions: 'companions',
 };
 
 /**

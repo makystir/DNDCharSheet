@@ -60,6 +60,9 @@ const InventoryPage = lazy(() =>
 const SpellsPage = lazy(() =>
   import('./components/pages/SpellsPage').then((m) => ({ default: m.SpellsPage })),
 );
+const CompanionsPage = lazy(() =>
+  import('./components/pages/CompanionsPage').then((m) => ({ default: m.CompanionsPage })),
+);
 const AdvancementPage = lazy(() =>
   import('./components/pages/AdvancementPage').then((m) => ({ default: m.AdvancementPage })),
 );
@@ -588,6 +591,16 @@ function App() {
                       onNotify={notify}
                       subTab={subTab}
                       onSubTabChange={(tab) => navigate('spells', tab)}
+                    />
+                  </PageLoader>
+                )}
+                {page === 'companions' && (
+                  <PageLoader>
+                    <CompanionsPage
+                      character={character}
+                      onChange={undoableChange}
+                      subTab={subTab}
+                      onSubTabChange={(tab) => navigate('companions', tab)}
                     />
                   </PageLoader>
                 )}

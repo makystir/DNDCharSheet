@@ -25,6 +25,7 @@ describe('buildSearchIndex — page entries', () => {
         'Go to Combat',
         'Go to Inventory',
         'Go to Advancement',
+        'Go to Companions',
         'Go to Settings',
       ]),
     );

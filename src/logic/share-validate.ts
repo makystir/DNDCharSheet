@@ -25,6 +25,7 @@ import { ABILITIES, BLANK_CHARACTER } from '../types/character';
 import { importFromJSON } from '../storage/export-import';
 import { sanitizeClassChoices } from './class-choices';
 import { sanitizeResourcesSpent } from './resources';
+import { sanitizeCompanionsState } from './companions-sanitize';
 
 /**
  * Array-valued `Character` fields the viewer may iterate. Each is re-normalised
@@ -123,6 +124,10 @@ export function validateSharedPayload(json: string): ValidateResult {
   const spent = sanitizeResourcesSpent(c.resourcesSpent);
   if (spent) c.resourcesSpent = spent;
   else delete c.resourcesSpent;
+
+  // Companions page fields: bounded shapes only (idempotent after the importer's
+  // own pass; unknown creature ids dropped, lengths capped, empties removed).
+  sanitizeCompanionsState(c);
 
   return { ok: true, character: c as unknown as Character };
 }

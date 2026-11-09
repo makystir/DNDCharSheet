@@ -7,6 +7,9 @@ import { SectionHeader } from '../shared/SectionHeader';
 import { InstallPromptControl } from '../shared/InstallPromptControl';
 import { DataBackupCard } from '../settings/DataBackupCard';
 import { ShareLinkCard } from '../settings/ShareLinkCard';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { resolveCompanionHouseRuleTooltip } from '../../logic/tooltip-content';
+import { loyaltyEnabled, setCompanionHouseRule, sidekicksEnabled } from '../../logic/companions-actions';
 import styles from './SettingsPage.module.css';
 
 export interface SettingsPageProps {
@@ -76,6 +79,8 @@ export function SettingsPage({
       ...character,
       houseRules: { ...character.houseRules, bonusFeatsAfter20: on },
     });
+  const sidekicks = sidekicksEnabled(character);
+  const loyalty = loyaltyEnabled(character);
   return (
     <div className={styles.page}>
       <Card>
@@ -183,6 +188,55 @@ export function SettingsPage({
               onChange={(e) => setBonusFeatsAfter20(e.target.checked)}
             />
             <span>{bonusFeatsAfter20 ? 'On' : 'Off'}</span>
+          </label>
+        </div>
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>
+              <MaybeContentTooltip content={resolveCompanionHouseRuleTooltip('sidekicks')}>
+                Sidekicks (Tasha's 2020, 5e / 2014 rules)
+              </MaybeContentTooltip>
+            </span>
+            <span className={styles.settingHint}>
+              Adds a Sidekicks tab to the Companions page: a creature with a
+              challenge rating of 1/2 or lower gains an Expert, Spellcaster or
+              Warrior class. Optional rules from Tasha's Cauldron of Everything
+              (Docs/TashasCauldronOfEverything.md L6917-7275), a 2014-edition
+              book, not part of the 2024 rules; off by default.
+            </span>
+          </span>
+          <label className={styles.toggleControl}>
+            <input
+              type="checkbox"
+              checked={sidekicks}
+              aria-label="Sidekicks (house rule)"
+              onChange={(e) => onChange(setCompanionHouseRule(character, 'sidekicks', e.target.checked))}
+            />
+            <span>{sidekicks ? 'On' : 'Off'}</span>
+          </label>
+        </div>
+        <div className={styles.settingRow}>
+          <span className={styles.settingLabel}>
+            <span className={styles.settingName}>
+              <MaybeContentTooltip content={resolveCompanionHouseRuleTooltip('loyalty')}>
+                Loyalty (DMG 2024)
+              </MaybeContentTooltip>
+            </span>
+            <span className={styles.settingHint}>
+              Tracks a Loyalty Score (0 to 20) for hirelings and NPC party
+              members on the Companions page (DMG 2024 "Loyalty",
+              Docs/DungeonMastersGuide.md L3572-3586). An optional rule; off by
+              default.
+            </span>
+          </span>
+          <label className={styles.toggleControl}>
+            <input
+              type="checkbox"
+              checked={loyalty}
+              aria-label="Loyalty (house rule)"
+              onChange={(e) => onChange(setCompanionHouseRule(character, 'loyalty', e.target.checked))}
+            />
+            <span>{loyalty ? 'On' : 'Off'}</span>
           </label>
         </div>
       </Card>

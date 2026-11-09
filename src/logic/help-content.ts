@@ -18,6 +18,8 @@ const helpContent: Record<string, string> = {
     'The Spells page appears only for a spellcaster. Track your known cantrips, prepared spells, and spell slots here; it updates as your class and level change.',
   'advancement-tab':
     'Record level-ups on the Advancement page. Changing your level updates the derived values across the sheet automatically.',
+  'companions-tab':
+    'Track permanent companions here: a Primal Companion, familiar, steed or pet, plus mounts, hirelings and NPC party members. Companion HP and conditions are edited on this page only.',
   'theme-toggle':
     'Switch between the dark and light colour themes from Settings. Your choice is saved on this device for next time.',
 };
