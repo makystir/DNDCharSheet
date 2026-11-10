@@ -144,6 +144,8 @@ If your class casts spells at level 1, you pick your starting **cantrips** (spel
 
 Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
 
+**Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
+
 ### Step 7: Equipment
 
 In the 2024 rules, both your **class** and your **background** give you starting equipment, and any coins you get can be spent on gear right away. This step has four parts:

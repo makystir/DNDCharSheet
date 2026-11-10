@@ -7,7 +7,7 @@ import {
 import { getSpecies } from '../data/species';
 import { getClass } from '../data/classes';
 import { getBackground } from '../data/backgrounds';
-import { DEITY_LIST } from '../data/deities';
+import { findDeityInfo } from './deity-recommendations';
 import { getWeapon } from '../data/weapons';
 import { getArmor } from '../data/armor';
 
@@ -299,10 +299,8 @@ const CLASS_FOCUS: Record<string, string> = {
 function describeFaithAndFocus(character: Character): string[] {
   const lines: string[] = [];
   const faith = clean(character.faith);
-  const deity = faith
-    ? DEITY_LIST.find((d) => d.name.toLowerCase() === faith.toLowerCase())
-    : undefined;
-  if (deity) {
+  const deity = faith ? findDeityInfo(faith) : undefined;
+  if (deity?.symbol) {
     lines.push(
       `Wears a holy symbol or emblem depicting: ${deity.symbol.toLowerCase()} (purely pictorial, no lettering).`,
     );

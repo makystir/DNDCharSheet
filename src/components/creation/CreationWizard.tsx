@@ -56,7 +56,8 @@ import {
   generatePersonality,
   generateDeity,
 } from '../../logic/personal-details-generation';
-import { DEITY_LIST } from '../../data/deities';
+import { allDeityOptions } from '../../logic/deity-recommendations';
+import { DeitySuggestions } from './DeitySuggestions';
 import type { NameGender } from '../../data/name-tables';
 import { createDefaultRng } from '../../logic/random';
 import { formatSigned, type Breakdown } from '../../logic/breakdown';
@@ -1189,16 +1190,20 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           onChange={(e) => setDetails((prev) => ({ ...prev, faith: e.target.value }))}
         />
         <datalist id="wiz-faith-list">
-          {DEITY_LIST.map((d) => (
-            <option key={d.id} value={d.name}>
-              {d.epithet}
-            </option>
-          ))}
+          {allDeityOptions().map((d) => (<option key={d.name} value={d.name}>{d.label}</option>))}
         </datalist>
         <button type="button" className={styles.genBtn} onClick={genFaith} aria-label="Generate deity">
           🎲
         </button>
       </div>
+      <DeitySuggestions
+        classId={classId}
+        speciesId={speciesId}
+        speciesChoices={speciesChoices}
+        alignment={alignment}
+        faith={details.faith}
+        onChoose={(faithName) => setDetails((prev) => ({ ...prev, faith: faithName }))}
+      />
 
       <div className={styles.genRow}>
         <span className={styles.fieldLabel}>Name</span>

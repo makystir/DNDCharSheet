@@ -10,6 +10,7 @@ import { resolveBackgroundTooltip } from '../../../logic/tooltip-content';
 import type { TooltipContent } from '../../../logic/tooltip-content';
 import { CharacterPortrait } from '../../shared/CharacterPortrait';
 import { DEITY_LIST } from '../../../data/deities';
+import { allDeityOptions, deityTooltip, findDeityInfo } from '../../../logic/deity-recommendations';
 import { SPECIES_LIST } from '../../../data/species';
 import type { SpeciesChoiceSpec } from '../../../data/species';
 import { resolveSize, resolveSpecies } from '../../../logic/species';
@@ -172,17 +173,8 @@ export function PersonalDetailsSection({
 
   // When the current faith value matches a catalog deity, surface its overview
   // (epithet, home plane, typical worshipers, symbol) as an informational hint.
-  const matchedDeity = DEITY_LIST.find(
-    (d) => d.name.toLowerCase() === (character.faith ?? '').trim().toLowerCase(),
-  );
-  const deityHint: TooltipContent | undefined = matchedDeity && {
-    title: `${matchedDeity.name}${matchedDeity.epithet ? `, ${matchedDeity.epithet}` : ''}`,
-    sections: [
-      { label: 'Home Plane', text: matchedDeity.homePlane },
-      { label: 'Typical Worshipers', text: matchedDeity.worshipers },
-      { label: 'Symbol', text: matchedDeity.symbol },
-    ],
-  };
+  const matchedDeity = findDeityInfo(character.faith);
+  const deityHint: TooltipContent | undefined = matchedDeity && deityTooltip(matchedDeity);
 
   // A tap-to-edit text field in the grid's shared single-line control style.
   const textField = (label: string, value: string, onSave: (v: string) => void) => (
@@ -365,11 +357,7 @@ export function PersonalDetailsSection({
                         onChange={(e) => setField('faith', e.target.value)}
                       />
                       <datalist id={faithListId}>
-                        {DEITY_LIST.map((d) => (
-                          <option key={d.id} value={d.name}>
-                            {d.epithet}
-                          </option>
-                        ))}
+                        {allDeityOptions().map((d) => (<option key={d.name} value={d.name}>{d.label}</option>))}
                       </datalist>
                     </>
                   }
