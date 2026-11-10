@@ -312,7 +312,7 @@ The sub-tabs are:
 
 - **Summary:** your spellcasting ability, spell save DC and spell attack bonus. The save DC is the number enemies must beat to resist your spells, and the app shows how it is worked out.
 - **Slots:** your spell slots by level. Mark them as you spend them.
-- **Prepared:** your cantrips and the spells you've prepared. Not every class prepares spells the same way: some prepare a number of spells from their whole list each day, while others know a fixed set. Wizards also keep a **Spellbook**.
+- **Prepared:** your cantrips and the spells you've prepared. Not every class prepares spells the same way: some prepare a number of spells from their whole list each day, while others know a fixed set. Wizards also keep a **Spellbook**: it starts with six spells and gains two more with each Wizard level after 1. The page shows how many of those free spells you have, and gently notes it if your book holds more (extra spells have to be copied in from scrolls or other books, so check with your DM). It never stops you from keeping them.
 - **Browse:** search the spell list. You'll only see spells your class can learn.
 
 Spell names throughout the app are underlined. Tap one to see its casting time, range, components and effect.

@@ -4,6 +4,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { SpellsPage } from '../SpellsPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
+import { spellsForClass } from '../../../data/spells';
 
 /**
  * Renders SpellsPage with a stateful harness so onChange edits (cantrip/prepared
@@ -368,5 +369,53 @@ describe('SpellsPage — class spell list legality', () => {
     expect(screen.queryByRole('checkbox', { name: /Fireball/ })).toBeNull();
     expect(screen.queryByRole('checkbox', { name: /Magic Missile/ })).toBeNull();
     expect(screen.getByRole('checkbox', { name: /^Bless/ })).toBeInTheDocument();
+  });
+});
+
+describe('SpellsPage - Wizard spellbook free allowance', () => {
+  // PHB 2024 Wizard "Spellbook": six level 1 spells, plus two per Wizard level after 1.
+  const level1Wizard = (n: number): Partial<Character> => ({
+    level: 1,
+    classes: [{ id: 'wizard', level: 1 }],
+    spellcasting: {
+      byClass: {
+        wizard: {
+          spellbook: spellsForClass('wizard')
+            .filter((s) => s.level === 1)
+            .slice(0, n)
+            .map((s) => s.id),
+        },
+      },
+    },
+  });
+
+  it('shows the free allowance with its breakdown and no note at the allowance', () => {
+    renderStatefulPage(level1Wizard(6));
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    expect(screen.getByRole('button', { name: /^Free spellbook spells:/ })).toHaveTextContent('6');
+    expect(screen.queryByTestId('spellbook-over-allowance')).toBeNull();
+  });
+
+  it('adds two free spells per Wizard level after 1', () => {
+    renderStatefulPage({
+      ...wizardLevel5,
+      spellcasting: { byClass: { wizard: { spellbook: ['magic-missile'] } } },
+    });
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    // 6 + 2 x 4 = 14.
+    expect(screen.getByRole('button', { name: /^Free spellbook spells:/ })).toHaveTextContent('14');
+  });
+
+  it('notes, but does not block, a spellbook over the free allowance', () => {
+    renderStatefulPage(level1Wizard(8));
+    fireEvent.click(screen.getByRole('tab', { name: 'Prepared' }));
+    expect(screen.getByTestId('spellbook-over-allowance')).toHaveTextContent(
+      /2 spells are beyond your free allowance/,
+    );
+    // Still free to scribe another.
+    const box = screen
+      .getAllByRole('checkbox', { name: /./ })
+      .find((c) => !(c as HTMLInputElement).checked && !(c as HTMLInputElement).disabled);
+    expect(box).toBeDefined();
   });
 });

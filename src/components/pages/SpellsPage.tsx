@@ -51,6 +51,7 @@ import {
   isSpellLegalForEntry,
   removeIllegalSpellSelections,
 } from '../../logic/spellcasting';
+import { wizardSpellbookSize } from '../../logic/starting-choices';
 import type { IllegalSpellSelection } from '../../logic/spellcasting';
 import { getClass } from '../../data/classes';
 import { SPELLCASTING_DESCRIPTORS } from '../../data/spell-progression';
@@ -144,6 +145,48 @@ function selectionBreakdown(label: string, chosen: number, cap: number) {
 }
 
 /** A breakdown for a plain count total, so it carries an explanatory tooltip. */
+/**
+ * Spellbook size next to the free allowance. PHB 2024 Wizard "Spellbook": the book
+ * starts with six level 1 spells and gains two Wizard spells with each Wizard
+ * level after 1, so 6 + 2 x (level - 1) are free. The rules set no hard maximum
+ * (spells can be copied in play), so going over only shows a note and never blocks.
+ */
+function SpellbookAllowance({ level, count }: { level: number; count: number }) {
+  const free = wizardSpellbookSize(level);
+  const over = count - free;
+  const breakdown = {
+    total: free,
+    components: [
+      { label: 'Starting spells (level 1)', value: 6 },
+      { label: `Level-up spells (2 x ${Math.max(0, level - 1)} levels after 1)`, value: free - 6 },
+    ],
+  };
+  return (
+    <>
+      <p className={styles.capLabel}>
+        Scribed spells (
+        <CalculatedValue
+          label="Spellbook size"
+          breakdown={countBreakdown('Scribed spells', count)}
+        >
+          {count}
+        </CalculatedValue>{' '}
+        in book). Free spells for your level (
+        <CalculatedValue label="Free spellbook spells" breakdown={breakdown}>
+          {free}
+        </CalculatedValue>
+        ). You prepare from your spellbook.
+      </p>
+      {over > 0 && (
+        <p className={styles.capLabel} role="note" data-testid="spellbook-over-allowance">
+          {over === 1 ? '1 spell is' : `${over} spells are`} beyond your free allowance. Extra
+          spells have to be copied into the book from scrolls or other spellbooks, so check with
+          your DM. You can still keep them here.
+        </p>
+      )}
+    </>
+  );
+}
 function countBreakdown(label: string, count: number) {
   return { total: count, components: [{ label, value: count }] };
 }
@@ -959,17 +1002,7 @@ export function SpellsPage({
           {usesSpellbook && (
             <Card>
               <CollapsibleSection title="Spellbook" storageKey="dnd-collapse-spellbook">
-                <p className={styles.capLabel}>
-                  Scribed spells (
-                  <CalculatedValue
-                    label="Spellbook size"
-                    breakdown={countBreakdown('Scribed spells', (perClass.spellbook ?? []).length)}
-                  >
-                    {(perClass.spellbook ?? []).length}
-                  </CalculatedValue>{' '}
-                  in book). You prepare from your spellbook; full scribe/copy
-                  mechanics arrive later.
-                </p>
+                <SpellbookAllowance level={primaryEntry?.level ?? 1} count={(perClass.spellbook ?? []).length} />
                 <SpellPickList
                   spells={spellbookCandidates}
                   selectedIds={perClass.spellbook ?? []}
@@ -1358,17 +1391,7 @@ function PreparedClassSection({
             title={`${className} — Spellbook`}
             storageKey={`dnd-collapse-spellbook-${entry.id}`}
           >
-            <p className={styles.capLabel}>
-              Scribed spells (
-              <CalculatedValue
-                label="Spellbook size"
-                breakdown={countBreakdown('Scribed spells', (perClass.spellbook ?? []).length)}
-              >
-                {(perClass.spellbook ?? []).length}
-              </CalculatedValue>{' '}
-              in book). You prepare from your spellbook; full scribe/copy
-              mechanics arrive later.
-            </p>
+            <SpellbookAllowance level={entry.level} count={(perClass.spellbook ?? []).length} />
             <SpellPickList
               spells={spellbookCandidates}
               selectedIds={perClass.spellbook ?? []}
