@@ -66,7 +66,7 @@ export function SpellPickList({
         const checked = selectedIds.includes(s.id);
         const locked = lockedIds.includes(s.id);
         return (
-          <li key={s.id} className={styles.pickRow}>
+          <li key={s.id} className={`${styles.pickRow}${checked ? ` ${styles.pickRowChecked}` : ''}`}>
             <label className={styles.pickLabel}>
               <input
                 type="checkbox"
@@ -83,7 +83,6 @@ export function SpellPickList({
               <span className={styles.pickName}>
                 <SpellName id={s.id} />
                 {locked && <span className={styles.pickLevel}> · {lockedLabel}</span>}
-                {showLevel && <span className={styles.pickLevel}> · L{s.level}</span>}
                 {/* Cross-pool castability (PHB 2024 L2168): only annotated when
                     a castableIds set is supplied (multiclass per-class picker)
                     and the spell is prepared. A leveled spell with no available
@@ -94,6 +93,7 @@ export function SpellPickList({
                   </span>
                 )}
               </span>
+              {showLevel && <span className={styles.pickLevelBadge}>L{s.level}</span>}
             </label>
             {showDetails && (
               <span className={styles.pickMeta}>

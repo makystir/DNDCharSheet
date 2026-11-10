@@ -3,17 +3,38 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 4px 16px;
+  /* Even columns: every spell sits in an equal-width card. */
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 8px 12px;
 }
-
 .pickRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  align-content: center;
   gap: 4px 12px;
+  min-height: 44px;
+  padding: 4px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
-
+.pickRowChecked {
+  border-color: var(--accent-gold);
+  background: var(--bg-tertiary);
+}
+/* The level sits at the right edge of the card on one line, so names wrap
+   alone instead of dragging its level onto a line of its own. */
+.pickLevelBadge {
+  margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
 /* Stage A5b: the "Concentrating" toggle on a prepared concentration spell. */
 .concentrateLabel {
   display: inline-flex;
@@ -42,7 +63,7 @@
    a "Concentrating" toggle drops to its own line when the cell is narrow
    instead of squeezing the spell name down to a few letters per line. */
 .pickLabel {
-  flex: 1 1 8rem;
+  flex: 1 1 100%;
   min-width: min(8rem, 100%);
   display: flex;
   align-items: center;
