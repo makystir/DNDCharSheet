@@ -25,6 +25,11 @@
   margin: 0 0 0.25rem;
   font-size: 1.25rem;
 }
+/* The wizard moves focus to the step heading on a step change so screen readers
+   announce it; the heading isn't interactive, so it shows no focus ring. */
+.stepTitle:focus {
+  outline: none;
+}
 
 .fieldLabel {
   font-weight: 600;

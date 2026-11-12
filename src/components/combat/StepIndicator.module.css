@@ -1,8 +1,10 @@
 /* StepIndicator component styles */
 
+/* Steps align to the top so the bar stays level even when one label is a taller
+   (44px touch-target) button. */
 .container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   gap: 0;
 }
@@ -114,6 +116,10 @@
 .labelButton {
   min-height: 44px;
   padding: 0 4px;
+  /* Text at the top, like the plain labels; the extra height is touch area below it. */
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
