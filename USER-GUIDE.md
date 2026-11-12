@@ -98,6 +98,8 @@ After you choose, the wizard shows a short guide to that class, including the ab
 - **Want to be sneaky and clever?** Look at Rogue or Ranger.
 - **Want to cast spells?** Look at Wizard, Sorcerer, Cleric, Druid, Bard or Warlock.
 
+Not sure yet? Open **Compare all classes** under the class list. It shows each class's one-line summary, what it "likes", how complex the Player's Handbook rates it (Fighter and Rogue are the Low-complexity ones, the simplest to learn), its main ability, Hit Die and whether it casts spells. Press **Choose** on the one you want.
+
 ### Step 2: Origin
 
 Your **Origin** is where your character comes from. You choose a **Background** and a **Species**.
@@ -116,13 +118,21 @@ Open **Compare all backgrounds** to see every background side by side. Press **C
 
 If the wizard shows a note that some backgrounds suit your class, that is only a suggestion. Any background works with any class.
 
-**Species.** Pick your character's people. Some species ask for an extra choice (for example a skill, or a lineage). The wizard shows these when they apply. You may also be asked to choose languages.
+**Ability increases.** Your background raises three ability scores: +2 to one and +1 to another, or +1 to all three. **Suggest for my class** fills in the two your class relies on most; you can change them after.
+
+**Tool.** If your background lets you choose a kind of tool (a gaming set, artisan's tools or a musical instrument), pick one from the list. The wizard shows what that tool lets you do.
+
+**Species.** Pick your character's people. In the 2024 rules your species doesn't change your ability scores, so choose the one you'd enjoy playing. The selected species shows a short description, its size, Speed, Darkvision and traits (tap a trait to read it), and **Compare all species** lists them side by side. Some species ask for an extra choice (for example a skill, a lineage, or the ability their spells use). The wizard shows these when they apply, with a hint: for a spellcasting ability it suggests the one your class casts with.
+
+**Languages.** Pick two besides Common. Tap a language to see who speaks it. If your species has a language of its own (Dwarvish for a dwarf, for example), the wizard points it out.
 
 ### Step 3: Skills
 
 The top of this step lists what you receive **automatically**: your class's saving throws, armor and weapon training, and the skills and feat from your background. You don't pick those.
 
 Below that, choose the number of **class skills** your class allows. Hover or tap a skill's name to see what it's used for. If a skill is already granted by your background or species, the wizard tells you that picking it again adds nothing, because the proficiency bonus is never added twice.
+
+Skills that use your class's main ability are tagged **Suggested**, because you'll be good at them from the start. Tap a skill's name to see what it's for.
 
 Not sure? You can move on and finish later. The Overview page will remind you.
 
@@ -134,6 +144,8 @@ Your six ability scores come from one of three methods:
 - **Point Buy:** you have a budget of points to spend, with higher scores costing more.
 - **Rolling:** you roll dice for each score.
 
+The wizard explains the method you pick, and you can tap an ability's name to see what it does.
+
 Put your highest numbers in the abilities your class cares about. The class guide from Step 1 tells you which. Your background's bonuses from Step 2 are added on top.
 
 ### Step 5: Spells (spellcasters only)
@@ -143,6 +155,8 @@ If your class casts spells at level 1, you pick your starting **cantrips** (spel
 ### Step 6: Alignment and Details
 
 Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
+
+The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. Stuck on personality? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
 
 **Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
 

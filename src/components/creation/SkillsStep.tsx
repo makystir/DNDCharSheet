@@ -11,6 +11,8 @@ import {
   resolveSaveTooltip,
   resolveSkillTooltip,
 } from '../../logic/tooltip-content';
+import { skillsUsingPrimaryAbility } from '../../logic/creation-guidance';
+import { classGuidance } from '../../logic/class-guidance';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import styles from './CreationWizard.module.css';
 
@@ -74,6 +76,12 @@ export function SkillsStep({
   };
 
   const feat = background ? getFeat(background.originFeatId) : undefined;
+  // Suggest (never pick) the class skills that use the class's primary ability,
+  // leaving out ones already held, so the player starts good at them.
+  const suggested = skillsUsingPrimaryAbility(classId, options).filter((s) => held[s] === undefined);
+  const primaryNames = cls.primaryAbilities
+    .map((a) => ABILITY_NAMES[a as Ability])
+    .join(classGuidance(classId)?.primaryIsOr ? ' or ' : ' and ');
   const savingThrows = cls.savingThrows as Ability[];
 
   return (
@@ -141,6 +149,12 @@ export function SkillsStep({
             You can finish this later: the Overview will remind you.
           </p>
         )}
+        {suggested.length > 0 && (
+          <p className={styles.hint} data-testid="skills-suggestion">
+            Suggested for a {cls.name}: skills that use {primaryNames}, your main abilit{primaryNames.includes(' and ') ? 'ies' : 'y'}, so you start out
+            good at them. Hover or tap a skill to see what it&apos;s for.
+          </p>
+        )}
         <div className={styles.skillGrid}>
           {options.map((skill) => {
             const selected = chosen.includes(skill);
@@ -157,6 +171,11 @@ export function SkillsStep({
                     onChange={(e) => toggle(skill, e.target.checked)}
                   />
                   <MaybeContentTooltip content={resolveSkillTooltip(skill)} ariaLabel={`About ${SKILL_NAME[skill]}`}>{SKILL_NAME[skill]}</MaybeContentTooltip>{' '}<span className={styles.skillAbility}>({abilityAbbr})</span>
+                  {suggested.includes(skill) && (
+                    <span className={`${styles.tag} ${styles.tagPrimary}`} data-testid={`skill-suggested-${skill}`}>
+                      Suggested
+                    </span>
+                  )}
                 </label>
                 {source !== undefined && (
                   <span className={styles.skillNote}>

@@ -14,6 +14,8 @@ import type { SpeciesChoiceSpec, SpeciesId } from '../../data/species';
 import { BACKGROUND_LIST, BACKGROUND_OPTION_B_GOLD, getBackground } from '../../data/backgrounds';
 import type { BackgroundId } from '../../data/backgrounds';
 import { BackgroundDetails } from './BackgroundDetails';
+import { ClassCompare } from './ClassCompare';
+import { SpeciesDetails } from './SpeciesDetails';
 import { EquipmentStep } from './EquipmentStep';
 import {
   cartCopper,
@@ -67,6 +69,24 @@ import {
   recommendedArray,
   suggestedBackgrounds,
 } from '../../logic/class-guidance';
+import {
+  ABILITY_METHOD_INFO,
+  ABILITY_METHOD_SOURCE,
+  ALIGNMENT_INFO,
+  CLASS_OVERVIEW,
+  EVIL_ALIGNMENT_NOTE,
+  PAST_PROMPTS,
+  PAST_PROMPTS_SOURCE,
+  isEvilAlignment,
+  speciesLanguageSuggestions,
+  suggestedBackgroundIncrease,
+  suggestedSpeciesSpellAbility,
+  toolChoicesFor,
+} from '../../logic/creation-guidance';
+import { resolveAbilityTooltip, resolveLanguageTooltip, resolveSkillTooltip } from '../../logic/tooltip-content';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { SKILLS } from '../../types/character';
+import type { SkillId as WizardSkillId } from '../../types/character';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { StepIndicator } from '../combat/StepIndicator';
@@ -302,6 +322,21 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
 
   // ─── Step 1 handlers ─────────────────────────────────────────────────────
+
+  const selectClass = (id: ClassId | '') => {
+    setClassId(id);
+    // Feature-language picks belong to the chosen class; reset them when
+    // the class changes so stale/over-cap picks cannot leak across.
+    setGrantedLanguages([]);
+    // Class skill picks belong to the class list; reset on change.
+    setSkillChoices([]);
+    // Spell picks belong to the class list; reset on change.
+    setSpellPicks({});
+    // Starting equipment belongs to the class too.
+    setClassOption('A');
+    setClassPicks({});
+    setCart({});
+  };
 
   // Starting gold available to spend: the class option's gold + the background's.
   const budgetFor = (
@@ -591,6 +626,57 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     else setStep((s) => s - 1);
   };
 
+  // ─── Derived: origin suggestions (shown only; the player still chooses) ────
+
+  const allocationSuggestion =
+    background && classId !== '' ? suggestedBackgroundIncrease(classId, background.abilities) : null;
+  const applyAllocationSuggestion = () => {
+    if (!allocationSuggestion) return;
+    setAllocation({ [allocationSuggestion.plusTwo]: 2, [allocationSuggestion.plusOne]: 1 });
+  };
+  const languageSuggestions = speciesLanguageSuggestions(speciesId || undefined).filter((l) =>
+    (LANGUAGES as readonly string[]).includes(l),
+  );
+  const skillName = (id: string) => SKILLS.find((s) => s.id === id)?.name ?? id;
+
+  /** A short hint under a species sub-choice, so the player knows what to pick. */
+  const speciesChoiceHint = (spec: SpeciesChoiceSpec) => {
+    if (spec.kind === 'spellcastingAbility') {
+      const s = suggestedSpeciesSpellAbility(classId || undefined, spec.options.map((o) => o.id));
+      if (!s) return <p className={styles.hint}>The ability your species&apos; spells use. Pick a class first for a suggestion.</p>;
+      return (
+        <p className={styles.hint} data-testid="wiz-species-ability-hint">
+          Suggested: {ABILITY_NAMES[s.ability]},{' '}
+          {s.reason === 'class-spellcasting'
+            ? `the ability your ${CLASS_LIST.find((c) => c.id === classId)?.name} casts spells with, so one high score powers both.`
+            : `your highest of these for a ${CLASS_LIST.find((c) => c.id === classId)?.name}.`}
+        </p>
+      );
+    }
+    if (spec.kind === 'keenSensesSkill' || spec.kind === 'skillfulSkill') {
+      const held = background?.skills ?? [];
+      return (
+        <p className={styles.hint}>
+          {held.length > 0
+            ? `Pick one your background doesn't already give (${held.map(skillName).join(', ')}).`
+            : 'Pick a skill you want to be good at.'}{' '}
+          {speciesChoices[spec.field] ? (
+            <MaybeContentTooltip
+              content={resolveSkillTooltip(speciesChoices[spec.field] as WizardSkillId)}
+              ariaLabel={`About ${skillName(speciesChoices[spec.field])}`}
+            >
+              What {skillName(speciesChoices[spec.field])} is for
+            </MaybeContentTooltip>
+          ) : null}
+        </p>
+      );
+    }
+    if (spec.kind === 'size') {
+      return <p className={styles.hint}>Pick whichever fits how you picture your character. A few rules care about size, such as which creatures you can grapple.</p>;
+    }
+    return null;
+  };
+
   // ─── Render helpers ───────────────────────────────────────────────────────
 
   const renderClassStep = () => (
@@ -615,20 +701,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         className={styles.select}
         value={classId}
         aria-label="Class"
-        onChange={(e) => {
-          setClassId(e.target.value as ClassId | '');
-          // Feature-language picks belong to the chosen class; reset them when
-          // the class changes so stale/over-cap picks cannot leak across.
-          setGrantedLanguages([]);
-          // Class skill picks belong to the class list; reset on change.
-          setSkillChoices([]);
-          // Spell picks belong to the class list; reset on change.
-          setSpellPicks({});
-          // Starting equipment belongs to the class too.
-          setClassOption('A');
-          setClassPicks({});
-          setCart({});
-        }}
+        onChange={(e) => selectClass(e.target.value as ClassId | '')}
       >
         <option value="">— Select a Class —</option>
         {CLASS_LIST.map((c) => (
@@ -658,14 +731,22 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
             <li>
               Saving throws: {guidance.savingThrows.map((a) => ABILITY_NAMES[a]).join(' & ')}
             </li>
+            {CLASS_OVERVIEW[classId] && (
+              <>
+                <li>Likes: {CLASS_OVERVIEW[classId].likes}</li>
+                <li>Complexity: {CLASS_OVERVIEW[classId].complexity}</li>
+              </>
+            )}
             <li>Hit die: d{guidance.hitDie}</li>
             {guidance.spellcastingAbility && (
               <li>Spellcasting: {ABILITY_NAMES[guidance.spellcastingAbility]}</li>
             )}
           </ul>
-          <p className={styles.guidanceCite}>Source: PHB 2024 Core Class Traits.</p>
+          <p className={styles.guidanceCite}>Source: PHB 2024 Core Class Traits; "Class Overview" table.</p>
         </div>
       )}
+
+      <ClassCompare selected={classId} onChoose={selectClass} />
     </div>
   );
 
@@ -734,20 +815,54 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
               Choose +2/+1 on two abilities, or +1 on all three.
             </p>
           )}
+          {/* SUGGEST-DON'T-AUTO-APPLY: fills the +2/+1 only on an explicit tap,
+              ranked by the class's PHB Standard Array by Class placement. */}
+          {allocationSuggestion && (
+            <div className={styles.methodBody}>
+              <button type="button" className={styles.recommendBtn} onClick={applyAllocationSuggestion}>
+                Suggest for my class
+              </button>
+              <p className={styles.hint}>
+                +2 {ABILITY_NAMES[allocationSuggestion.plusTwo]} and +1{' '}
+                {ABILITY_NAMES[allocationSuggestion.plusOne]}: the abilities a{' '}
+                {CLASS_LIST.find((c) => c.id === classId)?.name} relies on most. Raising your best score
+                makes you better at what your class does.
+              </p>
+            </div>
+          )}
 
           <label className={styles.fieldLabel} htmlFor="wiz-tool">
             Tool Proficiency: {background.tool.label}
           </label>
           {background.tool.category ? (
-            <input
-              id="wiz-tool"
-              className={styles.textInput}
-              type="text"
-              value={toolProficiency}
-              placeholder="Name your chosen tool…"
-              aria-label="Tool proficiency choice"
-              onChange={(e) => setToolProficiency(e.target.value)}
-            />
+            <>
+              <select
+                id="wiz-tool"
+                className={styles.select}
+                value={toolProficiency}
+                aria-label="Tool proficiency choice"
+                onChange={(e) => setToolProficiency(e.target.value)}
+              >
+                <option value="">— Choose a tool —</option>
+                {toolChoicesFor(background.tool.category).map((tool) => (
+                  <option key={tool.name} value={tool.name}>
+                    {tool.name}
+                  </option>
+                ))}
+              </select>
+              {(() => {
+                const chosenTool = toolChoicesFor(background.tool.category).find((x) => x.name === toolProficiency);
+                return chosenTool?.description ? (
+                  <p className={styles.hint} data-testid="wiz-tool-description">
+                    {chosenTool.description}
+                  </p>
+                ) : (
+                  <p className={styles.hint}>
+                    You&apos;re proficient with the kind you pick, so you add your Proficiency Bonus when you use it.
+                  </p>
+                );
+              })()}
+            </>
           ) : (
             <p className={styles.hint}>{background.tool.label}</p>
           )}
@@ -772,6 +887,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         ))}
       </select>
 
+      <SpeciesDetails selected={species} onChoose={selectSpecies} />
+
       {species?.choices?.map((spec: SpeciesChoiceSpec) => (
         <div key={spec.field} className={styles.allocRow}>
           <label className={styles.allocName} htmlFor={`wiz-species-${spec.field}`}>
@@ -794,6 +911,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
               </option>
             ))}
           </select>
+          {speciesChoiceHint(spec)}
         </div>
       ))}
 
@@ -813,6 +931,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           {' — '}
           {chosenLanguages.length} of {CREATION_LANGUAGE_CHOICES} chosen
         </p>
+        {languageSuggestions.length > 0 && (
+          <p className={styles.hint} role="note" data-testid="wiz-language-suggestion">
+            Spoken by {species?.name ?? 'your'} folk: {languageSuggestions.map(formatLanguage).join(', ')}. A
+            natural pick if your character grew up among them.
+          </p>
+        )}
+        <p className={styles.hint}>Hover or tap a language to see who speaks it.</p>
         <div className={styles.langGrid}>
           {LANGUAGES.map((lang) => {
             const selected = chosenLanguages.includes(lang);
@@ -829,7 +954,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                   aria-label={formatLanguage(lang)}
                   onChange={() => toggleLanguage(lang)}
                 />
-                {formatLanguage(lang)}
+                <MaybeContentTooltip content={resolveLanguageTooltip(lang)} ariaLabel={`About ${formatLanguage(lang)}`}>
+                  {formatLanguage(lang)}
+                </MaybeContentTooltip>
               </label>
             );
           })}
@@ -909,7 +1036,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       return (
         <div key={ability} className={styles.allocRow}>
           <span className={styles.allocName}>
-            {ABILITY_NAMES[ability]}
+            <MaybeContentTooltip content={resolveAbilityTooltip(ability)} ariaLabel={`About ${ABILITY_NAMES[ability]}`}>
+              {ABILITY_NAMES[ability]}
+            </MaybeContentTooltip>
             {hints && (
               <span className={styles.abilityTags}>
                 {' '}
@@ -1012,6 +1141,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           value={abilityMethod}
           onChange={(v) => setAbilityMethod(v as AbilityMethod)}
         />
+        <p className={styles.hint} data-testid="ability-method-info">
+          {ABILITY_METHOD_INFO[abilityMethod]}
+        </p>
+        <p className={styles.guidanceCite}>Source: {ABILITY_METHOD_SOURCE}</p>
 
         {/* Optional one-tap recommended-array fill (SUGGEST-DON'T-AUTO-APPLY:
             the only state change this feature makes, on an explicit tap). Fills
@@ -1073,7 +1206,11 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
               };
               return (
                 <div key={ability} className={styles.allocRow}>
-                  <span className={styles.allocName}>{ABILITY_NAMES[ability]}</span>
+                  <span className={styles.allocName}>
+                    <MaybeContentTooltip content={resolveAbilityTooltip(ability)} ariaLabel={`About ${ABILITY_NAMES[ability]}`}>
+                      {ABILITY_NAMES[ability]}
+                    </MaybeContentTooltip>
+                  </span>
                   <div className={styles.stepper}>
                     <button
                       type="button"
@@ -1171,6 +1308,28 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           🎲
         </button>
       </div>
+      {alignment && ALIGNMENT_INFO[alignment] && (
+        <p className={styles.hint} data-testid="wiz-alignment-info">
+          {ALIGNMENT_INFO[alignment].summary}
+          {isEvilAlignment(alignment) ? ` ${EVIL_ALIGNMENT_NOTE}` : ''}
+        </p>
+      )}
+      <details className={styles.bgCompare}>
+        <summary className={styles.bgCompareSummary}>What do the alignments mean?</summary>
+        <p className={styles.hint}>
+          Alignment is a shorthand for your character&apos;s moral compass: good, evil, or neutral, and lawful,
+          chaotic, or neutral about order. It has no effect on your numbers; it&apos;s a guide to how you play.
+        </p>
+        <dl className={styles.bgFacts}>
+          {ALIGNMENTS.map((a) => (
+            <div key={a} className={styles.alignmentRow}>
+              <dt>{a}</dt>
+              <dd>{ALIGNMENT_INFO[a]?.summary}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className={styles.guidanceCite}>Source: PHB 2024 "Choose an Alignment" (L1295, L1850-1878).</p>
+      </details>
 
       {/* Faith / Deity: a <datalist> of the 27 Gods of Greyhawk suggestions
           plus free text (homebrew / other-setting deities stay allowed). The
@@ -1260,6 +1419,15 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           🎲
         </button>
       </div>
+      <details className={styles.bgCompare}>
+        <summary className={styles.bgCompareSummary}>Stuck? Questions to imagine your past</summary>
+        <ul className={styles.promptList}>
+          {PAST_PROMPTS.map((q) => (
+            <li key={q}>{q}</li>
+          ))}
+        </ul>
+        <p className={styles.guidanceCite}>Source: {PAST_PROMPTS_SOURCE}.</p>
+      </details>
     </div>
   );
 

@@ -598,3 +598,19 @@
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
+
+/* Alignment meanings: each name/summary pair keeps the facts grid's two columns. */
+.alignmentRow {
+  display: contents;
+}
+
+/* "Imagine your past" questions on the Details step. */
+.promptList {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.promptList li + li {
+  margin-top: 0.2rem;
+}

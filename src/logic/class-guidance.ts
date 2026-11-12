@@ -124,7 +124,8 @@ const CLASS_BLURBS: Record<string, string> = {
   cleric: 'A divine caster who heals, protects, and calls on a deity for miracles.',
   druid: 'A nature caster who shapeshifts and commands the power of the wilds.',
   fighter: 'A master of weapons and armor, adaptable to any style of combat.',
-  monk: 'A fast, unarmored martial artist who strikes with focused Ki.',
+  // 2024 renamed Ki to Focus Points (PHB 2024 "Monk's Focus", L4538-4540).
+  monk: 'A fast, unarmored martial artist who fuels special strikes with Focus Points.',
   paladin: 'A holy warrior who blends martial might with divine oaths and spells.',
   ranger: 'A wilderness hunter who tracks foes and casts nature magic.',
   rogue: 'A nimble skirmisher who relies on stealth, skills, and Sneak Attack.',
