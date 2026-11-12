@@ -17,6 +17,7 @@ function toEquipment(classId: string) {
     target: { value: '2' },
   });
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
   next(); // Skills
   next(); // Ability Scores

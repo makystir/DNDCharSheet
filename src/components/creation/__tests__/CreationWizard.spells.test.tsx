@@ -29,6 +29,7 @@ function toSkills(classId: string) {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
   next();
 }
@@ -83,7 +84,7 @@ describe('CreationWizard Spells step', () => {
     );
     toSkills(classId);
     toAfterAbilities(0);
-    expect(screen.getByRole('heading', { name: /Step 5: Spells/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Step 6: Spells/ })).toBeInTheDocument();
     expect(screen.getByText(/Casters prepare a list of spells\./)).toBeInTheDocument();
     expect(screen.getByText(/You can change your prepared spells after a Long Rest/)).toBeInTheDocument();
     expect(screen.queryByText(/memoriz/i)).toBeNull();

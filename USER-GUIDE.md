@@ -86,6 +86,10 @@ In Settings, the **Install App** section offers **Install on this device** when 
 
 The wizard walks you through the choices in the same order the 2024 rulebook does. A progress bar at the top shows where you are. Use **Next** and **Back** to move. Nothing is locked in until the end, so you can step back and change your mind. If **Next** is greyed out, a line above it says what's still needed (for example "choose a species"). If going back and changing your class or background would clear picks you've made, such as your skills or spells, the wizard asks first.
 
+You can also tap a step's name in the progress bar to jump straight to it, back or forward, as long as you've reached it before and the steps before it are done.
+
+The wizard saves as you go. If you close the page or it reloads, the next time you open the wizard it offers to **Resume** your unfinished character, or **Start over**.
+
 The wizard has these steps. The **Spells** step only appears for classes that cast spells at level 1.
 
 ### Step 1: Class
@@ -100,9 +104,9 @@ After you choose, the wizard shows a short guide to that class, including the ab
 
 Not sure yet? Open **Compare all classes** under the class list. It shows each class's one-line summary, what it "likes", how complex the Player's Handbook rates it (Fighter and Rogue are the Low-complexity ones, the simplest to learn), its main ability, Hit Die and whether it casts spells. Press **Choose** on the one you want.
 
-### Step 2: Origin
+### Step 2: Background
 
-Your **Origin** is where your character comes from. You choose a **Background** and a **Species**.
+Your **Origin** is where your character comes from: a **Background** (this step) and a **Species** (the next).
 
 **Background.** Pick one from the dropdown. A panel appears below it that explains what the background gives you:
 
@@ -114,19 +118,19 @@ Your **Origin** is where your character comes from. You choose a **Background** 
 
 Open **Compare all backgrounds** to see every background side by side. Press **Choose** on any of them to pick it.
 
-**Ability score increase.** Your background raises your ability scores. You can add **+2 to one score and +1 to another**, or **+1 to all three**. The wizard won't let you continue until the split is valid.
-
 If the wizard shows a note that some backgrounds suit your class, that is only a suggestion. Any background works with any class.
 
-**Ability increases.** Your background raises three ability scores: +2 to one and +1 to another, or +1 to all three. **Suggest for my class** fills in the two your class relies on most; you can change them after.
+**Ability increases.** Your background raises three ability scores: **+2 to one and +1 to another**, or **+1 to all three**. **Suggest for my class** fills in the two your class relies on most; you can change them after. The wizard won't let you continue until the split is valid.
 
 **Tool.** If your background lets you choose a kind of tool (a gaming set, artisan's tools or a musical instrument), pick one from the list. The wizard shows what that tool lets you do.
+
+### Step 3: Species & Languages
 
 **Species.** Pick your character's people. In the 2024 rules your species doesn't change your ability scores, so choose the one you'd enjoy playing. The selected species shows a short description, its size, Speed, Darkvision and traits (tap a trait to read it), and **Compare all species** lists them side by side. Some species ask for an extra choice (for example a skill, a lineage, or the ability their spells use). The wizard shows these when they apply, with a hint: for a spellcasting ability it suggests the one your class casts with.
 
 **Languages.** Pick two besides Common. Tap a language to see who speaks it. If your species has a language of its own (Dwarvish for a dwarf, for example), the wizard points it out.
 
-### Step 3: Skills
+### Step 4: Skills
 
 The top of this step lists what you receive **automatically**: your class's saving throws, armor and weapon training, and the skills and feat from your background. You don't pick those.
 
@@ -136,7 +140,7 @@ Skills that use your class's main ability are tagged **Suggested**, because you'
 
 Not sure? You can move on and finish later. The Overview page will remind you.
 
-### Step 4: Ability Scores
+### Step 5: Ability Scores
 
 The scores on this step already include the +2 and +1 from your background, so what you see is what you'll have. Hover over a score to see the base score and the increase.
 
@@ -150,11 +154,11 @@ The wizard explains the method you pick, and you can tap an ability's name to se
 
 Put your highest numbers in the abilities your class cares about. The class guide from Step 1 tells you which. Your background's bonuses from Step 2 are added on top.
 
-### Step 5: Spells (spellcasters only)
+### Step 6: Spells (spellcasters only)
 
 If your class casts spells at level 1, you pick your starting **cantrips** (spells you can cast as often as you like) and your starting leveled spells. The list only shows spells your class can actually learn. If you picked a spell that isn't legal for your class, the app tells you and lets you remove it.
 
-### Step 6: Alignment and Details
+### Step 7: Alignment and Details
 
 Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. Each has a 🎲 button that rolls one for you (name, age and appearance suit your species), and you can type over anything it rolls. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
 
@@ -162,7 +166,7 @@ The wizard describes the alignment you pick, and **What do the alignments mean?*
 
 **Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
 
-### Step 7: Equipment
+### Step 8: Equipment
 
 In the 2024 rules, both your **class** and your **background** give you starting equipment, and any coins you get can be spent on gear right away. This step has four parts:
 
@@ -177,9 +181,9 @@ A gold-only choice gives you the biggest budget. A package gives you a ready-mad
 **Warnings about gear you may not use well.** If you buy something your class probably can't use properly, the app tells you. For example, a Wizard buying armor gets a warning that they aren't trained with it, and that wearing armor without training gives Disadvantage on Strength and Dexterity tests and stops spellcasting. A Rogue buying a Greatsword is told they won't add their Proficiency Bonus to its attacks. You'll also see a note for Heavy weapons or armor your Strength can't handle. These are only warnings. You can still buy the item, because a feat, a species trait or your DM's ruling might make it work.
 
 Armor and a shield you are trained in are worn automatically when you finish. You can change what you're wearing on the Inventory page.
-### Step 8: Review
+### Step 9: Review
 
-A summary of everything you picked. Anything still unfinished is listed here. When you're happy, confirm and the wizard creates your character and takes you to the sheet.
+Your character as it will be created, like a first look at the sheet. It leads with the numbers you use first in play: Hit Points, Armor Class, Speed, Initiative, Passive Perception and Proficiency Bonus (hover over any of them to see how it's worked out). Below come your ability scores, proficiencies, origin feat, species traits, languages, spells, equipment and coins, and details. Each section has an **Edit** link that takes you back to the step it came from. Anything still unfinished is listed at the bottom. When you're happy, press **Finish** and the wizard creates your character and takes you to the sheet.
 
 ---
 

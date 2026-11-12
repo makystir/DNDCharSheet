@@ -42,6 +42,7 @@ describe('CreationWizard help: backgrounds and class skills', () => {
     fireEvent.change(screen.getByLabelText('Wisdom background increase'), {
       target: { value: '1' },
     });
+    next(); // Background -> Species
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
     next();
     const checkbox = screen.getByRole('checkbox', { name: 'Acrobatics' });

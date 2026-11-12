@@ -24,6 +24,7 @@ function toDetails(classId: string, species: string) {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: species } });
   next(); // Skills
   next(); // Ability Scores

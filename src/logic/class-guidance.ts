@@ -211,7 +211,7 @@ export function abilityHints(classId: string | undefined): AbilityHints | undefi
  * For a paired primary (Fighter Str/Dex; Monk Dex/Wis; Paladin Str/Cha; Ranger
  * Dex/Wis) the result is the UNION across those abilities, first-seen order
  * preserved and de-duplicated. Returns [] for an unknown/empty classId (never
- * throws). Purely a nudge — the Origin step never restricts the pick.
+ * throws). Purely a nudge — the Background step never restricts the pick.
  */
 export function suggestedBackgrounds(classId: string | undefined): string[] {
   const data = getClass(classId);

@@ -141,7 +141,7 @@ export const ABILITY_HINT_CASES: AbilityHintCase[] = [
 
 // ─── Background-fit hint (suggestedBackgrounds) ──────────────────────────────
 // PHB 2024 "Ability Scores and Backgrounds" (L1583-1589): which backgrounds
-// boost each ability. The hint on the Origin step = the backgrounds that boost
+// boost each ability. The hint on the Background step = the backgrounds that boost
 // the chosen class's PRIMARY ability (for a paired primary, the union across
 // those abilities). Order not significant (compared as a set). The table maps
 // ability → backgrounds (verbatim from the PHB, OCR spacing cleaned):

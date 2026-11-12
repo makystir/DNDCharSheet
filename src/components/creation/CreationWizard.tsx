@@ -96,6 +96,14 @@ import { choiceOptions, formatLanguage } from '../pages/sheet-helpers';
 import { SkillsStep } from './SkillsStep';
 import { SpellsStep } from './SpellsStep';
 import { ReviewStep } from './ReviewStep';
+import type { ReviewEditTarget } from './ReviewStep';
+import {
+  clearWizardDraft,
+  draftHasProgress,
+  loadWizardDraft,
+  saveWizardDraft,
+  type WizardDraft,
+} from '../../logic/wizard-draft';
 import { startingChoicesFor } from '../../logic/starting-choices';
 import { startingSpellPools } from '../../logic/starting-spells';
 import styles from './CreationWizard.module.css';
@@ -114,7 +122,8 @@ export interface CreationWizardProps {
  */
 type StepId =
   | 'class'
-  | 'origin'
+  | 'background'
+  | 'species'
   | 'skills'
   | 'abilities'
   | 'spells'
@@ -123,7 +132,10 @@ type StepId =
   | 'review';
 const ALL_STEPS: { id: StepId; label: string }[] = [
   { id: 'class', label: 'Class' },
-  { id: 'origin', label: 'Origin' },
+  // PHB 2024 "Determine Origin" is background + species + languages; it is two
+  // steps here so each screen stays short.
+  { id: 'background', label: 'Background' },
+  { id: 'species', label: 'Species' },
   { id: 'skills', label: 'Skills' },
   { id: 'abilities', label: 'Ability Scores' },
   // Only for classes with level 1 spellcasting (startingChoicesFor(...).spells).
@@ -309,15 +321,17 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
    * to Finish: by then the species is known, so the Details step's name
    * generator can suggest one.
    */
-  const missingForStep = (): string[] => {
+  const missingForStep = (id: StepId = currentStepId): string[] => {
     const missing: string[] = [];
-    switch (currentStepId) {
+    switch (id) {
       case 'class':
         if (classId === '') missing.push('choose a class');
         break;
-      case 'origin':
+      case 'background':
         if (backgroundId === '') missing.push('choose a background');
         else if (!allocationValid) missing.push('set your background ability increases (+2 and +1, or +1 to all three)');
+        break;
+      case 'species':
         if (speciesId === '') missing.push('choose a species');
         break;
       case 'abilities':
@@ -339,6 +353,21 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
   const missing = missingForStep();
   const canProceed = (): boolean => missing.length === 0;
+
+  // The furthest step reached, so the step bar can jump back and forward to any
+  // step already visited, as long as every step before it is complete.
+  const [furthest, setFurthest] = useState(0);
+  const canJumpTo = (index: number): boolean =>
+    index <= Math.min(furthest, steps.length - 1) &&
+    steps.slice(0, index).every((s) => s.id === 'review' || missingForStep(s.id).length === 0);
+  const jumpTo = (index: number) => {
+    if (canJumpTo(index)) setStep(index);
+  };
+  /** Review's Edit links: back to the step that owns a section. */
+  const editStep = (target: ReviewEditTarget) => {
+    const index = steps.findIndex((s) => s.id === target);
+    if (index >= 0) setStep(index);
+  };
 
   // ─── Step 1 handlers ─────────────────────────────────────────────────────
 
@@ -680,6 +709,86 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     return character;
   };
 
+  // ─── Draft: keep an unfinished build across a reload or closed tab ────────
+  const [savedDraft, setSavedDraft] = useState<WizardDraft | null>(() => {
+    const d = loadWizardDraft();
+    return d && draftHasProgress(d) ? d : null;
+  });
+  const resumeDraft = (d: WizardDraft) => {
+    setName(d.name);
+    setClassId(d.classId as ClassId | '');
+    setBackgroundId(d.backgroundId as BackgroundId | '');
+    setAllocation(d.allocation as Partial<Record<Ability, number>>);
+    setSpeciesId(d.speciesId as SpeciesId | '');
+    setSpeciesChoices(d.speciesChoices);
+    setChosenLanguages(d.chosenLanguages);
+    setGrantedLanguages(d.grantedLanguages);
+    setToolProficiency(d.toolProficiency);
+    setSkillChoices(d.skillChoices as SkillId[]);
+    setSpellPicks(d.spellPicks as ClassSpellcasting);
+    setAbilityMethod(d.abilityMethod);
+    setArrayAssignment(d.arrayAssignment as Partial<Record<Ability, number>>);
+    setPointBuyScores({ ...EMPTY_SCORES, ...(d.pointBuyScores as Partial<Record<Ability, number>>) });
+    setRolledPool(d.rolledPool);
+    setRolledAssignment(d.rolledAssignment as Partial<Record<Ability, number>>);
+    setGender(d.gender);
+    setAlignment(d.alignment);
+    setDetails((prev) => ({ ...prev, ...d.details }));
+    setEquipmentChoice(d.equipmentChoice);
+    setClassOption(d.classOption as ClassOptionId);
+    setClassPicks(d.classPicks);
+    setCart(d.cart);
+    setTrinketRoll(d.trinketRoll);
+    setFurthest(d.furthest);
+    setStep(d.step);
+    setSavedDraft(null);
+  };
+  const discardDraft = () => {
+    clearWizardDraft();
+    setSavedDraft(null);
+  };
+  // Save as the player goes (not while a saved draft is still on offer, so
+  // starting fresh by accident can't overwrite it before they choose).
+  useEffect(() => {
+    if (savedDraft !== null) return;
+    if (classId === '' && name.trim() === '') return;
+    saveWizardDraft({
+      v: 1,
+      savedAt: Date.now(),
+      step,
+      furthest,
+      name,
+      classId,
+      backgroundId,
+      allocation: allocation as Record<string, number>,
+      speciesId,
+      speciesChoices,
+      chosenLanguages,
+      grantedLanguages,
+      toolProficiency,
+      skillChoices,
+      spellPicks: spellPicks as WizardDraft['spellPicks'],
+      abilityMethod,
+      arrayAssignment: arrayAssignment as Record<string, number>,
+      pointBuyScores,
+      rolledPool,
+      rolledAssignment: rolledAssignment as Record<string, number>,
+      gender,
+      alignment,
+      details,
+      equipmentChoice,
+      classOption,
+      classPicks,
+      cart,
+      trinketRoll,
+    });
+  }, [
+    savedDraft, step, furthest, name, classId, backgroundId, allocation, speciesId, speciesChoices,
+    chosenLanguages, grantedLanguages, toolProficiency, skillChoices, spellPicks, abilityMethod,
+    arrayAssignment, pointBuyScores, rolledPool, rolledAssignment, gender, alignment, details,
+    equipmentChoice, classOption, classPicks, cart, trinketRoll,
+  ]);
+
   // On a step change, scroll the new step's heading into view and move focus to
   // it, so a long step never opens part-way down and screen readers announce it.
   const stepRef = useRef<HTMLDivElement>(null);
@@ -698,8 +807,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   const goNext = () => {
     if (step < steps.length - 1) {
+      setFurthest((f) => Math.max(f, step + 1));
       setStep((s) => s + 1);
     } else {
+      clearWizardDraft();
       onComplete(buildCharacter());
     }
   };
@@ -836,9 +947,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
-  const renderOriginStep = () => (
+  const renderBackgroundStep = () => (
     <div className={styles.stepBody}>
-      <h2 className={styles.stepTitle}>Step {stepNumber('origin')}: Origin</h2>
+      <h2 className={styles.stepTitle}>Step {stepNumber('background')}: Background</h2>
 
       <label className={styles.fieldLabel} htmlFor="wiz-background">
         Background
@@ -954,6 +1065,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           )}
         </fieldset>
       )}
+
+    </div>
+  );
+
+  const renderSpeciesStep = () => (
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Step {stepNumber('species')}: Species &amp; Languages</h2>
 
       <label className={styles.fieldLabel} htmlFor="wiz-species">
         Species
@@ -1098,7 +1216,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   /**
    * The score the character will actually have: the base score plus the
-   * background increase chosen on the Origin step (PHB 2024 L1720: "adjust them
+   * background increase chosen on the Background step (PHB 2024 L1720: "adjust them
    * according to your background"). Shown here so the player sees 17, not 15.
    */
   const finalScoreBreakdown = (ability: Ability, base: number): Breakdown => ({
@@ -1626,13 +1744,14 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const renderReviewStep = () => (
     <div className={styles.stepBody}>
       <h2 className={styles.stepTitle}>Step {stepNumber('review')}: Review</h2>
-      <ReviewStep character={buildCharacter()} />
+      <ReviewStep character={buildCharacter()} onEdit={editStep} />
     </div>
   );
 
   const stepRenderers: Record<StepId, () => ReactElement> = {
     class: renderClassStep,
-    origin: renderOriginStep,
+    background: renderBackgroundStep,
+    species: renderSpeciesStep,
     skills: renderSkillsStep,
     abilities: renderAbilitiesStep,
     details: renderDetailsStep,
@@ -1643,7 +1762,25 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   return (
     <div className={styles.wizard} role="region" aria-label="Character creation wizard">
-      <StepIndicator steps={stepLabels} currentStep={step} />
+      {savedDraft && (
+        <div className={styles.resumeBanner} role="region" aria-label="Unfinished character">
+          <p className={styles.hint}>
+            You have an unfinished character
+            {savedDraft.name.trim() ? `, ${savedDraft.name.trim()}` : ''}
+            {savedDraft.classId ? ` (${CLASS_LIST.find((c) => c.id === savedDraft.classId)?.name})` : ''}, saved{' '}
+            {new Date(savedDraft.savedAt).toLocaleString()}. Pick up where you left off?
+          </p>
+          <div className={styles.resumeButtons}>
+            <button type="button" className={styles.primaryBtn} onClick={() => resumeDraft(savedDraft)}>
+              Resume
+            </button>
+            <button type="button" className={styles.secondaryBtn} onClick={discardDraft}>
+              Start over
+            </button>
+          </div>
+        </div>
+      )}
+      <StepIndicator steps={stepLabels} currentStep={step} canJumpTo={canJumpTo} onStepClick={jumpTo} />
       <div ref={stepRef}>{stepRenderers[currentStepId]()}</div>
       {missing.length > 0 && (
         <p className={styles.blockedNote} role="status" data-testid="wizard-missing">

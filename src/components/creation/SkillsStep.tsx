@@ -20,7 +20,7 @@ export interface SkillsStepProps {
   classId: string;
   backgroundId: BackgroundId | '';
   speciesId: SpeciesId | '';
-  /** Species sub-choices picked on the Origin step (e.g. skillfulSkill). */
+  /** Species sub-choices picked on the Species step (e.g. skillfulSkill). */
   speciesChoices: Record<string, string>;
   /** The class skills picked so far. */
   chosen: SkillId[];

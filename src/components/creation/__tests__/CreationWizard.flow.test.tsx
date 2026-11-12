@@ -25,6 +25,7 @@ function origin() {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
 }
 
@@ -36,7 +37,7 @@ describe('Wizard flow: names, blockers and focus', () => {
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
     expect(nextBtn()).toBeEnabled();
     next();
-    expect(screen.getByTestId('wizard-missing')).toHaveTextContent('choose a background and choose a species');
+    expect(screen.getByTestId('wizard-missing')).toHaveTextContent('To continue: choose a background.');
     fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
     expect(screen.getByTestId('wizard-missing')).toHaveTextContent('set your background ability increases');
   });
@@ -70,7 +71,7 @@ describe('Wizard flow: names, blockers and focus', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
     next();
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: /Step 2: Origin/ }));
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: /Step 2: Background/ }));
   });
 });
 
@@ -84,6 +85,7 @@ describe('Wizard flow: warnings before clearing picks', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: 'Athletics' }));
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'wizard' } });
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveTextContent('Change class to Wizard? This clears your class skill picks.');
@@ -93,7 +95,8 @@ describe('Wizard flow: warnings before clearing picks', () => {
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'wizard' } });
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Change' }));
     expect(screen.getByLabelText('Class')).toHaveValue('wizard');
-    next();
+    next(); // Background (still set)
+    next(); // Species (still set)
     next(); // Skills
     expect(screen.getByTestId('skills-counter')).toHaveTextContent('0 of');
   });
@@ -111,6 +114,7 @@ describe('Wizard flow: warnings before clearing picks', () => {
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
     next();
     origin();
+    fireEvent.click(screen.getByRole('button', { name: 'Back' })); // Species -> Background
     fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'sage' } });
     expect(screen.getByRole('dialog')).toHaveTextContent('This clears your background ability increases.');
   });

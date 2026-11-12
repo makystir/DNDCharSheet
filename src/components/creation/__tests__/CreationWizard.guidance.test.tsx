@@ -25,7 +25,17 @@ function completeOrigin(species = 'human') {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: species } });
+}
+
+/** Finish the Background step (Acolyte, +2 Int / +1 Wis) and move on to Species. */
+function toSpecies(classId = 'fighter') {
+  toOrigin(classId);
+  fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
+  fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
+  fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+  next();
 }
 
 describe('Class step: compare before choosing', () => {
@@ -47,10 +57,10 @@ describe('Class step: compare before choosing', () => {
   });
 });
 
-describe('Origin step: species, tools, increases and languages', () => {
+describe('Background and Species steps: species, tools, increases and languages', () => {
   it('describes a species before and after it is chosen, with trait tooltips', () => {
     start();
-    toOrigin();
+    toSpecies();
     fireEvent.click(screen.getByText('Compare all species'));
     expect(screen.getAllByText(/Raised from the earth by a god of the forge/).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: 'Choose Dwarf' }));
@@ -84,7 +94,7 @@ describe('Origin step: species, tools, increases and languages', () => {
 
   it("suggests the species' own language and explains each language", () => {
     start();
-    toOrigin();
+    toSpecies();
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'dwarf' } });
     expect(screen.getByTestId('wiz-language-suggestion')).toHaveTextContent('Spoken by Dwarf folk: Dwarvish');
     fireEvent.click(screen.getByRole('button', { name: 'About Elvish' }));
@@ -94,7 +104,7 @@ describe('Origin step: species, tools, increases and languages', () => {
 
   it("suggests the class's spellcasting ability for a species spell trait", () => {
     start();
-    toOrigin('wizard');
+    toSpecies('wizard');
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'elf' } });
     expect(screen.getByTestId('wiz-species-ability-hint')).toHaveTextContent('Suggested: Intelligence');
   });

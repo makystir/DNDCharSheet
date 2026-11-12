@@ -17,7 +17,7 @@ function completeStep1() {
   next();
 }
 
-/** Fill the Origin step (acolyte background +2/+1, species, no extra languages) and advance. */
+/** Fill the Background and Species steps (acolyte background +2/+1, species, no extra languages) and advance. */
 function completeOrigin() {
   fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
   // Acolyte abilities: int/wis/cha. Allocate +2 Int, +1 Wis.
@@ -27,6 +27,7 @@ function completeOrigin() {
   fireEvent.change(screen.getByLabelText('Wisdom background increase'), {
     target: { value: '1' },
   });
+  next(); // Background -> Species
   fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
   next();
 }
@@ -73,11 +74,10 @@ describe('CreationWizard', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('gates the Origin step until a valid ability allocation is chosen', () => {
+  it('gates the Background step until a valid ability allocation is chosen', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     completeStep1();
     fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
-    fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
     // No allocation yet → Next disabled.
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
     fireEvent.change(screen.getByLabelText('Intelligence background increase'), {
@@ -144,6 +144,10 @@ describe('CreationWizard', () => {
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'rogue' } });
     fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Shadow' } });
     next();
+    fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
+    fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+    next(); // Background -> Species (the languages live here)
     // The feature fieldset announces "choose 1" and the auto-granted Thieves' Cant.
     expect(screen.getByText(/Rogue feature languages/)).toBeInTheDocument();
     expect(screen.getByText(/choose 1/)).toBeInTheDocument();
@@ -230,7 +234,7 @@ describe('CreationWizard', () => {
     expect(pool[Number(valueOf('Charisma score assignment'))]).toBe(12);
   });
 
-  it('shows the background-fit hint on the Origin step', () => {
+  it('shows the background-fit hint on the Background step', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     completeStep1(); // fighter (primary Str or Dex)
     // Advance would need a valid origin; the hint shows as soon as step 2 renders.
@@ -255,6 +259,7 @@ describe('CreationWizard', () => {
     fireEvent.change(screen.getByLabelText('Wisdom background increase'), {
       target: { value: '1' },
     });
+    next(); // Background -> Species
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
     fireEvent.click(screen.getByLabelText('Goblin (feature)'));
     next(); // -> Skills
@@ -273,17 +278,17 @@ describe('CreationWizard', () => {
 });
 
 describe('CreationWizard Skills step', () => {
-  it('lists Skills between Origin and Ability Scores in the step indicator', () => {
+  it('lists Skills between Species and Ability Scores in the step indicator', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     const group = screen.getByRole('group', { name: 'Step progress' });
-    expect(group.textContent).toMatch(/Class.*Origin.*Skills.*Ability Scores.*Details.*Equipment.*Review/);
+    expect(group.textContent).toMatch(/Class.*Background.*Species.*Skills.*Ability Scores.*Details.*Equipment.*Review/);
   });
 
   it('shows the class saves and origin grants as granted automatically', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     completeStep1(); // fighter
     completeOrigin(); // acolyte + human
-    expect(screen.getByRole('heading', { name: /Step 3: Skills/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Step 4: Skills/ })).toBeInTheDocument();
     const panel = screen.getByRole('region', { name: 'Granted automatically' });
     expect(within(panel).getByText(/You don.t choose these/)).toBeInTheDocument();
     expect(panel.textContent).toMatch(/Saving throws \(Fighter\):\s*Strength & Constitution/);
@@ -331,6 +336,7 @@ describe('CreationWizard Skills step', () => {
     fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
     fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
     fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
+    next(); // Background -> Species
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
     next();
     expect(screen.getByLabelText('Performance')).toBeInTheDocument();
@@ -354,11 +360,11 @@ describe('CreationWizard Skills step', () => {
     expect(character.classes[0].skillChoices).toEqual(['athletics', 'perception']);
   });
 
-  it('goes Back from Skills to Origin', () => {
+  it('goes Back from Skills to Species', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     completeStep1();
     completeOrigin();
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByRole('heading', { name: /Step 2: Origin/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Step 3: Species/ })).toBeInTheDocument();
   });
 });
