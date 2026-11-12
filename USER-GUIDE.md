@@ -255,6 +255,8 @@ The Combat page is a quick reference for the table. Your DM runs the fight and y
 
 A strip across the top stays visible as you scroll. It shows your hit points (with any temporary hit points), Armor Class, Speed and Passive Perception (the eye icon), the round and your initiative once a fight is on, and the spell you are concentrating on. Tap or hover over a number to see how it was worked out.
 
+On a wide screen the page splits into two columns: **Status** (how you're doing) on the left, and **Attacks**, **Spells** or **Turn options**, and **Resources** (what you can do) on the right. On a phone or a narrow window it's one column, and links under the strip (**Status · Attacks · Spells · Resources**) jump straight to each part.
+
 ### Fight
 
 - **Start fight** begins a round counter at round 1.

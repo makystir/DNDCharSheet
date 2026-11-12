@@ -14,6 +14,8 @@ import { CombatStatusStrip } from '../combat/CombatStatusStrip';
 import { CombatRoundCard } from '../combat/CombatRoundCard';
 import { SavesPanel } from '../combat/SavesPanel';
 import { characterResources } from '../../logic/resources';
+import { anySpellcaster } from '../../logic/spellcasting';
+import { ScrollLink } from '../shared/ScrollLink';
 import styles from './CombatPage.module.css';
 
 export interface CombatPageProps {
@@ -46,6 +48,11 @@ export interface CombatPageProps {
  * section, and the Weapon Mastery chooser on Character > Class & Features (it
  * changes only on a Long Rest).
  *
+ * Layout: the strip (with jump links on a narrow page) and the Fight card span
+ * the page; below them, a wide page splits into two columns, Status on the left
+ * and Attacks / Spells and turn options / Resources on the right, so the main
+ * things a player looks up are on screen together.
+ *
  * No rule is computed in this component: every number comes from the logic layer.
  */
 export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
@@ -53,60 +60,89 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
   // cards (an Ammunition attack uses a piece) and the Ammunition card (recover half).
   const [ammoUsed, setAmmoUsed] = useState<Record<string, number>>({});
 
+  const isCaster = anySpellcaster(character);
+  const hasResources = characterResources(character).length > 0;
+  // Jump links (shown on narrow screens, where the page is one long column).
+  const sections = [
+    { id: 'combat-status-heading', label: 'Status' },
+    { id: 'combat-attacks-heading', label: 'Attacks' },
+    { id: 'combat-spells-heading', label: isCaster ? 'Spells' : 'Turn options' },
+    ...(hasResources ? [{ id: 'combat-resources-heading', label: 'Resources' }] : []),
+  ];
+
   return (
     <div className={styles.page}>
       {/* Read-only indicator of any opt-in house rules in effect. */}
       <HouseRuleIndicator houseRules={character.houseRules} />
 
-      <CombatStatusStrip character={character} />
+      {/* Stays at the top while scrolling: the glance, plus jump links when the
+          page is a single column. */}
+      <div className={styles.stickyTop}>
+        <CombatStatusStrip character={character} />
+        <nav className={styles.jump} aria-label="Combat sections">
+          {sections.map((s) => (
+            <ScrollLink key={s.id} targetId={s.id} fallbackHref="#combat" className={styles.jumpLink}>
+              {s.label}
+            </ScrollLink>
+          ))}
+        </nav>
+      </div>
 
       <CombatRoundCard character={character} onChange={onChange} />
 
-      <section className={styles.group} aria-labelledby="combat-status-heading">
-        <h2 id="combat-status-heading" className={styles.groupHeading}>
-          Status
-        </h2>
-        <HitPointsCard character={character} onChange={onChange} onNotify={onNotify} />
-        <SavesPanel character={character} />
-        <AffectingYouCard character={character} onChange={onChange} />
-        <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
-      </section>
+      {/* Two columns on a wide page: how you are doing (left) and what you can
+          do (right). One column, in this order, on a narrow one. */}
+      <div className={styles.columns}>
+        <div className={styles.column} data-testid="combat-column-status">
+          <section className={styles.group} aria-labelledby="combat-status-heading">
+            <h2 id="combat-status-heading" className={styles.groupHeading} tabIndex={-1}>
+              Status
+            </h2>
+            <HitPointsCard character={character} onChange={onChange} onNotify={onNotify} />
+            <SavesPanel character={character} />
+            <AffectingYouCard character={character} onChange={onChange} />
+            <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
+          </section>
+        </div>
 
-      <section className={styles.group} aria-labelledby="combat-attacks-heading">
-        <h2 id="combat-attacks-heading" className={styles.groupHeading}>
-          Attacks
-        </h2>
-        <WeaponCards
-          character={character}
-          onChange={onChange}
-          onAmmoFired={(id) => setAmmoUsed((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))}
-        />
-        <AmmoTracker
-          character={character}
-          onChange={onChange}
-          usedByItem={ammoUsed}
-          onUsedChange={setAmmoUsed}
-        />
-      </section>
+        <div className={styles.column} data-testid="combat-column-actions">
+          <section className={styles.group} aria-labelledby="combat-attacks-heading">
+            <h2 id="combat-attacks-heading" className={styles.groupHeading} tabIndex={-1}>
+              Attacks
+            </h2>
+            <WeaponCards
+              character={character}
+              onChange={onChange}
+              onAmmoFired={(id) => setAmmoUsed((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))}
+            />
+            <AmmoTracker
+              character={character}
+              onChange={onChange}
+              usedByItem={ammoUsed}
+              onUsedChange={setAmmoUsed}
+            />
+          </section>
 
-      <section className={styles.group} aria-labelledby="combat-spells-heading">
-        <h2 id="combat-spells-heading" className={styles.groupHeading}>
-          Spells and turn options
-        </h2>
-        <SpellcastingQuickCard character={character} onChange={onChange} />
-        <TurnOptionsCard character={character} />
-      </section>
+          <section className={styles.group} aria-labelledby="combat-spells-heading">
+            <h2 id="combat-spells-heading" className={styles.groupHeading} tabIndex={-1}>
+              {isCaster ? 'Spells and turn options' : 'Turn options'}
+            </h2>
+            <SpellcastingQuickCard character={character} onChange={onChange} />
+            <TurnOptionsCard character={character} />
+          </section>
 
-      {/* The whole group hides (heading included) when the character has no
-          limited-use features to track. */}
-      {characterResources(character).length > 0 && (
-        <section className={styles.group} aria-labelledby="combat-resources-heading">
-          <h2 id="combat-resources-heading" className={styles.groupHeading}>
-            Resources
-          </h2>
-          <ResourcesCard character={character} onChange={onChange} />
-        </section>
-      )}
+          {/* The whole group hides (heading included) when the character has no
+              limited-use features to track. */}
+          {hasResources && (
+            <section className={styles.group} aria-labelledby="combat-resources-heading">
+              <h2 id="combat-resources-heading" className={styles.groupHeading} tabIndex={-1}>
+                Resources
+              </h2>
+              <ResourcesCard character={character} onChange={onChange} />
+            </section>
+          )}
+        </div>
+      </div>
 
       <QuickRulesCard />
     </div>

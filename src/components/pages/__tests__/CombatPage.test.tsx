@@ -340,3 +340,51 @@ describe('CombatPage — Unarmored Defense and Speed reflect the new logic', () 
     expect(speed.getAttribute('aria-label')).toMatch(/Armor Strength requirement/);
   });
 });
+
+describe('CombatPage - layout and jump links', () => {
+  it('puts Status in one column and Attacks, turn options and Resources in the other', () => {
+    renderPage({ level: 1, classes: [{ id: 'fighter', level: 1 }] });
+    const status = within(screen.getByTestId('combat-column-status'));
+    const actions = within(screen.getByTestId('combat-column-actions'));
+    expect(status.getByRole('heading', { level: 2, name: 'Status' })).toBeInTheDocument();
+    expect(status.getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
+    expect(status.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument();
+    expect(actions.getByRole('heading', { level: 2, name: 'Attacks' })).toBeInTheDocument();
+    expect(actions.getByRole('heading', { level: 2, name: 'Turn options' })).toBeInTheDocument();
+    expect(actions.getByRole('heading', { level: 2, name: 'Resources' })).toBeInTheDocument();
+  });
+
+  it('names the spells group for a caster', () => {
+    renderPage({ level: 1, classes: [{ id: 'wizard', level: 1 }] });
+    expect(screen.getByRole('heading', { level: 2, name: 'Spells and turn options' })).toBeInTheDocument();
+    const nav = within(screen.getByRole('navigation', { name: 'Combat sections' }));
+    expect(nav.getByRole('link', { name: 'Spells' })).toBeInTheDocument();
+  });
+
+  it('offers a jump link per section that is on the page, and no Resources link without resources', () => {
+    renderPage();
+    const nav = within(screen.getByRole('navigation', { name: 'Combat sections' }));
+    expect(nav.getAllByRole('link').map((a) => a.textContent)).toEqual(['Status', 'Attacks', 'Turn options']);
+  });
+
+  it('a jump link scrolls to and focuses its section heading without changing the page hash', () => {
+    renderPage({ level: 1, classes: [{ id: 'fighter', level: 1 }] });
+    const heading = screen.getByRole('heading', { level: 2, name: 'Attacks' });
+    const scroll = vi.fn();
+    heading.scrollIntoView = scroll;
+    const link = within(screen.getByRole('navigation', { name: 'Combat sections' })).getByRole('link', {
+      name: 'Attacks',
+    });
+    const notPrevented = fireEvent.click(link);
+    expect(notPrevented).toBe(false); // default navigation prevented: the hash route stays #combat
+    expect(scroll).toHaveBeenCalled();
+    expect(document.activeElement).toBe(heading);
+  });
+
+  it('keeps the strip and the jump links together at the top', () => {
+    renderPage();
+    const strip = screen.getByRole('group', { name: 'Combat summary' });
+    const nav = screen.getByRole('navigation', { name: 'Combat sections' });
+    expect(strip.parentElement).toBe(nav.parentElement);
+  });
+});

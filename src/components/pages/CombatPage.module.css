@@ -1,7 +1,82 @@
+/* The page is a size container so the two-column split follows the space the
+   page actually has (the sidebar takes some on a computer), not the window. */
 .page {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  container-type: inline-size;
+  container-name: combat;
+}
+
+/* The summary strip and the jump links stay at the top while scrolling. */
+.stickyTop {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Jump links to each section: only needed when the page is one long column. */
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.jumpLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.jumpLink:hover,
+.jumpLink:focus-visible {
+  background: var(--bg-tertiary);
+  text-decoration: underline;
+}
+
+.jumpLink:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* One column by default (narrow page), in reading order. */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* Wide page: Status on the left, what you can do on the right, side by side.
+   The jump links are not needed there. */
+/* 720px of page is about a 1024px window with the sidebar open. */
+@container combat (min-width: 720px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .jump {
+    display: none;
+  }
 }
 
 /* A titled group of cards (Status, Attacks, Spells and turn options, Resources). */
@@ -18,4 +93,15 @@
   color: var(--accent-gold);
   border-bottom: 1px solid var(--border);
   padding-bottom: 6px;
+  /* Land below the sticky strip and jump links when jumped to. */
+  scroll-margin-top: 140px;
+}
+
+.groupHeading:focus {
+  outline: none;
+}
+
+.groupHeading:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
 }

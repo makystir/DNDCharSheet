@@ -1,13 +1,18 @@
-﻿/* Six compact chips in a row; three per row on a narrow screen. */
+﻿/* Three chips per row in a narrow card (a phone, or one of the Combat page's
+   two columns); all six in a row when the card is wide enough. */
+.gridWrap {
+  container-type: inline-size;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
-@media (max-width: 639px) {
+@container (min-width: 480px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
 

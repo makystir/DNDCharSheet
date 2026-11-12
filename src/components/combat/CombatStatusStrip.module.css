@@ -1,7 +1,5 @@
-﻿.strip {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+﻿/* Sticky positioning is on the Combat page's wrapper (strip + jump links). */
+.strip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

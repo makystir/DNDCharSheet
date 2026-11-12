@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Dices } from 'lucide-react';
 import type { Ability, Character } from '../../types/character';
 import { ABILITIES, ABILITY_ABBR, ABILITY_NAMES } from '../../types/character';
@@ -54,6 +54,7 @@ export function SavesPanel({ character }: SavesPanelProps) {
   return (
     <Card>
       <SectionHeader icon={Dices} title="Saving Throws" />
+      <div className={styles.gridWrap}>
       <div className={styles.grid}>
         {ABILITIES.map((ability) => {
           const name = ABILITY_NAMES[ability];
@@ -101,6 +102,7 @@ export function SavesPanel({ character }: SavesPanelProps) {
             </div>
           );
         })}
+      </div>
       </div>
 
       <p className={styles.result} role="status" aria-live="polite" data-testid="save-result">
