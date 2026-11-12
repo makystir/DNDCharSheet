@@ -39,10 +39,10 @@ describe('DefenseReadout', () => {
     expect(ac).toHaveTextContent('15'); // 10 + 2 (Dex) + 3 (Con)
   });
 
-  it('shows movement used / remaining dashes out of combat', () => {
+  it('no longer shows turn movement (the app does not run turns)', () => {
     render(<DefenseReadout character={char()} />);
-    // With no combat state, movement used is "—" and remaining falls back to allowance.
-    expect(screen.getByTestId('defend-movement-used')).toHaveTextContent('—');
+    expect(screen.queryByTestId('defend-movement-used')).toBeNull();
+    expect(screen.queryByTestId('defend-movement-remaining')).toBeNull();
   });
 
   it('P2: consolidates HP maximum, Initiative and Passive Perception into the one panel', () => {

@@ -1,0 +1,68 @@
+﻿.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.big {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.primary {
+  background: var(--accent-gold);
+  color: var(--bg-secondary);
+  border: 1px solid var(--accent-gold);
+  font-weight: 600;
+}
+
+.secondary {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+}
+
+.hint {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.status {
+  min-height: 1.4em;
+  margin: 4px 0 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}

@@ -681,6 +681,20 @@ export interface TurnState {
   dashes: number;
 }
 
+/**
+ * An effect the player is tracking during a fight (for example Bless, Rage or a
+ * spell's duration). Bookkeeping only: the app never applies what the effect
+ * does. `rounds` is the REMAINING combat rounds; absent means no timer (it stays
+ * until the player removes it). Additive-optional on Character; no version bump.
+ */
+export interface TrackedEffect {
+  id: string;
+  name: string;
+  /** Remaining rounds (integer >= 1); absent = no timer. */
+  rounds?: number;
+  note?: string;
+}
+
 /** The combat tracker (Stage A5c). `combat` is absent when not in combat. */
 export interface CombatState {
   inCombat: boolean;
@@ -692,6 +706,8 @@ export interface CombatState {
    * Optional and additive; absent means "the current round".
    */
   tickedThroughRound?: number;
+  /** The character's own Initiative result for this fight (shown on the Combat page). */
+  initiative?: number;
   /** Roster in Initiative order (highest first; ties in the user's chosen order). */
   combatants: Combatant[];
   /** Index into `combatants` of the combatant whose turn it is. */
@@ -1077,6 +1093,8 @@ export interface Character {
    * the field. Additive-optional; no `_v` bump. PHB 2024 "Initiative" and "Your
    * Turn" (Docs/PlayersHandbook.md L870-909).
    */
+  /** Effects the player is tracking in a fight (see TrackedEffect). */
+  effects?: TrackedEffect[];
   combat?: CombatState;
   /**
    * The weapon kinds (weapon catalog ids, e.g. 'longsword') whose Weapon Mastery

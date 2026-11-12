@@ -26,6 +26,7 @@ import { sanitizeClassChoices } from '../logic/class-choices';
 import { sanitizeResourcesSpent } from '../logic/resources';
 import { sanitizeCompanionsState } from '../logic/companions-sanitize';
 import { isConcentrating, sanitizeConditionDurations } from '../logic/condition-duration';
+import { sanitizeEffects } from '../logic/combat-effects';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
@@ -220,6 +221,11 @@ export function importFromJSON(json: string): ImportResult {
       isConcentrating(migrated.character.concentration),
     ) as Character['conditions'];
   }
+  // Tracked fight effects (Combat page) are additive-optional and untrusted: bounded,
+  // valid entries only; the field is dropped when nothing survives.
+  const sanitizedEffects = sanitizeEffects(migrated.character.effects);
+  if (sanitizedEffects) migrated.character.effects = sanitizedEffects;
+  else delete migrated.character.effects;
   // Reset identity so the manager adopts this as a NEW character (never clobber
   // the active one). The store/manager assigns a fresh id + timestamps.
   const character: Character = {

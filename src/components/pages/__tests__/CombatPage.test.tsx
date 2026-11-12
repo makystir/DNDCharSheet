@@ -4,19 +4,9 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { CombatPage } from '../CombatPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
-import { startCombat } from '../../../logic/initiative-order';
 
 function renderPage(overrides = {}) {
   const character = { ...createCharacter('Tester'), ...overrides };
-  const onChange = vi.fn();
-  render(<CombatPage character={character} onChange={onChange} />);
-  return { character, onChange };
-}
-
-/** An in-combat character (combat.inCombat true) for the segmented-control tests. */
-function renderInCombat(overrides = {}) {
-  const base = { ...createCharacter('Tester'), ...overrides };
-  const character = startCombat(base, []);
   const onChange = vi.fn();
   render(<CombatPage character={character} onChange={onChange} />);
   return { character, onChange };
@@ -134,91 +124,154 @@ describe('CombatPage — out of combat (flat stack)', () => {
     expect(hp.getAttribute('aria-label')).toMatch(/Dwarven Toughness/);
   });
 
-  it('shows no Attack/Defend/Status segmented control out of combat', () => {
+  it('has no Attack/Defend/Status tablist, initiative tracker or turn panel', () => {
     renderPage();
     expect(screen.queryByRole('tablist', { name: 'Combat mode' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Start Combat' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Next Turn' })).toBeNull();
+    expect(screen.queryByText('Movement used')).toBeNull();
   });
 
-  it('renders every A5a–A5d panel in the flat stack', () => {
+  it('groups the page into Status, Attacks and Resources and rests', () => {
     renderPage({
       level: 1,
       abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
       classes: [{ id: 'fighter', level: 1 }],
     });
-    // HP card, Take Damage, the consolidated Defenses & Combat Stats panel (P2),
-    // Death Saves, Concentration, Active Conditions, Hit Dice, Weapons,
-    // Unarmed Strike.
+    for (const name of ['Status', 'Attacks', 'Resources and rests']) {
+      expect(screen.getByRole('heading', { level: 2, name })).toBeInTheDocument();
+    }
+    // The cards that used to live behind the three modes are all on the page.
     expect(screen.getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Defenses & Combat Stats' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Defenses & Combat Stats' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Effects' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
-    // The Initiative tracker (starts combat) is reachable with a Start Combat button.
-    expect(screen.getByRole('button', { name: 'Start Combat' })).toBeInTheDocument();
+  });
+
+  it('shows a summary strip with HP, AC and Speed', () => {
+    renderPage();
+    const strip = screen.getByRole('group', { name: 'Combat summary' });
+    expect(within(strip).getByTestId('strip-ac')).toBeInTheDocument();
+    expect(within(strip).getByTestId('strip-speed')).toHaveTextContent('ft');
+    expect(within(strip).getByTestId('strip-hp')).toBeInTheDocument();
+    expect(within(strip).queryByTestId('strip-round')).toBeNull();
   });
 });
 
-describe('CombatPage — in combat (segmented control)', () => {
-  it('shows the Attack / Defend / Status tablist only while in combat', () => {
-    renderInCombat();
-    const tablist = screen.getByRole('tablist', { name: 'Combat mode' });
-    expect(tablist).toBeInTheDocument();
-    expect(within(tablist).getByRole('tab', { name: 'Attack' })).toBeInTheDocument();
-    expect(within(tablist).getByRole('tab', { name: 'Defend' })).toBeInTheDocument();
-    expect(within(tablist).getByRole('tab', { name: 'Status' })).toBeInTheDocument();
+describe('CombatPage - fight tracker', () => {
+  it('starts a fight at round 1 and counts rounds with Next round', () => {
+    renderStatefulPage();
+    expect(screen.getByTestId('round-number')).toHaveTextContent('-');
+    fireEvent.click(screen.getByRole('button', { name: 'Start fight' }));
+    expect(screen.getByTestId('round-number')).toHaveTextContent('1');
+    expect(within(screen.getByRole('group', { name: 'Combat summary' })).getByTestId('strip-round')).toHaveTextContent('Round 1');
+    fireEvent.click(screen.getByRole('button', { name: 'Next round' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next round' }));
+    expect(screen.getByTestId('round-number')).toHaveTextContent('3');
   });
 
-  it('defaults to Attack mode with its tabpanel shown and the others hidden', () => {
-    renderInCombat();
-    expect(screen.getByRole('tab', { name: 'Attack' })).toHaveAttribute('aria-selected', 'true');
-    const attackPanel = document.getElementById('combat-mode-panel-attack')!;
-    const defendPanel = document.getElementById('combat-mode-panel-defend')!;
-    expect(attackPanel).not.toHaveAttribute('hidden');
-    expect(defendPanel).toHaveAttribute('hidden');
-  });
-
-  it('switching to Defend reveals the Defend panel and hides Attack', () => {
-    renderInCombat();
-    fireEvent.click(screen.getByRole('tab', { name: 'Defend' }));
-    expect(screen.getByRole('tab', { name: 'Defend' })).toHaveAttribute('aria-selected', 'true');
-    const attackPanel = document.getElementById('combat-mode-panel-attack')!;
-    const defendPanel = document.getElementById('combat-mode-panel-defend')!;
-    expect(defendPanel).not.toHaveAttribute('hidden');
-    expect(attackPanel).toHaveAttribute('hidden');
-    // The Defend panel hosts the HP card and the consolidated Defenses & Combat
-    // Stats panel (AC + Speed + HP together, P2).
-    expect(within(defendPanel).getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
-    const consolidated = within(defendPanel).getByRole('heading', {
-      name: 'Defenses & Combat Stats',
+  it('Next round counts down timed conditions and effects and says what ended', () => {
+    const { onChange } = renderStatefulPage({
+      conditions: [
+        { id: 'poisoned', duration: { kind: 'rounds', rounds: 1 } },
+        { id: 'blinded', duration: { kind: 'rounds', rounds: 3 } },
+      ],
+      effects: [
+        { id: 'e1', name: 'Bless', rounds: 1 },
+        { id: 'e2', name: 'Rage', rounds: 4 },
+        { id: 'e3', name: 'Mage Armor' },
+      ],
     });
-    expect(consolidated).toBeInTheDocument();
-    const panel = within(consolidated.closest('div')!.parentElement as HTMLElement);
-    expect(panel.getByRole('button', { name: /Armor Class/ })).toBeInTheDocument();
-    expect(panel.getByRole('button', { name: /^Speed:/ })).toBeInTheDocument();
-    expect(panel.getByRole('button', { name: /Hit Point Maximum/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Start fight' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next round' }));
+    const next = onChange.mock.calls.at(-1)![0] as Character;
+    expect(next.combat?.round).toBe(2);
+    expect(next.conditions).toEqual([{ id: 'blinded', duration: { kind: 'rounds', rounds: 2 } }]);
+    expect(next.effects).toEqual([
+      { id: 'e2', name: 'Rage', rounds: 3 },
+      { id: 'e3', name: 'Mage Armor' },
+    ]);
+    const status = screen.getByTestId('round-status');
+    expect(status).toHaveTextContent('Round 2. Ended: Poisoned, Bless.');
   });
 
-  it('ArrowRight on the tablist moves selection to the next tab (roving tabindex)', () => {
-    renderInCombat();
-    const attackTab = screen.getByRole('tab', { name: 'Attack' });
-    expect(attackTab).toHaveAttribute('tabindex', '0');
-    fireEvent.keyDown(attackTab, { key: 'ArrowRight' });
-    const defendTab = screen.getByRole('tab', { name: 'Defend' });
-    expect(defendTab).toHaveAttribute('aria-selected', 'true');
-    expect(defendTab).toHaveAttribute('tabindex', '0');
-    expect(screen.getByRole('tab', { name: 'Attack' })).toHaveAttribute('tabindex', '-1');
+  it('records an initiative roll, starting the fight, and clears it when the fight ends', () => {
+    const { onChange } = renderStatefulPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll initiative' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Keep result' }));
+    const rolled = onChange.mock.calls.at(-1)![0] as Character;
+    expect(rolled.combat?.inCombat).toBe(true);
+    expect(typeof rolled.combat?.initiative).toBe('number');
+    expect(screen.getByTestId('initiative-result')).toHaveTextContent(String(rolled.combat?.initiative));
+
+    fireEvent.click(screen.getByRole('button', { name: 'End fight' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'End fight' }));
+    const ended = onChange.mock.calls.at(-1)![0] as Character;
+    expect(ended.combat).toBeUndefined();
+  });
+});
+
+describe('CombatPage - saving throws', () => {
+  it('shows all six saves with their bonus', () => {
+    renderPage({ abilities: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 } });
+    for (const ability of ['str', 'dex', 'con', 'int', 'wis', 'cha']) {
+      expect(screen.getByTestId(`save-${ability}`)).toBeInTheDocument();
+    }
+    expect(within(screen.getByTestId('save-dex')).getByRole('button', { name: /Dexterity Save/ })).toHaveTextContent('+2');
   });
 
-  it('Status mode hosts Active Conditions, Death Saves and Hit Dice', () => {
-    renderInCombat();
-    fireEvent.click(screen.getByRole('tab', { name: 'Status' }));
-    const statusPanel = document.getElementById('combat-mode-panel-status')!;
-    expect(within(statusPanel).getByRole('heading', { name: 'Hit Dice' })).toBeInTheDocument();
-    // P2: the consolidated defense panel (with AC) lives in Defend mode, so it is
-    // NOT duplicated in Status — no AC here.
-    expect(
-      within(statusPanel).queryByRole('heading', { name: 'Defenses & Combat Stats' }),
-    ).toBeNull();
+  it('flags what conditions do to a save', () => {
+    renderPage({ conditions: [{ id: 'restrained' }, { id: 'paralyzed' }] });
+    expect(screen.getByTestId('save-str')).toHaveTextContent('Auto-fail (Paralyzed)');
+    expect(screen.getByTestId('save-dex')).toHaveTextContent('Auto-fail');
+    expect(screen.getByTestId('save-wis')).not.toHaveTextContent('Auto-fail');
+  });
+
+  it('shows Disadvantage on Dexterity saves while Restrained', () => {
+    renderPage({ conditions: [{ id: 'restrained' }] });
+    expect(screen.getByTestId('save-dex')).toHaveTextContent('Disadvantage (Restrained)');
+    expect(screen.getByTestId('save-con')).not.toHaveTextContent('Disadvantage');
+  });
+
+  it('rolls a save and shows the result', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll Wisdom saving throw' }));
+    expect(screen.getByRole('dialog', { name: 'Wisdom saving throw' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.getByTestId('save-result')).toHaveTextContent(/Wisdom save: -?\d+ \(rolled \d+/);
+  });
+
+  it('starts a Dexterity save with Disadvantage while Restrained', () => {
+    renderPage({ conditions: [{ id: 'restrained' }] });
+    fireEvent.click(screen.getByRole('button', { name: 'Roll Dexterity saving throw' }));
+    expect(screen.getByRole('radio', { name: 'Disadvantage' })).toBeChecked();
+  });
+});
+
+describe('CombatPage - tracked effects', () => {
+  it('adds an effect with rounds, takes rounds off and ends it', () => {
+    renderStatefulPage();
+    fireEvent.change(screen.getByLabelText('Effect name'), { target: { value: 'Haste' } });
+    fireEvent.change(screen.getByLabelText('Effect rounds'), { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add effect' }));
+    const list = screen.getByRole('list', { name: 'Tracked effects' });
+    expect(within(list).getByText('Haste')).toBeInTheDocument();
+    expect(within(list).getByText('2 rounds left')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Take a round off Haste' }));
+    expect(within(list).getByText('1 round left')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Take a round off Haste' }));
+    expect(screen.queryByRole('list', { name: 'Tracked effects' })).toBeNull();
+  });
+
+  it('rejects a bad round count', () => {
+    renderStatefulPage();
+    fireEvent.change(screen.getByLabelText('Effect name'), { target: { value: 'Haste' } });
+    fireEvent.change(screen.getByLabelText('Effect rounds'), { target: { value: '0' } });
+    expect(screen.getByRole('button', { name: 'Add effect' })).toBeDisabled();
+    expect(screen.getByRole('note')).toHaveTextContent(/whole number of 1 or more/);
   });
 });
 

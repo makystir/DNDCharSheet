@@ -246,64 +246,36 @@ Where a feature offers a choice you haven't made yet (such as a fighting style),
 
 ## 6. The Combat page
 
-Combat in D&D is played in **turns**. On your turn you can move and take an **action**, and often a **bonus action**. You also get one **reaction** per round, used on someone else's turn. The Combat page tracks all of this.
+The Combat page is a quick reference for the table. Your DM runs the fight and you roll your own dice, so the page doesn't take turns for you. It keeps the numbers you look up during a fight in one place and handles the small things worth counting: hit points, saving throws, conditions, effects, ammo and rounds.
 
-### Out of combat and in combat
+### The summary strip
 
-When you're **not** in combat, the page shows everything in one scrolling list: hit points, damage, defenses, conditions, hit dice and rests, weapons, and so on.
+A strip across the top stays visible as you scroll. It shows your hit points (with any temporary hit points), Armor Class and Speed, the round and your initiative once a fight is on, and the spell you are concentrating on. Tap or hover over a number to see how it was worked out.
 
-Once you **start combat**, the page switches to three modes, chosen with a bar at the top:
+### Fight
 
-- **Attack:** your weapons, unarmed strike, ammunition and weapon mastery choices.
-- **Defend:** hit points, taking damage, Armor Class, speed and movement.
-- **Status:** conditions, death saves, concentration, class resources, spell slots and hit dice.
+- **Start fight** begins a round counter at round 1.
+- **Next round** adds a round and counts down every timed condition and effect for you. When something runs out it is removed, and a line under the buttons says what ended (for example "Round 4. Ended: Poisoned, Bless.").
+- **Roll initiative** rolls a Dexterity check with your bonus (and Advantage or Disadvantage where your conditions give it), or lets you type in the number from a physical die. It keeps the result in the strip until the fight ends. Rolling initiative starts a fight if one isn't on.
+- **End fight** clears the round and your initiative. Timers on conditions and effects keep their values.
 
-### Starting a fight (Initiative)
+### Status
 
-At the top of the page is the **Initiative** tracker. **Initiative** decides who acts first. Press **Roll my Initiative**, add anyone else to the roster with **Add to roster**, and press **Start Combat**. Use **Next Turn** and **Previous Turn** to move through the order, and **End Combat** when the fight is over.
+- **Hit Points and Take Damage:** type damage and its type, mark resistance or vulnerability for that hit, and heal or add temporary hit points. Temporary hit points are used up first and don't stack. If damage breaks your concentration, the app prompts you for the Constitution save.
+- **Death Saves:** appears when you are at 0 HP. Roll each save and the pips fill in.
+- **Saving Throws:** all six saves with your bonus and a **Roll** button each. A save shows **Auto-fail** when a condition like Paralyzed or Stunned makes you fail Strength and Dexterity saves, and **Disadvantage** when a condition like Restrained gives it (a Dexterity save). The roll starts with that Disadvantage already selected, and Exhaustion is applied. The result is shown under the saves. The app doesn't compare it to a DC; your DM tells you whether it worked.
+- **Active Conditions:** add a condition, read what it does, and give it a duration in rounds, minutes or hours, or until a rest or while you concentrate. Timed durations count down with **Next round**, and you can take a round off by hand.
+- **Effects:** track spells and features that last a number of rounds, such as Bless or Rage (1 minute is 10 rounds). Give it a name and an optional number of rounds. **Next round** counts them down, **-1** and **+1** adjust by hand, and **End** removes one. The app doesn't apply what an effect does; it only keeps the count.
+- **Concentration:** shows what you are concentrating on and ends it when you start another.
+- **Defenses & Combat Stats:** Armor Class, Speed, Hit Point Maximum, Initiative bonus and Passive Perception, with an **Adjust** area for an Armor Class override and an initiative bonus.
 
-### Your turn
+### Attacks
 
-The **Turn** panel tracks your **movement** (how far you've gone and how much you have left) and offers shortcuts like **Dash**. If you are at 0 HP, it prompts you to make your death saving throw.
+Your weapons, your unarmed strike, **Ammunition** and weapon mastery. In the Ammunition card, **Fire** takes one piece off the stack in your inventory, and after the fight **Recover half** returns half of what you fired, rounded down.
 
-### Attacking
+### Resources and rests
 
-On the **Attack** panel (or the weapon list when not in combat), press the attack button on a weapon. A short guided flow walks you through it:
-
-1. Enter the target's **Armor Class** and the distance, if the DM told you.
-2. The app shows your attack bonus and any **advantage** or **disadvantage**.
-3. Roll (the app rolls for you by default, or enter your physical dice, see [Settings](#11-settings-backups-and-sharing)).
-4. If you hit, roll damage and copy the total.
-
-**Weapon Mastery** is a 2024 feature some classes get. It lets you use a special property of certain weapons. You choose which weapons you've mastered on the Attack panel.
-
-### Taking damage and healing
-
-- **Take Damage:** enter the amount and damage type. The app subtracts it from your **temporary hit points** first, then from your regular hit points. It also lets you mark whether you have resistance or vulnerability to that damage type for that hit.
-- **Heal:** enter an amount. Healing can't go above your maximum.
-- **Grant Temp HP:** adds temporary hit points, a buffer that disappears first. If you already have some, the app asks whether to keep the old amount or replace it. Temporary hit points don't stack.
-
-### When you drop to 0 HP
-
-A character at 0 hit points is **unconscious** and starts making **death saving throws**, one at the start of each of their turns. The **Death Saves** card tracks successes and failures. Three successes and you stabilize. Three failures and you die. **Stabilize** marks a character as stable, for example after another character's healing or first aid.
-
-### Conditions
-
-**Conditions** are effects like Blinded, Poisoned or Prone. Add them in the **Active Conditions** card. Each condition has an explanation of what it does. You can set how long it lasts, and the app can track rounds in combat. **Exhaustion** is tracked here too.
-
-### Concentration
-
-Many spells need **concentration**: you can only hold one such spell at a time, and taking damage can break it. When you take damage while concentrating, the app prompts you to make the **Constitution saving throw** to keep it.
-
-### Resting
-
-Use the **Short Rest** and **Long Rest** buttons next to your Hit Dice.
-
-- **Short Rest** (about an hour): you can spend **Hit Dice** to heal, and some abilities recover.
-- **Long Rest** (about eight hours): you regain hit points, half of your spent Hit Dice, and most abilities and spell slots. The Long Rest dialog lists exactly what resets, and lets you note if the rest was interrupted.
-
----
-
+Spell slots, class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.
 ## 7. The Spells page
 
 This page appears only when your character can cast spells. (Some subclasses, like Eldritch Knight and Arcane Trickster, gain it at level 3.)

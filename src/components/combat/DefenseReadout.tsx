@@ -8,11 +8,6 @@ import { exhaustionLevelOf } from '../../logic/conditions';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import { formatSigned } from '../../logic/breakdown';
-import {
-  movementAllowanceBreakdown,
-  remainingMovementBreakdown,
-  turnContextOf,
-} from '../../logic/turn-economy';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
@@ -70,13 +65,6 @@ export function DefenseReadout({ character, onChange }: DefenseReadoutProps) {
   // Multiclass-aware (PHB 2024 "Multiclassing: Hit Points").
   const hpBreakdown = characterHitPointMaxBreakdown(character);
 
-  const combat = character.combat;
-  const turn = combat?.turn;
-  const context = turnContextOf(character);
-  const allowance = movementAllowanceBreakdown(context.speed, turn?.dashes ?? 0);
-  const remaining = turn
-    ? remainingMovementBreakdown(context.speed, turn)
-    : undefined;
 
   const setAcOverride = (raw: string) =>
     onChange?.({ ...character, acOverride: parseNumberInput(raw, true) });
@@ -121,41 +109,6 @@ export function DefenseReadout({ character, onChange }: DefenseReadoutProps) {
             <span className={styles.label}>Passive Perception</span>
             <span className={styles.value}>
               <CalculatedValue label="Passive Perception" breakdown={ppBreakdown} />
-            </span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.label}>Movement used</span>
-            <span className={styles.value} data-testid="defend-movement-used">
-              {turn ? (
-                <CalculatedValue
-                  label="Movement used"
-                  breakdown={{
-                    total: turn.movementUsed,
-                    components: [
-                      { label: 'Move entries since your turn started', value: turn.movementUsed },
-                    ],
-                    note: 'Only the running total is stored. Start my turn resets it to 0.',
-                  }}
-                >
-                  {turn.movementUsed} ft
-                </CalculatedValue>
-              ) : (
-                <span className={styles.muted}>—</span>
-              )}
-            </span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.label}>Movement remaining</span>
-            <span className={styles.value} data-testid="defend-movement-remaining">
-              {remaining ? (
-                <CalculatedValue label="Movement remaining" breakdown={remaining}>
-                  {remaining.total} ft
-                </CalculatedValue>
-              ) : (
-                <CalculatedValue label="Movement allowance" breakdown={allowance}>
-                  {allowance.total} ft
-                </CalculatedValue>
-              )}
             </span>
           </div>
         </div>

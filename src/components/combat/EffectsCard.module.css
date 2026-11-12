@@ -1,0 +1,124 @@
+﻿.hint {
+  margin: 0 0 10px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 12rem;
+}
+
+.fieldSmall {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 6rem;
+}
+
+.label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.input {
+  min-height: 44px;
+  padding: 0 10px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 8px 0 0;
+  color: var(--accent-red, #e57373);
+  font-size: 0.85rem;
+}
+
+.list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.muted {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

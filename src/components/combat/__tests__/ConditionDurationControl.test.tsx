@@ -64,17 +64,13 @@ describe('structured condition duration on the Combat page', () => {
     expect(option.disabled).toBe(true);
   });
 
-  it('the Next Turn button that starts a new round ticks the timed conditions', () => {
+  it('Next round ticks the timed conditions and says what ended', () => {
     renderPage({ conditions: [{ id: 'poisoned', duration: { kind: 'rounds', rounds: 1 } }] });
-    fireEvent.click(screen.getByRole('button', { name: 'Start Combat' }));
-    // One-combatant roster: every Next Turn starts a new round.
-    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Goblin' } });
-    fireEvent.change(screen.getByLabelText('Init'), { target: { value: '12' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Add to roster' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Next Turn' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Start fight' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next round' }));
     expect(latest.combat?.round).toBe(2);
     expect(latest.conditions).toBeUndefined();
-    expect(screen.getByTestId('initiative-status')).toHaveTextContent('Ended: Poisoned');
+    expect(screen.getByTestId('round-status')).toHaveTextContent('Ended: Poisoned');
   });
 });
 
