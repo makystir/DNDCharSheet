@@ -84,13 +84,13 @@ In Settings, the **Install App** section offers **Install on this device** when 
 
 ## 3. The character creation wizard, step by step
 
-The wizard walks you through the choices in the same order the 2024 rulebook does. A progress bar at the top shows where you are. Use **Next** and **Back** to move. Nothing is locked in until the end, so you can step back and change your mind.
+The wizard walks you through the choices in the same order the 2024 rulebook does. A progress bar at the top shows where you are. Use **Next** and **Back** to move. Nothing is locked in until the end, so you can step back and change your mind. If **Next** is greyed out, a line above it says what's still needed (for example "choose a species"). If going back and changing your class or background would clear picks you've made, such as your skills or spells, the wizard asks first.
 
 The wizard has these steps. The **Spells** step only appears for classes that cast spells at level 1.
 
 ### Step 1: Class
 
-Pick your **class** and give your character a **name**. A class is the biggest decision you'll make, because it decides how you fight, what you're good at, and how you play.
+Pick your **class**, and give your character a **name** if you have one in mind. The name can wait: once you've picked a species, the Details step can roll one that suits it. You only need a name to finish. A class is the biggest decision you'll make, because it decides how you fight, what you're good at, and how you play.
 
 After you choose, the wizard shows a short guide to that class, including the ability scores it cares about most, its Hit Die, and the saving throws it is trained in. If you aren't sure which class suits you, try a few and read the guide for each. A good rule of thumb:
 
@@ -138,6 +138,8 @@ Not sure? You can move on and finish later. The Overview page will remind you.
 
 ### Step 4: Ability Scores
 
+The scores on this step already include the +2 and +1 from your background, so what you see is what you'll have. Hover over a score to see the base score and the increase.
+
 Your six ability scores come from one of three methods:
 
 - **Standard Array:** you get a fixed set of numbers (15, 14, 13, 12, 10, 8) and assign each to an ability. **This is the simplest option for new players.**
@@ -154,7 +156,7 @@ If your class casts spells at level 1, you pick your starting **cantrips** (spel
 
 ### Step 6: Alignment and Details
 
-Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
+Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. Each has a 🎲 button that rolls one for you (name, age and appearance suit your species), and you can type over anything it rolls. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
 
 The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. Stuck on personality? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
 

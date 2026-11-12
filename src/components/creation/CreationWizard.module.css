@@ -614,3 +614,30 @@
 .promptList li + li {
   margin-top: 0.2rem;
 }
+
+/* Why Next / Finish is disabled, just above the footer. */
+.blockedNote {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+}
+
+/* "+2 background" beside an ability on the Ability Scores step. */
+.bonusTag {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  white-space: nowrap;
+}
+
+/* Editable appearance fields on the Details step. */
+.appearanceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.5rem 0.75rem;
+}
+.appearanceField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}

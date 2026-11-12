@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import type { Ability, Character, ClassSpellcasting, SkillId } from '../../types/character';
 import {
@@ -57,6 +57,7 @@ import {
   generateAppearance,
   generatePersonality,
   generateDeity,
+  generateAge,
 } from '../../logic/personal-details-generation';
 import { allDeityOptions } from '../../logic/deity-recommendations';
 import { DeitySuggestions } from './DeitySuggestions';
@@ -88,6 +89,7 @@ import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { SKILLS } from '../../types/character';
 import type { SkillId as WizardSkillId } from '../../types/character';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { SegmentedControl } from '../shared/SegmentedControl';
 import { StepIndicator } from '../combat/StepIndicator';
 import { choiceOptions, formatLanguage } from '../pages/sheet-helpers';
@@ -301,27 +303,85 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const stepNumber = (id: StepId): number => steps.findIndex((s) => s.id === id) + 1;
   const currentStepId = steps[step].id;
 
-  const canProceed = (): boolean => {
+  /**
+   * What still has to be done before Next (or Finish) works on this step, in
+   * plain words, so a disabled button always says why. The name is only needed
+   * to Finish: by then the species is known, so the Details step's name
+   * generator can suggest one.
+   */
+  const missingForStep = (): string[] => {
+    const missing: string[] = [];
     switch (currentStepId) {
       case 'class':
-        return name.trim().length > 0 && classId !== '';
+        if (classId === '') missing.push('choose a class');
+        break;
       case 'origin':
-        return backgroundId !== '' && allocationValid && speciesId !== '';
+        if (backgroundId === '') missing.push('choose a background');
+        else if (!allocationValid) missing.push('set your background ability increases (+2 and +1, or +1 to all three)');
+        if (speciesId === '') missing.push('choose a species');
+        break;
       case 'abilities':
-        return abilityStepValid();
-      // Skills never blocks: unfinished picks surface on the Overview later.
-      case 'skills':
-      case 'spells':
-      case 'details':
-      case 'equipment':
+        if (!abilityStepValid()) {
+          if (abilityMethod === 'point-buy') missing.push('keep every score between 8 and 15 within the 27 points');
+          else if (abilityMethod === 'roll' && rolledPool === null) missing.push('roll your scores');
+          else missing.push('give each ability one of the scores');
+        }
+        break;
       case 'review':
-        return true;
+        if (name.trim().length === 0) missing.push('give your character a name (the Details step can roll one)');
+        break;
+      // Skills, Spells, Details and Equipment never block: unfinished picks
+      // surface on the Overview later.
       default:
-        return false;
+        break;
     }
+    return missing;
   };
+  const missing = missingForStep();
+  const canProceed = (): boolean => missing.length === 0;
 
   // ─── Step 1 handlers ─────────────────────────────────────────────────────
+
+  // A pending change that would clear picks the player has made, awaiting OK.
+  const [pendingChange, setPendingChange] = useState<
+    { kind: 'class'; id: ClassId | ''; message: string } | { kind: 'background'; id: BackgroundId; message: string } | null
+  >(null);
+
+  /** What a class change would clear, in words (empty when nothing is set). */
+  const classDependents = (): string[] => {
+    const out: string[] = [];
+    if (skillChoices.length > 0) out.push('your class skill picks');
+    if (Object.values(spellPicks).some((v) => (v ?? []).length > 0)) out.push('your spell picks');
+    if (classOption !== 'A' || Object.keys(classPicks).length > 0 || Object.keys(cart).length > 0)
+      out.push('your class equipment choices and purchases');
+    if (grantedLanguages.length > 0) out.push('your class feature languages');
+    return out;
+  };
+  const listText = (items: string[]) =>
+    items.length <= 1 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+
+  const requestClass = (id: ClassId | '') => {
+    if (id === classId) return;
+    const lost = classDependents();
+    if (lost.length === 0) {
+      selectClass(id);
+      return;
+    }
+    const nextName = CLASS_LIST.find((c) => c.id === id)?.name ?? 'no class';
+    setPendingChange({ kind: 'class', id, message: `Change class to ${nextName}? This clears ${listText(lost)}.` });
+  };
+  const requestBackground = (id: BackgroundId) => {
+    if (id === backgroundId) return;
+    const lost: string[] = [];
+    if (Object.keys(allocation).length > 0) lost.push('your background ability increases');
+    if (toolProficiency) lost.push('your tool choice');
+    if (lost.length === 0) {
+      selectBackground(id);
+      return;
+    }
+    const nextName = getBackground(id)?.name ?? 'that background';
+    setPendingChange({ kind: 'background', id, message: `Change background to ${nextName}? This clears ${listText(lost)}.` });
+  };
 
   const selectClass = (id: ClassId | '') => {
     setClassId(id);
@@ -493,6 +553,12 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       weight: a.weight,
     }));
   };
+  const genAge = () => {
+    if (!speciesId) return;
+    setDetails((prev) => ({ ...prev, age: generateAge(speciesId, rng) }));
+  };
+  const setDetail = (field: keyof typeof details, value: string) =>
+    setDetails((prev) => ({ ...prev, [field]: value }));
   const genPersonality = () => setDetails((prev) => ({ ...prev, personality: generatePersonality(rng) }));
   const genAlignment = () => setAlignment(ALIGNMENTS[Math.floor(rng() * ALIGNMENTS.length)]);
   const genFaith = () => setDetails((prev) => ({ ...prev, faith: generateDeity(rng) }));
@@ -614,6 +680,22 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     return character;
   };
 
+  // On a step change, scroll the new step's heading into view and move focus to
+  // it, so a long step never opens part-way down and screen readers announce it.
+  const stepRef = useRef<HTMLDivElement>(null);
+  const firstStepRender = useRef(true);
+  useEffect(() => {
+    if (firstStepRender.current) {
+      firstStepRender.current = false;
+      return;
+    }
+    const heading = stepRef.current?.querySelector<HTMLElement>('h2');
+    if (!heading) return;
+    heading.tabIndex = -1;
+    heading.scrollIntoView?.({ block: 'start' });
+    heading.focus({ preventScroll: true });
+  }, [step]);
+
   const goNext = () => {
     if (step < steps.length - 1) {
       setStep((s) => s + 1);
@@ -690,9 +772,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         className={styles.textInput}
         type="text"
         value={name}
-        placeholder="Enter a name…"
+        placeholder="Enter a name, or leave it for later"
+        aria-describedby="wiz-name-hint"
         onChange={(e) => setName(e.target.value)}
       />
+      <p id="wiz-name-hint" className={styles.hint}>
+        No name yet? Leave it blank. Once you pick a species, the Details step can roll one that suits it.
+      </p>
       <label className={styles.fieldLabel} htmlFor="wiz-class">
         Class
       </label>
@@ -701,7 +787,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         className={styles.select}
         value={classId}
         aria-label="Class"
-        onChange={(e) => selectClass(e.target.value as ClassId | '')}
+        onChange={(e) => requestClass(e.target.value as ClassId | '')}
       >
         <option value="">— Select a Class —</option>
         {CLASS_LIST.map((c) => (
@@ -746,7 +832,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         </div>
       )}
 
-      <ClassCompare selected={classId} onChoose={selectClass} />
+      <ClassCompare selected={classId} onChoose={requestClass} />
     </div>
   );
 
@@ -762,7 +848,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         className={styles.select}
         value={backgroundId}
         aria-label="Background"
-        onChange={(e) => selectBackground(e.target.value as BackgroundId)}
+        onChange={(e) => requestBackground(e.target.value as BackgroundId)}
       >
         <option value="">— Select a Background —</option>
         {BACKGROUND_LIST.map((b) => (
@@ -772,7 +858,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         ))}
       </select>
 
-      <BackgroundDetails selected={background} onChoose={selectBackground} />
+      <BackgroundDetails selected={background} onChoose={requestBackground} />
 
       {/* Background-fit hint (DETERMINISTIC advisor; a nudge only — does NOT
           restrict the pick). Lists the backgrounds that boost the chosen class's
@@ -1010,22 +1096,37 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
+  /**
+   * The score the character will actually have: the base score plus the
+   * background increase chosen on the Origin step (PHB 2024 L1720: "adjust them
+   * according to your background"). Shown here so the player sees 17, not 15.
+   */
+  const finalScoreBreakdown = (ability: Ability, base: number): Breakdown => ({
+    total: base + (allocation[ability] ?? 0),
+    components: [
+      { label: `${ABILITY_ABBR[ability]} base score`, value: base },
+      { label: `${background?.name ?? 'Background'} increase`, value: allocation[ability] ?? 0 },
+    ],
+  });
+  const finalModBreakdown = (finalScore: number): Breakdown => {
+    const mod = abilityModifier(finalScore);
+    return { total: mod, components: [{ label: 'From final score', value: mod }], note: `Score ${finalScore}` };
+  };
+  const bonusTag = (ability: Ability) =>
+    (allocation[ability] ?? 0) > 0 ? (
+      <span className={styles.bonusTag} data-testid={`bonus-${ability}`}>
+        +{allocation[ability]} background
+      </span>
+    ) : null;
+
   const renderAbilityAssignRows = (pool: number[], isRoll: boolean) => {
     const assignment = isRoll ? rolledAssignment : arrayAssignment;
     return ABILITIES.map((ability) => {
       const idx = assignment[ability];
       const score = idx !== undefined ? pool[idx] : undefined;
-      // Breakdown: the assigned pool value IS the base score (no addends at creation).
-      const breakdown: Breakdown = {
-        total: score ?? 10,
-        components: [{ label: `${ABILITY_ABBR[ability]} (assigned)`, value: score ?? 10 }],
-      };
-      const mod = abilityModifier(score ?? 10);
-      const modBreakdown: Breakdown = {
-        total: mod,
-        components: [{ label: 'From score', value: mod }],
-        note: `Score ${score ?? 10}`,
-      };
+      const breakdown = finalScoreBreakdown(ability, score ?? 10);
+      const modBreakdown = finalModBreakdown(breakdown.total);
+      const mod = modBreakdown.total;
       // Per-ability guidance tags + recommended value (DETERMINISTIC advisor;
       // read-only). From abilityHints/recommendedArray (class-guidance.ts), the
       // PHB "Standard Array by Class" placement + the class saves.
@@ -1091,10 +1192,11 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
               );
             })}
           </select>
+          {bonusTag(ability)}
           {score !== undefined && (
             <span className={styles.totalCell}>
               <CalculatedValue label={`${ABILITY_NAMES[ability]} Score`} breakdown={breakdown}>
-                {score}
+                {breakdown.total}
               </CalculatedValue>
               <CalculatedValue
                 label={`${ABILITY_NAMES[ability]} Modifier`}
@@ -1145,6 +1247,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           {ABILITY_METHOD_INFO[abilityMethod]}
         </p>
         <p className={styles.guidanceCite}>Source: {ABILITY_METHOD_SOURCE}</p>
+        {allocationList.length > 0 && (
+          <p className={styles.hint} data-testid="ability-background-note">
+            Your {background?.name} background adds{' '}
+            {allocationList.map((a) => `+${a.amount} ${ABILITY_NAMES[a.ability]}`).join(' and ')}. The scores below
+            include it.
+          </p>
+        )}
 
         {/* Optional one-tap recommended-array fill (SUGGEST-DON'T-AUTO-APPLY:
             the only state change this feature makes, on an explicit tap). Fills
@@ -1198,12 +1307,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
             )}
             {ABILITIES.map((ability) => {
               const value = pointBuyScores[ability];
-              const mod = abilityModifier(value);
-              const modBreakdown: Breakdown = {
-                total: mod,
-                components: [{ label: 'From score', value: mod }],
-                note: `Score ${value}`,
-              };
+              const finalBreakdown = finalScoreBreakdown(ability, value);
+              const modBreakdown = finalModBreakdown(finalBreakdown.total);
+              const mod = modBreakdown.total;
               return (
                 <div key={ability} className={styles.allocRow}>
                   <span className={styles.allocName}>
@@ -1230,7 +1336,11 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                       +
                     </button>
                   </div>
+                  {bonusTag(ability)}
                   <span className={styles.totalCell}>
+                    <CalculatedValue label={`${ABILITY_NAMES[ability]} Score`} breakdown={finalBreakdown}>
+                      {finalBreakdown.total}
+                    </CalculatedValue>
                     <CalculatedValue
                       label={`${ABILITY_NAMES[ability]} Modifier`}
                       breakdown={modBreakdown}
@@ -1385,24 +1495,66 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       </div>
 
       <div className={styles.genRow}>
-        <span className={styles.fieldLabel}>Appearance</span>
-        <span className={styles.hint}>
-          {details.eyes || details.hair || details.height
-            ? `Eyes: ${details.eyes || '—'}, Hair: ${details.hair || '—'}, Skin: ${
-                details.skin || '—'
-              }, ${details.height || '—'} / ${details.weight || '—'}`
-            : 'Not set'}
-        </span>
+        <label className={styles.fieldLabel} htmlFor="wiz-age">
+          Age
+        </label>
+        <input
+          id="wiz-age"
+          className={styles.textInput}
+          type="text"
+          inputMode="numeric"
+          value={details.age}
+          placeholder="Years"
+          onChange={(e) => setDetail('age', e.target.value)}
+        />
         <button
           type="button"
           className={styles.genBtn}
-          onClick={genAppearance}
+          onClick={genAge}
           disabled={!speciesId}
-          aria-label="Generate appearance"
+          aria-label="Generate age"
         >
           🎲
         </button>
       </div>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.fieldLabel}>Appearance</legend>
+        <div className={styles.genRow}>
+          <span className={styles.hint}>Type your own, or roll a look that suits your species.</span>
+          <button
+            type="button"
+            className={styles.genBtn}
+            onClick={genAppearance}
+            disabled={!speciesId}
+            aria-label="Generate appearance"
+          >
+            🎲
+          </button>
+        </div>
+        <div className={styles.appearanceGrid}>
+          {(
+            [
+              ['height', 'Height'],
+              ['weight', 'Weight'],
+              ['eyes', 'Eyes'],
+              ['hair', 'Hair'],
+              ['skin', 'Skin'],
+            ] as const
+          ).map(([field, label]) => (
+            <label key={field} className={styles.appearanceField}>
+              <span className={styles.fieldLabel}>{label}</span>
+              <input
+                className={styles.textInput}
+                type="text"
+                value={details[field]}
+                aria-label={label}
+                onChange={(e) => setDetail(field, e.target.value)}
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className={styles.genRow}>
         <label className={styles.fieldLabel} htmlFor="wiz-personality">
@@ -1492,7 +1644,25 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   return (
     <div className={styles.wizard} role="region" aria-label="Character creation wizard">
       <StepIndicator steps={stepLabels} currentStep={step} />
-      {stepRenderers[currentStepId]()}
+      <div ref={stepRef}>{stepRenderers[currentStepId]()}</div>
+      {missing.length > 0 && (
+        <p className={styles.blockedNote} role="status" data-testid="wizard-missing">
+          To {step === steps.length - 1 ? 'finish' : 'continue'}: {listText(missing)}.
+        </p>
+      )}
+      {pendingChange && (
+        <ConfirmDialog
+          message={pendingChange.message}
+          confirmLabel="Change"
+          cancelLabel="Keep"
+          onConfirm={() => {
+            if (pendingChange.kind === 'class') selectClass(pendingChange.id);
+            else selectBackground(pendingChange.id);
+            setPendingChange(null);
+          }}
+          onCancel={() => setPendingChange(null)}
+        />
+      )}
       <div className={styles.footer}>
         <button type="button" className={styles.secondaryBtn} onClick={goBack}>
           {step === 0 ? 'Cancel' : 'Back'}
