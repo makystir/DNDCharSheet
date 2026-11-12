@@ -84,7 +84,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Spells',
     icon: Sparkles,
     shortcut: '4',
-    subTabHint: 'Summary · Slots · Prepared · Browse',
+    subTabHint: 'Summary · Prepared · Browse',
     predicate: anySpellcaster,
   },
   // Advancement: an UNCONDITIONAL top-level tab (every character can level up, so

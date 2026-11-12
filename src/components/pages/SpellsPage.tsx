@@ -65,6 +65,7 @@ import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EmptyState } from '../shared/EmptyState';
 import { SpellPickList } from '../shared/SpellPickList';
 import { SpellName, SpellNameList } from '../shared/SpellName';
+import { KnownSpellsCard } from './spells/KnownSpellsCard';
 import { SCHOOL_LABELS } from '../shared/spellSchoolLabels';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
@@ -82,14 +83,16 @@ export interface SpellsPageProps {
   onNotify?: (message: string) => void;
 }
 
-type SpellSubTab = 'summary' | 'slots' | 'prepared' | 'browse';
+type SpellSubTab = 'summary' | 'prepared' | 'browse';
 
 // Stable identity (module scope) so it stays out of effect dependency arrays.
-const VALID_SUBTABS: SpellSubTab[] = ['summary', 'slots', 'prepared', 'browse'];
+const VALID_SUBTABS: SpellSubTab[] = ['summary', 'prepared', 'browse'];
+
+// The Slots tab was folded into Summary; an old link or saved last-used tab maps there.
+const LEGACY_SUBTABS: Record<string, SpellSubTab> = { slots: 'summary' };
 
 const DEFAULT_SUBTABS: { id: SpellSubTab; label: string }[] = [
   { id: 'summary', label: 'Summary' },
-  { id: 'slots', label: 'Slots' },
   { id: 'prepared', label: 'Prepared' },
   { id: 'browse', label: 'Browse' },
 ];
@@ -249,12 +252,16 @@ export function SpellsPage({
     saveError,
   } = useTabOrder({ pageKey: 'spells', defaultTabs: DEFAULT_SUBTABS });
 
+  // Map a legacy id (the retired Slots tab) to its new home before validating.
+  const normalizeSubTab = (value: string | null | undefined): string | null | undefined =>
+    value != null && value in LEGACY_SUBTABS ? LEGACY_SUBTABS[value] : value;
   const isValidSubTab = (value: string | null | undefined): value is SpellSubTab =>
     value != null && VALID_SUBTABS.includes(value as SpellSubTab);
 
   const resolveInitialTab = (): SpellSubTab => {
-    if (isValidSubTab(subTab)) return subTab;
-    const lastUsed = loadLastSubTab('spells');
+    const fromHash = normalizeSubTab(subTab);
+    if (isValidSubTab(fromHash)) return fromHash;
+    const lastUsed = normalizeSubTab(loadLastSubTab('spells'));
     if (isValidSubTab(lastUsed)) return lastUsed;
     const firstOrdered = orderedTabs[0]?.id;
     if (isValidSubTab(firstOrdered)) return firstOrdered;
@@ -265,9 +272,10 @@ export function SpellsPage({
 
   // Mirror a valid external hash sub-tab into local state (deep link / paste).
   useEffect(() => {
-    if (subTab && isValidSubTab(subTab)) {
+    const next = normalizeSubTab(subTab);
+    if (next && isValidSubTab(next)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveSubTabInternal(subTab);
+      setActiveSubTabInternal(next);
     }
     // Only the external hash prop retriggers this; isValidSubTab reads only
     // module-scoped VALID_SUBTABS, so subTab is the sole dependency.
@@ -721,7 +729,7 @@ export function SpellsPage({
         </Card>
       )}
 
-      {activeSubTab === 'slots' && isMulticlass && (
+      {activeSubTab === 'summary' && isMulticlass && (
         <Card>
           <CollapsibleSection title="Spell Slots" storageKey="dnd-collapse-spell-slots">
             {/* Multiclass (Stage M5): the COMBINED Spellcasting pool (one shared
@@ -792,7 +800,7 @@ export function SpellsPage({
         </Card>
       )}
 
-      {activeSubTab === 'slots' && !isMulticlass && (
+      {activeSubTab === 'summary' && !isMulticlass && (
         <Card>
           <CollapsibleSection title="Spell Slots" storageKey="dnd-collapse-spell-slots">
             {pact ? (
@@ -840,7 +848,7 @@ export function SpellsPage({
         </Card>
       )}
 
-      {activeSubTab === 'slots' && arcanumLevels.length > 0 && (
+      {activeSubTab === 'summary' && arcanumLevels.length > 0 && (
         <Card>
           <CollapsibleSection
             title="Mystic Arcanum"
@@ -888,6 +896,11 @@ export function SpellsPage({
             })}
           </CollapsibleSection>
         </Card>
+      )}
+
+      {/* Everything the character has: known cantrips and prepared spells. */}
+      {activeSubTab === 'summary' && (
+        <KnownSpellsCard character={character} onEdit={() => setActiveSubTab('prepared')} />
       )}
 
       {/* Multiclass (Stage M5): one Prepared / Cantrips / Spellbook section per

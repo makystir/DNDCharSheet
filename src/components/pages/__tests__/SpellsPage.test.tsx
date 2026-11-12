@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { SpellsPage } from '../SpellsPage';
 import type { Character } from '../../../types/character';
@@ -32,6 +32,11 @@ function renderStatefulPage(overrides: Partial<Character> = {}) {
   return { onChange };
 }
 
+// The page remembers the last-used sub-tab; start each test on the default (Summary).
+beforeEach(() => {
+  localStorage.clear();
+});
+
 const wizardLevel5: Partial<Character> = {
   level: 5,
   classes: [{ id: 'wizard', level: 5 }],
@@ -51,7 +56,6 @@ describe('SpellsPage — Summary tooltips', () => {
 describe('SpellsPage — Slots tracker', () => {
   it('spends and recovers a slot, with an available-count tooltip', () => {
     const { onChange } = renderStatefulPage(wizardLevel5);
-    fireEvent.click(screen.getByRole('tab', { name: 'Slots' }));
     // Available count is a CalculatedValue trigger (max + (-expended)).
     expect(screen.getByRole('button', { name: /Level 1 available/ })).toBeInTheDocument();
     // Spend a level-1 slot.
@@ -229,7 +233,6 @@ describe('SpellsPage — multiclass (Stage M5)', () => {
 
   it('shows the combined Spellcasting pool AND the separate Pact Magic pool on Slots', () => {
     renderStatefulPage(wizardWarlock);
-    fireEvent.click(screen.getByRole('tab', { name: 'Slots' }));
     // The combined (Wizard) pool has a level-1 available tracker.
     expect(screen.getByRole('button', { name: /Level 1 available/ })).toBeInTheDocument();
     // The separate Pact Magic pool is tracked alongside it.
@@ -295,7 +298,6 @@ describe('SpellsPage — multiclass (Stage M5)', () => {
       ...wizardSorcerer,
       spellcasting: { slotsExpended: { 2: 99 } },
     });
-    fireEvent.click(screen.getByRole('tab', { name: 'Slots' }));
     // The level-2 tracker still renders (sized by max capacity) ...
     expect(screen.getByRole('button', { name: /Level 2 available/ })).toBeInTheDocument();
     // ... and the pool does not collapse into the empty state.
@@ -419,3 +421,56 @@ describe('SpellsPage - Wizard spellbook free allowance', () => {
     expect(box).toBeDefined();
   });
 });
+
+describe('SpellsPage - Summary holds slots and known spells', () => {
+  it('has no Slots tab; slots are on the Summary', () => {
+    renderStatefulPage(wizardLevel5);
+    expect(screen.queryByRole('tab', { name: 'Slots' })).toBeNull();
+    expect(screen.getByRole('tab', { name: 'Summary' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Level 1 available/ })).toBeInTheDocument();
+  });
+
+  it('lists known cantrips and prepared spells on the Summary, with required and always-prepared tags', () => {
+    renderStatefulPage({
+      ...wizardLevel5,
+      spellcasting: {
+        byClass: {
+          wizard: {
+            cantrips: ['fire-bolt', 'mage-hand'],
+            spellbook: ['magic-missile', 'shield'],
+            prepared: ['magic-missile'],
+          },
+        },
+      },
+    });
+    const cantrips = screen.getByRole('list', { name: 'Wizard cantrips' });
+    expect(within(cantrips).getByText('Fire Bolt')).toBeInTheDocument();
+    expect(within(cantrips).getByText('Mage Hand')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Cantrips (2)' })).toBeInTheDocument();
+    const prepared = screen.getByRole('list', { name: 'Wizard level 1 prepared spells' });
+    expect(within(prepared).getByText('Magic Missile')).toBeInTheDocument();
+    // A spell in the book but not prepared is not listed.
+    expect(within(prepared).queryByText('Shield')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Prepared spells (1)' })).toBeInTheDocument();
+  });
+
+  it('shows friendly empty states and a button to the Prepared tab', () => {
+    renderStatefulPage({ level: 1, classes: [{ id: 'wizard', level: 1 }] });
+    expect(screen.getByText('No cantrips chosen yet.')).toBeInTheDocument();
+    expect(screen.getByText('No spells prepared yet.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Change spells on the Prepared tab' }));
+    expect(screen.getByText(/Prepared . choose/)).toBeInTheDocument();
+  });
+
+  it('opens an old #spells/slots link or saved Slots tab on the Summary', () => {
+    localStorage.setItem('lastSubTab:spells', 'slots');
+    render(
+      <SpellsPage
+        character={{ ...createCharacter('Caster'), ...wizardLevel5 }}
+        onChange={vi.fn()}
+        subTab="slots"
+      />,
+    );
+    expect(screen.getByRole('tab', { name: 'Summary', selected: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Level 1 available/ })).toBeInTheDocument();
+  });});
