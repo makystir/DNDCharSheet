@@ -190,6 +190,14 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
   );
 }
 
+/**
+ * Where a suggestion can be acted on. The subclass is picked on the Character
+ * page's Class & Features tab (the Subclass select), not here.
+ */
+const SUGGESTION_LINKS: Record<string, { href: string; text: string }> = {
+  'choose-subclass': { href: '#character/build', text: 'Choose on Class & Features' },
+};
+
 /** The deterministic suggestion prompts as a list of cited ContentTooltips. */
 function SuggestionList({ suggestions }: { suggestions: ReturnType<typeof advisorSuggestions> }) {
   if (suggestions.length === 0) {
@@ -200,6 +208,14 @@ function SuggestionList({ suggestions }: { suggestions: ReturnType<typeof adviso
       {suggestions.map((s) => (
         <li key={s.id} className={styles.suggestionItem}>
           <ContentTooltip content={s.content}>{s.title}</ContentTooltip>
+          {SUGGESTION_LINKS[s.id] && (
+            <>
+              {' '}
+              <a className={styles.suggestionLink} href={SUGGESTION_LINKS[s.id].href}>
+                {SUGGESTION_LINKS[s.id].text}
+              </a>
+            </>
+          )}
         </li>
       ))}
     </ul>

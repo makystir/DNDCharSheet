@@ -378,3 +378,23 @@ describe('AdvancementPage spell legality', () => {
     expect(screen.queryByTestId('pending-illegal-spells')).toBeNull();
   });
 });
+
+describe('AdvancementPage - Progression Advisor subclass link', () => {
+  it('links the "Choose a subclass" suggestion to Class & Features', () => {
+    renderStateful({ level: 3, classes: [{ id: 'fighter', level: 3 }] });
+    const advisor = screen.getByRole('list', { name: 'Advisor suggestions' });
+    expect(within(advisor).getByText('Choose a subclass')).toBeInTheDocument();
+    expect(within(advisor).getByRole('link', { name: 'Choose on Class & Features' })).toHaveAttribute(
+      'href',
+      '#character/build',
+    );
+  });
+
+  it('shows no subclass link once a subclass is chosen', () => {
+    renderStateful({
+      level: 3,
+      classes: [{ id: 'fighter', level: 3, subclassId: 'champion' }],
+    });
+    expect(screen.queryByRole('link', { name: 'Choose on Class & Features' })).toBeNull();
+  });
+});
