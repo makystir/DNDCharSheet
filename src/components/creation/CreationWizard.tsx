@@ -1111,13 +1111,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       <SpeciesDetails selected={species} onChoose={selectSpecies} />
 
       {species?.choices?.map((spec: SpeciesChoiceSpec) => (
-        <div key={spec.field} className={styles.allocRow}>
-          <label className={styles.allocName} htmlFor={`wiz-species-${spec.field}`}>
+        <div key={spec.field} className={styles.speciesChoiceRow}>
+          <label className={styles.speciesChoiceLabel} htmlFor={`wiz-species-${spec.field}`}>
             {spec.label}
           </label>
           <select
             id={`wiz-species-${spec.field}`}
-            className={styles.selectSmall}
+            className={`${styles.selectSmall} ${styles.speciesChoiceSelect}`}
             value={speciesChoices[spec.field] ?? ''}
             aria-label={spec.label}
             onChange={(e) =>
