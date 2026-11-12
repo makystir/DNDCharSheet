@@ -11,7 +11,7 @@ import type { Suggestion } from '../types';
  * (hit-points-state.ts), `hitDiceAvailable` (rests.ts) and `exhaustionLevelOf`
  * (conditions.ts) — so it never recomputes HP, the Bloodied threshold, Hit
  * Dice, or Exhaustion. It emits soft reminders only; both actions NAVIGATE to
- * the Combat page (where the Rest controls live) and nothing mutates the
+ * the Character Overview (where the Rest card lives) and nothing mutates the
  * character.
  *
  * The 0-HP / death-save state is owned by the combat module (a critical nudge),
@@ -40,7 +40,7 @@ export function restSuggestions(character: Character): Suggestion[] {
         'You are Bloodied (half your Hit Point maximum or fewer) and have Hit Dice to spend — a Short Rest can restore Hit Points.',
       category: 'health',
       urgency: 'recommended',
-      action: { kind: 'navigate', page: 'combat' },
+      action: { kind: 'navigate', page: 'character', subTab: 'identity' },
       citation: 'PHB 2024 "Short Rest"',
     });
   }
@@ -58,7 +58,7 @@ export function restSuggestions(character: Character): Suggestion[] {
         'You have the Exhaustion condition (−2 × level on D20 Tests, −5 ft × level Speed). A Long Rest removes 1 level.',
       category: 'health',
       urgency: exhaustion >= 5 ? 'critical' : 'info',
-      action: { kind: 'navigate', page: 'combat' },
+      action: { kind: 'navigate', page: 'character', subTab: 'identity' },
       citation: 'PHB 2024 "Exhaustion"',
     });
   }

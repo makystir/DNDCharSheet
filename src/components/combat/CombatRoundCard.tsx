@@ -3,6 +3,10 @@ import { Swords } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { characterInitiativeModifier, initiativeRollMode } from '../../logic/initiative-roll';
 import { exhaustionLevelOf } from '../../logic/conditions';
+import { initiativeBreakdown } from '../../logic/initiative';
+import { effectiveAbilityScores } from '../../logic/feats';
+import { formatSigned } from '../../logic/breakdown';
+import { CalculatedValue } from '../shared/CalculatedValue';
 import {
   beginFight,
   currentRound,
@@ -47,6 +51,11 @@ export function CombatRoundCard({ character, onChange }: CombatRoundCardProps) {
   const initiative = initiativeResult(character);
   const initMod = characterInitiativeModifier(character);
   const modeInfo = initiativeRollMode(character);
+  const initDisplay = initiativeBreakdown(
+    effectiveAbilityScores(character),
+    character.initiativeBonus,
+    exhaustionLevelOf(character),
+  );
 
   const handleNextRound = () => {
     const r = nextRound(character);
@@ -83,6 +92,14 @@ export function CombatRoundCard({ character, onChange }: CombatRoundCardProps) {
           <span className={styles.label}>Initiative</span>
           <span className={styles.big} data-testid="initiative-result">
             {initiative !== undefined ? initiative : '-'}
+          </span>
+          {/* The modifier to add when rolling physical dice. Exhaustion is a D20
+              Test penalty (PHB 2024 L21024), so it shows here too. */}
+          <span className={styles.label} data-testid="initiative-modifier">
+            Mod{' '}
+            <CalculatedValue label="Initiative" breakdown={initDisplay}>
+              {formatSigned(initDisplay.total)}
+            </CalculatedValue>
           </span>
         </div>
         <div className={styles.buttons}>

@@ -44,7 +44,7 @@ export function TurnOptionsCard({ character }: TurnOptionsCardProps) {
   const featureList = (items: FeatureTurnOptionEntry[], label: string) => (
     <ul className={styles.list} aria-label={label}>
       {items.map((f) => (
-        <li key={`-`} className={styles.item}>
+        <li key={`${f.origin}-${f.name}`} className={styles.item}>
           <ContentTooltip content={resolveClassFeatureTooltip(f.feature, f.origin)}>{f.name}</ContentTooltip>
           <span className={styles.meta}>{f.origin}</span>
         </li>

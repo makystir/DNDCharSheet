@@ -67,8 +67,11 @@ export function AmmoTracker({
   const [status, setStatus] = useState('');
 
   // Unique ammunition stacks across all equipped Ammunition weapons.
+  const ammoWeapons = equippedWeapons(character).filter(({ weapon }) =>
+    weapon.properties.includes('ammunition'),
+  );
   const stacks: InventoryItem[] = [];
-  for (const { weapon } of equippedWeapons(character)) {
+  for (const { weapon } of ammoWeapons) {
     for (const item of matchingAmmunition(character, weapon)) {
       if (!stacks.some((s) => s.id === item.id)) stacks.push(item);
     }
@@ -101,6 +104,11 @@ export function AmmoTracker({
   };
 
   const tip = resolveWeaponPropertyTooltip('ammunition');
+
+  // Nothing to track without an equipped Ammunition weapon: hide the card (the
+  // Combat page shows only what applies to this character). With one but no
+  // matching ammunition, the card stays and says so.
+  if (ammoWeapons.length === 0) return null;
 
   return (
     <Card>

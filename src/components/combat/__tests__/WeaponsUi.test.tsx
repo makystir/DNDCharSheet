@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { CombatPage } from '../../pages/CombatPage';
+import { CharacterPage } from '../../pages/CharacterPage';
+import { WeaponMasteryChooser } from '../WeaponMasteryChooser';
 import type { Character, InventoryItem } from '../../../types/character';
 import type { ClassId } from '../../../data/classes';
 import { createCharacter } from '../../../storage/character-store';
@@ -44,6 +46,25 @@ function fighter(overrides: Partial<Character> = {}): Character {
 function renderPage(initial: Character) {
   latest = initial;
   return render(<Harness initial={initial} />);
+}
+
+/** The chooser on its own (it now lives on Character > Class & Features). */
+function ChooserHarness({ initial }: { initial: Character }) {
+  const [character, setCharacter] = useState<Character>(initial);
+  return (
+    <WeaponMasteryChooser
+      character={character}
+      onChange={(next) => {
+        latest = next;
+        setCharacter(next);
+      }}
+    />
+  );
+}
+
+function renderChooser(initial: Character) {
+  latest = initial;
+  return render(<ChooserHarness initial={initial} />);
 }
 
 /** Open a CalculatedValue / ContentTooltip trigger and return the tooltip. */
@@ -235,6 +256,11 @@ describe('Ammunition tracker', () => {
       equipped: equip ? { weaponItemIds: ['w1'] } : { weaponItemIds: [] },
     });
 
+  it('shows an empty state with an Ammunition weapon but no matching ammunition', () => {
+    renderPage(fighter({ inventory: [weapon('w1', 'longbow')], equipped: { weaponItemIds: ['w1'] } }));
+    expect(screen.getByText('No ammunition tracked')).toBeTruthy();
+  });
+
   it('shows the matching inventory ammunition with its inventory quantity', () => {
     renderPage(archer(20));
     const tile = screen.getByTestId('ammo-a1');
@@ -242,9 +268,9 @@ describe('Ammunition tracker', () => {
     expect(within(tile).getByText('20')).toBeTruthy();
   });
 
-  it('shows an empty state when no equipped weapon uses ammunition', () => {
+  it('hides the card when no equipped weapon uses ammunition', () => {
     renderPage(archer(20, false));
-    expect(screen.getByText('No ammunition tracked')).toBeTruthy();
+    expect(screen.queryByText('No ammunition tracked')).toBeNull();
     expect(screen.queryByTestId('ammo-a1')).toBeNull();
   });
 
@@ -301,27 +327,27 @@ describe('Ammunition tracker', () => {
 
 describe('Weapon Mastery chooser', () => {
   it('shows no chooser, only a locked note, for a class with no Weapon Mastery', () => {
-    renderPage(fighter({ classes: [{ id: 'wizard' as ClassId, level: 5 }] }));
+    renderChooser(fighter({ classes: [{ id: 'wizard' as ClassId, level: 5 }] }));
     expect(screen.getByTestId('mastery-locked-note').textContent).toContain('Every weapon mastery is locked');
     expect(screen.queryByLabelText('Add a weapon')).toBeNull();
   });
 
   it('shows no chooser when no class is selected', () => {
     const c = fighter();
-    renderPage({ ...c, classes: undefined });
+    renderChooser({ ...c, classes: undefined });
     expect(screen.getByTestId('mastery-locked-note')).toBeTruthy();
     expect(screen.queryByLabelText('Add a weapon')).toBeNull();
   });
 
   it('shows the limit as a Breakdown', () => {
-    renderPage(fighter());
+    renderChooser(fighter());
     const tip = openTooltip(/Weapon Mastery limit/);
     expect(tip.textContent).toContain('Weapon Mastery');
     expect(screen.getByRole('button', { name: /Weapon Mastery limit/ }).textContent).toBe('4');
   });
 
   it('adds an eligible weapon and lists it', () => {
-    renderPage(fighter());
+    renderChooser(fighter());
     fireEvent.change(screen.getByLabelText('Add a weapon'), { target: { value: 'greatsword' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add' }));
     expect(latest.weaponMasteries).toEqual(['greatsword']);
@@ -329,7 +355,7 @@ describe('Weapon Mastery chooser', () => {
   });
 
   it('only offers weapons the class can pick', () => {
-    renderPage(fighter({ classes: [{ id: 'barbarian' as ClassId, level: 5 }] }));
+    renderChooser(fighter({ classes: [{ id: 'barbarian' as ClassId, level: 5 }] }));
     const options = Array.from(
       (screen.getByLabelText('Add a weapon') as HTMLSelectElement).options,
     ).map((o) => o.value);
@@ -338,7 +364,7 @@ describe('Weapon Mastery chooser', () => {
   });
 
   it('removes a chosen weapon only when the Remove button is pressed', () => {
-    renderPage(fighter({ weaponMasteries: ['greatsword', 'longsword'] }));
+    renderChooser(fighter({ weaponMasteries: ['greatsword', 'longsword'] }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove Greatsword from Weapon Mastery' }));
     expect(latest.weaponMasteries).toEqual(['longsword']);
   });
@@ -346,7 +372,7 @@ describe('Weapon Mastery chooser', () => {
   it('keeps an over-limit list, warns, and locks the extras (never deletes silently)', () => {
     const onChange = vi.fn();
     const masteries = ['greatsword', 'longsword', 'battleaxe', 'dagger', 'quarterstaff'];
-    render(<CombatPage character={fighter({ weaponMasteries: masteries })} onChange={onChange} />);
+    render(<WeaponMasteryChooser character={fighter({ weaponMasteries: masteries })} onChange={onChange} />);
     const alert = screen.getByTestId('mastery-over-cap');
     expect(alert.getAttribute('role')).toBe('alert');
     expect(alert.textContent).toContain('Quarterstaff');
@@ -358,8 +384,28 @@ describe('Weapon Mastery chooser', () => {
   });
 
   it('disables adding when the list is full', () => {
-    renderPage(fighter({ weaponMasteries: ['greatsword', 'longsword', 'battleaxe', 'dagger'] }));
+    renderChooser(fighter({ weaponMasteries: ['greatsword', 'longsword', 'battleaxe', 'dagger'] }));
     expect((screen.getByLabelText('Add a weapon') as HTMLSelectElement).disabled).toBe(true);
     expect((screen.getByRole('button', { name: 'Add' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+});
+
+describe('Weapon Mastery chooser placement', () => {
+  // Masteries change only on a Long Rest, so the chooser lives on Character >
+  // Class & Features, shown only to a class with Weapon Mastery.
+  it('is not on the Combat page (weapon cards keep their mastery chip)', () => {
+    renderPage(fighter());
+    expect(screen.queryByLabelText('Add a weapon')).toBeNull();
+  });
+
+  it('is on Class & Features for a class with Weapon Mastery', () => {
+    render(<CharacterPage character={fighter()} onChange={() => {}} subTab="build" />);
+    expect(screen.getByLabelText('Add a weapon')).toBeTruthy();
+  });
+
+  it('is hidden on Class & Features for a class without it', () => {
+    render(<CharacterPage character={fighter({ classes: [{ id: 'wizard' as ClassId, level: 5 }] })} onChange={() => {}} subTab="build" />);
+    expect(screen.queryByTestId('mastery-locked-note')).toBeNull();
+    expect(screen.queryByLabelText('Add a weapon')).toBeNull();
   });
 });

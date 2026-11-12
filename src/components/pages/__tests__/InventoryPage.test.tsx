@@ -7,14 +7,12 @@ import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
 /**
- * P2: the CombatPage renders the Armor Class exactly once, in the consolidated
- * "Defenses & Combat Stats" panel (the former Combat Stats card and the
- * Defenses & Movement readout are merged). These helpers scope the AC trigger
- * to that one panel so the integration assertions stay unambiguous.
+ * The CombatPage renders the Armor Class exactly once, in the sticky summary
+ * strip. These helpers scope the AC trigger to the strip so the integration
+ * assertions stay unambiguous.
  */
 function coreStatsCard(): HTMLElement {
-  return screen.getByRole('heading', { name: 'Defenses & Combat Stats' }).closest('div')!
-    .parentElement as HTMLElement;
+  return screen.getByRole('group', { name: 'Combat summary' });
 }
 function coreStatsAc(): HTMLElement {
   return within(coreStatsCard()).getByRole('button', { name: /Armor Class/ });

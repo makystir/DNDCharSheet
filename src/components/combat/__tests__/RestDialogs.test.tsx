@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { CombatPage } from '../../pages/CombatPage';
+// Rests live on the Character Overview Rest card (not the Combat page).
+import { OverviewRest } from '../../pages/character/OverviewRest';
 import { ShortRestDialog } from '../ShortRestDialog';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
@@ -17,7 +18,7 @@ const notify = vi.fn();
 function Harness({ initial }: { initial: Character }) {
   const [character, setCharacter] = useState<Character>(initial);
   return (
-    <CombatPage
+    <OverviewRest
       character={character}
       onNotify={notify}
       onChange={(next) => {
@@ -119,7 +120,7 @@ describe('Recovered limited-use features', () => {
 });
 
 describe('Rest buttons', () => {
-  it('sit in the Hit Dice card with rule tooltips', () => {
+  it('sit in the Rest card with rule tooltips', () => {
     renderPage();
     expect(screen.getByRole('button', { name: 'Short Rest' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Long Rest' })).toBeInTheDocument();

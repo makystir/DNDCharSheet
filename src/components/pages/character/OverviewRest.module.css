@@ -1,0 +1,47 @@
+/* Hit Dice row of the Overview Rest card. */
+.hitDiceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  color: var(--text-secondary);
+  font-size: 0.82em;
+}
+
+.input {
+  width: 72px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Mobile: enlarge tap targets. */
+@media (hover: none), (max-width: 767px) {
+  .input {
+    min-height: 44px;
+  }
+}

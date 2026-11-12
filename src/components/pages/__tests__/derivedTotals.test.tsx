@@ -31,6 +31,8 @@ describe('derived totals survive the page split', () => {
       /Proficiency Bonus/,
       /^Darkvision:/,
       /Hit Dice remaining/,
+      // The Rest card under the vitals.
+      /^Hit Dice total/,
     ]) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument();
     }
@@ -65,16 +67,13 @@ describe('derived totals survive the page split', () => {
   it('CombatPage exposes every expected CalculatedValue trigger', () => {
     render(<CombatPage character={character} onChange={vi.fn()} />);
 
-    // P2: AC, Initiative, Passive Perception and HP max now live together in the
-    // ONE consolidated Defenses & Combat Stats panel (DefenseReadout).
+    // AC, HP max and Passive Perception sit in the summary strip; the
+    // Initiative modifier on the Fight card. Hit Dice moved to the Overview.
     expect(screen.getAllByRole('button', { name: /^Armor Class:/ }).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /^Initiative:/ })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /^Passive Perception:/ }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Hit Point Maximum/ }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Hit Dice total/ })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Max HP/ }).length).toBeGreaterThan(0);
   });
 });

@@ -212,22 +212,22 @@ describe('encumbrance rule (PHB Carrying Capacity)', () => {
 });
 
 describe('rest rule (PHB Short Rest / Exhaustion)', () => {
-  it('nudges a Short Rest when Bloodied with Hit Dice available, navigating to combat', () => {
+  it('nudges a Short Rest when Bloodied with Hit Dice available, navigating to the Overview Rest card', () => {
     const bloodied = fighter({ currentHp: 3 }); // 3 of 10 ⇒ Bloodied; 1 Hit Die
     const out = restSuggestions(bloodied);
     const hp = out.find((s) => s.id === 'rest:short-rest-hp');
     expect(hp).toBeDefined();
     expect(hp!.category).toBe('health');
-    expect(hp!.action).toEqual({ kind: 'navigate', page: 'combat' });
+    expect(hp!.action).toEqual({ kind: 'navigate', page: 'character', subTab: 'identity' });
   });
 
-  it('nudges a rest for Exhaustion, navigating to combat', () => {
+  it('nudges a rest for Exhaustion, navigating to the Overview Rest card', () => {
     const tired = fighter({ currentHp: 10, exhaustionLevel: 2 });
     const out = restSuggestions(tired);
     const ex = out.find((s) => s.id === 'rest:exhaustion');
     expect(ex).toBeDefined();
     expect(ex!.category).toBe('health');
-    expect(ex!.action).toEqual({ kind: 'navigate', page: 'combat' });
+    expect(ex!.action).toEqual({ kind: 'navigate', page: 'character', subTab: 'identity' });
   });
 
   it('stays silent while making death saves (the combat module owns it)', () => {

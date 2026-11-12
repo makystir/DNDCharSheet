@@ -569,6 +569,7 @@ function App() {
                     portraitURL={portraitURL}
                     onPortraitUpload={uploadPortrait}
                     onPortraitRemove={removePortrait}
+                    onNotify={notify}
                   />
                 )}
                 {page === 'combat' && (

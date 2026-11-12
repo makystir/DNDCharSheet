@@ -176,7 +176,7 @@ The app has up to seven pages. On a computer they sit in a sidebar on the left. 
 | Key | Page | What it's for |
 |-----|------|---------------|
 | **1** | Character | Who you are: abilities, skills, saving throws, class features, a quick overview |
-| **2** | Combat | Attacking, taking damage, resting, conditions, initiative |
+| **2** | Combat | Attacking, taking damage, saving throws, conditions, initiative |
 | **4** | Spells | Spell slots, prepared spells, and a spell browser (**spellcasters only**) |
 | **5** | Inventory | Weapons, armor, gear, coins, and how much you're carrying |
 | **6** | Advancement | Leveling up |
@@ -220,7 +220,8 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 
 - **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them.
 - **Finish setting up:** a checklist of choices you haven't made yet, such as skills or spells. It disappears when everything is done.
-- **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more.
+- **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more. **Adjust** (closed at first) holds an Armor Class override and an initiative bonus, for anything the app doesn't know about.
+- **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets.
 - **Heroic Inspiration:** a toggle. In D&D 2024 your DM may award you Heroic Inspiration, which lets you reroll a die once.
 - **Conditions:** anything currently affecting you, such as Poisoned or Prone.
 - **Reactions:** things you can do in response to an event on someone else's turn.
@@ -240,6 +241,8 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 
 Your class and everything it gives you, listed by the level at which you gained it. Use this to look up what an ability does.
 
+Classes with **Weapon Mastery** (such as Fighter, Barbarian, Paladin, Ranger and Rogue) also get the **Weapon Mastery** chooser here: pick which kinds of weapon you can use the mastery property of. You can change them when you finish a Long Rest. Your weapon cards on the Combat page show the mastery you can use.
+
 Where a feature offers a choice you haven't made yet (such as a fighting style), look for it under **Choices Pending** on the **Advancement** page.
 
 ---
@@ -250,12 +253,13 @@ The Combat page is a quick reference for the table. Your DM runs the fight and y
 
 ### The summary strip
 
-A strip across the top stays visible as you scroll. It shows your hit points (with any temporary hit points), Armor Class and Speed, the round and your initiative once a fight is on, and the spell you are concentrating on. Tap or hover over a number to see how it was worked out.
+A strip across the top stays visible as you scroll. It shows your hit points (with any temporary hit points), Armor Class, Speed and Passive Perception (the eye icon), the round and your initiative once a fight is on, and the spell you are concentrating on. Tap or hover over a number to see how it was worked out.
 
 ### Fight
 
 - **Start fight** begins a round counter at round 1.
 - **Next round** adds a round and counts down every timed condition and effect for you. When something runs out it is removed, and a line under the buttons says what ended (for example "Round 4. Ended: Poisoned, Bless.").
+- Your **Initiative** modifier sits under the result (**Mod**), for when you roll a physical die.
 - **Roll initiative** rolls a Dexterity check with your bonus (and Advantage or Disadvantage where your conditions give it), or lets you type in the number from a physical die. It keeps the result in the strip until the fight ends. Rolling initiative starts a fight if one isn't on.
 - **End fight** clears the round and your initiative. Timers on conditions and effects keep their values.
 
@@ -266,8 +270,9 @@ A strip across the top stays visible as you scroll. It shows your hit points (wi
 - **Saving Throws:** all six saves with your bonus and a **Roll** button each. A save shows **Auto-fail** when a condition like Paralyzed or Stunned makes you fail Strength and Dexterity saves, and **Disadvantage** when a condition like Restrained gives it (a Dexterity save). The roll starts with that Disadvantage already selected, and Exhaustion is applied. The result is shown under the saves. The app doesn't compare it to a DC; your DM tells you whether it worked.
 - **Active Conditions:** add a condition, read what it does, and give it a duration in rounds, minutes or hours, or until a rest or while you concentrate. Timed durations count down with **Next round**, and you can take a round off by hand.
 - **Effects:** track spells and features that last a number of rounds, such as Bless or Rage (1 minute is 10 rounds). Give it a name and an optional number of rounds. **Next round** counts them down, **-1** and **+1** adjust by hand, and **End** removes one. The app doesn't apply what an effect does; it only keeps the count.
-- **Concentration:** shows what you are concentrating on and ends it when you start another.
-- **Defenses & Combat Stats:** Armor Class, Speed, Hit Point Maximum, Initiative bonus and Passive Perception, with an **Adjust** area for an Armor Class override and an initiative bonus.
+- **Concentration:** appears while you are concentrating, shows on what, and ends it when you start another.
+
+The page only shows what applies to you right now. Death Saves appear at 0 HP, Concentration while you concentrate, Ammunition when you have a weapon that uses it, Spellcasting if you cast spells, and Resources if you have limited-use features.
 
 ### Attacks
 
@@ -282,9 +287,11 @@ A weapon that uses ammunition, like a bow, shows how much you have left right on
 
 - **Spellcasting** (spellcasters only): your spell save DC and spell attack bonus, your spell slots as circles you tap to spend or get back, and the cantrips and prepared spells ready to cast, with their casting time and Concentration or Ritual tags. Tap a spell's name for the full description.
 - **On your turn:** the standard actions anyone can take (Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study, Utilize), your Bonus Action spells, and the Reactions you have, such as Opportunity Attack or Shield, with a note when one isn't available right now. Tap a name for what it does. It also lists your own class and subclass features by how you use them: under Actions the ones that take an action (such as Channel Divinity: Turn Undead), and under Bonus Actions the ones that take a Bonus Action (such as Second Wind, Cunning Action or Flurry of Blows). Only features you have reached are shown, and a subclass feature appears once you choose that subclass.
-### Resources and rests
 
-Class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.
+### Resources
+
+Class resources (such as Rage, Second Wind or Channel Divinity) with their counters, to spend during a fight. Hit Dice and the rest buttons are on the Character page's Overview.
+
 ### Quick rules
 
 At the bottom of the page, **Quick rules** opens a searchable list of the rules you look up during a fight: actions, cover, critical hits, opportunity attacks, grappling and shoving, hiding, ranged attacks, difficult terrain, falling, death saves, concentration, every condition, and the weapon properties and masteries. Type a word like prone or grapple to filter, then tap a rule to read it.

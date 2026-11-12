@@ -84,3 +84,51 @@
     align-items: center;
   }
 }
+
+/* The collapsible "Adjust" affordance holding the single-source setup editors
+   (AC override, Initiative bonus), moved here from the Combat page. */
+.adjust {
+  margin-top: 12px;
+}
+
+.adjustGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.adjustField {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.adjustLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.adjustInput {
+  width: 72px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+}
+
+.adjustInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .adjustInput {
+    min-height: 44px;
+  }
+}

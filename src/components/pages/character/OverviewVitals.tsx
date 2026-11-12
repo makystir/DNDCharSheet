@@ -22,12 +22,20 @@ import { Card } from '../../shared/Card';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { MaybeContentTooltip } from '../../shared/ContentTooltip';
+import { CollapsibleSection } from '../../shared/CollapsibleSection';
 import { resolveVitalTooltip } from '../../../logic/tooltip-content';
 import type { VitalId } from '../../../data/rules-text';
+import { parseNumberInput } from '../sheet-helpers';
 import styles from './OverviewVitals.module.css';
 
 export interface OverviewVitalsProps {
   character: Character;
+  /**
+   * When given, the card also holds the single-source setup editors (Armor Class
+   * override, Initiative bonus) behind a collapsed "Adjust" section. Omitted, the
+   * card is read-only.
+   */
+  onChange?: (next: Character) => void;
 }
 
 interface TileProps {
@@ -73,7 +81,7 @@ function Tile({ label, children, manage, sub, testId, hint }: TileProps) {
  * (no rule is computed here) and carries its breakdown tooltip. Each tile links
  * to the page that owns the editor, keeping one editor per field.
  */
-export function OverviewVitals({ character }: OverviewVitalsProps) {
+export function OverviewVitals({ character, onChange }: OverviewVitalsProps) {
   const scores = effectiveAbilityScores(character);
   const ac = characterArmorClassBreakdown(character);
   const hpMax = characterHitPointMaxBreakdown(character);
@@ -104,6 +112,13 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
     .sort((a, b) => b.die - a.die);
 
   const combatLink = { href: '#combat', text: 'manage on Combat' };
+  // AC override and Initiative bonus are edited in this card's Adjust section and
+  // Hit Dice in the Rest card just below (rests are never taken mid-fight), so
+  // those tiles carry no "manage" link.
+
+  const setAcOverride = (raw: string) => onChange?.({ ...character, acOverride: parseNumberInput(raw, true) });
+  const setInitiativeBonus = (raw: string) =>
+    onChange?.({ ...character, initiativeBonus: parseNumberInput(raw, false) });
 
   return (
     <Card>
@@ -116,7 +131,7 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
         >
           {character.level}
         </Tile>
-        <Tile label="Armor Class" hint="armorClass" manage={combatLink}>
+        <Tile label="Armor Class" hint="armorClass">
           <CalculatedValue label="Armor Class" breakdown={ac} />
         </Tile>
         <Tile
@@ -158,7 +173,7 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
             '—'
           )}
         </Tile>
-        <Tile label="Initiative" hint="initiative" manage={combatLink}>
+        <Tile label="Initiative" hint="initiative">
           <CalculatedValue label="Initiative" breakdown={initiative}>
             {formatSigned(initiative.total)}
           </CalculatedValue>
@@ -184,7 +199,6 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
         <Tile
           label="Hit Dice"
           hint="hitDice"
-          manage={combatLink}
           testId="vital-hit-dice"
           sub={
             dieTypes.length > 0 ? (
@@ -199,6 +213,46 @@ export function OverviewVitals({ character }: OverviewVitalsProps) {
           </CalculatedValue>
         </Tile>
       </div>
+
+      {/* Single-source setup editors, collapsed so the glance stays read-only.
+          Moved here from the Combat page (set once, not changed mid-fight). */}
+      {onChange && (
+        <div className={styles.adjust}>
+          <CollapsibleSection title="Adjust" storageKey="dnd-collapse-vitals-adjust" defaultExpanded={false}>
+            <div className={styles.adjustGrid}>
+              <div className={styles.adjustField}>
+                <label className={styles.adjustLabel} htmlFor="ac-override">
+                  Armor Class override
+                </label>
+                <input
+                  id="ac-override"
+                  className={styles.adjustInput}
+                  type="number"
+                  min={0}
+                  value={character.acOverride ?? ''}
+                  placeholder="auto"
+                  aria-label="Armor Class override"
+                  onChange={(e) => setAcOverride(e.target.value)}
+                />
+              </div>
+              <div className={styles.adjustField}>
+                <label className={styles.adjustLabel} htmlFor="init-bonus">
+                  Initiative bonus
+                </label>
+                <input
+                  id="init-bonus"
+                  className={styles.adjustInput}
+                  type="number"
+                  value={character.initiativeBonus ?? ''}
+                  placeholder="0"
+                  aria-label="Initiative bonus"
+                  onChange={(e) => setInitiativeBonus(e.target.value)}
+                />
+              </div>
+            </div>
+          </CollapsibleSection>
+        </div>
+      )}
     </Card>
   );
 }

@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import type { Character } from '../../types/character';
-import { resolveClass, hitDiceTotal } from '../../logic/classes';
-import { CalculatedValue } from '../shared/CalculatedValue';
-import { Card } from '../shared/Card';
-import { SectionHeader } from '../shared/SectionHeader';
 import { ActiveConditions } from '../combat/ActiveConditions';
 import { HitPointsCard } from '../combat/HitPointsCard';
 import { TakeDamagePanel } from '../combat/TakeDamagePanel';
@@ -12,9 +8,6 @@ import { ConcentrationCard } from '../combat/ConcentrationCard';
 import { WeaponCards } from '../combat/WeaponCards';
 import { UnarmedStrikeCard } from '../combat/UnarmedStrikeCard';
 import { AmmoTracker } from '../combat/AmmoTracker';
-import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
-import { RestControls } from '../combat/RestControls';
-import { DefenseReadout } from '../combat/DefenseReadout';
 import { SpellcastingQuickCard } from '../combat/SpellcastingQuickCard';
 import { TurnOptionsCard } from '../combat/TurnOptionsCard';
 import { QuickRulesCard } from '../combat/QuickRulesCard';
@@ -24,29 +17,37 @@ import { CombatStatusStrip } from '../combat/CombatStatusStrip';
 import { CombatRoundCard } from '../combat/CombatRoundCard';
 import { SavesPanel } from '../combat/SavesPanel';
 import { EffectsCard } from '../combat/EffectsCard';
-import { Swords } from 'lucide-react';
-import { parseNumberInput } from './sheet-helpers';
+import { characterResources } from '../../logic/resources';
 import styles from './CombatPage.module.css';
 
 export interface CombatPageProps {
   character: Character;
   onChange: (next: Character) => void;
-  /** Optional app-level Toast sink (Concentration and rest results). */
+  /** Optional app-level Toast sink (Concentration and damage results). */
   onNotify?: (message: string) => void;
 }
 
 /**
  * The Combat page: a reference for the player to use while the DM runs the fight.
- * The player resolves combat at the table, so the page does not run turns. It
- * puts what a player looks up and updates during a fight in one scroll, top to
- * bottom:
- *  - a sticky strip with HP, AC, Speed, the round and Initiative, and what the
- *    character is concentrating on;
+ * The player resolves combat at the table, so the page does not run turns. Every
+ * card must earn its place by being needed DURING a fight, and cards that do not
+ * apply to this character right now hide themselves (Death Saves above 0 HP,
+ * Concentration when not concentrating, Ammunition without an Ammunition weapon,
+ * Spellcasting for a non-caster, Resources with none). Top to bottom:
+ *  - a sticky strip with HP, AC, Speed, Passive Perception, the round and
+ *    Initiative, and what the character is concentrating on;
  *  - the Fight card (round counter, Next round, Initiative roll);
  *  - Status: hit points and damage, death saves, saving throws, conditions,
- *    tracked effects and concentration, and the defenses;
- *  - Attacks: weapons, ammunition and weapon mastery;
- *  - Resources: spell slots, class resources, hit dice and rests.
+ *    tracked effects and concentration;
+ *  - Attacks: weapons and ammunition;
+ *  - Spells and turn options;
+ *  - Resources: limited-use features and spell slots spent in a fight.
+ *
+ * Out-of-fight content lives elsewhere: Hit Dice and Short/Long Rest on the
+ * Character Overview (rolling Initiative interrupts a rest, PHB 2024 L21256 /
+ * L21485), the AC override and Initiative bonus in the Overview Vitals "Adjust"
+ * section, and the Weapon Mastery chooser on Character > Class & Features (it
+ * changes only on a Long Rest).
  *
  * No rule is computed in this component: every number comes from the logic layer.
  */
@@ -54,57 +55,6 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
   // Ammunition fired this fight, by inventory item id (UI state). Shared by the weapon
   // cards (an Ammunition attack uses a piece) and the Ammunition card (recover half).
   const [ammoUsed, setAmmoUsed] = useState<Record<string, number>>({});
-
-  const setHitDiceSpent = (raw: string, total: number) => {
-    const parsed = parseNumberInput(raw, true);
-    const clamped = parsed === undefined ? undefined : Math.min(parsed, total);
-    onChange({ ...character, hitDiceSpent: clamped });
-  };
-
-  const selectedClass = resolveClass(character);
-  // Hit Dice total equals the character level (PHB 2024 "Hit Points"); shown as
-  // a CalculatedValue with a single summing component so the total is explained.
-  const hitDiceTotalValue = hitDiceTotal(character);
-  const hitDiceBreakdown = {
-    total: hitDiceTotalValue,
-    components: [{ label: 'Character level', value: hitDiceTotalValue }],
-  };
-  const hitDiceSpent = character.hitDiceSpent ?? 0;
-
-  const hitDiceCard = (
-    <Card>
-      <SectionHeader icon={Swords} title="Hit Dice" />
-      <div className={styles.hitDiceRow}>
-        <span className={styles.fieldLabel}>Hit Die</span>
-        <span className={styles.statValue}>{selectedClass ? `d${selectedClass.hitDie}` : '-'}</span>
-        <span className={styles.fieldLabel}>Total</span>
-        <span className={styles.statValue}>
-          <CalculatedValue label="Hit Dice total" breakdown={hitDiceBreakdown}>
-            {hitDiceTotalValue}
-          </CalculatedValue>
-        </span>
-        <label className={styles.derivedInputLabel} htmlFor="hit-dice-spent">
-          Spent
-        </label>
-        <input
-          id="hit-dice-spent"
-          className={styles.derivedInput}
-          type="number"
-          min={0}
-          max={hitDiceTotalValue}
-          value={character.hitDiceSpent ?? ''}
-          placeholder="0"
-          aria-label="Hit Dice spent"
-          onChange={(e) => setHitDiceSpent(e.target.value, hitDiceTotalValue)}
-        />
-        <span className={styles.speciesNote}>
-          {hitDiceSpent} / {hitDiceTotalValue}
-        </span>
-      </div>
-      {/* Short Rest and Long Rest, beside the Hit Dice they spend. */}
-      <RestControls character={character} onChange={onChange} onNotify={onNotify} />
-    </Card>
-  );
 
   return (
     <div className={styles.page}>
@@ -126,7 +76,6 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         <ActiveConditions character={character} onChange={onChange} />
         <EffectsCard character={character} onChange={onChange} />
         <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
-        <DefenseReadout character={character} onChange={onChange} />
       </section>
 
       <section className={styles.group} aria-labelledby="combat-attacks-heading">
@@ -145,7 +94,6 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
           usedByItem={ammoUsed}
           onUsedChange={setAmmoUsed}
         />
-        <WeaponMasteryChooser character={character} onChange={onChange} />
       </section>
 
       <section className={styles.group} aria-labelledby="combat-spells-heading">
@@ -156,16 +104,18 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         <TurnOptionsCard character={character} />
       </section>
 
-      <section className={styles.group} aria-labelledby="combat-resources-heading">
-        <h2 id="combat-resources-heading" className={styles.groupHeading}>
-          Resources and rests
-        </h2>
-        <ResourcesCard character={character} onChange={onChange} />
-        {hitDiceCard}
-      </section>
+      {/* The whole group hides (heading included) when the character has no
+          limited-use features to track. */}
+      {characterResources(character).length > 0 && (
+        <section className={styles.group} aria-labelledby="combat-resources-heading">
+          <h2 id="combat-resources-heading" className={styles.groupHeading}>
+            Resources
+          </h2>
+          <ResourcesCard character={character} onChange={onChange} />
+        </section>
+      )}
 
       <QuickRulesCard />
-
     </div>
   );
 }

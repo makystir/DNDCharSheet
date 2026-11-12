@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { OverviewVitals } from '../OverviewVitals';
-import { DefenseReadout } from '../../../combat/DefenseReadout';
+import { CombatStatusStrip } from '../../../combat/CombatStatusStrip';
+import { CombatRoundCard } from '../../../combat/CombatRoundCard';
 import { buildCoreStats } from '../../../layout/printLayoutGenerators';
 import { createCharacter } from '../../../../storage/character-store';
 import type { Character } from '../../../../types/character';
@@ -59,7 +61,17 @@ const CASES: Record<string, Character> = {
 
 const text = (name: RegExp) => screen.getByRole('button', { name }).textContent ?? '';
 
-describe('OverviewVitals parity with DefenseReadout and the print sheet', () => {
+/** The Combat page's glance: the summary strip plus the Fight card (Initiative). */
+function renderCombatGlance(character: Character) {
+  render(
+    <>
+      <CombatStatusStrip character={character} />
+      <CombatRoundCard character={character} onChange={() => {}} />
+    </>,
+  );
+}
+
+describe('OverviewVitals parity with the Combat page glance and the print sheet', () => {
   for (const [label, character] of Object.entries(CASES)) {
     it(`matches AC / HP max / Initiative / Passive Perception / Speed: ${label}`, () => {
       render(<OverviewVitals character={character} />);
@@ -72,10 +84,10 @@ describe('OverviewVitals parity with DefenseReadout and the print sheet', () => 
       };
       cleanup();
 
-      render(<DefenseReadout character={character} />);
+      renderCombatGlance(character);
       expect(overview).toEqual({
         ac: text(/^Armor Class/),
-        hpMax: text(/^Hit Point Maximum/),
+        hpMax: text(/^Max HP/),
         initiative: text(/^Initiative/),
         pp: text(/^Passive Perception/),
         speed: text(/^Speed/),
@@ -97,8 +109,8 @@ describe('OverviewVitals parity with DefenseReadout and the print sheet', () => 
     render(<OverviewVitals character={character} />);
     expect(text(/^Hit Point Maximum/)).toBe(String(max));
     cleanup();
-    render(<DefenseReadout character={character} />);
-    expect(text(/^Hit Point Maximum/)).toBe(String(max));
+    renderCombatGlance(character);
+    expect(text(/^Max HP/)).toBe(String(max));
     // Fighter d10 x3 + Wizard d6 x2 + Con(+2) x 5 differs from a single d10 x5.
     expect(max).toBe(10 + 2 + 2 * (6 + 2) /* fighter 2-3 */ + 2 * (4 + 2) /* wizard */);
   });
@@ -136,5 +148,43 @@ describe('OverviewVitals tiles', () => {
   it('shows Darkvision None when the species grants none', () => {
     render(<OverviewVitals character={make({})} />);
     expect(text(/^Darkvision:/)).toBe('None');
+  });
+});
+
+describe('OverviewVitals Adjust editors', () => {
+  // Moved from the Combat page: set once, not changed mid-fight.
+  it('are hidden when read-only and collapsed by default with onChange', () => {
+    render(<OverviewVitals character={make({})} />);
+    expect(screen.queryByRole('button', { name: /Adjust/ })).toBeNull();
+    expect(screen.queryByLabelText('Armor Class override')).toBeNull();
+    cleanup();
+    localStorage.clear();
+    render(<OverviewVitals character={make({})} onChange={() => {}} />);
+    expect(screen.getByRole('button', { name: /Adjust/ })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('emit acOverride and initiativeBonus, and clearing the override unsets it', () => {
+    localStorage.clear();
+    const calls: Character[] = [];
+    function Harness() {
+      const [character, setCharacter] = useState<Character>(make({}));
+      return (
+        <OverviewVitals
+          character={character}
+          onChange={(next) => {
+            calls.push(next);
+            setCharacter(next);
+          }}
+        />
+      );
+    }
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: /Adjust/ }));
+    fireEvent.change(screen.getByLabelText('Armor Class override'), { target: { value: '17' } });
+    expect(calls.at(-1)?.acOverride).toBe(17);
+    fireEvent.change(screen.getByLabelText('Armor Class override'), { target: { value: '' } });
+    expect(calls.at(-1)?.acOverride).toBeUndefined();
+    fireEvent.change(screen.getByLabelText('Initiative bonus'), { target: { value: '2' } });
+    expect(calls.at(-1)?.initiativeBonus).toBe(2);
   });
 });

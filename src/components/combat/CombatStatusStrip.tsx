@@ -1,4 +1,5 @@
-﻿import { Heart, Shield, Footprints, Brain } from 'lucide-react';
+﻿import { Heart, Shield, Footprints, Brain, Eye } from 'lucide-react';
+import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import type { Character } from '../../types/character';
 import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { speedBreakdown } from '../../logic/species';
@@ -20,7 +21,7 @@ export interface CombatStatusStripProps {
 
 /**
  * The always-visible glance at the top of the Combat page: hit points (with
- * temporary hit points), Armor Class, Speed, the round and the player's
+ * temporary hit points), Armor Class, Speed, Passive Perception, the round and the player's
  * Initiative result while a fight is on, and the spell being concentrated on.
  * Read-only: every figure comes from the logic layer and carries its breakdown
  * tooltip. Editing happens in the cards below.
@@ -32,6 +33,7 @@ export function CombatStatusStrip({ character }: CombatStatusStripProps) {
   const currentBreakdown = currentHpBreakdown(character);
   const ac = characterArmorClassBreakdown(character);
   const speed = speedBreakdown(character);
+  const passivePerception = passivePerceptionBreakdown(character);
   const inFight = isInFight(character);
   const initiative = initiativeResult(character);
   const concentrating = character.concentration;
@@ -78,6 +80,13 @@ export function CombatStatusStrip({ character }: CombatStatusStripProps) {
           </CalculatedValue>
         </span>
         <span className={styles.srOnly}>Speed</span>
+      </span>
+      <span className={styles.stat}>
+        <Eye size={16} aria-hidden="true" className={styles.icon} />
+        <span className={styles.value} data-testid="strip-passive-perception">
+          <CalculatedValue label="Passive Perception" breakdown={passivePerception} />
+        </span>
+        <span className={styles.srOnly}>Passive Perception</span>
       </span>
       {inFight && (
         <span className={styles.chip} data-testid="strip-round">

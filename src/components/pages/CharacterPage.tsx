@@ -40,6 +40,9 @@ import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { OverviewSetup } from './character/OverviewSetup';
 import { OverviewVitals } from './character/OverviewVitals';
+import { OverviewRest } from './character/OverviewRest';
+import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
+import { masteryChoices } from '../../logic/weapon-mastery';
 import { OverviewInspiration } from './character/OverviewInspiration';
 import { OverviewAttacks } from './character/OverviewAttacks';
 import { OverviewSpellcasting } from './character/OverviewSpellcasting';
@@ -66,6 +69,8 @@ export interface CharacterPageProps {
   onPortraitUpload?: (file: File) => void;
   /** Remove the active character's portrait. */
   onPortraitRemove?: () => void;
+  /** Optional app-level Toast sink (rest results on the Overview Rest card). */
+  onNotify?: (message: string) => void;
 }
 
 // The Character page has THREE sub-tabs: Overview (id 'identity'), Abilities &
@@ -129,6 +134,7 @@ export function CharacterPage({
   portraitURL = '',
   onPortraitUpload,
   onPortraitRemove,
+  onNotify,
 }: CharacterPageProps) {
   const {
     orderedTabs,
@@ -378,7 +384,8 @@ export function CharacterPage({
             onSpeciesChoiceChange={setSpeciesChoice}
           />
           <OverviewSetup character={character} />
-          <OverviewVitals character={character} />
+          <OverviewVitals character={character} onChange={onChange} />
+          <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
           <OverviewInspiration character={character} onChange={onChange} />
           {/* Two independent column stacks (no shared grid rows, so a short
               card never leaves a hole beside a tall one): the "right now"
@@ -793,6 +800,12 @@ export function CharacterPage({
           )}
         </CollapsibleSection>
       </Card>
+      {/* Weapon Mastery choices change only on a Long Rest, so the chooser lives
+          with the class build, not on the Combat page (weapon cards there keep
+          their mastery chip). Shown only to a class with Weapon Mastery. */}
+      {masteryChoices(character).cap > 0 && (
+        <WeaponMasteryChooser character={character} onChange={onChange} />
+      )}
         </>
       )}
     </div>
