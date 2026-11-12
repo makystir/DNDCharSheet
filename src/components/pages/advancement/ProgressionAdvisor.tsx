@@ -9,6 +9,8 @@ import { CalculatedValue } from '../../shared/CalculatedValue';
 import { ContentTooltip } from '../../shared/ContentTooltip';
 import { ScrollLink } from '../../shared/ScrollLink';
 import { levelingMode, canLevelUp } from '../../../logic/advancement';
+import { upcomingMilestones } from '../../../logic/advancement-planner';
+import { resolveClass } from '../../../logic/classes';
 import {
   advisorSuggestions,
   type AdvisorSuggestionId,
@@ -55,7 +57,7 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
   if (mode !== 'xp') {
     return (
       <Card>
-        <SectionHeader icon={Compass} title="Progression Advisor" />
+        <SectionHeader icon={Compass} title="Progression" />
         <p className={styles.modeNote}>
           Milestone mode: the DM grants levels at story milestones, so there is no XP progress to
           track (PHB 2024 &ldquo;Character Advancement&rdquo;).
@@ -67,7 +69,7 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
         )}
         {/* The milestone prompt above already states the can-level-up message, so
             drop the duplicate 'can-level-up' suggestion from the list here. */}
-        <SuggestionList suggestions={suggestions.filter((s) => s.id !== 'can-level-up')} />
+        <NextSteps character={character} suggestions={suggestions.filter((s) => s.id !== 'can-level-up')} />
       </Card>
     );
   }
@@ -123,7 +125,7 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
 
   return (
     <Card>
-      <SectionHeader icon={Compass} title="Progression Advisor" />
+      <SectionHeader icon={Compass} title="Progression" />
 
       {progress.atCap ? (
         <p className={styles.modeNote}>At the level cap (20). No further XP progress to track.</p>
@@ -187,7 +189,7 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
         </>
       )}
 
-      <SuggestionList suggestions={suggestions} />
+      <NextSteps character={character} suggestions={suggestions} />
     </Card>
   );
 }
@@ -248,5 +250,61 @@ function SuggestionList({ suggestions }: { suggestions: ReturnType<typeof adviso
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * "What to do now" (the advisor's suggestions, each with a link to where it is
+ * done) followed by "Coming up" (the planner's look ahead: the next feat slots and
+ * the subclass choice). Together they answer the two questions a player has at a
+ * level: what is waiting for me, and what is next.
+ */
+function NextSteps({
+  character,
+  suggestions,
+}: {
+  character: Character;
+  suggestions: ReturnType<typeof advisorSuggestions>;
+}) {
+  const milestones = upcomingMilestones(character);
+  const subclassLevel = resolveClass(character)?.subclassLevel;
+  const hasAhead = milestones.nextFeatSlotLevel !== null || milestones.subclassAhead;
+  return (
+    <>
+      <h4 className={styles.subHeading}>What to do now</h4>
+      <SuggestionList suggestions={suggestions} />
+      {hasAhead && (
+        <>
+          <h4 className={styles.subHeading}>Coming up</h4>
+          <ul className={styles.aheadList} aria-label="Coming up">
+            <li>
+              {milestones.nextFeatSlotLevel !== null ? (
+                <ContentTooltip
+                  content={{
+                    title: 'Next feat / ASI slot',
+                    sections: [
+                      {
+                        label: 'Rule',
+                        text: `Your next Ability Score Improvement slot opens at level ${milestones.nextFeatSlotLevel} (PHB 2024 "Ability Score Improvement").`,
+                      },
+                    ],
+                  }}
+                >
+                  Next feat slot: level {milestones.nextFeatSlotLevel}
+                </ContentTooltip>
+              ) : (
+                'No further feat slots ahead'
+              )}
+            </li>
+            {milestones.featSlotLevelsAhead.length > 1 && (
+              <li>All feat slots ahead: levels {milestones.featSlotLevelsAhead.join(', ')}</li>
+            )}
+            {milestones.subclassAhead && subclassLevel !== undefined && (
+              <li>Subclass choice at level {subclassLevel}</li>
+            )}
+          </ul>
+        </>
+      )}
+    </>
   );
 }

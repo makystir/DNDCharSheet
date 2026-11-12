@@ -469,3 +469,26 @@ describe('AdvancementPage - layout', () => {
     const level = screen.getByRole('heading', { name: /Level & Experience/ });
     expect(level.compareDocumentPosition(quiet) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });});
+
+describe('AdvancementPage - combined Progression card', () => {
+  it('has one Progression card with "What to do now" and "Coming up", and no separate planner', () => {
+    renderStateful({ level: 2, classes: [{ id: 'fighter', level: 2 }] });
+    expect(screen.queryByRole('heading', { name: 'Advancement Planner' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Progression Advisor' })).toBeNull();
+    const card = screen.getByRole('heading', { level: 3, name: 'Progression' }).closest('div[class*="card"]')!;
+    expect(within(card as HTMLElement).getByRole('heading', { level: 4, name: 'What to do now' })).toBeInTheDocument();
+    expect(within(card as HTMLElement).getByRole('heading', { level: 4, name: 'Coming up' })).toBeInTheDocument();
+  });
+
+  it('looks ahead to the next feat slot and the subclass choice', () => {
+    renderStateful({ level: 2, classes: [{ id: 'fighter', level: 2 }] });
+    const ahead = screen.getByRole('list', { name: 'Coming up' });
+    expect(within(ahead).getByText(/Next feat slot: level 4/)).toBeInTheDocument();
+    expect(within(ahead).getByText(/Subclass choice at level 3/)).toBeInTheDocument();
+  });
+
+  it('shows no "Coming up" at the level cap', () => {
+    renderStateful({ level: 20, classes: [{ id: 'fighter', level: 20, subclassId: 'champion' }] });
+    expect(screen.queryByRole('heading', { level: 4, name: 'Coming up' })).toBeNull();
+  });
+});

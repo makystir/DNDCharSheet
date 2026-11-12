@@ -42,7 +42,6 @@ import {
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { FightingStyleSection } from './advancement/FightingStyleSection';
 import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
-import { AdvancementPlanner } from './advancement/AdvancementPlanner';
 import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
 import { LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
 import {
@@ -571,7 +570,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         </div>
       </Card>
 
-      {/* ── Progression Advisor (read-only XP/milestone projection + prompts) ─ */}
+      {/* ── Progression (XP/milestone progress, what to do now, what is coming up) ─ */}
       <ProgressionAdvisor character={character} />
 
       {/* ── Hit Points ──────────────────────────────────────────────────────── */}
@@ -741,9 +740,6 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
           </>
         )}
       </Card>
-
-      {/* ── Advancement Planner (read-only upcoming milestones + preview) ───── */}
-      <AdvancementPlanner character={character} />
 
       {/* ── Fighting Style (Fighter 1, Paladin 2, Ranger 2) ─────────────────── */}
       <FightingStyleSection character={character} onChange={onChange} now={now} />

@@ -104,3 +104,20 @@
   padding: 0 0.25rem;
   color: var(--accent-gold);
 }
+
+.subHeading {
+  margin: 16px 0 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.aheadList {
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}

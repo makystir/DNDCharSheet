@@ -359,6 +359,10 @@ The top card shows your level and, in XP mode, your progress toward the next lev
 - **Ability Score Improvements or feats** at certain levels.
 - More spell slots or spells.
 
+### Progression
+
+The **Progression** card tells you where you stand and what is next. In XP mode it shows a progress bar toward your next level. **What to do now** lists anything waiting for you, such as a subclass or feat to choose or a level you can take, and each item has a link to the place where you do it. **Coming up** looks ahead to your next feat slot and your subclass choice.
+
 ### Hit Points
 
 When you level up, you also gain hit points. Choose to **Take fixed value** (the safe average) or **Roll the Hit Die** (random, could be better or worse). Your Constitution modifier is added either way.
