@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import { Tooltip } from '../Tooltip';
+import styles from '../Tooltip.module.css';
 
 afterEach(() => {
   cleanup();
@@ -72,7 +73,71 @@ describe('Tooltip placement', () => {
     expect(placed().top).toBeGreaterThanOrEqual(124);
   });
 
-  it('caps its height instead of covering the trigger when neither side fits', () => {
+  /*
+   * All content must be readable without scrolling: the page may already be scrolled
+   * to the bottom and a hover tooltip ignores the pointer, so it cannot be scrolled.
+   * The tooltip is never height-capped unless it is taller than the whole screen.
+   */
+  it('goes beside the trigger, uncapped, when it fits neither below nor above', () => {
+    window.innerHeight = 700;
+    window.innerWidth = 1200;
+    mockTooltipSize(300, 500);
+    const anchor = anchorAt({ top: 300, left: 100, width: 140, height: 24 });
+    render(
+      <Tooltip id="t" anchorEl={anchor} title="Friends" onClose={() => {}}>
+        long text
+      </Tooltip>,
+    );
+    const p = placed();
+    expect(p.maxHeight).toBeUndefined();
+    expect(p.left).toBeGreaterThanOrEqual(240); // right of the anchor, not over it
+    expect(p.top).toBeGreaterThanOrEqual(8);
+    expect(p.top + 500).toBeLessThanOrEqual(700 - 8);
+  });
+
+  it('widens so the text takes fewer lines instead of capping its height', () => {
+    window.innerHeight = 700;
+    window.innerWidth = 1200;
+    // Rendered height shrinks as the allowed width grows (fewer wrapped lines).
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (this: HTMLElement) {
+      return parseFloat(this.style.maxWidth) || 300;
+    });
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
+      const w = parseFloat(this.style.maxWidth) || 320;
+      return w <= 320 ? 600 : 450;
+    });
+    // Full-width anchor: no room to either side, so only widening can help.
+    const anchor = anchorAt({ top: 100, left: 0, width: 1200, height: 24 });
+    render(
+      <Tooltip id="t" anchorEl={anchor} title="x" onClose={() => {}}>
+        text
+      </Tooltip>,
+    );
+    const tip = screen.getByRole('tooltip');
+    expect(tip.style.maxWidth).toBe('440px');
+    expect(tip.style.maxHeight).toBe('');
+    expect(parseFloat(tip.style.top)).toBeGreaterThanOrEqual(124); // below the anchor
+  });
+
+  it('is placed fully on screen, uncapped, when it fits nowhere beside the trigger', () => {
+    window.innerHeight = 400;
+    window.innerWidth = 1200;
+    mockTooltipSize(300, 350);
+    const anchor = anchorAt({ top: 200, left: 0, width: 1200, height: 24 });
+    render(
+      <Tooltip id="t" anchorEl={anchor} title="x" onClose={() => {}}>
+        text
+      </Tooltip>,
+    );
+    const tip = screen.getByRole('tooltip');
+    const p = placed();
+    expect(p.maxHeight).toBeUndefined();
+    expect(tip.className).not.toContain(styles.scrollable);
+    expect(p.top).toBeGreaterThanOrEqual(8);
+    expect(p.top + 350).toBeLessThanOrEqual(400 - 8);
+  });
+
+  it('only scrolls (and takes the pointer) when taller than the whole screen', () => {
     window.innerHeight = 400;
     window.innerWidth = 1200;
     mockTooltipSize(300, 600);
@@ -82,10 +147,12 @@ describe('Tooltip placement', () => {
         text
       </Tooltip>,
     );
+    const tip = screen.getByRole('tooltip');
     const p = placed();
-    expect(p.maxHeight).toBeDefined();
-    const overlapsAnchor = p.top < 224 && p.top + (p.maxHeight ?? 0) > 200;
-    expect(overlapsAnchor).toBe(false);
+    expect(tip.className).toContain(styles.compact);
+    expect(tip.className).toContain(styles.scrollable);
+    expect(p.maxHeight).toBe(384);
+    expect(p.top).toBe(8);
   });
 
   it('keeps the tooltip inside the viewport horizontally', () => {

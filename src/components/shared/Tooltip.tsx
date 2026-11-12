@@ -14,58 +14,112 @@ export interface TooltipProps {
 interface Placement {
   top: number;
   left: number;
-  /** Set when neither side has room for the whole tooltip, so it scrolls instead of covering the anchor. */
-  maxHeight?: number;
+}
+
+const MARGIN = 8;
+const GAP = 6;
+/** Widths tried, narrowest first, when the tooltip is too tall at its normal width. */
+const WIDTHS = [320, 440, 560, 720];
+
+/**
+ * Where the tooltip fits WHOLE next to its anchor without covering it: below, then
+ * above, then to the right or left (vertically centred on the anchor, kept on
+ * screen). Null when none of those has room for its measured size.
+ *
+ * Not covering the anchor matters on touch screens; on hover devices the tooltip
+ * ignores the pointer (CSS), so covering the anchor cannot steal the hover.
+ */
+function besideAnchor(rect: DOMRect, width: number, height: number): Placement | null {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const centredLeft = Math.max(MARGIN, Math.min(rect.left + rect.width / 2 - width / 2, vw - width - MARGIN));
+  if (height <= vh - rect.bottom - GAP - MARGIN) return { top: rect.bottom + GAP, left: centredLeft };
+  if (height <= rect.top - GAP - MARGIN) return { top: rect.top - GAP - height, left: centredLeft };
+  if (height <= vh - 2 * MARGIN) {
+    const top = Math.max(MARGIN, Math.min(rect.top + rect.height / 2 - height / 2, vh - height - MARGIN));
+    if (rect.right + GAP + width <= vw - MARGIN) return { top, left: rect.right + GAP };
+    if (rect.left - GAP - width >= MARGIN) return { top, left: rect.left - GAP - width };
+  }
+  return null;
+}
+
+/** Fully on screen, centred on the anchor as far as the viewport allows (may cover it). */
+function onScreen(rect: DOMRect, width: number, height: number): Placement {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  return {
+    top: Math.max(MARGIN, Math.min(rect.top + rect.height / 2 - height / 2, vh - height - MARGIN)),
+    left: Math.max(MARGIN, Math.min(rect.left + rect.width / 2 - width / 2, vw - width - MARGIN)),
+  };
 }
 
 /**
- * Place the tooltip beside its anchor using the tooltip's MEASURED size. It goes
- * below the anchor when it fits, otherwise above, otherwise on the side with more
- * room with a capped height. It must never overlap the anchor: a tooltip that sits
- * under the cursor steals the hover, hides, and reappears in a rapid flicker.
+ * Lay the tooltip out so ALL of its content is visible without scrolling (the page may
+ * already be scrolled as far as it goes, and a hover tooltip cannot be scrolled):
+ *  1. at its normal width, beside the anchor (below, above, right, left);
+ *  2. wider, so the same text takes fewer lines, again beside the anchor;
+ *  3. at the widest width that fits the screen, fully on screen even if it covers the anchor;
+ *  4. the same with compact text;
+ *  5. only if it is still taller than the screen, capped to the screen and scrollable
+ *     (the tooltip then takes the pointer so it can actually be scrolled).
+ * The tooltip's real rendered size is measured at each step.
  */
-function computePlacement(anchorEl: HTMLElement, width: number, height: number): Placement {
+function layout(el: HTMLElement, anchorEl: HTMLElement): void {
   const rect = anchorEl.getBoundingClientRect();
-  const margin = 8;
-  const gap = 6;
-  const spaceBelow = window.innerHeight - rect.bottom - gap - margin;
-  const spaceAbove = rect.top - gap - margin;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const maxWidth = Math.max(160, vw - 2 * MARGIN);
+  el.style.maxHeight = '';
+  el.style.maxWidth = '';
+  el.classList.remove(styles.compact, styles.scrollable);
 
-  let top: number;
-  let maxHeight: number | undefined;
-  if (height <= spaceBelow) {
-    top = rect.bottom + gap;
-  } else if (height <= spaceAbove) {
-    top = rect.top - gap - height;
-  } else if (spaceBelow >= spaceAbove) {
-    top = rect.bottom + gap;
-    maxHeight = Math.max(spaceBelow, 80);
-  } else {
-    maxHeight = Math.max(spaceAbove, 80);
-    top = rect.top - gap - maxHeight;
+  const place = (p: Placement) => {
+    el.style.top = `${p.top}px`;
+    el.style.left = `${p.left}px`;
+  };
+  const tryWidth = (w: number): Placement | null => {
+    el.style.maxWidth = `${Math.min(w, maxWidth)}px`;
+    return besideAnchor(rect, el.offsetWidth, el.offsetHeight);
+  };
+
+  for (const w of WIDTHS) {
+    const p = tryWidth(w);
+    if (p) return place(p);
+    if (w >= maxWidth) break;
   }
 
-  // Horizontal: center on the anchor, clamp to the viewport.
-  let left = rect.left + rect.width / 2 - width / 2;
-  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
-  return { top, left, ...(maxHeight !== undefined ? { maxHeight } : {}) };
+  const widest = Math.min(WIDTHS[WIDTHS.length - 1], maxWidth);
+  el.style.maxWidth = `${widest}px`;
+  if (el.offsetHeight <= vh - 2 * MARGIN) return place(onScreen(rect, el.offsetWidth, el.offsetHeight));
+
+  el.classList.add(styles.compact);
+  if (el.offsetHeight <= vh - 2 * MARGIN) return place(onScreen(rect, el.offsetWidth, el.offsetHeight));
+
+  el.classList.add(styles.scrollable);
+  el.style.maxHeight = `${vh - 2 * MARGIN}px`;
+  place(onScreen(rect, el.offsetWidth, vh - 2 * MARGIN));
 }
 
 export function Tooltip({ anchorEl, title, children, onClose, id }: TooltipProps) {
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  // Position from the real rendered size before the browser paints (no flash at the
+  // Lay out from the real rendered size before the browser paints (no flash at the
   // wrong spot). Written straight to the element, not through state, so a re-render
   // can never overwrite the measured placement with a stale estimate.
   useLayoutEffect(() => {
     const el = tooltipRef.current;
-    if (!el) return;
-    el.style.maxHeight = '';
-    const placement = computePlacement(anchorEl, el.offsetWidth, el.offsetHeight);
-    el.style.top = `${placement.top}px`;
-    el.style.left = `${placement.left}px`;
-    if (placement.maxHeight !== undefined) el.style.maxHeight = `${placement.maxHeight}px`;
+    if (el) layout(el, anchorEl);
   }, [anchorEl, title, children]);
+
+  // Re-lay out when the window size changes while it is open.
+  useEffect(() => {
+    const onResize = () => {
+      if (tooltipRef.current) layout(tooltipRef.current, anchorEl);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [anchorEl]);
+
   // Auto-focus on mount
   useEffect(() => {
     tooltipRef.current?.focus();

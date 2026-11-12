@@ -11,8 +11,10 @@
   box-shadow: 0 4px 16px var(--shadow);
   padding: 12px;
   outline: none;
-  /* Position is set by Tooltip.tsx from the measured size; scroll if it must be capped. */
-  overflow-y: auto;
+  box-sizing: border-box;
+  /* Tooltip.tsx lays it out so the whole content is visible (it widens rather than
+     scrolls). Only content taller than the screen gets the .scrollable fallback. */
+  overflow: hidden;
 }
 /* On hover devices the tooltip never captures the pointer, so it can't steal the hover from its
    trigger. Touch keeps it interactive (tap inside keeps it open, tap outside closes it). */
@@ -20,6 +22,13 @@
   .tooltip {
     pointer-events: none;
   }
+}
+
+/* Last resort for content taller than the whole screen: it can be scrolled, so it must
+   take the pointer even on hover devices. */
+.tooltip.scrollable {
+  overflow-y: auto;
+  pointer-events: auto;
 }
 
 .title {
@@ -33,4 +42,14 @@
   color: var(--text-primary);
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* Tighter text when even the widest layout is taller than the screen. */
+.compact .title {
+  margin-bottom: 4px;
+}
+
+.compact .body {
+  font-size: 12px;
+  line-height: 1.35;
 }
