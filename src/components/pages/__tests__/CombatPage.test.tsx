@@ -133,7 +133,11 @@ describe('CombatPage — out of combat (flat stack)', () => {
     // The cards that used to live behind the three modes are all on the page.
     expect(screen.getByRole('heading', { name: 'Hit Points' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Effects' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Affecting you' })).toBeInTheDocument();
+    // Merged cards: one HP card (Take damage inside it), one Attacks card.
+    expect(screen.queryByRole('heading', { name: 'Take Damage', level: 3 })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Unarmed Strike' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Effects' })).toBeNull();
     // Out-of-fight cards are elsewhere.
     expect(screen.queryByRole('heading', { name: 'Hit Dice' })).toBeNull();
     expect(screen.queryByRole('heading', { name: 'Rest' })).toBeNull();
@@ -257,6 +261,8 @@ describe('CombatPage - saving throws', () => {
 describe('CombatPage - tracked effects', () => {
   it('adds an effect with rounds, takes rounds off and ends it', () => {
     renderStatefulPage();
+    expect(screen.queryByLabelText('Effect name')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Track effect/ }));
     fireEvent.change(screen.getByLabelText('Effect name'), { target: { value: 'Haste' } });
     fireEvent.change(screen.getByLabelText('Effect rounds'), { target: { value: '2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add effect' }));
@@ -271,6 +277,7 @@ describe('CombatPage - tracked effects', () => {
 
   it('rejects a bad round count', () => {
     renderStatefulPage();
+    fireEvent.click(screen.getByRole('button', { name: /Track effect/ }));
     fireEvent.change(screen.getByLabelText('Effect name'), { target: { value: 'Haste' } });
     fireEvent.change(screen.getByLabelText('Effect rounds'), { target: { value: '0' } });
     expect(screen.getByRole('button', { name: 'Add effect' })).toBeDisabled();

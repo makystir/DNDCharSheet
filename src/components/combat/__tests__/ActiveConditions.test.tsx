@@ -27,10 +27,10 @@ function renderPage(overrides: Partial<Character> = {}) {
 }
 
 describe('Active Conditions on the Combat page', () => {
-  it('shows an empty state with an Add Condition control', () => {
+  it('shows a one-line empty state in "Affecting you" with an Add Condition control', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: 'Active Conditions' })).toBeInTheDocument();
-    expect(screen.getByText('No Conditions')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Affecting you' })).toBeInTheDocument();
+    expect(screen.getByTestId('affecting-you-empty')).toHaveTextContent('No conditions or tracked effects.');
     expect(screen.getByRole('button', { name: /Add Condition/ })).toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe('Active Conditions on the Combat page', () => {
     renderPage({ conditions: [{ id: 'prone' }] });
     fireEvent.click(screen.getByRole('button', { name: 'Remove Prone' }));
     expect('conditions' in latest).toBe(false);
-    expect(screen.getByText('No Conditions')).toBeInTheDocument();
+    expect(screen.getByTestId('affecting-you-empty')).toBeInTheDocument();
   });
 
   it('shows a descriptive content tooltip on the badge name', () => {

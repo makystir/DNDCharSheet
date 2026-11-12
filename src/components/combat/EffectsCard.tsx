@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { Timer, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { Character } from '../../types/character';
 import {
   MAX_EFFECTS,
@@ -10,14 +10,14 @@ import {
   tickEffect,
   trackedEffects,
 } from '../../logic/combat-effects';
-import { Card } from '../shared/Card';
-import { SectionHeader } from '../shared/SectionHeader';
-import { EmptyState } from '../shared/EmptyState';
 import styles from './EffectsCard.module.css';
 
 export interface EffectsCardProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** Show the add form (opened from the "Affecting you" card header). */
+  formOpen: boolean;
+  onCloseForm: () => void;
 }
 
 function newId(): string {
@@ -31,8 +31,11 @@ function newId(): string {
  * Name them, give a number of rounds if they have one, and "Next round" on the
  * round card counts them down. Bookkeeping only: the app never applies what an
  * effect does. A round is about 6 seconds, so 1 minute is 10 rounds.
+ *
+ * Combat declutter: this is the effects part of the "Affecting you" card. The
+ * add form shows only when opened, and the list only when something is tracked.
  */
-export function EffectsCard({ character, onChange }: EffectsCardProps) {
+export function EffectsCard({ character, onChange, formOpen, onCloseForm }: EffectsCardProps) {
   const [name, setName] = useState('');
   const [rounds, setRounds] = useState('');
   const [status, setStatus] = useState('');
@@ -49,11 +52,13 @@ export function EffectsCard({ character, onChange }: EffectsCardProps) {
     setStatus(`Added ${name.trim()}.`);
     setName('');
     setRounds('');
+    onCloseForm();
   };
 
   return (
-    <Card>
-      <SectionHeader icon={Timer} title="Effects" />
+    <>
+      {formOpen && (
+      <>
       <p className={styles.hint}>
         Track spells and features that last a number of rounds (1 minute is 10 rounds). Next
         round counts them down.
@@ -93,20 +98,23 @@ export function EffectsCard({ character, onChange }: EffectsCardProps) {
         <button type="submit" className={styles.addBtn} disabled={!canAdd} aria-label="Add effect">
           <Plus size={16} aria-hidden="true" /> Add
         </button>
+        <button type="button" className={styles.btn} onClick={onCloseForm}>
+          Cancel
+        </button>
       </form>
       {!roundsValid && (
         <p className={styles.error} role="note">
           Rounds must be a whole number of 1 or more, or left empty for no timer.
         </p>
       )}
+      </>
+      )}
 
       <div role="status" aria-live="polite" className={styles.srOnly}>
         {status}
       </div>
 
-      {effects.length === 0 ? (
-        <EmptyState compact icon={Timer} heading="No effects" description="Nothing is being tracked." />
-      ) : (
+      {effects.length > 0 && (
         <ul className={styles.list} aria-label="Tracked effects">
           {effects.map((e) => (
             <li key={e.id} className={styles.item}>
@@ -161,6 +169,6 @@ export function EffectsCard({ character, onChange }: EffectsCardProps) {
           ))}
         </ul>
       )}
-    </Card>
+    </>
   );
 }

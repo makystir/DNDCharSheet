@@ -265,23 +265,26 @@ A strip across the top stays visible as you scroll. It shows your hit points (wi
 
 ### Status
 
-- **Hit Points and Take Damage:** type damage and its type, mark resistance or vulnerability for that hit, and heal or add temporary hit points. Temporary hit points are used up first and don't stack. If damage breaks your concentration, the app prompts you for the Constitution save.
-- **Death Saves:** appears when you are at 0 HP. Roll each save and the pips fill in.
-- **Saving Throws:** all six saves with your bonus and a **Roll** button each. A save shows **Auto-fail** when a condition like Paralyzed or Stunned makes you fail Strength and Dexterity saves, and **Disadvantage** when a condition like Restrained gives it (a Dexterity save). The roll starts with that Disadvantage already selected, and Exhaustion is applied. The result is shown under the saves. The app doesn't compare it to a DC; your DM tells you whether it worked.
-- **Active Conditions:** add a condition, read what it does, and give it a duration in rounds, minutes or hours, or until a rest or while you concentrate. Timed durations count down with **Next round**, and you can take a round off by hand.
-- **Effects:** track spells and features that last a number of rounds, such as Bless or Rage (1 minute is 10 rounds). Give it a name and an optional number of rounds. **Next round** counts them down, **-1** and **+1** adjust by hand, and **End** removes one. The app doesn't apply what an effect does; it only keeps the count.
+- **Hit Points:** one card for everything about your hit points.
+  - **Take damage:** type the damage and press **Apply**. **Damage options** (closed at first) holds the damage type, a flat adjustment, Resistance, Vulnerability, Immunity or a Critical Hit for that hit, and **Knock out** (when an attacker chooses to leave you at 1 HP and Unconscious instead of 0). When an option is on, its name shows next to **Damage options** even while it's closed. If damage breaks your concentration, the app prompts you for the Constitution save.
+  - **Heal:** heal, or add temporary hit points. Temporary hit points are used up first and don't stack.
+  - **Death Saves:** appear in the card when you are at 0 HP. Roll each save and the pips fill in. You can still be healed or take damage at 0 HP.
+- **Saving Throws:** a row of six chips (STR, DEX, CON, INT, WIS, CHA) with your bonus and a dice button to roll each. A save shows **Auto-fail** when a condition like Paralyzed or Stunned makes you fail Strength and Dexterity saves, and **Disadvantage** when a condition like Restrained gives it (a Dexterity save). The roll starts with that Disadvantage already selected, and Exhaustion is applied. The result is shown under the saves. The app doesn't compare it to a DC; your DM tells you whether it worked.
+- **Affecting you:** your conditions and the effects you're tracking, in one card. With nothing on you it's a single line.
+  - **Add Condition:** pick a condition, read what it does, and give it a duration in rounds, minutes or hours, or until a rest or while you concentrate. Timed durations count down with **Next round**, and you can take a round off by hand.
+  - **Track effect:** track spells and features that last a number of rounds, such as Bless or Rage (1 minute is 10 rounds). Give it a name and an optional number of rounds. **Next round** counts them down, **-1** and **+1** adjust by hand, and **End** removes one. The app doesn't apply what an effect does; it only keeps the count.
 - **Concentration:** appears while you are concentrating, shows on what, and ends it when you start another.
 
 The page only shows what applies to you right now. Death Saves appear at 0 HP, Concentration while you concentrate, Ammunition when you have a weapon that uses it, Spellcasting if you cast spells, and Resources if you have limited-use features.
 
 ### Attacks
 
-Each equipped weapon (and your Unarmed Strike) shows its attack bonus, damage, properties and mastery, with two buttons:
+The **Attacks** card has a row for each equipped weapon and one for your Unarmed Strike (with your Grapple and Shove DCs). Each row shows the attack bonus, damage, properties and mastery. Use the view switch in the card's header for bigger cards instead of rows. Each row has two buttons:
 
 - **Attack** rolls a d20 with your attack bonus (or lets you type a physical die) and shows the total to tell your DM. The app doesn't check it against Armor Class; your DM says whether it hits. A natural 20 is a Critical Hit and a natural 1 misses. Conditions you have set the starting roll: Poisoned starts it with Disadvantage, for example. Exhaustion is applied.
 - **Damage** rolls the weapon's damage. Tick **Critical hit** to double the dice (it's ticked for you after a natural 20). With manual dice, it tells you what to roll instead.
 
-A weapon that uses ammunition, like a bow, shows how much you have left right on its card. Each attack roll uses one piece. When you are out, the Attack button turns off. The **Ammunition** card counts what you fired this fight and has **Recover half** for after the fight (half of what you fired, rounded down).
+A weapon that uses ammunition, like a bow, shows how much you have left right on its row. Each attack roll uses one piece. When you are out, the Attack button turns off. The **Ammunition** card counts what you fired this fight and has **Recover half** for after the fight (half of what you fired, rounded down).
 
 ### Spells and turn options
 

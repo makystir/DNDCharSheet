@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { Dices } from 'lucide-react';
 import type { Ability, Character } from '../../types/character';
-import { ABILITIES, ABILITY_NAMES } from '../../types/character';
+import { ABILITIES, ABILITY_ABBR, ABILITY_NAMES } from '../../types/character';
 import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
 import { saveConditionEffects } from '../../logic/save-conditions';
 import { exhaustionLevelOf } from '../../logic/conditions';
@@ -26,7 +26,8 @@ interface LastResult {
 }
 
 /**
- * The six saving throws as one-tap rolls for the Combat page. Each tile shows the
+ * The six saving throws as one-tap rolls for the Combat page, as a compact row
+ * of six chips (three per row on a phone). Each tile shows the
  * bonus (with its breakdown tooltip), flags what the character's conditions do to
  * that save (an automatic failure, or Disadvantage), and rolls through the shared
  * RollPrompt, which honors the manual-dice setting and adds the Exhaustion penalty.
@@ -67,9 +68,13 @@ export function SavesPanel({ character }: SavesPanelProps) {
                   content={resolveSaveTooltip(ability, character)}
                   ariaLabel={`About ${name} saving throw`}
                 >
-                  {name}
+                  {ABILITY_ABBR[ability]}
                 </MaybeContentTooltip>
-                {prof.proficient && <span className={styles.prof}>Proficient</span>}
+                {prof.proficient && (
+                  <span className={styles.prof} title="Proficient">
+                    Prof
+                  </span>
+                )}
               </span>
               <span className={styles.bonus}>
                 <CalculatedValue label={`${name} Save`} breakdown={breakdown}>
@@ -91,7 +96,7 @@ export function SavesPanel({ character }: SavesPanelProps) {
                 aria-label={`Roll ${name} saving throw`}
                 onClick={() => setRolling(ability)}
               >
-                Roll
+                <Dices size={16} aria-hidden="true" />
               </button>
             </div>
           );

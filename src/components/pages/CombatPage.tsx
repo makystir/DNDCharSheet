@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import type { Character } from '../../types/character';
-import { ActiveConditions } from '../combat/ActiveConditions';
+import { AffectingYouCard } from '../combat/AffectingYouCard';
 import { HitPointsCard } from '../combat/HitPointsCard';
-import { TakeDamagePanel } from '../combat/TakeDamagePanel';
-import { DeathSavesCard } from '../combat/DeathSavesCard';
 import { ConcentrationCard } from '../combat/ConcentrationCard';
 import { WeaponCards } from '../combat/WeaponCards';
-import { UnarmedStrikeCard } from '../combat/UnarmedStrikeCard';
 import { AmmoTracker } from '../combat/AmmoTracker';
 import { SpellcastingQuickCard } from '../combat/SpellcastingQuickCard';
 import { TurnOptionsCard } from '../combat/TurnOptionsCard';
@@ -16,7 +13,6 @@ import { HouseRuleIndicator } from '../combat/HouseRuleIndicator';
 import { CombatStatusStrip } from '../combat/CombatStatusStrip';
 import { CombatRoundCard } from '../combat/CombatRoundCard';
 import { SavesPanel } from '../combat/SavesPanel';
-import { EffectsCard } from '../combat/EffectsCard';
 import { characterResources } from '../../logic/resources';
 import styles from './CombatPage.module.css';
 
@@ -37,9 +33,10 @@ export interface CombatPageProps {
  *  - a sticky strip with HP, AC, Speed, Passive Perception, the round and
  *    Initiative, and what the character is concentrating on;
  *  - the Fight card (round counter, Next round, Initiative roll);
- *  - Status: hit points and damage, death saves, saving throws, conditions,
- *    tracked effects and concentration;
- *  - Attacks: weapons and ammunition;
+ *  - Status: one Hit Points card (damage, healing, Temp HP and, at 0 HP, death
+ *    saves), the six saving throws as a row of chips, "Affecting you"
+ *    (conditions and tracked effects, one line when empty) and concentration;
+ *  - Attacks: one card with a row per weapon plus Unarmed Strike, and ammunition;
  *  - Spells and turn options;
  *  - Resources: limited-use features and spell slots spent in a fight.
  *
@@ -69,12 +66,9 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         <h2 id="combat-status-heading" className={styles.groupHeading}>
           Status
         </h2>
-        <HitPointsCard character={character} onChange={onChange} />
-        <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
-        <DeathSavesCard character={character} onChange={onChange} />
+        <HitPointsCard character={character} onChange={onChange} onNotify={onNotify} />
         <SavesPanel character={character} />
-        <ActiveConditions character={character} onChange={onChange} />
-        <EffectsCard character={character} onChange={onChange} />
+        <AffectingYouCard character={character} onChange={onChange} />
         <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
       </section>
 
@@ -87,7 +81,6 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
           onChange={onChange}
           onAmmoFired={(id) => setAmmoUsed((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))}
         />
-        <UnarmedStrikeCard character={character} />
         <AmmoTracker
           character={character}
           onChange={onChange}

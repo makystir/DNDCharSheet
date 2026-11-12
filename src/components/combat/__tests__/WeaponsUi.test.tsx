@@ -86,22 +86,31 @@ describe('Weapons panel', () => {
       ...extra,
     });
 
-  it('shows an empty state when nothing is equipped', () => {
+  it('says nothing is equipped and still offers Unarmed Strike', () => {
     renderPage(fighter({ inventory: [weapon('w1', 'longsword')] }));
-    expect(screen.getByText('No weapons equipped')).toBeTruthy();
-    expect(screen.queryByTestId('weapon-card-w1')).toBeNull();
+    expect(screen.getByText(/No weapons equipped/)).toBeTruthy();
+    expect(screen.queryByTestId('weapon-list-row-w1')).toBeNull();
+    expect(screen.getByTestId('unarmed-strike-card')).toBeTruthy();
+  });
+
+  it('is one Attacks card: a compact row per weapon by default, then Unarmed Strike', () => {
+    renderPage(withSword());
+    expect(screen.getByRole('heading', { name: 'Attacks', level: 3 })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Unarmed Strike' })).toBeNull();
+    const rows = within(screen.getByRole('list', { name: 'Equipped weapons' })).getAllByRole('listitem');
+    expect(rows.map((r) => r.dataset.testid)).toEqual(['weapon-list-row-w1', 'unarmed-strike-card']);
   });
 
   it('puts the full weapon name on line 1 and the stats and Attack button on line 2', () => {
     renderPage(withSword());
-    const card = screen.getByTestId('weapon-card-w1');
+    const card = screen.getByTestId('weapon-list-row-w1');
     expect(within(card).getByText('Longsword')).toBeTruthy();
     expect(within(card).getByRole('button', { name: 'Roll attack with Longsword' })).toBeTruthy();
   });
 
   it('shows the attack bonus as a CalculatedValue with its zero-inclusive breakdown', () => {
     renderPage(withSword());
-    const card = screen.getByTestId('weapon-card-w1');
+    const card = screen.getByTestId('weapon-list-row-w1');
     expect(within(card).getByRole('button', { name: /Longsword attack bonus/ }).textContent).toBe('+6');
     const tip = openTooltip(/Longsword attack bonus/);
     expect(tip.textContent).toContain('Strength mod');
@@ -120,7 +129,7 @@ describe('Weapons panel', () => {
 
   it('has no versatile toggle on a weapon without Versatile', () => {
     renderPage(fighter({ inventory: [weapon('w1', 'greatsword')], equipped: { weaponItemIds: ['w1'] } }));
-    expect(within(screen.getByTestId('weapon-card-w1')).queryByRole('checkbox', { name: /two-handed/ })).toBeNull();
+    expect(within(screen.getByTestId('weapon-list-row-w1')).queryByRole('checkbox', { name: /two-handed/ })).toBeNull();
   });
 
   it('shows property chips with tooltips', () => {
@@ -166,12 +175,15 @@ describe('Weapons panel', () => {
 
   it('rolls an attack (total for the DM) and damage, with a Critical Hit toggle', () => {
     renderPage(withSword());
-    const card = screen.getByTestId('weapon-card-w1');
+    const card = screen.getByTestId('weapon-list-row-w1');
     fireEvent.click(within(card).getByRole('button', { name: 'Roll attack with Longsword' }));
     expect(screen.getByRole('dialog', { name: 'Longsword attack' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.getByTestId('attack-result-Longsword').textContent).toMatch(/^Attack: \d+ \(rolled \d+\)/);
+    // A random natural 20 ticks Critical Hit for you; start the damage check from unticked.
+    const critBox = within(card).getByRole('checkbox', { name: /Longsword Critical Hit/ }) as HTMLInputElement;
+    if (critBox.checked) fireEvent.click(critBox);
     fireEvent.click(within(card).getByRole('button', { name: 'Roll damage for Longsword' }));
     expect(screen.getByTestId('attack-result-Longsword').textContent).toMatch(/Damage: \d+ slashing \(1d8: \d+ \+ 3\)/);
     fireEvent.click(within(card).getByRole('checkbox', { name: /Longsword Critical Hit/ }));
@@ -195,6 +207,8 @@ describe('Weapons panel', () => {
 
   it('switches between card and list view and keeps the full name and Attack button', () => {
     renderPage(withSword());
+    fireEvent.click(screen.getByRole('radio', { name: 'Card view' }));
+    expect(screen.getByTestId('weapon-card-w1')).toBeTruthy();
     fireEvent.click(screen.getByRole('radio', { name: 'List view' }));
     const row = screen.getByTestId('weapon-list-row-w1');
     expect(within(row).getByText('Longsword')).toBeTruthy();

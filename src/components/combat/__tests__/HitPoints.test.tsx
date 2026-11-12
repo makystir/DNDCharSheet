@@ -258,11 +258,19 @@ describe('Take Damage preview', () => {
     expect(screen.getByTestId('preview-warning')).toHaveTextContent(/third death-save failure/);
   });
 
-  it('collapses with its header toggle', () => {
+  it('is part of the Hit Points card, with the per-hit options folded away', () => {
     renderPage();
+    expect(screen.queryByRole('heading', { name: 'Take Damage', level: 3 })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Take damage' })).toBeInTheDocument();
     expect(screen.getByLabelText('Damage amount')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Take Damage/ }));
-    expect(screen.queryByLabelText('Damage amount')).toBeNull();
+    const options = screen.getByText(/^Damage options/).closest('details')!;
+    expect(options.open).toBe(false);
+  });
+
+  it('names the options that are on, so a folded panel still shows them', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Resistance' }));
+    expect(screen.getByText(/^Damage options/)).toHaveTextContent('Damage options: Resistance');
   });
 });
 
@@ -275,13 +283,13 @@ describe('Derived Unconscious badges and Knock out', () => {
       expect(within(badge).queryByRole('button', { name: /^Remove/ })).toBeNull();
     }
     expect(latest.conditions).toBeUndefined();
-    expect(screen.queryByText('No Conditions')).toBeNull();
+    expect(screen.queryByTestId('affecting-you-empty')).toBeNull();
   });
 
   it('does not show derived badges above 0 HP', () => {
     renderPage({ currentHp: 1 });
     expect(screen.queryByTestId('derived-unconscious')).toBeNull();
-    expect(screen.getByText('No Conditions')).toBeInTheDocument();
+    expect(screen.getByTestId('affecting-you-empty')).toBeInTheDocument();
   });
 
   it('does not duplicate Unconscious when it is also stored', () => {

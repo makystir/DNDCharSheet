@@ -1,4 +1,4 @@
-/* Weapons panel and Unarmed Strike card (Stage A5d).
+/* Attacks card: weapons plus the Unarmed Strike row (Stage A5d).
  * Presentation follows PWACharSheet WeaponCards.module.css: tertiary-background
  * cards, heading-font name on its own line, gold stat values, and a compact list
  * mode. ui-layout.md: line 1 is the full weapon name (wraps, never truncated);
@@ -18,8 +18,7 @@
   grid-template-columns: 1fr;
   gap: 0;
 }
-.weaponCard,
-.unarmedCard {
+.weaponCard {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -29,8 +28,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
-.weaponCard:focus-within,
-.unarmedCard:focus-within {
+.weaponCard:focus-within {
   border-color: var(--accent-gold);
 }
 .name {
@@ -163,11 +161,6 @@
 .manageLink:hover,
 .manageLink:focus-visible {
   text-decoration: underline;
-}
-.unarmedGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
 }
 
 /* Compact list view */

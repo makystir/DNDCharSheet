@@ -3,12 +3,14 @@ import { Lock, Swords, Target } from 'lucide-react';
 import type { Character } from '../../types/character';
 import type { MasteryProperty } from '../../data/weapons';
 import { proficiencyBonus } from '../../logic/abilities';
+import { effectiveAbilityScores } from '../../logic/feats';
 import { formatSigned } from '../../logic/breakdown';
 import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import {
   equippedWeapons,
   fireAmmo,
   matchingAmmunition,
+  unarmedStrike,
   weaponAttackProfile,
   type EquippedWeapon,
 } from '../../logic/attacks';
@@ -24,7 +26,6 @@ import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
-import { EmptyState } from '../shared/EmptyState';
 import { ViewModeToggle } from '../shared/ViewModeToggle';
 import { AttackRollControls } from './AttackRollControls';
 import styles from './WeaponCards.module.css';
@@ -54,9 +55,13 @@ const damageText = (dice: string, flat: number) => `${dice}${formatSigned(flat)}
  * weapons (equipped.weaponItemIds), so there are no add/edit/delete buttons (the
  * Inventory page owns equipping), no rune manager, and no drag reorder. The
  * mobile long-press context menu is phased.
+ *
+ * Combat declutter: this is the one "Attacks" card. It defaults to the compact
+ * list (one row per weapon) and ends with the Unarmed Strike row, which every
+ * character can make (PHB 2024 "Unarmed Strike"), so there is no separate card.
  */
 export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsProps) {
-  const { mode: viewMode, setMode: setViewMode } = useViewMode('viewmode-weapons', 'cards');
+  const { mode: viewMode, setMode: setViewMode } = useViewMode('viewmode-weapons', 'list');
   // Per-item "wielded two-handed" choice for Versatile weapons (UI state only).
   const [twoHanded, setTwoHanded] = useState<Record<string, boolean>>({});
   const weapons = equippedWeapons(character);
@@ -200,6 +205,19 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
       </>
     );
 
+    // Weapon properties (Finesse, Light, Thrown...) with their rule tooltips.
+    const chipList = chips.map((chip) =>
+      chip.tooltip ? (
+        <ContentTooltip key={chip.label} content={chip.tooltip} className={styles.chipTrigger}>
+          <span className={styles.chip}>{chip.label}</span>
+        </ContentTooltip>
+      ) : (
+        <span key={chip.label} className={styles.chip}>
+          {chip.label}
+        </span>
+      ),
+    );
+
     const proficiencyNote = !profile.proficiency.proficient && (
       <span className={styles.note}>Not proficient: {profile.proficiency.reason}</span>
     );
@@ -210,6 +228,7 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
           <span className={styles.name}>{weapon.name}</span>
           <div className={styles.statsLine}>
             {stats}
+            {chipList}
             {renderMastery(entry, profile.attack.abilityMod)}
             {attackButton}
           </div>
@@ -228,17 +247,7 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
           {attackButton}
         </div>
         <div className={styles.chipLine}>
-          {chips.map((chip) =>
-            chip.tooltip ? (
-              <ContentTooltip key={chip.label} content={chip.tooltip} className={styles.chipTrigger}>
-                <span className={styles.chip}>{chip.label}</span>
-              </ContentTooltip>
-            ) : (
-              <span key={chip.label} className={styles.chip}>
-                {chip.label}
-              </span>
-            ),
-          )}
+          {chipList}
           {renderMastery(entry, profile.attack.abilityMod)}
         </div>
         {proficiencyNote}
@@ -246,42 +255,69 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
     );
   };
 
+  // Unarmed Strike (PHB 2024 "Unarmed Strike"): attack, damage, grapple and shove DCs.
+  const strike = unarmedStrike(effectiveAbilityScores(character), pb);
+  // Static attack bonus is a D20 Test total: show the Exhaustion penalty (PHB 2024 L21024).
+  const strikeAttack = withExhaustion(strike.attack, exhaustionLevelOf(character));
+  const unarmedRow = (
+    <li
+      key="unarmed-strike"
+      className={viewMode === 'list' ? styles.listRow : styles.weaponCard}
+      data-testid="unarmed-strike-card"
+    >
+      <span className={styles.name}>Unarmed Strike</span>
+      <div className={styles.statsLine}>
+        <span className={styles.stat}>
+          <span className={styles.statLabel}>Attack</span>
+          <CalculatedValue label="Unarmed Strike attack bonus" breakdown={strikeAttack} className={styles.valueBtn}>
+            {formatSigned(strikeAttack.total)}
+          </CalculatedValue>
+        </span>
+        <span className={styles.stat}>
+          <span className={styles.statLabel}>Damage</span>
+          <CalculatedValue label="Unarmed Strike damage" breakdown={strike.damage} className={styles.valueBtn}>
+            {strike.damage.total} bludgeoning
+          </CalculatedValue>
+        </span>
+        <span className={styles.stat}>
+          <span className={styles.statLabel}>Grapple DC</span>
+          <CalculatedValue label="Grapple DC" breakdown={strike.grappleDc} className={styles.valueBtn} />
+        </span>
+        <span className={styles.stat}>
+          <span className={styles.statLabel}>Shove DC</span>
+          <CalculatedValue label="Shove DC" breakdown={strike.shoveDc} className={styles.valueBtn} />
+        </span>
+        <AttackRollControls
+          character={character}
+          name="Unarmed Strike"
+          attackModifiers={strike.attack.components}
+          damage={{ dice: String(strike.damage.total), flat: 0, breakdown: strike.damage, damageType: 'bludgeoning' }}
+        />
+      </div>
+    </li>
+  );
+
   return (
     <Card>
       <SectionHeader
         icon={Swords}
-        title="Weapons"
-        action={
-          weapons.length > 0 ? (
-            <ViewModeToggle mode={viewMode} onChange={setViewMode} label="Weapons view" />
-          ) : undefined
-        }
+        title="Attacks"
+        action={<ViewModeToggle mode={viewMode} onChange={setViewMode} label="Attacks view" />}
       />
-      {weapons.length === 0 && (
-        <EmptyState
-          icon={Swords}
-          heading="No weapons equipped"
-          description="Equip a weapon on the Inventory page to see its attack and damage here."
-          compact
-        />
-      )}
-      {weapons.length > 0 && (
-        <p className={styles.manageHint}>
-          Add, remove, or equip weapons on the{' '}
-          <a className={styles.manageLink} href="#inventory">
-            Inventory page
-          </a>
-          .
-        </p>
-      )}
-      {weapons.length > 0 && (
-        <ul
-          className={viewMode === 'list' ? styles.list : styles.cardGrid}
-          aria-label="Equipped weapons"
-        >
-          {weapons.map(renderCard)}
-        </ul>
-      )}
+      <p className={styles.manageHint}>
+        {weapons.length === 0 ? 'No weapons equipped. Equip one' : 'Add, remove, or equip weapons'} on the{' '}
+        <a className={styles.manageLink} href="#inventory">
+          Inventory page
+        </a>
+        .
+      </p>
+      <ul
+        className={viewMode === 'list' ? styles.list : styles.cardGrid}
+        aria-label="Equipped weapons"
+      >
+        {weapons.map(renderCard)}
+        {unarmedRow}
+      </ul>
       {unresolved > 0 && (
         <p className={styles.note}>
           {unresolved} equipped item{unresolved === 1 ? '' : 's'} could not be shown because{' '}

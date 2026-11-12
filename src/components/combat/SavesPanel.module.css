@@ -1,15 +1,23 @@
-﻿.grid {
+﻿/* Six compact chips in a row; three per row on a narrow screen. */
+.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+@media (max-width: 639px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 4px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -32,7 +40,7 @@
 
 .bonus {
   font-family: var(--font-heading);
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   color: var(--accent-gold);
   font-variant-numeric: tabular-nums;
 }
@@ -53,7 +61,10 @@
   min-height: 44px;
   min-width: 44px;
   margin-top: auto;
-  padding: 0 18px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-primary);
   background: var(--bg-secondary);
   border: 1px solid var(--accent-gold);

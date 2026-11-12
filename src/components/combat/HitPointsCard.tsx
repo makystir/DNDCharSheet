@@ -20,11 +20,15 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { ProgressBar, type ProgressBarLevel } from '../shared/ProgressBar';
 import { parseNumberInput } from '../pages/sheet-helpers';
+import { DeathSavesCard } from './DeathSavesCard';
+import { TakeDamagePanel } from './TakeDamagePanel';
 import styles from './HitPoints.module.css';
 
 export interface HitPointsCardProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** Optional app-level Toast sink (Concentration results after damage). */
+  onNotify?: (message: string) => void;
 }
 
 /** Severity of the HP bar, from the logic-derived life status. */
@@ -43,8 +47,12 @@ function barLevel(status: ReturnType<typeof lifeStatus>, bloodied: boolean): Pro
  * current / max). Deviations: the PWA tracks Wounds; D&D tracks Hit Points with
  * Temp HP, so the card also hosts Heal and Temp HP (the PWA has no healing
  * control on the dashboard). Every rule lives in logic/hit-points-state.ts.
+ *
+ * Combat declutter: everything about this character's Hit Points is in this one
+ * card. Death Saves appear in it only at 0 HP (healing and damage still apply
+ * there, so they stay available), then Take damage, then Heal and Temp HP.
  */
-export function HitPointsCard({ character, onChange }: HitPointsCardProps) {
+export function HitPointsCard({ character, onChange, onNotify }: HitPointsCardProps) {
   const [healRaw, setHealRaw] = useState('');
   const [tempRaw, setTempRaw] = useState('');
   const [pendingTemp, setPendingTemp] = useState<number | null>(null);
@@ -181,7 +189,15 @@ export function HitPointsCard({ character, onChange }: HitPointsCardProps) {
         />
       )}
 
-      {/* Line 2: controls. */}
+      <DeathSavesCard character={character} onChange={onChange} />
+
+      <TakeDamagePanel character={character} onChange={onChange} onNotify={onNotify} />
+
+      {/* Heal and Temp HP. */}
+      <section className={styles.subsection} aria-labelledby="heal-heading">
+      <h4 id="heal-heading" className={styles.subheading}>
+        Heal
+      </h4>
       <div className={styles.controls}>
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel} htmlFor="hp-heal-amount">
@@ -271,6 +287,7 @@ export function HitPointsCard({ character, onChange }: HitPointsCardProps) {
       >
         {status}
       </div>
+      </section>
     </Card>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Skull } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { exhaustionEffects, exhaustionLevelOf } from '../../logic/conditions';
 import {
@@ -12,8 +11,6 @@ import {
 } from '../../logic/hit-points-state';
 import { resolveHitPointRuleTooltip } from '../../logic/tooltip-content';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
-import { Card } from '../shared/Card';
-import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
@@ -67,7 +64,8 @@ function announce(roll: DeathSaveRoll, advance: DeathSaveAdvance): string {
 }
 
 /**
- * Death Saves widget for the Combat tab (Stage A5a): three success pips, three
+ * Death Saves section of the Combat page's Hit Points card (Stage A5a; folded
+ * into the HP card in the Combat declutter): three success pips, three
  * failure pips, a Roll / Enter-result button that opens the shared RollPrompt
  * (with the Exhaustion line, decision D1), Stable and Dead states, and an
  * aria-live announcement of each result.
@@ -124,11 +122,10 @@ export function DeathSavesCard({ character, onChange, rollRequest = 0 }: DeathSa
         {status}
       </div>
       {relevant && (
-        <Card>
-          <SectionHeader
-            icon={Skull}
-            title={deathTip ? <ContentTooltip content={deathTip}>Death Saves</ContentTooltip> : 'Death Saves'}
-          />
+        <section className={styles.subsection} aria-labelledby="death-saves-heading">
+          <h4 id="death-saves-heading" className={styles.subheading}>
+            {deathTip ? <ContentTooltip content={deathTip}>Death Saves</ContentTooltip> : 'Death Saves'}
+          </h4>
 
           <div className={styles.pipRow}>
             <Pips kind="success" filled={saves.successes} />
@@ -193,7 +190,7 @@ export function DeathSavesCard({ character, onChange, rollRequest = 0 }: DeathSa
               onCancel={() => setConfirmStable(false)}
             />
           )}
-        </Card>
+        </section>
       )}
     </>
   );

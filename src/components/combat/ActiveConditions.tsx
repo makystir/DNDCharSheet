@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import type { CSSProperties } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import type { Character } from '../../types/character';
 import {
   CONDITION_COLORS,
@@ -18,12 +16,7 @@ import {
   setExhaustion,
 } from '../../logic/conditions';
 import { resolveConditionTooltip, resolveExhaustionLevelTooltip } from '../../logic/tooltip-content';
-import { derivedConditionIds, knockOut } from '../../logic/hit-points-state';
-import { Card } from '../shared/Card';
-import { ConfirmDialog } from '../shared/ConfirmDialog';
-import { SectionHeader } from '../shared/SectionHeader';
-import { EmptyState } from '../shared/EmptyState';
-import { AddButton } from '../shared/AddButton';
+import { derivedConditionIds } from '../../logic/hit-points-state';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { ConditionPicker } from './ConditionPicker';
@@ -33,6 +26,9 @@ import styles from './ActiveConditions.module.css';
 export interface ActiveConditionsProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** The condition picker is open (its button lives in the "Affecting you" card header). */
+  pickerOpen: boolean;
+  onClosePicker: () => void;
 }
 
 /**
@@ -46,17 +42,18 @@ export interface ActiveConditionsProps {
  * Stage A5a additions (decision D2): conditions the character has because it is
  * at 0 HP (Unconscious plus the Incapacitated and Prone it implies) are shown as
  * read-only "from 0 HP" badges and are never written to `character.conditions`;
- * a separate, explicit "Knock out" button WRITES Unconscious (ends 'Short Rest').
+ * a separate, explicit "Knock out" button WRITES Unconscious (ends 'Short Rest');
+ * it lives with Take damage on the Hit Points card.
+ *
+ * Combat declutter: this is the conditions part of the "Affecting you" card. It
+ * renders nothing but the picker when there is nothing to list.
  */
-export function ActiveConditions({ character, onChange }: ActiveConditionsProps) {
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [confirmKnockOut, setConfirmKnockOut] = useState(false);
+export function ActiveConditions({ character, onChange, pickerOpen, onClosePicker }: ActiveConditionsProps) {
   // De-duplicate by id so hand-edited/imported data cannot yield duplicate keys.
   const active = (character.conditions ?? []).filter((c, i, arr) => arr.findIndex((o) => o.id === c.id) === i);
   const exhaustion = exhaustionLevelOf(character);
   // Read-only conditions derived from 0 HP (never stored; decision D2).
   const derived = derivedConditionIds(character);
-  const canKnockOut = knockOut(character) !== null;
   const isEmpty = active.length === 0 && exhaustion === 0 && derived.length === 0;
 
   const badgeStyle = (id: ConditionId): CSSProperties => {
@@ -74,34 +71,9 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
   const exhaustionTooltip = exhaustion > 0 ? resolveExhaustionLevelTooltip(exhaustion) : null;
 
   return (
-    <Card>
-      <SectionHeader
-        icon={AlertTriangle}
-        title="Active Conditions"
-        action={
-          <div className={styles.headerActions}>
-            <button
-              type="button"
-              className={styles.knockBtn}
-              disabled={!canKnockOut}
-              title="A melee attack that would reduce a creature to 0 HP can leave it at 1 HP and Unconscious instead"
-              onClick={() => setConfirmKnockOut(true)}
-            >
-              Knock out
-            </button>
-            <AddButton label="Add Condition" onClick={() => setPickerOpen(true)} />
-          </div>
-        }
-      />
-      {isEmpty ? (
-        <EmptyState
-          compact
-          icon={AlertTriangle}
-          heading="No Conditions"
-          description="No active conditions. Use Add Condition to apply one."
-        />
-      ) : (
-        <div className={styles.list} data-testid="active-conditions">
+    <>
+      {!isEmpty && (
+        <div className={styles.list} data-testid="active-conditions" role="group" aria-label="Active conditions">
           {active.map((cond) => {
             const data = getCondition(cond.id);
             const tip = resolveConditionTooltip(cond.id);
@@ -243,28 +215,15 @@ export function ActiveConditions({ character, onChange }: ActiveConditionsProps)
         </div>
       )}
 
-      {confirmKnockOut && (
-        <ConfirmDialog
-          message="Knock out the character? Hit Points become 1 and the Unconscious condition is added (ends after a Short Rest)."
-          confirmLabel="Knock out"
-          onConfirm={() => {
-            setConfirmKnockOut(false);
-            const next = knockOut(character);
-            if (next) onChange(next);
-          }}
-          onCancel={() => setConfirmKnockOut(false)}
-        />
-      )}
-
       {pickerOpen && (
         <ConditionPicker
           conditions={active}
           exhaustionLevel={exhaustion}
           onApply={(id) => onChange(addCondition(character, id))}
           onRemove={(id) => onChange(dropCondition(character, id))}
-          onClose={() => setPickerOpen(false)}
+          onClose={onClosePicker}
         />
       )}
-    </Card>
+    </>
   );
 }
