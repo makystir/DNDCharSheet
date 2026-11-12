@@ -369,3 +369,31 @@
     padding-top: 2px;
   }
 }
+
+/* Count badge over a nav icon (for example the choices a character owes). */
+.navBadge {
+  position: absolute;
+  top: -6px;
+  right: -9px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background-color: var(--accent-gold);
+  color: var(--bg-secondary);
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* The collapsed rule above hides every span in the item; keep the icon wrapper
+   (and so its badge) visible. */
+.navItemCollapsed .iconWrapper {
+  display: inline-flex;
+}
+
+.navItemCollapsed .navBadge {
+  display: block;
+}

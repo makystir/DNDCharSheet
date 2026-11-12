@@ -45,6 +45,24 @@ interface NavigationProps {
   assistantCount?: number;
 }
 
+/** Accessible name for a nav item, announcing its badge count when it has one. */
+function badgeLabel(label: string, count: number | undefined, forceLabel = false): string | undefined {
+  if (count !== undefined && count > 0) {
+    return `${label}, ${count} ${count === 1 ? 'choice' : 'choices'} to make`;
+  }
+  return forceLabel ? label : undefined;
+}
+
+/** The small count pill over a nav icon. Hidden from assistive tech: the button's name carries the count. */
+function NavBadge({ count }: { count: number | undefined }) {
+  if (count === undefined || count <= 0) return null;
+  return (
+    <span className={styles.navBadge} aria-hidden="true" data-testid="nav-badge">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
 function getInitialCollapsed(): boolean {
   try {
     return localStorage.getItem('nav-collapsed') === 'true';
@@ -80,6 +98,12 @@ export function Navigation({
   // Items visible for the active character: the conditional Spells tab is
   // filtered out for a non-caster (or a sub-caster below its casting level).
   const navItems = visibleNavItems(character);
+  // Badge counts (for example the choices a character owes), keyed by nav item.
+  const badgeCounts: Partial<Record<PageSection, number>> = {};
+  for (const item of navItems) {
+    const n = character && item.badge ? item.badge(character) : 0;
+    if (n > 0) badgeCounts[item.id] = n;
+  }
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => {
@@ -149,10 +173,12 @@ export function Navigation({
             onClick={() => onPageChange(item.id)}
             onTouchEnd={(e) => handleNavTouchEnd(e, item.id)}
             aria-current={isActive ? 'page' : undefined}
+            aria-label={badgeLabel(item.label, badgeCounts[item.id])}
             data-section={item.id}
           >
             <span className={styles.iconWrapper}>
               <Icon size={18} />
+              <NavBadge count={badgeCounts[item.id]} />
             </span>
             <span className={styles.mobileLabelRow}>
               {item.label}
@@ -222,12 +248,13 @@ export function Navigation({
           onClick={() => onPageChange(item.id)}
           onTouchEnd={(e) => handleNavTouchEnd(e, item.id)}
           aria-current={isActive ? 'page' : undefined}
-          aria-label={collapsed ? item.label : undefined}
+          aria-label={badgeLabel(item.label, badgeCounts[item.id], collapsed)}
           title={collapsed ? item.label : undefined}
           data-section={item.id}
         >
           <span className={styles.iconWrapper}>
             <Icon size={18} />
+            <NavBadge count={badgeCounts[item.id]} />
           </span>
           {!collapsed && (
             <span className={styles.navItemLabel}>

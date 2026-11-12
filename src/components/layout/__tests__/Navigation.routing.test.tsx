@@ -56,7 +56,11 @@ async function renderApp() {
 }
 
 function navButton(label: string) {
-  return screen.getByRole('button', { name: label });
+  // A nav item may carry a count badge in its name ("Advancement, 3 choices to make"),
+  // so match the label followed by the end or that suffix.
+  return screen.getByRole('button', {
+    name: new RegExp(`^${label}(, \\d+ choices? to make)?$`),
+  });
 }
 
 describe('Navigation routing (shell)', () => {

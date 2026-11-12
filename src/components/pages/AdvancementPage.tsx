@@ -16,7 +16,7 @@ import {
   proficiencyBonusBreakdown,
   MAX_LEVEL,
 } from '../../logic/abilities';
-import { resolveClass, resolveSubclass, resolveClasses } from '../../logic/classes';
+import { resolveClass, resolveClasses } from '../../logic/classes';
 import { effectiveAbilityScores } from '../../logic/feats';
 import { multiclassOptions, type MulticlassOption } from '../../logic/multiclass';
 import { getClass, type ClassId } from '../../data/classes';
@@ -27,7 +27,6 @@ import {
   applyMulticlassLevel,
   canLevelUp,
   characterXp,
-  featSlotLevels,
   hitPointMaxWithAdvancement,
   hpChoiceTooltip,
   levelingMode,
@@ -40,15 +39,12 @@ import {
   type HpChoice,
   type LevelingMode,
 } from '../../logic/advancement';
-import { featSlotAssignments, fightingStyleSlots } from '../../logic/feats';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { FightingStyleSection } from './advancement/FightingStyleSection';
 import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
 import { AdvancementPlanner } from './advancement/AdvancementPlanner';
 import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
-import { expertiseStatus } from '../../logic/expertise';
 import { LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
-import { languagePicksStatus } from '../../logic/language-picks';
 import {
   ClassChoicesPending,
   ClassChoicesOverNote,
@@ -56,10 +52,8 @@ import {
   MulticlassPicksOverNote,
   MulticlassPicksPending,
 } from './advancement/ClassChoicesPending';
-import { choiceStatus } from '../../logic/class-choices';
-import { pendingMulticlassPicks } from '../../logic/multiclass-picks';
-import { pendingSpellPicks, spellPickLabel } from '../../logic/spell-picks-pending';
-import { illegalSpellSelections } from '../../logic/spellcasting';
+import { spellPickLabel } from '../../logic/spell-picks-pending';
+import { pendingChoices } from '../../logic/pending-choices';
 import { SpellNameList } from '../shared/SpellName';
 import { useXpAward } from './useXpAward';
 import styles from './AdvancementPage.module.css';
@@ -107,7 +101,6 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
     useXpAward((mutator) => onChange(mutator(character)), now);
 
   const cls = resolveClass(character);
-  const subclass = resolveSubclass(character);
   const level = clampLevel(character.level);
   const mode = levelingMode(character);
   const xp = characterXp(character);
@@ -233,51 +226,20 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const log = advancementLog(character);
   const hpTip = hpChoiceTooltip(character);
 
-  // ── Choices pending: UNFILLED feat slots at asi-marker levels, the subclass
-  //    not chosen at level >= subclassLevel, and any level missing an HP record.
-  //    All read from the logic; none computed here.
-  const unfilledFeatLevels = featSlotAssignments(character, featSlotLevels(character))
-    .filter((a) => a.filled === undefined)
-    .map((a) => a.level);
-  const subclassDue =
-    cls !== undefined && level >= cls.subclassLevel && subclass === undefined;
-  const recordedHpLevels = new Set(
-    (character.advancement?.levels ?? []).filter((l) => l.hp !== undefined).map((l) => l.level),
-  );
-  const unrecordedHpLevels: number[] = [];
-  for (let l = 2; l <= level; l += 1) {
-    if (!recordedHpLevels.has(l)) unrecordedHpLevels.push(l);
-  }
-  // Expertise owed by class features (Bard, Ranger, Rogue, Wizard) but not yet
-  // chosen counts as one pending item (the picker is rendered inline below).
-  const expertise = expertiseStatus(character);
-  // Class-feature choices (Metamagic, Invocations, Maneuvers, Divine/Primal Order,
-  // ...) and multiclass skill/instrument picks: one pending item per group.
-  // Feature languages owed (Rogue L1 Thieves' Cant, Ranger L2 Deft Explorer): one item.
-  const languagePicks = languagePicksStatus(character);
-  const classChoices = choiceStatus(character);
-  const pendingClassChoiceCount = classChoices.filter((s) => s.remaining > 0).length;
-  const pendingMulticlassCount = pendingMulticlassPicks(character).length;
-  // Newly owed spell picks (cantrips, spellbook, prepared, Mystic Arcanum): one item
-  // each, made on the Spells page. Same source as the Overview "Finish setting up" card.
-  const spellPicks = pendingSpellPicks(character);
-  // Spell picks stored on the sheet that are not on the class's spell list (an import,
-  // an older save, a class or subclass change). Fixed on the Spells page.
-  const illegalSpells = illegalSpellSelections(character);
-  // A class with the Fighting Style feature (Fighter 1, Paladin 2, Ranger 2) that
-  // has not picked its Fighting Style feat yet is one pending choice per class.
-  const unfilledFightingStyles = fightingStyleSlots(character).filter((s) => s.filled === undefined);
-  const pendingCount =
-    unfilledFightingStyles.length +
-    unfilledFeatLevels.length +
-    (subclassDue ? 1 : 0) +
-    unrecordedHpLevels.length +
-    (expertise.remaining > 0 ? 1 : 0) +
-    (languagePicks.remaining > 0 ? 1 : 0) +
-    pendingClassChoiceCount +
-    pendingMulticlassCount +
-    spellPicks.length +
-    (illegalSpells.length > 0 ? 1 : 0);
+  // Everything still owed (feat slots, subclass, HP records, expertise, languages,
+  // class choices, spell picks, ...). Shared with the nav badge so the counts agree.
+  const {
+    unfilledFeatLevels,
+    subclassDue,
+    unrecordedHpLevels,
+    expertise,
+    languagePicks,
+    classChoices,
+    spellPicks,
+    illegalSpells,
+    unfilledFightingStyles,
+    total: pendingCount,
+  } = pendingChoices(character);
 
   // The pending-choices card. When choices are owed it is shown first and styled as a
   // call to action; with none owed it stays a quiet note at the bottom of the page.

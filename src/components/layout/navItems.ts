@@ -2,6 +2,7 @@ import { User, Swords, Sparkles, Settings, Backpack, TrendingUp, PawPrint } from
 import type { LucideIcon } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { anySpellcaster } from '../../logic/spellcasting';
+import { pendingChoiceCount } from '../../logic/pending-choices';
 
 /**
  * The routing key for a top-level page. This is the single source of truth for
@@ -37,6 +38,12 @@ export interface NavItem {
    * tab (shown only to a spellcaster at/above its casting level).
    */
   predicate?: (character: Character) => boolean;
+  /**
+   * Optional count shown as a badge on the nav item (for example the choices a
+   * character still owes). 0 shows nothing. Derived from the character, so the
+   * badge and the page it points to always agree.
+   */
+  badge?: (character: Character) => number;
 }
 
 /**
@@ -94,6 +101,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: TrendingUp,
     shortcut: '6',
     subTabHint: 'Level · Hit Points · Next level · Log',
+    badge: pendingChoiceCount,
   },
   // Companions: an UNCONDITIONAL top-level tab (permanent creature companions,
   // mounts, hirelings and NPC party members; any character may keep a pet or hire

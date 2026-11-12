@@ -369,7 +369,7 @@ You can take levels in a **second class** instead of your current one. The 2024 
 
 ### Choices Pending and Class Choices
 
-Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, a **subclass**, a **feat**, spells, or class options like **Metamagic** or **Eldritch Invocations**. When you owe any choices, the **Choices Pending** card moves to the **top** of the page with a gold border and the heading **Action needed**, so you can't miss it. Work through the items in it. Each one either lets you pick right there or links to the page where you make the choice. The list gets shorter as you finish, and when nothing is owed the card drops to a quiet note near the bottom. The Overview's **Finish setting up** card also reminds you.
+Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, a **subclass**, a **feat**, spells, or class options like **Metamagic** or **Eldritch Invocations**. When you owe any choices, the **Choices Pending** card moves to the **top** of the page with a gold border and the heading **Action needed**, so you can't miss it. Work through the items in it. Each one either lets you pick right there or links to the page where you make the choice. The list gets shorter as you finish, and when nothing is owed the card drops to a quiet note near the bottom. The **Advancement** tab in the main menu also shows a small gold badge with the number of choices you owe, on every page, so you know there is something to do before you open it. The Overview's **Finish setting up** card also reminds you.
 
 ### Advancement Log
 
