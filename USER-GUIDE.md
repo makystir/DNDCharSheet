@@ -238,7 +238,7 @@ The Character page has three sub-tabs: **Overview**, **Abilities & Skills**, and
 
 Your at-a-glance page, and the one you'll use most during play. From top to bottom you'll find:
 
-- **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them.
+- **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them. An empty field has a 🎲 that rolls a suggestion; once the field has something in it, the 🎲 goes away. Clear the field to get it back.
 - **Finish setting up:** a checklist of choices you haven't made yet, such as skills or spells. It disappears when everything is done.
 - **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more. **Adjust** (closed at first) holds an Armor Class override and an initiative bonus, for anything the app doesn't know about.
 - **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets.

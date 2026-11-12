@@ -46,10 +46,16 @@ interface RollButtonProps {
   title: string;
   onClick: () => void;
   disabled?: boolean;
+  /**
+   * The field already has a value: the 🎲 is no longer needed, so an empty slot
+   * of the same size takes its place (the inputs stay lined up).
+   */
+  filled?: boolean;
 }
 
 /** The fixed-size 🎲 button that ends every field's control row. */
-function RollButton({ label, title, onClick, disabled }: RollButtonProps) {
+function RollButton({ label, title, onClick, disabled, filled }: RollButtonProps) {
+  if (filled) return <RollSlotPlaceholder />;
   return (
     <button
       type="button"
@@ -64,6 +70,9 @@ function RollButton({ label, title, onClick, disabled }: RollButtonProps) {
     </button>
   );
 }
+
+/** A field counts as filled once it holds anything but whitespace. */
+const isFilled = (value: string | undefined): boolean => (value ?? '').trim() !== '';
 
 /**
  * An empty slot the same size as a RollButton, for fields with nothing to roll
@@ -204,6 +213,7 @@ export function PersonalDetailsSection({
           title={canGenerate ? rollTitle : needSpecies}
           onClick={() => rollAppearanceField(field)}
           disabled={!canGenerate}
+          filled={isFilled(character[field])}
         />
       }
     />
@@ -252,6 +262,7 @@ export function PersonalDetailsSection({
                       title={canGenerate ? 'Roll a name for the current species + gender' : needSpecies}
                       onClick={rollName}
                       disabled={!canGenerate}
+                      filled={isFilled(character.name)}
                     />
                   }
                 />
@@ -322,7 +333,14 @@ export function PersonalDetailsSection({
                       </select>
                     </>
                   }
-                  roll={<RollButton label="Roll alignment" title="Roll alignment" onClick={rollAlignment} />}
+                  roll={
+                    <RollButton
+                      label="Roll alignment"
+                      title="Roll alignment"
+                      onClick={rollAlignment}
+                      filled={isFilled(character.alignment)}
+                    />
+                  }
                 />
 
                 {/* Faith / Deity is a COMBO: a <datalist> of the 27 Gods of
@@ -361,7 +379,14 @@ export function PersonalDetailsSection({
                       </datalist>
                     </>
                   }
-                  roll={<RollButton label="Roll deity" title="Roll a random deity" onClick={rollFaith} />}
+                  roll={
+                    <RollButton
+                      label="Roll deity"
+                      title="Roll a random deity"
+                      onClick={rollFaith}
+                      filled={isFilled(character.faith)}
+                    />
+                  }
                 />
 
                 <FieldCell
@@ -373,6 +398,7 @@ export function PersonalDetailsSection({
                       title={canGenerate ? 'Roll an age for the current species' : needSpecies}
                       onClick={rollAge}
                       disabled={!canGenerate}
+                      filled={isFilled(character.age)}
                     />
                   }
                 />
@@ -494,11 +520,13 @@ export function PersonalDetailsSection({
                   <label className={styles.fieldLabel} htmlFor={personalityId}>
                     Personality
                   </label>
-                  <RollButton
-                    label="Roll personality"
-                    title="Roll a personality trait"
-                    onClick={rollPersonality}
-                  />
+                  {!isFilled(character.personality) && (
+                    <RollButton
+                      label="Roll personality"
+                      title="Roll a personality sketch that fits your alignment"
+                      onClick={rollPersonality}
+                    />
+                  )}
                 </div>
                 <textarea
                   id={personalityId}

@@ -108,7 +108,7 @@ describe('PersonalDetailsSection', () => {
   });
 
   it('name/appearance roll buttons are disabled until a species is chosen', () => {
-    renderSection();
+    renderSection({ name: '' });
     expect(screen.getByRole('button', { name: 'Roll name' })).toBeDisabled();
     for (const field of ['height', 'weight', 'eyes', 'hair', 'skin']) {
       expect(screen.getByRole('button', { name: `Roll ${field}` })).toBeDisabled();
@@ -116,7 +116,7 @@ describe('PersonalDetailsSection', () => {
   });
 
   it('rolling a name fills character.name from the species+gender pools', () => {
-    const { onChange } = renderSection({ species: { id: 'dwarf' }, gender: 'male' });
+    const { onChange } = renderSection({ species: { id: 'dwarf' }, gender: 'male', name: '' });
     fireEvent.click(screen.getByRole('button', { name: 'Roll name' }));
     const rolled = onChange.mock.calls.at(-1)?.[0].name;
     expect(typeof rolled).toBe('string');
@@ -161,7 +161,7 @@ describe('PersonalDetailsSection', () => {
   });
 
   it('every cell ends with exactly one roll slot; Gender reserves an empty one', () => {
-    renderSection();
+    renderSection({ name: '' });
     const grid = screen.getByTestId('personal-details-grid');
     for (const cell of [...grid.children]) {
       const slots = cell.querySelectorAll('[data-roll-slot]');
@@ -221,5 +221,36 @@ describe('PersonalDetailsSection', () => {
     renderSection({ species: { id: 'human' } });
     expect(screen.getByRole('combobox', { name: 'Size' })).toBeInTheDocument();
     expect(screen.queryByTestId('pd-size-value')).toBeNull();
+  });
+});
+
+describe('PersonalDetailsSection dice on filled fields', () => {
+  it('hides the 🎲 once a field has a value, keeping an empty slot so inputs stay aligned', () => {
+    renderSection({
+      name: 'Tess',
+      species: { id: 'dwarf' },
+      alignment: 'Lawful Good',
+      faith: 'Moradin',
+      age: '40',
+      eyes: 'Grey',
+      personality: 'Gruff but kind.',
+    });
+    for (const label of ['Roll name', 'Roll alignment', 'Roll deity', 'Roll age', 'Roll eyes', 'Roll personality']) {
+      expect(screen.queryByRole('button', { name: label }), label).toBeNull();
+    }
+    // Empty fields still offer the dice.
+    for (const label of ['Roll height', 'Roll weight', 'Roll hair', 'Roll skin']) {
+      expect(screen.getByRole('button', { name: label }), label).toBeInTheDocument();
+    }
+    // Every grid cell still ends in exactly one roll slot (button or placeholder).
+    const grid = screen.getByTestId('personal-details-grid');
+    for (const cell of [...grid.children]) {
+      expect(cell.querySelectorAll('[data-roll-slot]')).toHaveLength(1);
+    }
+  });
+
+  it('brings the 🎲 back when a field is cleared (whitespace counts as empty)', () => {
+    renderSection({ name: '   ', species: { id: 'dwarf' } });
+    expect(screen.getByRole('button', { name: 'Roll name' })).toBeInTheDocument();
   });
 });
