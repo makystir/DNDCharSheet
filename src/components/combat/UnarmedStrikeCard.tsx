@@ -1,11 +1,11 @@
-import { Hand, Swords } from 'lucide-react';
+import { Hand } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { proficiencyBonus } from '../../logic/abilities';
 import { formatSigned } from '../../logic/breakdown';
 import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import { unarmedStrike } from '../../logic/attacks';
 import { effectiveAbilityScores } from '../../logic/feats';
-import { UNARMED_ATTACK_ID } from '../../logic/attack-flow';
+import { AttackRollControls } from './AttackRollControls';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -13,8 +13,6 @@ import styles from './WeaponCards.module.css';
 
 export interface UnarmedStrikeCardProps {
   character: Character;
-  /** Called with `UNARMED_ATTACK_ID` when Attack is pressed. Disabled without it. */
-  onAttack?: (weaponItemId: string) => void;
 }
 
 /**
@@ -22,7 +20,7 @@ export interface UnarmedStrikeCardProps {
  * each a CalculatedValue over the Breakdown from logic/attacks.ts `unarmedStrike`
  * (PHB 2024 "Unarmed Strike"). Always shown: every character can make one.
  */
-export function UnarmedStrikeCard({ character, onAttack }: UnarmedStrikeCardProps) {
+export function UnarmedStrikeCard({ character }: UnarmedStrikeCardProps) {
   const strike = unarmedStrike(effectiveAbilityScores(character), proficiencyBonus(character.level));
   // Static attack bonus is a D20 Test total: show the Exhaustion penalty (PHB 2024 L21024).
   const attack = withExhaustion(strike.attack, exhaustionLevelOf(character));
@@ -52,16 +50,13 @@ export function UnarmedStrikeCard({ character, onAttack }: UnarmedStrikeCardProp
             <span className={styles.statLabel}>Shove DC</span>
             <CalculatedValue label="Shove DC" breakdown={strike.shoveDc} className={styles.valueBtn} />
           </span>
-          <button
-            type="button"
-            className={styles.attackBtn}
-            disabled={!onAttack}
-            onClick={() => onAttack?.(UNARMED_ATTACK_ID)}
-            aria-label="Attack with Unarmed Strike"
-          >
-            <Swords size={16} aria-hidden="true" /> Attack
-          </button>
         </div>
+        <AttackRollControls
+          character={character}
+          name="Unarmed Strike"
+          attackModifiers={strike.attack.components}
+          damage={{ dice: String(strike.damage.total), flat: 0, breakdown: strike.damage, damageType: 'bludgeoning' }}
+        />
       </div>
     </Card>
   );

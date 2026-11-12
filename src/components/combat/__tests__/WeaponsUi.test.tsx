@@ -7,9 +7,7 @@ import type { ClassId } from '../../../data/classes';
 import { createCharacter } from '../../../storage/character-store';
 
 let latest: Character;
-const onAttack = vi.fn();
-
-function Harness({ initial, attack = true }: { initial: Character; attack?: boolean }) {
+function Harness({ initial }: { initial: Character }) {
   const [character, setCharacter] = useState<Character>(initial);
   return (
     <CombatPage
@@ -18,7 +16,6 @@ function Harness({ initial, attack = true }: { initial: Character; attack?: bool
         latest = next;
         setCharacter(next);
       }}
-      onAttack={attack ? onAttack : undefined}
     />
   );
 }
@@ -44,9 +41,9 @@ function fighter(overrides: Partial<Character> = {}): Character {
   };
 }
 
-function renderPage(initial: Character, attack = true) {
+function renderPage(initial: Character) {
   latest = initial;
-  return render(<Harness initial={initial} attack={attack} />);
+  return render(<Harness initial={initial} />);
 }
 
 /** Open a CalculatedValue / ContentTooltip trigger and return the tooltip. */
@@ -57,7 +54,6 @@ function openTooltip(name: RegExp | string) {
 
 beforeEach(() => {
   localStorage.clear();
-  onAttack.mockReset();
 });
 afterEach(() => localStorage.clear());
 
@@ -79,7 +75,7 @@ describe('Weapons panel', () => {
     renderPage(withSword());
     const card = screen.getByTestId('weapon-card-w1');
     expect(within(card).getByText('Longsword')).toBeTruthy();
-    expect(within(card).getByRole('button', { name: 'Attack with Longsword' })).toBeTruthy();
+    expect(within(card).getByRole('button', { name: 'Roll attack with Longsword' })).toBeTruthy();
   });
 
   it('shows the attack bonus as a CalculatedValue with its zero-inclusive breakdown', () => {
@@ -103,7 +99,7 @@ describe('Weapons panel', () => {
 
   it('has no versatile toggle on a weapon without Versatile', () => {
     renderPage(fighter({ inventory: [weapon('w1', 'greatsword')], equipped: { weaponItemIds: ['w1'] } }));
-    expect(within(screen.getByTestId('weapon-card-w1')).queryByRole('checkbox')).toBeNull();
+    expect(within(screen.getByTestId('weapon-card-w1')).queryByRole('checkbox', { name: /two-handed/ })).toBeNull();
   });
 
   it('shows property chips with tooltips', () => {
@@ -147,17 +143,33 @@ describe('Weapons panel', () => {
     expect(screen.getByRole('button', { name: /Greatsword Graze damage/ }).textContent).toBe('3');
   });
 
-  it('calls the onAttack observer with the weapon item id, and opens the Attack Flow with or without it', () => {
-    const { unmount } = renderPage(withSword());
-    fireEvent.click(screen.getByRole('button', { name: 'Attack with Longsword' }));
-    expect(onAttack).toHaveBeenCalledWith('w1');
-    expect(screen.getByTestId('attack-flow')).toBeTruthy();
-    unmount();
-    renderPage(withSword(), false);
-    const button = screen.getByRole('button', { name: 'Attack with Longsword' }) as HTMLButtonElement;
-    expect(button.disabled).toBe(false);
-    fireEvent.click(button);
-    expect(screen.getByTestId('attack-flow')).toBeTruthy();
+  it('rolls an attack (total for the DM) and damage, with a Critical Hit toggle', () => {
+    renderPage(withSword());
+    const card = screen.getByTestId('weapon-card-w1');
+    fireEvent.click(within(card).getByRole('button', { name: 'Roll attack with Longsword' }));
+    expect(screen.getByRole('dialog', { name: 'Longsword attack' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.getByTestId('attack-result-Longsword').textContent).toMatch(/^Attack: \d+ \(rolled \d+\)/);
+    fireEvent.click(within(card).getByRole('button', { name: 'Roll damage for Longsword' }));
+    expect(screen.getByTestId('attack-result-Longsword').textContent).toMatch(/Damage: \d+ slashing \(1d8: \d+ \+ 3\)/);
+    fireEvent.click(within(card).getByRole('checkbox', { name: /Longsword Critical Hit/ }));
+    fireEvent.click(within(card).getByRole('button', { name: 'Roll damage for Longsword' }));
+    expect(screen.getByTestId('attack-result-Longsword').textContent).toMatch(/Damage: \d+ slashing \(2d8: \d+ \+ \d+ \+ 3\), Critical Hit/);
+  });
+
+  it('with manual dice, damage says what to roll', () => {
+    localStorage.setItem('dnd-dice-entry-mode', 'manual');
+    renderPage(withSword());
+    fireEvent.click(screen.getByRole('button', { name: 'Roll damage for Longsword' }));
+    expect(screen.getByTestId('attack-result-Longsword').textContent).toBe('Roll 1d8+3 slashing.');
+  });
+
+  it('starts the attack roll with Disadvantage while Poisoned', () => {
+    renderPage(withSword({ conditions: [{ id: 'poisoned' }] }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll attack with Longsword' }));
+    expect(screen.getByRole('radio', { name: 'Disadvantage' })).toBeChecked();
+    expect(screen.getByText(/Poisoned: Disadvantage/)).toBeTruthy();
   });
 
   it('switches between card and list view and keeps the full name and Attack button', () => {
@@ -166,8 +178,7 @@ describe('Weapons panel', () => {
     const row = screen.getByTestId('weapon-list-row-w1');
     expect(within(row).getByText('Longsword')).toBeTruthy();
     expect(within(row).getByRole('button', { name: /Longsword attack bonus/ })).toBeTruthy();
-    fireEvent.click(within(row).getByRole('button', { name: 'Attack with Longsword' }));
-    expect(onAttack).toHaveBeenCalledWith('w1');
+    expect(within(row).getByRole('button', { name: 'Roll attack with Longsword' })).toBeTruthy();
     fireEvent.click(screen.getByRole('radio', { name: 'Card view' }));
     expect(screen.getByTestId('weapon-card-w1')).toBeTruthy();
   });
@@ -209,10 +220,11 @@ describe('Unarmed Strike card', () => {
     expect(openTooltip(/Unarmed Strike damage/).textContent).toContain('Cannot go below 0');
   });
 
-  it('calls onAttack with the unarmed id', () => {
+  it('rolls an Unarmed Strike attack and its fixed damage', () => {
     renderPage(fighter());
-    fireEvent.click(screen.getByRole('button', { name: 'Attack with Unarmed Strike' }));
-    expect(onAttack).toHaveBeenCalledWith('unarmed');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll damage for Unarmed Strike' }));
+    expect(screen.getByTestId('attack-result-Unarmed Strike').textContent).toBe('Damage: 4 bludgeoning (4)');
+    expect(screen.queryByRole('checkbox', { name: /Unarmed Strike Critical Hit/ })).toBeNull();
   });
 });
 
@@ -260,6 +272,23 @@ describe('Ammunition tracker', () => {
     fireEvent.click(screen.getByRole('button', { name: /Recover half of the Arrows fired/ }));
     expect(latest.inventory?.find((i) => i.id === 'a1')?.quantity).toBe(18);
     expect(screen.getByTestId('ammo-used-a1').textContent).toBe('0');
+  });
+
+  it('an attack roll with a bow uses one arrow, shown on the weapon card and counted as fired', () => {
+    renderPage(archer(20));
+    expect(screen.getByTestId('weapon-ammo-w1').textContent).toContain('20 Arrows');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll attack with Longbow' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(latest.inventory?.find((i) => i.id === 'a1')?.quantity).toBe(19);
+    expect(screen.getByTestId('weapon-ammo-w1').textContent).toContain('19 Arrows');
+    expect(screen.getByTestId('ammo-used-a1').textContent).toBe('1');
+  });
+
+  it('cannot roll an attack with a bow when out of arrows', () => {
+    renderPage(archer(0));
+    expect((screen.getByRole('button', { name: 'Roll attack with Longbow' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText(/No Arrow left/)).toBeTruthy();
   });
 
   it('recovers nothing from a single fired piece (half of 1, rounded down)', () => {

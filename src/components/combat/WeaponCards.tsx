@@ -1,11 +1,18 @@
-﻿import { useState } from 'react';
-import { Lock, Swords } from 'lucide-react';
+import { useState } from 'react';
+import { Lock, Swords, Target } from 'lucide-react';
 import type { Character } from '../../types/character';
 import type { MasteryProperty } from '../../data/weapons';
 import { proficiencyBonus } from '../../logic/abilities';
 import { formatSigned } from '../../logic/breakdown';
 import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
-import { equippedWeapons, weaponAttackProfile, type EquippedWeapon } from '../../logic/attacks';
+import {
+  equippedWeapons,
+  fireAmmo,
+  matchingAmmunition,
+  weaponAttackProfile,
+  type EquippedWeapon,
+} from '../../logic/attacks';
+import { getEquipment } from '../../data/equipment';
 import { grazeDamage, itemMasteryStatus, toppleDc } from '../../logic/weapon-mastery';
 import {
   resolveMasteryLockedTooltip,
@@ -19,16 +26,15 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
 import { EmptyState } from '../shared/EmptyState';
 import { ViewModeToggle } from '../shared/ViewModeToggle';
+import { AttackRollControls } from './AttackRollControls';
 import styles from './WeaponCards.module.css';
 
 export interface WeaponCardsProps {
   character: Character;
-  /**
-   * Called with the equipped weapon's inventory item id when the Attack button is
-   * pressed. The Attack Flow (A5d step 3) hooks in here. Without it the button is
-   * disabled.
-   */
-  onAttack?: (weaponItemId: string) => void;
+  /** Needed to use ammunition when an Ammunition weapon's attack is rolled. */
+  onChange?: (next: Character) => void;
+  /** Told which ammunition stack lost a piece (feeds the Ammunition card's 'fired' count). */
+  onAmmoFired?: (ammoItemId: string) => void;
 }
 
 const titleCase = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -49,7 +55,7 @@ const damageText = (dice: string, flat: number) => `${dice}${formatSigned(flat)}
  * Inventory page owns equipping), no rune manager, and no drag reorder. The
  * mobile long-press context menu is phased.
  */
-export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
+export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsProps) {
   const { mode: viewMode, setMode: setViewMode } = useViewMode('viewmode-weapons', 'cards');
   // Per-item "wielded two-handed" choice for Versatile weapons (UI state only).
   const [twoHanded, setTwoHanded] = useState<Record<string, boolean>>({});
@@ -123,6 +129,40 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
     const attackBreakdown = withExhaustion(profile.attack.breakdown, exhaustionLevelOf(character));
     const chips = resolveWeaponPropertyChips(weapon);
 
+    // Ammunition weapons use one piece per attack (PHB 2024 "Ammunition", L9304).
+    const usesAmmo = weapon.properties.includes('ammunition');
+    const ammoStacks = usesAmmo ? matchingAmmunition(character, weapon) : [];
+    const ammoLeft = ammoStacks.reduce((sum, s) => sum + Math.max(0, s.quantity), 0);
+    const ammoName =
+      ammoStacks[0]?.name ??
+      (ammoStacks[0]?.catalogId ? getEquipment(ammoStacks[0].catalogId)?.name : undefined) ??
+      weapon.ammunitionType ??
+      'ammunition';
+    const ammoLine = usesAmmo && (
+      <span className={styles.stat} data-testid={`weapon-ammo-${item.id}`}>
+        <Target size={14} aria-hidden="true" />
+        <span className={styles.statLabel}>Ammo</span>
+        {ammoStacks.length === 0 ? `No ${weapon.ammunitionType ?? 'ammunition'} in inventory` : `${ammoLeft} ${ammoName}`}
+      </span>
+    );
+    const attackButton = (
+      <AttackRollControls
+        character={character}
+        name={weapon.name}
+        attackModifiers={profile.attack.breakdown.components}
+        damage={damage}
+        blockedReason={usesAmmo && ammoLeft === 0 ? `No ${weapon.ammunitionType ?? 'ammunition'} left. Add more on the Inventory page.` : null}
+        onAttackRolled={() => {
+          if (!usesAmmo) return;
+          const fired = fireAmmo(character, weapon);
+          if (fired.consumed) {
+            onChange?.(fired.character);
+            if (fired.ammoItemId) onAmmoFired?.(fired.ammoItemId);
+          }
+        }}
+      />
+    );
+
     const stats = (
       <>
         <span className={styles.stat}>
@@ -145,6 +185,7 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
             {damageText(damage.dice, damage.flat)} {damage.damageType}
           </CalculatedValue>
         </span>
+        {ammoLine}
         {canTwoHand && (
           <label className={styles.versatile}>
             <input
@@ -157,18 +198,6 @@ export function WeaponCards({ character, onAttack }: WeaponCardsProps) {
           </label>
         )}
       </>
-    );
-
-    const attackButton = (
-      <button
-        type="button"
-        className={styles.attackBtn}
-        disabled={!onAttack}
-        onClick={() => onAttack?.(item.id)}
-        aria-label={`Attack with ${weapon.name}`}
-      >
-        <Swords size={16} aria-hidden="true" /> Attack
-      </button>
     );
 
     const proficiencyNote = !profile.proficiency.proficient && (

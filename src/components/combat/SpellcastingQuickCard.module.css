@@ -1,0 +1,154 @@
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.statGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.className {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+}
+
+.stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-family: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.slotRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.slotLabel {
+  min-width: 10rem;
+  color: var(--text-primary);
+}
+
+.pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pipOn,
+.pipOff {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--accent-gold);
+  background-clip: content-box;
+  padding: 10px;
+}
+
+.pipOn {
+  background-color: var(--accent-gold);
+}
+
+.pipOff {
+  background-color: transparent;
+}
+
+.lists {
+  margin-top: 12px;
+}
+
+.listHeading {
+  margin: 8px 0 4px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.spellList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.levelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.levelBadge {
+  align-self: flex-start;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.spell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  min-height: 36px;
+  flex: 1 1 auto;
+}
+
+.spellName {
+  color: var(--text-primary);
+}
+
+.spellMeta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tag {
+  padding: 1px 6px;
+  font-size: 0.72rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.note {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.note a {
+  color: var(--accent-gold);
+}

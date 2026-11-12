@@ -1,0 +1,66 @@
+﻿.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.attackBtn,
+.damageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.attackBtn {
+  border-color: var(--accent-gold);
+}
+
+.attackBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.crit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.crit input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-gold);
+}
+
+.blocked {
+  margin: 0;
+  color: var(--accent-red, #e57373);
+  font-size: 0.85rem;
+}
+
+.result {
+  min-height: 1.3em;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}

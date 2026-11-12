@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import type { Character } from '../../types/character';
 import { resolveClass, hitDiceTotal } from '../../logic/classes';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -12,11 +12,11 @@ import { ConcentrationCard } from '../combat/ConcentrationCard';
 import { WeaponCards } from '../combat/WeaponCards';
 import { UnarmedStrikeCard } from '../combat/UnarmedStrikeCard';
 import { AmmoTracker } from '../combat/AmmoTracker';
-import { AttackFlow } from '../combat/AttackFlow';
 import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
 import { RestControls } from '../combat/RestControls';
 import { DefenseReadout } from '../combat/DefenseReadout';
-import { SpellSlotSummary } from '../combat/SpellSlotSummary';
+import { SpellcastingQuickCard } from '../combat/SpellcastingQuickCard';
+import { TurnOptionsCard } from '../combat/TurnOptionsCard';
 import { ResourcesCard } from '../combat/ResourcesCard';
 import { HouseRuleIndicator } from '../combat/HouseRuleIndicator';
 import { CombatStatusStrip } from '../combat/CombatStatusStrip';
@@ -24,7 +24,6 @@ import { CombatRoundCard } from '../combat/CombatRoundCard';
 import { SavesPanel } from '../combat/SavesPanel';
 import { EffectsCard } from '../combat/EffectsCard';
 import { Swords } from 'lucide-react';
-import { DEFAULT_ATTACK_TARGET, type AttackTarget } from '../../logic/attack-flow';
 import { parseNumberInput } from './sheet-helpers';
 import styles from './CombatPage.module.css';
 
@@ -33,11 +32,6 @@ export interface CombatPageProps {
   onChange: (next: Character) => void;
   /** Optional app-level Toast sink (Concentration and rest results). */
   onNotify?: (message: string) => void;
-  /**
-   * Called with an equipped weapon's inventory item id (or `UNARMED_ATTACK_ID`)
-   * when its Attack button is pressed.
-   */
-  onAttack?: (weaponItemId: string) => void;
 }
 
 /**
@@ -55,17 +49,10 @@ export interface CombatPageProps {
  *
  * No rule is computed in this component: every number comes from the logic layer.
  */
-export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPageProps) {
-  // Ammunition fired this fight, by inventory item id (UI state). Lives here so the
-  // Attack Flow can record shots too.
+export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
+  // Ammunition fired this fight, by inventory item id (UI state). Shared by the weapon
+  // cards (an Ammunition attack uses a piece) and the Ammunition card (recover half).
   const [ammoUsed, setAmmoUsed] = useState<Record<string, number>>({});
-  // The Attack Flow (open weapon id) and the last-used ad-hoc target.
-  const [attackWeaponId, setAttackWeaponId] = useState<string | null>(null);
-  const [attackTarget, setAttackTarget] = useState<AttackTarget>(DEFAULT_ATTACK_TARGET);
-  const openAttack = (weaponItemId: string) => {
-    onAttack?.(weaponItemId);
-    setAttackWeaponId(weaponItemId);
-  };
 
   const setHitDiceSpent = (raw: string, total: number) => {
     const parsed = parseNumberInput(raw, true);
@@ -145,8 +132,12 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
         <h2 id="combat-attacks-heading" className={styles.groupHeading}>
           Attacks
         </h2>
-        <WeaponCards character={character} onAttack={openAttack} />
-        <UnarmedStrikeCard character={character} onAttack={openAttack} />
+        <WeaponCards
+          character={character}
+          onChange={onChange}
+          onAmmoFired={(id) => setAmmoUsed((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))}
+        />
+        <UnarmedStrikeCard character={character} />
         <AmmoTracker
           character={character}
           onChange={onChange}
@@ -156,27 +147,22 @@ export function CombatPage({ character, onChange, onNotify, onAttack }: CombatPa
         <WeaponMasteryChooser character={character} onChange={onChange} />
       </section>
 
+      <section className={styles.group} aria-labelledby="combat-spells-heading">
+        <h2 id="combat-spells-heading" className={styles.groupHeading}>
+          Spells and turn options
+        </h2>
+        <SpellcastingQuickCard character={character} onChange={onChange} />
+        <TurnOptionsCard character={character} />
+      </section>
+
       <section className={styles.group} aria-labelledby="combat-resources-heading">
         <h2 id="combat-resources-heading" className={styles.groupHeading}>
           Resources and rests
         </h2>
-        <SpellSlotSummary character={character} />
         <ResourcesCard character={character} onChange={onChange} />
         {hitDiceCard}
       </section>
 
-      {attackWeaponId !== null && (
-        <AttackFlow
-          character={character}
-          onChange={onChange}
-          weaponId={attackWeaponId}
-          onClose={() => setAttackWeaponId(null)}
-          target={attackTarget}
-          onTargetChange={setAttackTarget}
-          ammoUsed={ammoUsed}
-          onAmmoUsedChange={setAmmoUsed}
-        />
-      )}
     </div>
   );
 }

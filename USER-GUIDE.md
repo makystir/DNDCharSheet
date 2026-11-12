@@ -271,11 +271,20 @@ A strip across the top stays visible as you scroll. It shows your hit points (wi
 
 ### Attacks
 
-Your weapons, your unarmed strike, **Ammunition** and weapon mastery. In the Ammunition card, **Fire** takes one piece off the stack in your inventory, and after the fight **Recover half** returns half of what you fired, rounded down.
+Each equipped weapon (and your Unarmed Strike) shows its attack bonus, damage, properties and mastery, with two buttons:
 
+- **Attack** rolls a d20 with your attack bonus (or lets you type a physical die) and shows the total to tell your DM. The app doesn't check it against Armor Class; your DM says whether it hits. A natural 20 is a Critical Hit and a natural 1 misses. Conditions you have set the starting roll: Poisoned starts it with Disadvantage, for example. Exhaustion is applied.
+- **Damage** rolls the weapon's damage. Tick **Critical hit** to double the dice (it's ticked for you after a natural 20). With manual dice, it tells you what to roll instead.
+
+A weapon that uses ammunition, like a bow, shows how much you have left right on its card. Each attack roll uses one piece. When you are out, the Attack button turns off. The **Ammunition** card counts what you fired this fight and has **Recover half** for after the fight (half of what you fired, rounded down).
+
+### Spells and turn options
+
+- **Spellcasting** (spellcasters only): your spell save DC and spell attack bonus, your spell slots as circles you tap to spend or get back, and the cantrips and prepared spells ready to cast, with their casting time and Concentration or Ritual tags. Tap a spell's name for the full description.
+- **On your turn:** the standard actions anyone can take (Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study, Utilize), your Bonus Action spells, and the Reactions you have, such as Opportunity Attack or Shield, with a note when one isn't available right now. Tap a name for what it does. Class features that use a Bonus Action are on the Class & Features tab.
 ### Resources and rests
 
-Spell slots, class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.
+Class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.
 ## 7. The Spells page
 
 This page appears only when your character can cast spells. (Some subclasses, like Eldritch Knight and Arcane Trickster, gain it at level 3.)
