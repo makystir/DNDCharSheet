@@ -78,3 +78,11 @@
   background: var(--bg-tertiary);
   color: var(--text-primary);
 }
+
+/* Who each creation mode is for, under its button. */
+.modeDesc {
+  margin: -0.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}

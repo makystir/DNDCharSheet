@@ -562,6 +562,23 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     setArrayAssignment(assignment);
   };
 
+  // SUGGEST-DON'T-AUTO-APPLY: on an explicit tap, place the ROLLED scores the way
+  // the PHB "Standard Array by Class" table ranks the class's abilities: highest
+  // roll to the ability the class ranks highest, and so on. PHB 2024 L1691: the
+  // table can guide where you put your highest and lowest scores whichever method
+  // you used. Every slot stays editable.
+  const placeRolledByClass = () => {
+    const ranks = recommendedArray(classId || undefined);
+    if (!ranks || !rolledPool) return;
+    const abilityOrder = [...ABILITIES].sort((a, b) => ranks[b] - ranks[a]);
+    const poolOrder = rolledPool.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+    const assignment: Partial<Record<Ability, number>> = {};
+    abilityOrder.forEach((ability, n) => {
+      assignment[ability] = poolOrder[n].i;
+    });
+    setRolledAssignment(assignment);
+  };
+
   // ─── Step 4 handlers (per-field flavor generators) ─────────────────────────
 
   const rng = useMemo(() => createDefaultRng(), []);
@@ -588,7 +605,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
   const setDetail = (field: keyof typeof details, value: string) =>
     setDetails((prev) => ({ ...prev, [field]: value }));
-  const genPersonality = () => setDetails((prev) => ({ ...prev, personality: generatePersonality(rng) }));
+  const genPersonality = () => setDetails((prev) => ({ ...prev, personality: generatePersonality(rng, alignment || undefined) }));
   const genAlignment = () => setAlignment(ALIGNMENTS[Math.floor(rng() * ALIGNMENTS.length)]);
   const genFaith = () => setDetails((prev) => ({ ...prev, faith: generateDeity(rng) }));
 
@@ -1483,6 +1500,17 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                 <p className={styles.hint}>
                   Rolled: {rolledPool.join(', ')}. Assign each to an ability.
                 </p>
+                {classId !== '' && (
+                  <div className={styles.methodBody}>
+                    <button type="button" className={styles.recommendBtn} onClick={placeRolledByClass}>
+                      Place my rolls for my class
+                    </button>
+                    <p className={styles.hint}>
+                      Puts your highest roll where a {CLASS_LIST.find((c) => c.id === classId)?.name} needs it most,
+                      following the PHB&apos;s suggested order. You can still move any of them.
+                    </p>
+                  </div>
+                )}
                 {renderAbilityAssignRows(rolledPool, true)}
               </>
             ) : (
@@ -1682,7 +1710,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           id="wiz-personality"
           className={styles.textarea}
           value={details.personality}
-          rows={3}
+          rows={5}
           onChange={(e) => setDetails((prev) => ({ ...prev, personality: e.target.value }))}
         />
         <button type="button" className={styles.genBtn} onClick={genPersonality} aria-label="Generate personality">

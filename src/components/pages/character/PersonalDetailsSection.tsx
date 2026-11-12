@@ -154,7 +154,7 @@ export function PersonalDetailsSection({
     onChange({ ...character, age: generateAge(speciesId, createDefaultRng()) });
   };
   const rollPersonality = () =>
-    onChange({ ...character, personality: generatePersonality(createDefaultRng()) });
+    onChange({ ...character, personality: generatePersonality(createDefaultRng(), character.alignment) });
   const rollAlignment = () => {
     const next = ALIGNMENTS[Math.floor(createDefaultRng()() * ALIGNMENTS.length)];
     onChange({ ...character, alignment: next });

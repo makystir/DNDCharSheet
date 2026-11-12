@@ -67,7 +67,7 @@ You don't have to memorize any of this. Hover or tap the underlined names and nu
 When you open the app with no characters saved, you'll see three ways to begin:
 
 - **Guided Wizard:** a step-by-step flow that explains each choice. **Start here if you're new.**
-- **Roll a Random Character:** one click builds a complete character. It's good for trying the app out, for an NPC (a character the DM plays), or for inspiration. Everything can be edited afterward.
+- **Roll a Random Character:** one click builds a complete character: ability increases placed for its class, skills, languages, tools, starting gear, a trinket, spells for a caster, and a personality that fits its alignment. It's good for trying the app out, for an NPC (a character the DM plays), or for inspiration. Everything can be edited afterward.
 - **Skip the Wizard:** give the character a name and get a blank sheet to fill in yourself. Best if you already know the rules.
 
 You can also import a character you exported earlier (see [Settings, backups and sharing](#11-settings-backups-and-sharing)).
@@ -132,7 +132,7 @@ If the wizard shows a note that some backgrounds suit your class, that is only a
 
 ### Step 4: Skills
 
-The top of this step lists what you receive **automatically**: your class's saving throws, armor and weapon training, and the skills and feat from your background. You don't pick those.
+The top of this step lists what you receive **automatically**: your class's saving throws, armor and weapon training, and the skills and feat from your background. You don't pick those. Tap an armor or weapon entry (like **Heavy armor** or **Martial weapons**) to see what it lets you do.
 
 Below that, choose the number of **class skills** your class allows. Hover or tap a skill's name to see what it's used for. If a skill is already granted by your background or species, the wizard tells you that picking it again adds nothing, because the proficiency bonus is never added twice.
 
@@ -148,7 +148,7 @@ Your six ability scores come from one of three methods:
 
 - **Standard Array:** you get a fixed set of numbers (15, 14, 13, 12, 10, 8) and assign each to an ability. **This is the simplest option for new players.**
 - **Point Buy:** you have a budget of points to spend, with higher scores costing more.
-- **Rolling:** you roll dice for each score.
+- **Rolling:** you roll dice for each score. **Place my rolls for my class** then puts your highest roll where your class needs it most, following the PHB's suggested order; you can still move any of them.
 
 The wizard explains the method you pick, and you can tap an ability's name to see what it does.
 
@@ -162,7 +162,7 @@ If your class casts spells at level 1, you pick your starting **cantrips** (spel
 
 Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and personality. Each has a 🎲 button that rolls one for you (name, age and appearance suit your species), and you can type over anything it rolls. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
 
-The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. Stuck on personality? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
+The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. The 🎲 next to **Personality** rolls a short sketch that fits your alignment: two traits from the Player's Handbook's alignment table, a habit, an ideal, a bond and a flaw. Roll as often as you like and edit what you keep. Stuck on personality? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
 
 **Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
 
@@ -170,8 +170,8 @@ The wizard describes the alignment you pick, and **What do the alignments mean?*
 
 In the 2024 rules, both your **class** and your **background** give you starting equipment, and any coins you get can be spent on gear right away. This step has four parts:
 
-1. **Class equipment.** Pick a package (for example "Package A"), or take the gold instead. The Fighter has two packages plus a gold option. If a package says "choose one" (a Monk picks a tool or instrument, for example), choose it from the list.
-2. **Background equipment.** Take the **Equipment Package** or **50 GP**.
+1. **Class equipment.** Pick a package (for example "Package A"), or take the gold instead. **Compare the choices side by side** shows every package at once. Tap an item, like **Explorer's Pack**, to see what it is or what's inside. The Fighter has two packages plus a gold option. If a package says "choose one" (a Monk picks a tool or instrument, for example), choose it from the list.
+2. **Background equipment.** Take the **Equipment Package** or **50 GP**. Tap an item to see what it is.
 3. **Buy your own gear.** Your gold from both choices above is your budget. Browse **Weapons**, **Armor** and **Gear**, search by name, and use **+** and **−** to buy or return items. Prices are the book prices. **Gold left** updates as you go, and you can hover over it to see how it was worked out.
 
 4. **Trinket.** You can roll once on the Trinkets table (a d100) for a free, Tiny keepsake, such as a mummified goblin hand or a crystal that glows in moonlight. It has no use in the rules. It's just a bit of mystery to inspire your character's story. You can also pick one from the list if your DM allows.

@@ -289,3 +289,60 @@ export function toolChoicesFor(category: 'gaming-set' | 'artisans-tools' | 'musi
     .map((e) => ({ name: e.name, description: e.description }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
+
+// ─── Armor training and weapon proficiency (PHB 2024 chapter 6) ──────────────
+
+export interface TrainingTooltip {
+  title: string;
+  sections: { label: string; text: string }[];
+}
+
+/**
+ * What a class's armor training or weapon proficiency entry means, for a player
+ * who doesn't know yet (e.g. "Light armor", "Shields", "Martial weapons").
+ * Paraphrased from PHB 2024 "Armor Training" (L9613, L9626, L9630) and "Weapon
+ * Proficiency" (L9282, L9298). Null for an entry it doesn't recognise.
+ */
+export function trainingTooltip(entry: string): TrainingTooltip | null {
+  const e = entry.toLowerCase();
+  if (e.includes('shield')) {
+    return {
+      title: entry,
+      sections: [
+        { label: 'What it means', text: 'You can use a Shield effectively: it adds +2 to your Armor Class.' },
+        { label: 'Without it', text: 'You can still hold a Shield, but you get no Armor Class from it.' },
+        { label: 'Source', text: 'PHB 2024 "Armor Training: Shield" (L9630) and the Armor table' },
+      ],
+    };
+  }
+  if (e.includes('armor')) {
+    return {
+      title: entry,
+      sections: [
+        {
+          label: 'What it means',
+          text: 'You can wear this category of armor (Light, Medium, or Heavy) without penalty.',
+        },
+        {
+          label: 'Without it',
+          text: "Anyone can put armor on, but wearing armor you aren't trained with gives Disadvantage on every D20 Test that uses Strength or Dexterity, and you can't cast spells.",
+        },
+        { label: 'Source', text: 'PHB 2024 "Armor Training" (L9613, L9626)' },
+      ],
+    };
+  }
+  if (e.includes('weapon')) {
+    return {
+      title: entry,
+      sections: [
+        {
+          label: 'What it means',
+          text: 'You add your Proficiency Bonus to attack rolls with these weapons. Every weapon is either Simple (such as daggers, clubs and shortbows) or Martial (such as longswords and longbows).',
+        },
+        { label: 'Without it', text: 'Anyone can wield any weapon, but without proficiency you don\'t add your Proficiency Bonus to the attack.' },
+        { label: 'Source', text: 'PHB 2024 "Weapons: Category" (L9282) and "Weapon Proficiency" (L9298)' },
+      ],
+    };
+  }
+  return null;
+}

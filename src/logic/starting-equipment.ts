@@ -89,6 +89,18 @@ export function entryChoiceOptions(entry: string): string[] | null {
   return [...new Set(flat)];
 }
 
+/**
+ * The catalog item an equipment entry as printed stands for ("Explorer's Pack",
+ * "4 Handaxes"), so the UI can show what it is. Undefined for text the resolver
+ * can't match. (Entries that need a player pick get a picker instead.)
+ */
+export function entryItem(entry: string): InventoryItem | undefined {
+  for (const r of resolveEquipment(entry)) {
+    if (r.kind !== 'choice') return r.item;
+  }
+  return undefined;
+}
+
 /** The entries of an option that still need a player pick. */
 export function optionChoiceEntries(option: ClassEquipmentOption): string[] {
   return option.entries.filter((e) => entryChoiceOptions(e) !== null);

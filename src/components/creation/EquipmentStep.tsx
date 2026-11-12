@@ -8,9 +8,12 @@ import { BACKGROUND_OPTION_B_GOLD } from '../../data/backgrounds';
 import type { BackgroundData } from '../../data/backgrounds';
 import type { Breakdown } from '../../logic/breakdown';
 import type { TooltipContent } from '../../logic/tooltip-content';
+import { resolveArmorTooltip, resolveItemTooltip, resolveWeaponTooltip } from '../../logic/tooltip-content';
+import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import {
   cartCopper,
   classEquipmentOptions,
+  entryItem,
   entryChoiceOptions,
   formatCopper,
   gpToCopper,
@@ -53,6 +56,17 @@ const SECTION_LABEL: Record<ShopSection, string> = {
 
 function gpText(copper: number): string {
   return formatCopper(copper);
+}
+
+/** An equipment entry as printed, with what the item is (a pack lists its contents) on hover or tap. */
+function EntryText({ entry }: { entry: string }) {
+  const item = entryItem(entry);
+  const tip = item ? (resolveWeaponTooltip(item) ?? resolveArmorTooltip(item) ?? resolveItemTooltip(item)) : null;
+  return (
+    <MaybeContentTooltip content={tip} ariaLabel={`About ${entry}`}>
+      {entry}
+    </MaybeContentTooltip>
+  );
 }
 
 function warningContent(name: string, warnings: string[]): TooltipContent {
@@ -165,13 +179,48 @@ export function EquipmentStep({
                       </select>
                     </label>
                   ) : (
-                    entry
+                    <EntryText entry={entry} />
                   )}
                 </li>
               );
             })}
             <li>{option.goldGp} GP</li>
           </ul>
+        )}
+        {options.length > 1 && (
+          <details className={styles.bgCompare}>
+            <summary className={styles.bgCompareSummary}>Compare the {cls.name} choices side by side</summary>
+            <div className={styles.pkgCompare} data-testid="class-package-compare">
+              {options.map((o) => (
+                <div key={o.id} className={styles.pkgCompareCol} aria-current={o.id === option.id ? 'true' : undefined}>
+                  <div className={styles.bgCompareHead}>
+                    <strong>{o.entries.length === 0 ? `${o.goldGp} GP` : `Package ${o.id}`}</strong>
+                    <button
+                      type="button"
+                      className={styles.bgChoose}
+                      aria-pressed={o.id === option.id}
+                      aria-label={`Take ${o.entries.length === 0 ? `${o.goldGp} GP` : `Package ${o.id}`}`}
+                      onClick={() => onClassOption(o.id)}
+                    >
+                      {o.id === option.id ? 'Chosen' : 'Take'}
+                    </button>
+                  </div>
+                  <ul className={styles.pkgList}>
+                    {o.entries.map((entry) => (
+                      <li key={entry}>
+                        <EntryText entry={entry} />
+                      </li>
+                    ))}
+                    <li>{o.goldGp} GP</li>
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <p className={styles.hint}>
+              A package is ready to play straight away. Taking the gold instead lets you buy exactly what you
+              want below, but you&apos;ll need to know what to buy.
+            </p>
+          </details>
         )}
       </section>
 
@@ -189,7 +238,9 @@ export function EquipmentStep({
         {backgroundChoice === 'A' ? (
           <ul className={styles.pkgList}>
             {background.equipment.packageItems.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item}>
+                <EntryText entry={item} />
+              </li>
             ))}
             <li>{background.equipment.packageGold} GP</li>
           </ul>

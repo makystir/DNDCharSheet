@@ -34,6 +34,7 @@ import {
   resolveSpeciesTraitTooltip,
   resolveWeaponTooltip,
 } from '../../logic/tooltip-content';
+import { TrainingList } from './TrainingList';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { SpellNameList } from '../shared/SpellName';
@@ -66,6 +67,7 @@ const PENDING_LABEL: Record<PendingItem['kind'] | FeaturePickItem['kind'], strin
   expertise: 'Expertise skills',
   languages: 'feature languages',
 };
+
 
 const itemName = (item: InventoryItem): string =>
   item.name ??
@@ -275,8 +277,16 @@ export function ReviewStep({ character, onEdit }: ReviewStepProps) {
           </ul>
           {cls && (
             <p className={styles.hint}>
-              {cls.armorTraining.length > 0 ? `Armor: ${cls.armorTraining.join(', ')}. ` : ''}
-              {cls.weaponProficiencies.length > 0 ? `Weapons: ${cls.weaponProficiencies.join(', ')}.` : ''}
+              {cls.armorTraining.length > 0 && (
+                <>
+                  Armor: <TrainingList entries={cls.armorTraining} />.{' '}
+                </>
+              )}
+              {cls.weaponProficiencies.length > 0 && (
+                <>
+                  Weapons: <TrainingList entries={cls.weaponProficiencies} />.
+                </>
+              )}
             </p>
           )}
         </>,

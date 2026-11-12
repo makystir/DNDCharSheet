@@ -12,6 +12,7 @@ import {
   resolveSkillTooltip,
 } from '../../logic/tooltip-content';
 import { skillsUsingPrimaryAbility } from '../../logic/creation-guidance';
+import { TrainingList } from './TrainingList';
 import { classGuidance } from '../../logic/class-guidance';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import styles from './CreationWizard.module.css';
@@ -28,6 +29,7 @@ export interface SkillsStepProps {
 }
 
 const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name])) as Record<SkillId, string>;
+
 
 /**
  * Wizard "Skills" step. PHB 2024 Core <Class> Traits: the class grants two
@@ -101,9 +103,15 @@ export function SkillsStep({
               </span>
             ))}
           </li>
-          {cls.armorTraining.length > 0 && <li>Armor training: {cls.armorTraining.join(', ')}</li>}
+          {cls.armorTraining.length > 0 && (
+            <li>
+              Armor training: <TrainingList entries={cls.armorTraining} />
+            </li>
+          )}
           {cls.weaponProficiencies.length > 0 && (
-            <li>Weapons: {cls.weaponProficiencies.join(', ')}</li>
+            <li>
+              Weapons: <TrainingList entries={cls.weaponProficiencies} />
+            </li>
           )}
           {cls.toolProficiencies.length > 0 && <li>Tools: {cls.toolProficiencies.join(', ')}</li>}
           {background && (

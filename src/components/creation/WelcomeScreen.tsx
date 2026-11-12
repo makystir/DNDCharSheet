@@ -103,20 +103,38 @@ export function WelcomeScreen({ onCharacterReady, onCancel }: WelcomeScreenProps
           ref={wizardBtnRef}
           type="button"
           className={styles.primaryBtn}
+          aria-describedby="welcome-wizard-desc"
           onClick={() => setMode('wizard')}
         >
           Guided Wizard
         </button>
+        <p id="welcome-wizard-desc" className={styles.modeDesc}>
+          Best if you&apos;re new to D&amp;D. Walks you through each choice, explains your options, and
+          suggests picks for your class.
+        </p>
         <button
           type="button"
           className={styles.secondaryBtn}
+          aria-describedby="welcome-random-desc"
           onClick={() => onCharacterReady(generateRandomCharacter(createDefaultRng()))}
         >
           Roll a Random Character
         </button>
-        <button type="button" className={styles.secondaryBtn} onClick={() => setMode('skip')}>
+        <p id="welcome-random-desc" className={styles.modeDesc}>
+          Ready to play in one tap: a complete level 1 character with gear (and spells, for a spellcaster). Great for a quick
+          game; you can change anything on the sheet.
+        </p>
+        <button
+          type="button"
+          className={styles.secondaryBtn}
+          aria-describedby="welcome-skip-desc"
+          onClick={() => setMode('skip')}
+        >
           Skip the Wizard
         </button>
+        <p id="welcome-skip-desc" className={styles.modeDesc}>
+          For experienced players: start from a blank sheet and fill it in yourself.
+        </p>
         {/* Abort the whole flow back to the active character. Only rendered when
             creation was launched over existing characters (onCancel supplied). */}
         {onCancel && (

@@ -43,8 +43,18 @@ import {
 } from './starting-equipment';
 import { rollTrinket } from '../data/trinkets';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
-import { pick, type RNG } from './random';
+import { createSeededRng, pick, type RNG } from './random';
+import {
+  ALIGNMENT_TRAITS,
+  BONDS,
+  FLAWS,
+  IDEALS,
+  QUIRKS,
+  type AlignmentPart,
+} from '../data/personality-tables';
 import { speciesGrantedSkills } from './skills';
+import { CREATION_LANGUAGE_CHOICES, LANGUAGES, featureLanguageGrants, knownLanguages } from './languages';
+import { speciesLanguageSuggestions, suggestedBackgroundIncrease, toolChoicesFor } from './creation-guidance';
 import { pickStartingSpells } from './starting-spells';
 
 /** Generated appearance fields (all NON-RAW flavor). */
@@ -133,31 +143,52 @@ export function generateAlignment(rng: RNG): Alignment {
 }
 
 /**
- * A short NON-RAW personality seed (flavor only, no mechanic). The player edits
- * freely; this just offers a starting trait + ideal + bond + flaw sketch.
+ * The parts of an alignment the PHB 2024 "Personality Traits by Alignment"
+ * table is keyed by (L1886-1896): "Lawful Good" is Lawful + Good, "Neutral
+ * Good" is Neutral + Good, "True Neutral" is Neutral. Unaligned (or none) has
+ * no parts.
  */
-const PERSONALITY_TRAITS: string[] = [
-  'Blunt to the point of rudeness, but always honest.',
-  'Quick with a joke to cut the tension.',
-  'Collects trinkets from every place visited.',
-  'Judges others by their deeds, not their words.',
-  'Deeply loyal to a cause only they fully understand.',
-  'Speaks in proverbs and half-remembered sayings.',
-  'Suspicious of strangers until proven wrong.',
-  'Endlessly curious about how things work.',
-  'Masks fear with reckless bravado.',
-  'Patient, methodical, and slow to anger.',
-  'Haunted by a mistake they can never undo.',
-  'Treats every meal like it might be the last.',
-  'Keeps a careful ledger of debts owed and owing.',
-  'Finds comfort in routine and ritual.',
-  'Drawn to lost causes and underdogs.',
-  'Never backs down from a dare.',
-];
+export function alignmentParts(alignment: string | undefined): AlignmentPart[] {
+  if (!alignment || alignment === 'Unaligned') return [];
+  if (alignment === 'True Neutral' || alignment === 'Neutral') return ['Neutral'];
+  const parts = alignment.split(' ').filter((p): p is AlignmentPart => p in ALIGNMENT_TRAITS);
+  return [...new Set(parts)];
+}
 
-/** Generate a short NON-RAW personality note (flavor only). */
-export function generatePersonality(rng: RNG): string {
-  return pick(rng, PERSONALITY_TRAITS);
+const ALL_PARTS = Object.keys(ALIGNMENT_TRAITS) as AlignmentPart[];
+
+/** Two distinct items from a list (or the one item when the list has one). */
+function pickTwo<T>(rng: RNG, items: readonly T[]): [T, T] {
+  const first = Math.floor(rng() * items.length);
+  let second = Math.floor(rng() * (items.length - 1));
+  if (second >= first) second += 1;
+  return [items[first], items[Math.min(second, items.length - 1)]];
+}
+
+/**
+ * A short personality sketch (flavor only, no mechanic; the player edits it
+ * freely): two traits from the PHB 2024 "Personality Traits by Alignment" table
+ * for the character's alignment, a habit, and an ideal (matched to the
+ * alignment), a bond and a flaw from the app's own tables
+ * (data/personality-tables.ts). With no alignment, the two traits come from any
+ * row. Example: "Loyal and kind. Hums old songs when nervous. Ideal: ...
+ * Bond: ... Flaw: ...".
+ */
+export function generatePersonality(rng: RNG, alignment?: string): string {
+  const parts = alignmentParts(alignment);
+  let traits: [string, string];
+  if (parts.length === 2) {
+    traits = [pick(rng, [...ALIGNMENT_TRAITS[parts[0]]]), pick(rng, [...ALIGNMENT_TRAITS[parts[1]]])];
+  } else {
+    const pool = parts.length === 1 ? ALIGNMENT_TRAITS[parts[0]] : ALL_PARTS.flatMap((p) => ALIGNMENT_TRAITS[p]);
+    traits = pickTwo(rng, pool);
+  }
+  const idealPart = parts.length > 0 ? pick(rng, parts) : pick(rng, ALL_PARTS);
+  const quirk = pick(rng, [...QUIRKS]);
+  const ideal = pick(rng, [...IDEALS[idealPart]]);
+  const bond = pick(rng, [...BONDS]);
+  const flaw = pick(rng, [...FLAWS]);
+  return `${traits[0]} and ${traits[1].toLowerCase()}. ${quirk} Ideal: ${ideal} Bond: ${bond} Flaw: ${flaw}`;
 }
 
 /**
@@ -263,12 +294,15 @@ export function generateRandomCharacter(
   character = { ...character, abilities: assignStandardArray(classId) };
 
   // Gender + alignment + personality (flavor).
+  const alignment = generateAlignment(rng);
   character = {
     ...character,
     gender,
-    alignment: generateAlignment(rng),
+    alignment,
     faith: generateDeity(rng),
-    personality: generatePersonality(rng),
+    // One draw seeds the personality generator, as the single trait pick did
+    // before, so every later seeded result is unchanged.
+    personality: generatePersonality(createSeededRng(Math.floor(rng() * 2 ** 32)), alignment),
   };
 
   // Appearance + age (flavor).
@@ -285,13 +319,18 @@ export function generateRandomCharacter(
   };
 
   // Background via the audited A6b path, with a legal +2/+1 allocation on the
-  // background's first two listed abilities and equipment resolved randomly.
+  // two background abilities the class ranks highest (the same suggestion the
+  // wizard offers, from the PHB "Standard Array by Class" table) and equipment
+  // resolved randomly.
   const bg = BACKGROUND_LIST.find((b) => b.id === backgroundId)!;
+  const suggested = suggestedBackgroundIncrease(classId, bg.abilities);
   const abilityAllocation: BackgroundAbilityAllocation[] = [
-    { ability: bg.abilities[0], amount: 2 },
-    { ability: bg.abilities[1], amount: 1 },
+    { ability: suggested?.plusTwo ?? bg.abilities[0], amount: 2 },
+    { ability: suggested?.plusOne ?? bg.abilities[1], amount: 1 },
   ];
-  const toolProficiency = bg.tool.id; // undefined for a category choice (resolved later)
+  // A "choose one kind of ..." tool is picked at random from the real options.
+  const toolProficiency =
+    bg.tool.id ?? (bg.tool.category ? pick(rng, toolChoicesFor(bg.tool.category)).name : undefined);
   character = applyBackground(
     character,
     backgroundId,
@@ -329,11 +368,40 @@ export function generateRandomCharacter(
     });
   }
 
-  // One free trinket (PHB 2024 "Trinkets"), the very last draw.
+  // One free trinket (PHB 2024 "Trinkets").
   const trinket = trinketItem(rollTrinket(rng).roll);
   if (trinket) character = { ...character, inventory: [...(character.inventory ?? []), trinket] };
 
+  // Languages, the last draws: Common plus two standard languages (PHB 2024
+  // "Choose Languages", L1625), the species' own language first when it has
+  // one, then any class feature picks (Rogue Thieves' Cant +1, Ranger +2).
+  const chosen = pickLanguages(rng, CREATION_LANGUAGE_CHOICES, speciesLanguageSuggestions(speciesId), new Set(['common']));
+  const grant = featureLanguageGrants(character);
+  const known = new Set<string>([...knownLanguages({ ...character, languages: { chosen } }), ...grant.fixed]);
+  const granted = pickLanguages(rng, grant.chooseCount, [], known);
+  character = {
+    ...character,
+    languages: { chosen, ...(granted.length > 0 ? { granted } : {}) },
+  };
+
   return { ...character, abilityGenMethod: 'standard-array' };
+}
+
+/**
+ * Picks `count` distinct languages from the standard list (data/rules-text
+ * LANGUAGE_INFO via logic/languages LANGUAGES), taking `prefer` first, never one
+ * already in `exclude`.
+ */
+function pickLanguages(rng: RNG, count: number, prefer: readonly string[], exclude: ReadonlySet<string>): string[] {
+  const out: string[] = [];
+  for (const l of prefer) {
+    if (out.length < count && !exclude.has(l) && (LANGUAGES as readonly string[]).includes(l)) out.push(l);
+  }
+  const rest = (LANGUAGES as readonly string[]).filter((l) => !exclude.has(l) && !out.includes(l));
+  while (out.length < count && rest.length > 0) {
+    out.push(rest.splice(Math.floor(rng() * rest.length), 1)[0]);
+  }
+  return out;
 }
 
 /**

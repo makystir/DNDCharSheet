@@ -697,3 +697,19 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/* Class equipment packages side by side. */
+.pkgCompare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+.pkgCompareCol {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.pkgCompareCol[aria-current='true'] {
+  border-color: var(--accent-gold);
+}
