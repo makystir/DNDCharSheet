@@ -281,7 +281,7 @@ A weapon that uses ammunition, like a bow, shows how much you have left right on
 ### Spells and turn options
 
 - **Spellcasting** (spellcasters only): your spell save DC and spell attack bonus, your spell slots as circles you tap to spend or get back, and the cantrips and prepared spells ready to cast, with their casting time and Concentration or Ritual tags. Tap a spell's name for the full description.
-- **On your turn:** the standard actions anyone can take (Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study, Utilize), your Bonus Action spells, and the Reactions you have, such as Opportunity Attack or Shield, with a note when one isn't available right now. Tap a name for what it does. Class features that use a Bonus Action are on the Class & Features tab.
+- **On your turn:** the standard actions anyone can take (Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study, Utilize), your Bonus Action spells, and the Reactions you have, such as Opportunity Attack or Shield, with a note when one isn't available right now. Tap a name for what it does. It also lists your own class and subclass features by how you use them: under Actions the ones that take an action (such as Channel Divinity: Turn Undead), and under Bonus Actions the ones that take a Bonus Action (such as Second Wind, Cunning Action or Flurry of Blows). Only features you have reached are shown, and a subclass feature appears once you choose that subclass.
 ### Resources and rests
 
 Class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.

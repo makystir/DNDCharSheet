@@ -2,7 +2,14 @@ import { ListChecks } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { availableReactions } from '../../logic/reactions';
 import type { ReactionUnavailable } from '../../logic/reactions';
-import { bonusActionSpells, STANDARD_ACTIONS, STANDARD_ACTIONS_SOURCE } from '../../logic/turn-options';
+import {
+  bonusActionSpells,
+  featureTurnOptionsFor,
+  STANDARD_ACTIONS,
+  STANDARD_ACTIONS_SOURCE,
+  type FeatureTurnOptionEntry,
+} from '../../logic/turn-options';
+import { resolveClassFeatureTooltip } from '../../logic/tooltip-content';
 import { resolveSpellTooltip } from '../../logic/tooltip-content';
 import { SPELL_CATALOG } from '../../data/spells';
 import { Card } from '../shared/Card';
@@ -30,6 +37,20 @@ const REASON_TEXT: Record<ReactionUnavailable, string> = {
  */
 export function TurnOptionsCard({ character }: TurnOptionsCardProps) {
   const bonus = bonusActionSpells(character);
+  const features = featureTurnOptionsFor(character);
+  const actionFeatures = features.filter((f) => f.activation === 'action');
+  const bonusFeatures = features.filter((f) => f.activation === 'bonus-action');
+
+  const featureList = (items: FeatureTurnOptionEntry[], label: string) => (
+    <ul className={styles.list} aria-label={label}>
+      {items.map((f) => (
+        <li key={`-`} className={styles.item}>
+          <ContentTooltip content={resolveClassFeatureTooltip(f.feature, f.origin)}>{f.name}</ContentTooltip>
+          <span className={styles.meta}>{f.origin}</span>
+        </li>
+      ))}
+    </ul>
+  );
   const reactions = availableReactions(character);
 
   return (
@@ -62,14 +83,21 @@ export function TurnOptionsCard({ character }: TurnOptionsCardProps) {
             </li>
           ))}
         </ul>
+        {actionFeatures.length > 0 && (
+          <>
+            <h5 className={styles.subheading}>Your features that use an action</h5>
+            {featureList(actionFeatures, 'Features that use an action')}
+          </>
+        )}
       </section>
 
       <section aria-labelledby="turn-bonus">
         <h4 id="turn-bonus" className={styles.heading}>
           Bonus Actions
         </h4>
+        {bonusFeatures.length > 0 && featureList(bonusFeatures, 'Features that use a Bonus Action')}
         {bonus.length === 0 ? (
-          <p className={styles.empty}>No Bonus Action spells ready.</p>
+          bonusFeatures.length === 0 && <p className={styles.empty}>No Bonus Actions available.</p>
         ) : (
           <ul className={styles.list} aria-label="Bonus Action spells">
             {bonus.map((s) => (
@@ -83,10 +111,6 @@ export function TurnOptionsCard({ character }: TurnOptionsCardProps) {
             ))}
           </ul>
         )}
-        <p className={styles.empty}>
-          Class features that use a Bonus Action are on the{' '}
-          <a href="#character/build">Class &amp; Features</a> tab.
-        </p>
       </section>
 
       <section aria-labelledby="turn-reactions">

@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { CombatPage } from '../../pages/CombatPage';
 import type { Character } from '../../../types/character';
 import type { ClassId } from '../../../data/classes';
 import { createCharacter } from '../../../storage/character-store';
-import { STANDARD_ACTIONS, bonusActionSpells } from '../../../logic/turn-options';
+import { STANDARD_ACTIONS, bonusActionSpells, featureTurnOptionsFor } from '../../../logic/turn-options';
 import { setPactExpended, setSlotsExpended, slotLevels, pactSlots } from '../../../logic/spell-slot-spend';
 import { attackModeAdvice, attackNaturalNote } from '../../../logic/attack-rolls';
 
@@ -100,9 +100,46 @@ describe('On your turn card', () => {
     expect(within(screen.getByRole('list', { name: 'Bonus Action spells' })).getByText('Healing Word')).toBeInTheDocument();
   });
 
-  it('says when no Bonus Action spells are ready', () => {
+  it('says when no Bonus Actions are available', () => {
+    renderPage({ level: 1, classes: [{ id: 'wizard' as ClassId, level: 1 }] });
+    expect(screen.getByText('No Bonus Actions available.')).toBeInTheDocument();
+  });
+
+  it('lists class features used as a Bonus Action, gated by level', () => {
     renderPage({ level: 1, classes: [{ id: 'fighter' as ClassId, level: 1 }] });
-    expect(screen.getByText('No Bonus Action spells ready.')).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: 'Features that use a Bonus Action' });
+    expect(within(list).getByText('Second Wind')).toBeInTheDocument();
+    expect(within(list).queryByText(/Know Your Enemy/)).toBeNull();
+  });
+
+  it('lists subclass features only for the chosen subclass', () => {
+    const c = (sub: string): Partial<Character> => ({
+      level: 7,
+      classes: [{ id: 'fighter' as ClassId, level: 7, subclassId: sub as never }],
+    });
+    expect(featureTurnOptionsFor({ ...createCharacter('F'), ...c('battleMaster') }).map((f) => f.name)).toContain('Know Your Enemy');
+    expect(featureTurnOptionsFor({ ...createCharacter('F'), ...c('champion') }).map((f) => f.name)).not.toContain('Know Your Enemy');
+  });
+
+  it('lists the Cleric Channel Divinity options under actions', () => {
+    renderPage({ level: 2, classes: [{ id: 'cleric' as ClassId, level: 2 }] });
+    const list = screen.getByRole('list', { name: 'Features that use an action' });
+    expect(within(list).getByText('Channel Divinity: Turn Undead')).toBeInTheDocument();
+    expect(within(list).getByText('Channel Divinity: Divine Spark')).toBeInTheDocument();
+  });
+
+  it('lists every feature of a multiclass character, each by its own class level', () => {
+    const c: Character = {
+      ...createCharacter('Mc'),
+      level: 4,
+      classes: [
+        { id: 'rogue' as ClassId, level: 2 },
+        { id: 'monk' as ClassId, level: 2 },
+      ],
+    };
+    const names = featureTurnOptionsFor(c).map((f) => f.name);
+    expect(names).toEqual(expect.arrayContaining(['Cunning Action: Dash, Disengage or Hide', 'Flurry of Blows', 'Martial Arts: Unarmed Strike']));
+    expect(names).not.toContain('Steady Aim');
   });
 });
 

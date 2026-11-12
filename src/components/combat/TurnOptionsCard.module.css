@@ -71,3 +71,9 @@
 .empty a {
   color: var(--accent-gold);
 }
+
+.subheading {
+  margin: 10px 0 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

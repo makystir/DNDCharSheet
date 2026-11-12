@@ -299,6 +299,8 @@ export interface TaggedClassFeature {
   className: string;
   /** Present when the feature comes from the chosen subclass. */
   subclassName?: string;
+  /** The subclass id, alongside subclassName. */
+  subclassId?: string;
 }
 
 /**
@@ -328,6 +330,7 @@ export function classFeaturesByLevelTagged(
               classId: data.id,
               className: data.name,
               subclassName: subclass?.name,
+              subclassId: subclass?.id,
             }),
           ),
       ];

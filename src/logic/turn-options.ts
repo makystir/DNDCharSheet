@@ -1,4 +1,4 @@
-﻿/**
+/**
  * What a character can do on a turn, for the Combat page reference.
  *
  * STANDARD ACTIONS: the PHB 2024 Actions table (Docs/PlayersHandbook.md L590-605),
@@ -6,8 +6,8 @@
  * BONUS ACTIONS: you have one only when a feature, spell or other ability says so
  * (PHB 2024 "Bonus Actions", L617-623). Listed here: the prepared spells and
  * cantrips whose casting time is a Bonus Action. Class features that use a Bonus
- * Action are not tagged in the class data yet, so they are not listed (never
- * guessed from effect text).
+ * Action are listed from data/feature-turn-options.ts (read from the PHB, pinned by an
+ * oracle), never guessed from effect text.
  * REACTIONS: logic/reactions.ts `availableReactions` (Opportunity Attack, tagged
  * features, feats, reaction spells).
  */
@@ -15,6 +15,10 @@
 import type { Character } from '../types/character';
 import { getSpell } from '../data/spells';
 import { knownSpellsByClass } from './known-spells';
+import { classFeaturesByLevelTagged } from './classes';
+import { featureTurnOptions } from '../data/feature-turn-options';
+import type { TurnActivation } from '../data/feature-turn-options';
+import type { ClassFeature } from '../data/classes';
 
 export interface StandardAction {
   name: string;
@@ -69,4 +73,34 @@ export function bonusActionSpells(character: Character): BonusActionSpell[] {
     }
   }
   return out.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+}
+
+export interface FeatureTurnOptionEntry {
+  name: string;
+  activation: TurnActivation;
+  feature: ClassFeature;
+  /** "Fighter" or "Fighter: Battle Master". */
+  origin: string;
+}
+
+/**
+ * The class and subclass features the character has reached that are used as an
+ * action or a Bonus Action (each class gated by its own level, each subclass by the
+ * subclass chosen on that class, PHB 2024 "Multiclassing").
+ */
+export function featureTurnOptionsFor(character: Character): FeatureTurnOptionEntry[] {
+  const out: FeatureTurnOptionEntry[] = [];
+  for (const group of classFeaturesByLevelTagged(character).values()) {
+    for (const { feature, classId, className, subclassName, subclassId } of group) {
+      for (const option of featureTurnOptions(classId, subclassId, feature.name)) {
+        out.push({
+          name: option.name,
+          activation: option.activation,
+          feature,
+          origin: subclassName ? `${className}: ${subclassName}` : className,
+        });
+      }
+    }
+  }
+  return out;
 }
