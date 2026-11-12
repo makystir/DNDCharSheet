@@ -563,6 +563,16 @@
 .trinketRow .rollBtn {
   min-height: 44px;
 }
+/* The trinket list's options are whole sentences, so a native select would grow
+   to the longest one and spill out of the card. Fill the row instead and let the
+   browser cut the long options off; the chosen trinket is shown in full below. */
+.trinketRow .select {
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  text-overflow: ellipsis;
+}
 
 /* --- Deity suggestions ---------------------------------------------------- */
 
@@ -742,4 +752,10 @@
 .speciesChoiceRow > p {
   flex: 1 1 16rem;
   margin: 0;
+}
+
+/* No wizard dropdown may grow wider than its card (long option text). */
+.select,
+.selectSmall {
+  max-width: 100%;
 }
