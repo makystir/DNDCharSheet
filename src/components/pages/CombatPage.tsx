@@ -17,6 +17,7 @@ import { RestControls } from '../combat/RestControls';
 import { DefenseReadout } from '../combat/DefenseReadout';
 import { SpellcastingQuickCard } from '../combat/SpellcastingQuickCard';
 import { TurnOptionsCard } from '../combat/TurnOptionsCard';
+import { QuickRulesCard } from '../combat/QuickRulesCard';
 import { ResourcesCard } from '../combat/ResourcesCard';
 import { HouseRuleIndicator } from '../combat/HouseRuleIndicator';
 import { CombatStatusStrip } from '../combat/CombatStatusStrip';
@@ -162,6 +163,8 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         <ResourcesCard character={character} onChange={onChange} />
         {hitDiceCard}
       </section>
+
+      <QuickRulesCard />
 
     </div>
   );

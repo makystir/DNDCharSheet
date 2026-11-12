@@ -708,11 +708,14 @@ export interface CombatState {
   tickedThroughRound?: number;
   /** The character's own Initiative result for this fight (shown on the Combat page). */
   initiative?: number;
-  /** Roster in Initiative order (highest first; ties in the user's chosen order). */
-  combatants: Combatant[];
-  /** Index into `combatants` of the combatant whose turn it is. */
-  activeIndex: number;
-  turn: TurnState;
+  /**
+   * LEGACY (the retired initiative tracker): the roster, the active index and the
+   * turn economy. Older saves may still carry them; nothing reads them now except
+   * `turn.reactionUsed` (logic/reactions.ts, optional).
+   */
+  combatants?: Combatant[];
+  activeIndex?: number;
+  turn?: TurnState;
 }
 
 /**

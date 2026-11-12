@@ -13,7 +13,6 @@
 import type { Character, CombatState } from '../types/character';
 import { advanceRounds } from './condition-duration';
 import { advanceEffects } from './combat-effects';
-import { endCombat, startCombat } from './initiative-order';
 import { getCondition } from '../data/conditions';
 
 export function isInFight(character: Character): boolean {
@@ -27,7 +26,8 @@ export function currentRound(character: Character): number {
 
 /** Start a fight at round 1. Does nothing when one is already on. */
 export function beginFight(character: Character): Character {
-  return isInFight(character) ? character : startCombat(character, []);
+  if (isInFight(character)) return character;
+  return { ...character, combat: { inCombat: true, round: 1 } };
 }
 
 /** The character's own Initiative result for this fight, if rolled. */
@@ -77,5 +77,8 @@ export function nextRound(character: Character): NextRoundResult {
 
 /** End the fight: clears the round and the Initiative result. Timers keep their values. */
 export function endFight(character: Character): Character {
-  return endCombat(character);
+  if (character.combat === undefined) return character;
+  const next = { ...character };
+  delete next.combat;
+  return next;
 }

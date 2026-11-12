@@ -1,0 +1,76 @@
+.search {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+}
+
+.count {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.empty {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+
+.group {
+  margin-top: 12px;
+}
+
+.groupHeading {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rule {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.sections {
+  margin: 0;
+  padding: 0 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.section dd {
+  margin: 2px 0 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}

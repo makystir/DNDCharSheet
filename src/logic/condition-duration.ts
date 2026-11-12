@@ -14,8 +14,7 @@
  * DURATION KINDS and where each one ticks / expires:
  *  - rounds / minutes / hours (TIMED): `rounds` holds the REMAINING combat
  *    rounds. It goes down by 1 per manual tick (Combat tab), and by 1 each time
- *    the initiative tracker starts a new round (advanceCombatTurn /
- *    advanceRounds). When it reaches 0 the condition is removed.
+ *    the Combat page's Next round starts a new round (advanceRounds). When it reaches 0 the condition is removed.
  *    Conversion: "A round represents about 6 seconds in the game world"
  *    (PHB "The Order of Combat", L863), so 1 minute = 60 / 6 = 10 rounds and
  *    1 hour = 600 rounds. INTERPRETATION: the PHB states the 6-second round,
@@ -33,13 +32,10 @@
  *    while concentrating.
  *  - manual: the old free-text behaviour; never expires by itself.
  *
- * AUTOMATIC TICKING happens ONLY when the initiative tracker is running
- * (`character.combat.inCombat`) AND the round number goes up past the highest
- * round already ticked (`combat.tickedThroughRound`). It fires at the start of
- * each new round, i.e. when the first combatant's turn begins (INTERPRETATION:
- * the PHB gives no round-boundary rule for durations). Going back never
- * restores time, and re-entering a round already ticked does not tick again.
- * Without a running tracker nothing ticks.
+ * AUTOMATIC TICKING happens ONLY while a fight is on (`character.combat.inCombat`),
+ * when the Combat page's Next round button moves to the next round
+ * (logic/combat-round.ts `nextRound`, which calls `advanceRounds`). Without a fight
+ * on, nothing ticks automatically; the manual tick still works.
  *
  * Every function is pure and returns the input object when nothing changes.
  * Expiry removes the condition and appends a 'condition-expired' event-log
@@ -49,7 +45,6 @@ import type { ActiveCondition, Character, ConditionDuration, ConditionDurationKi
 import { getCondition } from '../data/conditions';
 import type { Breakdown, BreakdownComponent } from './breakdown';
 import { appendEvent } from './event-log';
-import { advanceTurn } from './initiative-order';
 
 /** PHB L863: a round is about 6 seconds, so 60 / 6 rounds in a minute. */
 export const ROUNDS_PER_MINUTE = 10;
@@ -271,8 +266,7 @@ export function tickConditionManually(character: Character, id: TrackedId): Char
 }
 
 /**
- * Tick every timed condition by `rounds`, but ONLY while the initiative tracker
- * is running. Manual / rest / concentration / duration-less conditions are
+ * Tick every timed condition by `rounds`, but ONLY while a fight is on. Manual / rest / concentration / duration-less conditions are
  * untouched.
  */
 export function advanceRounds(character: Character, rounds: number): Character {
@@ -301,33 +295,6 @@ export function expireOnConcentrationEnd(character: Character): Character {
   ).character;
 }
 
-/**
- * Move the initiative tracker one turn and tick the conditions when this starts
- * a NEW ROUND. Going back never ticks or restores. No tracker: unchanged.
- * `expired` lists the condition ids removed by this step (for status text).
- */
-export function advanceCombatTurn(
-  character: Character,
-  direction: 'next' | 'previous',
-): { character: Character; expired: TrackedId[] } {
-  const combat = character.combat;
-  if (!combat) return { character, expired: [] };
-  const moved = advanceTurn(combat, direction);
-  if (moved === combat) return { character, expired: [] };
-  // High-water round: a round whose start already ticked never ticks again, so
-  // "next, previous, next" costs each timer one round, not two.
-  const ticked = Math.max(combat.round, combat.tickedThroughRound ?? 0);
-  const high = Math.max(ticked, moved.round);
-  const next: Character = {
-    ...character,
-    combat: high > moved.round ? { ...moved, tickedThroughRound: high } : moved,
-  };
-  if (direction === 'next' && combat.inCombat && moved.round > ticked) {
-    const result = tick(next, moved.round - ticked);
-    return { character: result.character, expired: result.expired };
-  }
-  return { character: next, expired: [] };
-}
 
 // ── Untrusted input ────────────────────────────────────────────────────────
 

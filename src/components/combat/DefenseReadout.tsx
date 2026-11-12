@@ -46,7 +46,6 @@ export interface DefenseReadoutProps {
  *    authoritative on the Advancement tab (P1).
  *  - Initiative: `initiativeBreakdown(...)`; Passive Perception:
  *    `passivePerceptionBreakdown(...)`.
- *  - Movement used / remaining: the A5c turn-economy breakdowns.
  *
  * The single-source setup editors (AC override, Initiative bonus) stay editable
  * behind the "Adjust" collapsible (P2/P6), so the glance stays read-only.

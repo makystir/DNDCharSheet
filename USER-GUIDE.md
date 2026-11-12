@@ -285,6 +285,10 @@ A weapon that uses ammunition, like a bow, shows how much you have left right on
 ### Resources and rests
 
 Class resources (such as Rage or Channel Divinity) with their counters, your Hit Dice, and the **Short Rest** and **Long Rest** buttons. A Long Rest dialog lists exactly what resets.
+### Quick rules
+
+At the bottom of the page, **Quick rules** opens a searchable list of the rules you look up during a fight: actions, cover, critical hits, opportunity attacks, grappling and shoving, hiding, ranged attacks, difficult terrain, falling, death saves, concentration, every condition, and the weapon properties and masteries. Type a word like prone or grapple to filter, then tap a rule to read it.
+
 ## 7. The Spells page
 
 This page appears only when your character can cast spells. (Some subclasses, like Eldritch Knight and Arcane Trickster, gain it at level 3.)

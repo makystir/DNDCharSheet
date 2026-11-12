@@ -1,9 +1,8 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createCharacter } from '../../storage/character-store';
 import type { ActiveCondition, Character, ConditionDuration } from '../../types/character';
 import type { SpellId } from '../../data/spells';
 import {
-  advanceCombatTurn,
   advanceRounds,
   durationFromAmount,
   expireOnConcentrationEnd,
@@ -13,7 +12,7 @@ import {
   setConditionDuration,
   tickConditionManually,
 } from '../condition-duration';
-import { startCombat } from '../initiative-order';
+import { beginFight, nextRound } from '../combat-round';
 import { endConcentration, endConcentrationIfBroken, startConcentration } from '../concentration';
 import { shortRest, longRest } from '../rests';
 import { importFromJSON } from '../../storage/export-import';
@@ -43,10 +42,7 @@ function buildCharacter(s: DurationScenario): Character {
     c = setConditionDuration(c, spec.id as ActiveCondition['id'], duration);
   }
   if (s.tracker) {
-    c = startCombat(c, [
-      { id: 'me', name: 'Me', initiative: 15, isCharacter: true },
-      { id: 'foe', name: 'Foe', initiative: 10 },
-    ]);
+    c = beginFight(c);
   }
   return c;
 }
@@ -154,34 +150,24 @@ describe('condition durations: wiring into the real tracker, rests and Concentra
     steps: [],
   };
 
-  it('advanceCombatTurn ticks only when the round number goes up', () => {
-    let c = buildCharacter(timedFightScenario);
-    // Roster: Me (active), Foe. Next -> Foe (same round 1): no tick.
-    let out = advanceCombatTurn(c, 'next');
-    expect(out.character.combat?.round).toBe(1);
-    expect(project(out.character)[0]).toEqual({ id: 'poisoned', rounds: 2, kind: 'rounds' });
-    // Next again wraps to round 2: ticks once.
-    out = advanceCombatTurn(out.character, 'next');
+  it('Next round ticks once per round and lists what expired', () => {
+    const c = buildCharacter(timedFightScenario);
+    let out = nextRound(c);
     expect(out.character.combat?.round).toBe(2);
     expect(project(out.character)[0]).toEqual({ id: 'poisoned', rounds: 1, kind: 'rounds' });
     expect(out.expired).toEqual([]);
-    // Two more turns -> round 3: expires.
-    out = advanceCombatTurn(advanceCombatTurn(out.character, 'next').character, 'next');
+    out = nextRound(out.character);
     expect(out.character.combat?.round).toBe(3);
-    expect(out.expired).toEqual(['poisoned']);
+    expect(out.expired).toEqual(['Poisoned']);
     expect(project(out.character).map((p) => p.id)).toEqual(['blinded', 'charmed']);
-    c = out.character;
-    // Previous never restores or ticks.
-    const back = advanceCombatTurn(c, 'previous');
-    expect(back.expired).toEqual([]);
-    expect(project(back.character).map((p) => p.id)).toEqual(['blinded', 'charmed']);
   });
 
-  it('advanceCombatTurn with no tracker returns the character unchanged', () => {
+  it('Next round with no fight on starts one at round 1 and ticks nothing', () => {
     const c = buildCharacter({ ...timedFightScenario, tracker: false });
-    const out = advanceCombatTurn(c, 'next');
-    expect(out.character).toBe(c);
+    const out = nextRound(c);
+    expect(out.character.combat?.round).toBe(1);
     expect(out.expired).toEqual([]);
+    expect(project(out.character)[0]).toEqual({ id: 'poisoned', rounds: 2, kind: 'rounds' });
   });
 
   it('a Short Rest ends a short-rest condition and a Long Rest ends a long-rest one (real rests)', () => {
@@ -298,45 +284,14 @@ describe('condition durations: review fixes', () => {
     });
   const rounds = (c: Character) => project(c)[0];
 
-  it('next, previous, next over one round boundary ticks once (high-water round)', () => {
+  it('every Next round takes exactly one round off', () => {
     let c = fight();
-    c = advanceCombatTurn(advanceCombatTurn(c, 'next').character, 'next').character; // round 2
+    c = nextRound(c).character;
     expect(c.combat?.round).toBe(2);
     expect(rounds(c)).toEqual({ id: 'poisoned', rounds: 2, kind: 'rounds' });
-    c = advanceCombatTurn(c, 'previous').character; // back to Foe, round 1
-    expect(c.combat?.round).toBe(1);
-    expect(rounds(c)).toEqual({ id: 'poisoned', rounds: 2, kind: 'rounds' });
-    c = advanceCombatTurn(c, 'next').character; // round 2 again: no second tick
-    expect(c.combat?.round).toBe(2);
-    expect(rounds(c)).toEqual({ id: 'poisoned', rounds: 2, kind: 'rounds' });
-    // Reaching round 3 for the first time ticks again.
-    c = advanceCombatTurn(advanceCombatTurn(c, 'next').character, 'next').character;
-    expect(c.combat?.round).toBe(3);
-    expect(rounds(c)).toEqual({ id: 'poisoned', rounds: 1, kind: 'rounds' });
-  });
-
-  it('a one-combatant roster ticks on every Next', () => {
-    let c = buildCharacter({
-      name: 'x',
-      tracker: false,
-      concentrating: false,
-      conditions: [{ id: 'poisoned', duration: { kind: 'rounds', amount: 2 } }],
-      steps: [],
-    });
-    c = startCombat(c, [{ id: 'me', name: 'Me', initiative: 15, isCharacter: true }]);
-    c = advanceCombatTurn(c, 'next').character;
-    expect(c.combat?.round).toBe(2);
-    expect(rounds(c)).toEqual({ id: 'poisoned', rounds: 1, kind: 'rounds' });
-    const out = advanceCombatTurn(c, 'next');
-    expect(out.expired).toEqual(['poisoned']);
-  });
-
-  it('an empty roster changes nothing and ticks nothing', () => {
-    const c = fight();
-    const empty: Character = { ...c, combat: { ...c.combat!, combatants: [], activeIndex: 0 } };
-    const out = advanceCombatTurn(empty, 'next');
-    expect(out.character).toBe(empty);
-    expect(out.expired).toEqual([]);
+    c = nextRound(nextRound(c).character).character;
+    expect(c.combat?.round).toBe(4);
+    expect(c.conditions).toBeUndefined();
   });
 
   describe('Concentration ending through the real paths', () => {
