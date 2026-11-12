@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, Heart, ArrowUpCircle, ListChecks, ScrollText, Trash2, Layers } from 'lucide-react';
+import { TrendingUp, Heart, TriangleAlert, ListChecks, ScrollText, Trash2, Layers } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -279,8 +279,80 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
     spellPicks.length +
     (illegalSpells.length > 0 ? 1 : 0);
 
+  // The pending-choices card. When choices are owed it is shown first and styled as a
+  // call to action; with none owed it stays a quiet note at the bottom of the page.
+  const owed = pendingCount > 0;
+  const pendingCard = (
+    <section id="adv-section-pending" aria-labelledby="adv-pending-title">
+      <Card className={owed ? styles.pendingAlert : undefined}>
+        <SectionHeader
+          icon={owed ? TriangleAlert : ListChecks}
+          titleId="adv-pending-title"
+          title={owed ? `Action needed: Choices Pending (${pendingCount})` : `Choices Pending (${pendingCount})`}
+        />
+        {owed && (
+          <p className={styles.pendingIntro}>
+            Your character has choices to make. Work through each item below; the list shrinks as
+            you finish them.
+          </p>
+        )}
+        {pendingCount === 0 ? (
+          <p className={styles.placeholder}>No outstanding choices.</p>
+        ) : (
+          <ul className={styles.pendingList}>
+            {subclassDue && <li className={styles.pendingItem}>Subclass not chosen (due at level {cls?.subclassLevel})</li>}
+            {unfilledFightingStyles.map((s) => (
+              <li key={`fighting-style-${s.key}`} className={styles.pendingItem}>
+                Fighting Style feat not chosen ({s.className})
+              </li>
+            ))}
+            {unfilledFeatLevels.map((l) => (
+              <li key={`feat-${l}`} className={styles.pendingItem}>
+                Feat not chosen for level {l}
+              </li>
+            ))}
+            {unrecordedHpLevels.map((l) => (
+              <li key={`hp-${l}`} className={styles.pendingItem}>
+                Hit Points not recorded for level {l} (using the fixed value)
+              </li>
+            ))}
+            <ExpertisePending character={character} onChange={onChange} status={expertise} />
+            <LanguagePicksPending character={character} onChange={onChange} status={languagePicks} />
+            <ClassChoicesPending character={character} onChange={onChange} statuses={classChoices} />
+            <MulticlassPicksPending character={character} onChange={onChange} />
+            {spellPicks.map((item) => (
+              <li
+                key={`spell-${item.kind}-${item.className ?? ''}-${item.spellLevel ?? ''}`}
+                className={styles.pendingItem}
+                data-testid={`pending-spell-${item.kind}${item.spellLevel ? `-${item.spellLevel}` : ''}`}
+              >
+                {spellPickLabel(item)}: {item.have} of {item.need} chosen.{' '}
+                <a href="#spells">Choose on Spells</a>
+              </li>
+            ))}
+            {illegalSpells.length > 0 && (
+              <li className={styles.pendingItem} data-testid="pending-illegal-spells">
+                {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
+                class&apos;s spell list:{' '}
+                <SpellNameList ids={[...new Set(illegalSpells.map((s) => s.id))]} />.{' '}
+                <a href="#spells">Review on Spells</a>
+              </li>
+            )}
+          </ul>
+        )}
+        <ExpertiseOverNote status={expertise} />
+        <LanguagePicksOverNote status={languagePicks} />
+        <ClassChoicesOverNote statuses={classChoices} />
+        <MulticlassPicksOverNote character={character} />
+      </Card>
+    </section>
+  );
+
   return (
     <div className={styles.page}>
+      {/* Owed choices come first so they cannot be missed. */}
+      {owed && pendingCard}
+
       {/* ── Level + leveling mode ───────────────────────────────────────────── */}
       <Card>
         <SectionHeader icon={TrendingUp} title="Level &amp; Experience" />
@@ -433,6 +505,108 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
             </div>
           </div>
         )}
+
+        {/* Next level: preview + Level Up, part of the same card. */}
+        <div id="adv-section-next-level" tabIndex={-1} className={styles.nextLevelSection}>
+          <h4 className={styles.subHeading}>Next Level</h4>
+          {preview === null ? (
+            <p className={styles.placeholder}>At the level cap (20). Nothing further to gain.</p>
+          ) : (
+            <>
+              <p className={styles.previewHeading}>Advancing to level {preview.nextLevel}:</p>
+              <ul className={styles.previewList}>
+                {preview.proficiencyBonusChangesTo !== undefined && (
+                  <li>
+                    Proficiency Bonus rises to {formatSigned(preview.proficiencyBonusChangesTo)}
+                  </li>
+                )}
+                {preview.subclassChoice && <li>Choose a subclass</li>}
+                {preview.featSlotOpens && (
+                  <li>
+                    <ContentTooltip
+                      content={{
+                        title: 'Feat slot',
+                        sections: [
+                          {
+                            label: 'Rule',
+                            text:
+                              'This level grants a feat (an Ability Score Improvement feat or another you qualify for; level 19 is an Epic Boon). Choose it below in "Feats & Ability Score Improvements" after leveling up.',
+                          },
+                        ],
+                      }}
+                    >
+                      A feat slot opens
+                    </ContentTooltip>
+                  </li>
+                )}
+                {preview.features.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+                {preview.features.length === 0 &&
+                  !preview.subclassChoice &&
+                  !preview.featSlotOpens &&
+                  preview.proficiencyBonusChangesTo === undefined && <li>No new features</li>}
+              </ul>
+  
+              {/* Which held class gains the level. Shown only for a multiclass
+                  character (a single-class character always advances its one
+                  class). PHB 2024 "Multiclassing": a level may be taken in any
+                  class you already have. */}
+              {isMulticlass && (
+                <div className={styles.field}>
+                  <label className={styles.fieldLabel} htmlFor="adv-levelup-class">
+                    Class to advance
+                  </label>
+                  <select
+                    id="adv-levelup-class"
+                    className={styles.classSelect}
+                    aria-label="Class to advance"
+                    value={levelUpTargetId ?? ''}
+                    onChange={(e) => setLevelUpClass(e.target.value as ClassId | '')}
+                  >
+                    {heldClasses.map(({ entry, data }) => (
+                      <option key={data.id} value={data.id}>
+                        {data.name} {entry.level} → {entry.level + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+  
+              <div className={styles.levelUpRow}>
+                <span className={styles.hint}>
+                  {mode === 'xp' && !mayLevelUp
+                    ? `Not enough XP: level ${preview.nextLevel} needs ${xpForLevel(preview.nextLevel)} XP total.`
+                    : cls === undefined
+                      ? 'Fixed HP only until a class is chosen.'
+                      : isMulticlass
+                        ? `Advancing ${getClass(levelUpTargetId ?? '')?.name ?? 'your class'} (d${levelUpTargetDie}). Multiclass HP uses the fixed per-level value.`
+                        : 'Choose how to gain Hit Points this level:'}
+                </span>
+                <div className={styles.hpChoiceButtons}>
+                  <button
+                    type="button"
+                    className={styles.primaryBtn}
+                    disabled={!mayLevelUp}
+                    onClick={handleFixedLevelUp}
+                  >
+                    Level up (fixed HP)
+                  </button>
+                  {rolledHpAvailable && (
+                    <button
+                      type="button"
+                      className={styles.primaryBtn}
+                      disabled={!mayLevelUp || cls === undefined}
+                      onClick={() => setHpRoll('level-up')}
+                    >
+                      Level up (roll HP)
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </Card>
 
       {/* ── Progression Advisor (read-only XP/milestone projection + prompts) ─ */}
@@ -501,108 +675,6 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 )}
               </div>
             )}
-          </>
-        )}
-      </Card>
-
-      {/* ── Next-level preview + Level Up ───────────────────────────────────── */}
-      <Card id="adv-section-next-level">
-        <SectionHeader icon={ArrowUpCircle} title="Next Level" />
-        {preview === null ? (
-          <p className={styles.placeholder}>At the level cap (20). Nothing further to gain.</p>
-        ) : (
-          <>
-            <p className={styles.previewHeading}>Advancing to level {preview.nextLevel}:</p>
-            <ul className={styles.previewList}>
-              {preview.proficiencyBonusChangesTo !== undefined && (
-                <li>
-                  Proficiency Bonus rises to {formatSigned(preview.proficiencyBonusChangesTo)}
-                </li>
-              )}
-              {preview.subclassChoice && <li>Choose a subclass</li>}
-              {preview.featSlotOpens && (
-                <li>
-                  <ContentTooltip
-                    content={{
-                      title: 'Feat slot',
-                      sections: [
-                        {
-                          label: 'Rule',
-                          text:
-                            'This level grants a feat (an Ability Score Improvement feat or another you qualify for; level 19 is an Epic Boon). Choose it below in "Feats & Ability Score Improvements" after leveling up.',
-                        },
-                      ],
-                    }}
-                  >
-                    A feat slot opens
-                  </ContentTooltip>
-                </li>
-              )}
-              {preview.features.map((f) => (
-                <li key={f}>{f}</li>
-              ))}
-              {preview.features.length === 0 &&
-                !preview.subclassChoice &&
-                !preview.featSlotOpens &&
-                preview.proficiencyBonusChangesTo === undefined && <li>No new features</li>}
-            </ul>
-
-            {/* Which held class gains the level. Shown only for a multiclass
-                character (a single-class character always advances its one
-                class). PHB 2024 "Multiclassing": a level may be taken in any
-                class you already have. */}
-            {isMulticlass && (
-              <div className={styles.field}>
-                <label className={styles.fieldLabel} htmlFor="adv-levelup-class">
-                  Class to advance
-                </label>
-                <select
-                  id="adv-levelup-class"
-                  className={styles.classSelect}
-                  aria-label="Class to advance"
-                  value={levelUpTargetId ?? ''}
-                  onChange={(e) => setLevelUpClass(e.target.value as ClassId | '')}
-                >
-                  {heldClasses.map(({ entry, data }) => (
-                    <option key={data.id} value={data.id}>
-                      {data.name} {entry.level} → {entry.level + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className={styles.levelUpRow}>
-              <span className={styles.hint}>
-                {mode === 'xp' && !mayLevelUp
-                  ? `Not enough XP: level ${preview.nextLevel} needs ${xpForLevel(preview.nextLevel)} XP total.`
-                  : cls === undefined
-                    ? 'Fixed HP only until a class is chosen.'
-                    : isMulticlass
-                      ? `Advancing ${getClass(levelUpTargetId ?? '')?.name ?? 'your class'} (d${levelUpTargetDie}). Multiclass HP uses the fixed per-level value.`
-                      : 'Choose how to gain Hit Points this level:'}
-              </span>
-              <div className={styles.hpChoiceButtons}>
-                <button
-                  type="button"
-                  className={styles.primaryBtn}
-                  disabled={!mayLevelUp}
-                  onClick={handleFixedLevelUp}
-                >
-                  Level up (fixed HP)
-                </button>
-                {rolledHpAvailable && (
-                  <button
-                    type="button"
-                    className={styles.primaryBtn}
-                    disabled={!mayLevelUp || cls === undefined}
-                    onClick={() => setHpRoll('level-up')}
-                  >
-                    Level up (roll HP)
-                  </button>
-                )}
-              </div>
-            </div>
           </>
         )}
       </Card>
@@ -725,58 +797,8 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         </Card>
       )}
 
-      {/* ── Choices pending ─────────────────────────────────────────────────── */}
-      <Card>
-        <SectionHeader icon={ListChecks} title={`Choices Pending (${pendingCount})`} />
-        {pendingCount === 0 ? (
-          <p className={styles.placeholder}>No outstanding choices.</p>
-        ) : (
-          <ul className={styles.pendingList}>
-            {subclassDue && <li className={styles.pendingItem}>Subclass not chosen (due at level {cls?.subclassLevel})</li>}
-            {unfilledFightingStyles.map((s) => (
-              <li key={`fighting-style-${s.key}`} className={styles.pendingItem}>
-                Fighting Style feat not chosen ({s.className})
-              </li>
-            ))}
-            {unfilledFeatLevels.map((l) => (
-              <li key={`feat-${l}`} className={styles.pendingItem}>
-                Feat not chosen for level {l}
-              </li>
-            ))}
-            {unrecordedHpLevels.map((l) => (
-              <li key={`hp-${l}`} className={styles.pendingItem}>
-                Hit Points not recorded for level {l} (using the fixed value)
-              </li>
-            ))}
-            <ExpertisePending character={character} onChange={onChange} status={expertise} />
-            <LanguagePicksPending character={character} onChange={onChange} status={languagePicks} />
-            <ClassChoicesPending character={character} onChange={onChange} statuses={classChoices} />
-            <MulticlassPicksPending character={character} onChange={onChange} />
-            {spellPicks.map((item) => (
-              <li
-                key={`spell-${item.kind}-${item.className ?? ''}-${item.spellLevel ?? ''}`}
-                className={styles.pendingItem}
-                data-testid={`pending-spell-${item.kind}${item.spellLevel ? `-${item.spellLevel}` : ''}`}
-              >
-                {spellPickLabel(item)}: {item.have} of {item.need} chosen.{' '}
-                <a href="#spells">Choose on Spells</a>
-              </li>
-            ))}
-            {illegalSpells.length > 0 && (
-              <li className={styles.pendingItem} data-testid="pending-illegal-spells">
-                {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
-                class&apos;s spell list:{' '}
-                <SpellNameList ids={[...new Set(illegalSpells.map((s) => s.id))]} />.{' '}
-                <a href="#spells">Review on Spells</a>
-              </li>
-            )}
-          </ul>
-        )}
-        <ExpertiseOverNote status={expertise} />
-        <LanguagePicksOverNote status={languagePicks} />
-        <ClassChoicesOverNote statuses={classChoices} />
-        <MulticlassPicksOverNote character={character} />
-      </Card>
+      {/* Choices pending: the quiet version, when nothing is owed. */}
+      {!owed && pendingCard}
 
       {/* ── Audit log ───────────────────────────────────────────────────────── */}
       <Card>

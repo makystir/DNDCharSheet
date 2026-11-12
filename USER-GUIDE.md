@@ -350,22 +350,18 @@ At the top, pick a **leveling mode**:
 - **Milestone** (the default): your DM tells you when you level up. Most groups play this way.
 - **XP:** the page tracks **experience points**. Enter an amount (and an optional reason) to **Award** XP. When you have enough, you can level up.
 
-### Level & Experience
+### Level & Experience (and levelling up)
 
-Shows your level and, in XP mode, your progress toward the next level.
-
-### Hit Points
-
-When you level up, you also gain hit points. Choose to **Take fixed value** (the safe average) or **Roll the Hit Die** (random, could be better or worse). Your Constitution modifier is added either way.
-
-### Next Level
-
-This section shows what your next level gives you and lets you advance. Level-ups can include:
+The top card shows your level and, in XP mode, your progress toward the next level. Below that, in the same card, the **Next Level** part shows what your next level gives you and lets you advance. Level-ups can include:
 
 - New class features.
 - A **subclass** (a specialization, usually chosen at level 3).
 - **Ability Score Improvements or feats** at certain levels.
 - More spell slots or spells.
+
+### Hit Points
+
+When you level up, you also gain hit points. Choose to **Take fixed value** (the safe average) or **Roll the Hit Die** (random, could be better or worse). Your Constitution modifier is added either way.
 
 ### Multiclass
 
@@ -373,7 +369,7 @@ You can take levels in a **second class** instead of your current one. The 2024 
 
 ### Choices Pending and Class Choices
 
-Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, or class options like **Metamagic** or **Eldritch Invocations**. They show up under **Choices Pending**. The Overview's **Finish setting up** card also reminds you.
+Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, a **subclass**, a **feat**, spells, or class options like **Metamagic** or **Eldritch Invocations**. When you owe any choices, the **Choices Pending** card moves to the **top** of the page with a gold border and the heading **Action needed**, so you can't miss it. Work through the items in it. Each one either lets you pick right there or links to the page where you make the choice. The list gets shorter as you finish, and when nothing is owed the card drops to a quiet note near the bottom. The Overview's **Finish setting up** card also reminds you.
 
 ### Advancement Log
 

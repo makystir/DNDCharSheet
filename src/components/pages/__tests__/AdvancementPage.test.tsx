@@ -438,3 +438,34 @@ describe('AdvancementPage - Progression Advisor action links', () => {
     }
   });
 });
+
+describe('AdvancementPage - layout', () => {
+  it('has one combined Level & Experience card that holds the Next Level section', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4, subclassId: 'champion' }] });
+    // No separate "Next Level" section heading; it is a sub-heading inside the card.
+    expect(screen.queryByRole('heading', { level: 3, name: 'Next Level' })).toBeNull();
+    const sub = screen.getByRole('heading', { level: 4, name: 'Next Level' });
+    const card = screen.getByRole('heading', { name: /Level & Experience/ }).closest('div[class*="card"]')!;
+    expect(card.contains(sub)).toBe(true);
+    // The level-up buttons live in that same card.
+    expect(within(card as HTMLElement).getByRole('button', { name: /Level up \(fixed HP\)/ })).toBeInTheDocument();
+  });
+
+  it('puts owed choices first, with an action-needed heading and intro', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4 }] });
+    const pending = screen.getByRole('region', { name: /Action needed: Choices Pending/ });
+    expect(pending).toBeInTheDocument();
+    expect(within(pending).getByText(/Your character has choices to make/)).toBeInTheDocument();
+    // It comes before the Level & Experience card in the page.
+    const level = screen.getByRole('heading', { name: /Level & Experience/ });
+    expect(pending.compareDocumentPosition(level) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('keeps a quiet Choices Pending note at the bottom when nothing is owed', () => {
+    renderStateful({ level: 1, classes: [{ id: 'barbarian', level: 1 }] });
+    const quiet = screen.getByRole('region', { name: /^Choices Pending \(0\)/ });
+    expect(within(quiet).getByText('No outstanding choices.')).toBeInTheDocument();
+    expect(screen.queryByText(/Action needed/)).toBeNull();
+    const level = screen.getByRole('heading', { name: /Level & Experience/ });
+    expect(level.compareDocumentPosition(quiet) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });});

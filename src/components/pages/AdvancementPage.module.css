@@ -271,3 +271,53 @@
 .logDetail {
   color: var(--text-primary);
 }
+
+/* --- Level & Experience: the Next Level part of the same card ------------- */
+
+.nextLevelSection {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.nextLevelSection:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 4px;
+}
+
+.subHeading {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* --- Choices Pending: attention-grabbing when choices are owed ------------- */
+
+.pendingAlert {
+  border: 2px solid var(--accent-gold);
+  border-left-width: 6px;
+  background: var(--bg-tertiary);
+}
+
+.pendingIntro {
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.pendingAlert .pendingList {
+  gap: 8px;
+}
+
+.pendingAlert .pendingItem {
+  padding: 8px 10px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.pendingAlert .pendingItem a {
+  color: var(--accent-gold);
+}
