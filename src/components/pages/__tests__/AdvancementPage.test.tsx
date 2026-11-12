@@ -398,3 +398,43 @@ describe('AdvancementPage - Progression Advisor subclass link', () => {
     expect(screen.queryByRole('link', { name: 'Choose on Class & Features' })).toBeNull();
   });
 });
+
+describe('AdvancementPage - Progression Advisor action links', () => {
+  const advisor = () => screen.getByRole('list', { name: 'Advisor suggestions' });
+
+  it('links an open feat slot to the Feats section and scrolls and focuses it', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4, subclassId: 'champion' }] });
+    const link = within(advisor()).getByRole('link', { name: 'Choose in Feats & ASIs' });
+    const target = document.getElementById('adv-section-feats')!;
+    expect(target).not.toBeNull();
+    const scroll = vi.fn();
+    target.scrollIntoView = scroll;
+    fireEvent.click(link);
+    expect(scroll).toHaveBeenCalled();
+    expect(document.activeElement).toBe(target);
+  });
+
+  it('links "You can level up" to the Next Level section', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4, subclassId: 'champion' }] });
+    const link = screen.getAllByRole('link', { name: 'Go to Next Level' })[0];
+    const target = document.getElementById('adv-section-next-level')!;
+    expect(target).not.toBeNull();
+    fireEvent.click(link);
+    expect(document.activeElement).toBe(target);
+  });
+
+  it('has no link on the informational Proficiency Bonus note', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4, subclassId: 'champion' }] });
+    const item = within(advisor()).getByText(/raises your Proficiency Bonus|Next level raises/).closest('li')!;
+    expect(within(item).queryByRole('link')).toBeNull();
+  });
+
+  it('every suggestion that names an action has a link', () => {
+    renderStateful({ level: 4, classes: [{ id: 'fighter', level: 4 }] });
+    const items = within(advisor()).getAllByRole('listitem');
+    for (const li of items) {
+      const informational = /Proficiency Bonus/.test(li.textContent ?? '');
+      expect(within(li).queryAllByRole('link').length > 0, li.textContent ?? '').toBe(!informational);
+    }
+  });
+});

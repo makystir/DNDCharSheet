@@ -7,9 +7,11 @@ import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { ContentTooltip } from '../../shared/ContentTooltip';
+import { ScrollLink } from '../../shared/ScrollLink';
 import { levelingMode, canLevelUp } from '../../../logic/advancement';
 import {
   advisorSuggestions,
+  type AdvisorSuggestionId,
   sessionsToNextLevel,
   xpProgress,
 } from '../../../logic/advancement-advisor';
@@ -59,7 +61,7 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
           track (PHB 2024 &ldquo;Character Advancement&rdquo;).
         </p>
         {canLevelUp(character) ? (
-          <p className={styles.milestonePrompt}>You can level up — use the Next Level controls below.</p>
+          <p className={styles.milestonePrompt}>You can level up: use the Next Level controls below.{' '}<ScrollLink className={styles.suggestionLink} targetId="adv-section-next-level" fallbackHref="#advancement">Go to Next Level</ScrollLink></p>
         ) : (
           <p className={styles.modeNote}>You are at the level cap (20).</p>
         )}
@@ -191,13 +193,47 @@ export function ProgressionAdvisor({ character }: ProgressionAdvisorProps) {
 }
 
 /**
- * Where a suggestion can be acted on. The subclass is picked on the Character
- * page's Class & Features tab (the Subclass select), not here.
+ * Where each suggestion can be acted on. A suggestion that names an action gets a
+ * link to the place that does it: another page (`href`) or a section of this
+ * page (`targetId`, scrolled to and focused). 'pb-increases-next' only informs,
+ * with nothing to do, so it has no link.
  */
-const SUGGESTION_LINKS: Record<string, { href: string; text: string }> = {
+type SuggestionLink =
+  | { href: string; text: string }
+  | { targetId: string; text: string };
+
+const SUGGESTION_LINKS: Partial<Record<AdvisorSuggestionId, SuggestionLink>> = {
+  // The Subclass select is on the Character page's Class & Features tab.
   'choose-subclass': { href: '#character/build', text: 'Choose on Class & Features' },
+  // Feats are picked in the Feats & Ability Score Improvements section below.
+  'pending-feat-slot': { targetId: 'adv-section-feats', text: 'Choose in Feats & ASIs' },
+  // Levels are applied from the Next Level section below.
+  'can-level-up': { targetId: 'adv-section-next-level', text: 'Go to Next Level' },
+  'level-earned-unapplied': { targetId: 'adv-section-next-level', text: 'Go to Next Level' },
 };
 
+function SuggestionAction({ id }: { id: AdvisorSuggestionId }) {
+  const link = SUGGESTION_LINKS[id];
+  if (!link) return null;
+  return (
+    <>
+      {' '}
+      {'targetId' in link ? (
+        <ScrollLink
+          className={styles.suggestionLink}
+          targetId={link.targetId}
+          fallbackHref="#advancement"
+        >
+          {link.text}
+        </ScrollLink>
+      ) : (
+        <a className={styles.suggestionLink} href={link.href}>
+          {link.text}
+        </a>
+      )}
+    </>
+  );
+}
 /** The deterministic suggestion prompts as a list of cited ContentTooltips. */
 function SuggestionList({ suggestions }: { suggestions: ReturnType<typeof advisorSuggestions> }) {
   if (suggestions.length === 0) {
@@ -208,14 +244,7 @@ function SuggestionList({ suggestions }: { suggestions: ReturnType<typeof adviso
       {suggestions.map((s) => (
         <li key={s.id} className={styles.suggestionItem}>
           <ContentTooltip content={s.content}>{s.title}</ContentTooltip>
-          {SUGGESTION_LINKS[s.id] && (
-            <>
-              {' '}
-              <a className={styles.suggestionLink} href={SUGGESTION_LINKS[s.id].href}>
-                {SUGGESTION_LINKS[s.id].text}
-              </a>
-            </>
-          )}
+          <SuggestionAction id={s.id} />
         </li>
       ))}
     </ul>

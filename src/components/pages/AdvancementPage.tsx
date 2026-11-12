@@ -506,7 +506,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       </Card>
 
       {/* ── Next-level preview + Level Up ───────────────────────────────────── */}
-      <Card>
+      <Card id="adv-section-next-level">
         <SectionHeader icon={ArrowUpCircle} title="Next Level" />
         {preview === null ? (
           <p className={styles.placeholder}>At the level cap (20). Nothing further to gain.</p>

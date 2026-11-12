@@ -77,7 +77,7 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
 
   if (slotLevels.length === 0) {
     return (
-      <Card>
+      <Card id="adv-section-feats">
         <SectionHeader icon={Award} title="Feats & Ability Score Improvements" />
         <p className={styles.placeholder}>
           No feat slots yet. Feat slots open at the Ability Score Improvement levels (PHB 2024:
@@ -129,7 +129,7 @@ export function FeatSlotsSection({ character, onChange, now = Date.now }: FeatSl
   const allocatingFeat = allocating ? getFeat(allocating.featId) : undefined;
 
   return (
-    <Card>
+    <Card id="adv-section-feats">
       <SectionHeader icon={Award} title="Feats & Ability Score Improvements" />
       <ul className={styles.slotList}>
         {assignments.map(({ level, filled }) => {
