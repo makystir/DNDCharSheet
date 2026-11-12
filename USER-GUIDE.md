@@ -261,6 +261,8 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 
 Your class and everything it gives you, listed by the level at which you gained it. Use this to look up what an ability does.
 
+**Subclass.** When you reach the level where your class picks a subclass (level 3 for every class in the 2024 rules), choose it here. Below the dropdown, **Compare all subclasses** shows each one's one-line summary and the features it gives you at each level; tap a feature's name to read it, and press **Choose** on the one you want. Before that level the same list is a **Preview**, so you can plan ahead. Once chosen, your subclass's summary and features are shown under it. A multiclass character gets this for each of their classes, unlocked at their level in that class.
+
 Classes with **Weapon Mastery** (such as Fighter, Barbarian, Paladin, Ranger and Rogue) also get the **Weapon Mastery** chooser here: pick which kinds of weapon you can use the mastery property of. You can change them when you finish a Long Rest. Your weapon cards on the Combat page show the mastery you can use.
 
 Where a feature offers a choice you haven't made yet (such as a fighting style), look for it under **Choices Pending** on the **Advancement** page.

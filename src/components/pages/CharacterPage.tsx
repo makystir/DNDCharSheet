@@ -41,6 +41,7 @@ import { PersonalDetailsSection } from './character/PersonalDetailsSection';
 import { OverviewSetup } from './character/OverviewSetup';
 import { OverviewVitals } from './character/OverviewVitals';
 import { OverviewRest } from './character/OverviewRest';
+import { SubclassDetails } from './character/SubclassDetails';
 import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
 import { masteryChoices } from '../../logic/weapon-mastery';
 import { OverviewInspiration } from './character/OverviewInspiration';
@@ -229,16 +230,39 @@ export function CharacterPage({
       onChange(next);
       return;
     }
-    // Single-class this stage: classes[0] is the initial class, level mirrors
-    // the character level (PHB 2024 "Multiclassing"; multiclass UI is M4).
+    const entries = allClasses(character);
+    if (entries.length >= 2) {
+      // Multiclass: replace only the initial class (classes[0]), keeping its
+      // level and every other class. A class the character already has as a
+      // multiclass can't be picked here (the option is disabled), so no class
+      // is ever listed twice.
+      if (entries.slice(1).some((e) => e.id === raw)) return;
+      const nextClass: ClassEntry = { id: raw as ClassEntry['id'], level: entries[0].level };
+      const next: Character = { ...character, classes: [nextClass, ...entries.slice(1)] };
+      // Only the replaced class's spell picks go; the other classes keep theirs.
+      if (shouldResetSpellcasting(prevEntry, nextClass) && prevEntry && next.spellcasting?.byClass) {
+        const byClass = { ...next.spellcasting.byClass };
+        delete byClass[prevEntry.id];
+        next.spellcasting = { ...next.spellcasting, byClass };
+      }
+      onChange(next);
+      return;
+    }
+    // Single class: classes[0] is the initial class and its level mirrors the
+    // character level (PHB 2024 "Multiclassing").
     const nextClass: ClassEntry = { id: raw as ClassEntry['id'], level: character.level };
     const next: Character = { ...character, classes: [nextClass] };
     if (shouldResetSpellcasting(prevEntry, nextClass)) delete next.spellcasting;
     onChange(next);
   };
 
-  const setSubclass = (raw: string) => {
-    const prevEntry = primaryClass(character);
+  /**
+   * Sets (or clears) the subclass of one class entry, keeping every other class
+   * (a multiclass character's other classes must survive a subclass change).
+   */
+  const setSubclassAt = (index: number, raw: string) => {
+    const entries = allClasses(character);
+    const prevEntry = entries[index];
     if (prevEntry === undefined) return;
     const nextClass: ClassEntry = { ...prevEntry };
     if (raw === '') {
@@ -246,12 +270,16 @@ export function CharacterPage({
     } else {
       nextClass.subclassId = raw as ClassEntry['subclassId'];
     }
-    const next: Character = { ...character, classes: [nextClass] };
+    const next: Character = {
+      ...character,
+      classes: entries.map((e, i) => (i === index ? nextClass : e)),
+    };
     // A subclass change on a subclass caster (Eldritch Knight / Arcane
     // Trickster) changes the spell source, so reconcile the spell state.
     if (shouldResetSpellcasting(prevEntry, nextClass)) delete next.spellcasting;
     onChange(next);
   };
+  const setSubclass = (raw: string) => setSubclassAt(0, raw);
 
   // Toggles a single class skill-choice proficiency, deduped and capped at the
   // class's allowed count (PHB 2024 Core <Class> Traits: Skill Proficiencies).
@@ -266,9 +294,11 @@ export function CharacterPage({
     } else {
       next = current.filter((s) => s !== skillId);
     }
+    // Only the initial class grants skill choices; keep any other classes.
+    const entries = allClasses(character);
     onChange({
       ...character,
-      classes: [{ ...prevEntry, skillChoices: next }],
+      classes: [{ ...prevEntry, skillChoices: next }, ...entries.slice(1)],
     });
   };
 
@@ -615,16 +645,22 @@ export function CharacterPage({
                 aria-label="Class"
                 onChange={(e) => setClass(e.target.value)}
               >
-                <option value="">— None —</option>
+                {/* A multiclass character can't clear the initial class or swap
+                    it for one of their other classes. */}
+                <option value="" disabled={isMulticlass}>— None —</option>
                 {CLASS_LIST.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option
+                    key={c.id}
+                    value={c.id}
+                    disabled={classEntries.slice(1).some((e) => e.id === c.id)}
+                  >
                     {c.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {selectedClass && character.level >= selectedClass.subclassLevel && (
+            {selectedClass && (primaryClass(character)?.level ?? 0) >= selectedClass.subclassLevel && (
               <div className={styles.speciesField}>
                 <label className={styles.fieldLabel} htmlFor="subclass-select">
                   Subclass
@@ -653,6 +689,17 @@ export function CharacterPage({
               </span>
             </div>
           </div>
+
+          {/* What each subclass offers, before and after choosing (single-class
+              view; the select above holds the choice). */}
+          {selectedClass && selectedClass.subclasses.length > 0 && !isMulticlass && (
+            <SubclassDetails
+              cls={selectedClass}
+              classLevel={primaryClass(character)?.level ?? character.level}
+              selectedId={primaryClass(character)?.subclassId}
+              onChoose={setSubclass}
+            />
+          )}
 
           {selectedClass && classSkillOptions.length > 0 && (
             <div className={styles.classSkills}>
@@ -734,6 +781,16 @@ export function CharacterPage({
                   {data.name} {entry.level}
                   {subclassName ? ` — ${subclassName}` : ''}
                 </h3>
+                {/* Each class's own subclass: preview below its subclass level,
+                    then Choose (PHB 2024: gained at a level in that class). */}
+                {data.subclasses.length > 0 && (
+                  <SubclassDetails
+                    cls={data}
+                    classLevel={entry.level}
+                    selectedId={entry.subclassId}
+                    onChoose={(id) => setSubclassAt(classEntries.indexOf(entry), id)}
+                  />
+                )}
                 {[...byLevel.entries()].map(([level, features]) => (
                   <div key={level} className={styles.featureLevelGroup}>
                     <h3 className={styles.featureLevelHeading}>Level {level}</h3>
