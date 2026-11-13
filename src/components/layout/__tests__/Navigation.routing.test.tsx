@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { describe, it, expect, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, beforeAll } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor, act, within } from '@testing-library/react';
 import App from '../../../App';
 import {
@@ -50,10 +50,30 @@ async function renderApp() {
   }
   render(<App />);
   // The Character tab defaults to the Overview sub-tab (id 'identity'), which
-  // renders the Personal Details heading once loaded (Ability Scores live on
-  // Abilities & Skills).
+  // renders the Personal Details heading once loaded.
   await screen.findByRole('heading', { name: 'Personal Details' });
 }
+
+/**
+ * App loads its non-Character pages with React.lazy. The first visit in a
+ * worker would otherwise transform the whole page module graph inside a
+ * findBy wait, which overruns under full-suite load; preloading puts the
+ * modules in the cache so the lazy import resolves at once.
+ */
+beforeAll(async () => {
+  await Promise.all([
+    import('../../pages/CombatPage'),
+    import('../../pages/SettingsPage'),
+    import('../../pages/SpellsPage'),
+  ]);
+}, 60_000);
+
+/**
+ * Mounting a whole page can far exceed findBy's 1s default under full-suite
+ * load (a first Combat render was measured at ~5-8s), so allow 10s; the test
+ * timeout is 15s.
+ */
+const PAGE_SWITCH_WAIT = { timeout: 10_000 };
 
 function navButton(label: string) {
   // A nav item may carry a count badge in its name ("Advancement, 3 choices to make"),
@@ -86,7 +106,7 @@ describe('Navigation routing (shell)', () => {
   it('routes to Combat on click, moving aria-current and the hash', async () => {
     await renderApp();
     fireEvent.click(navButton('Combat'));
-    await screen.findAllByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ }, PAGE_SWITCH_WAIT);
     expect(navButton('Combat')).toHaveAttribute('aria-current', 'page');
     expect(navButton('Character')).not.toHaveAttribute('aria-current');
     expect(window.location.hash).toBe('#combat');
@@ -95,18 +115,19 @@ describe('Navigation routing (shell)', () => {
   it('switches tabs via number-key shortcuts', async () => {
     await renderApp();
     fireEvent.keyDown(document.body, { key: '2' });
-    await screen.findAllByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ }, PAGE_SWITCH_WAIT);
     expect(navButton('Combat')).toHaveAttribute('aria-current', 'page');
 
     fireEvent.keyDown(document.body, { key: '3' });
-    await screen.findByRole('button', { name: /Switch to/ });
+    await screen.findByRole('button', { name: /Switch to/ }, PAGE_SWITCH_WAIT);
     expect(navButton('Settings')).toHaveAttribute('aria-current', 'page');
   });
 
   it('ignores number-key shortcuts while a form field is focused', async () => {
     await renderApp();
-    // The Dexterity score input lives on the Abilities & Skills sub-tab (P3).
-    fireEvent.click(screen.getByRole('tab', { name: 'Abilities & Skills' }));
+    // The Dexterity score input sits behind the Overview's Abilities, Saves &
+    // Skills card Edit toggle.
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     const dexInput = await screen.findByLabelText('Dexterity score');
     dexInput.focus();
     // '2' would normally switch to Combat; from within an input it must not.
@@ -119,7 +140,7 @@ describe('Navigation routing (shell)', () => {
     await renderApp();
     history.replaceState(null, '', '#settings');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    await screen.findByRole('button', { name: /Switch to/ });
+    await screen.findByRole('button', { name: /Switch to/ }, PAGE_SWITCH_WAIT);
     expect(navButton('Settings')).toHaveAttribute('aria-current', 'page');
   });
 
@@ -133,7 +154,7 @@ describe('Navigation routing (shell)', () => {
   it('moves focus to the main content region on route change', async () => {
     await renderApp();
     fireEvent.click(navButton('Combat'));
-    await screen.findAllByRole('button', { name: /Armor Class/ });
+    await screen.findAllByRole('button', { name: /Armor Class/ }, PAGE_SWITCH_WAIT);
     await waitFor(() => {
       const main = document.getElementById('main-content');
       expect(document.activeElement).toBe(main);
@@ -180,8 +201,7 @@ describe('Character sub-tab routing', () => {
   it('clicking a sub-tab updates the hash and persists last-used', async () => {
     history.replaceState(null, '', '#character');
     render(<App />);
-    // P3: the default Overview tab shows Personal Details (Ability Scores moved
-    // to the Abilities & Skills tab).
+    // The default Overview tab shows Personal Details.
     await screen.findByRole('heading', { name: 'Personal Details' });
     fireEvent.click(screen.getByRole('tab', { name: 'Class & Features' }));
     await screen.findByRole('combobox', { name: 'Class' });
@@ -211,13 +231,12 @@ describe('Character sub-tab routing', () => {
     localStorage.setItem('lastSubTab:character', 'overview');
     history.replaceState(null, '', '#character');
     render(<App />);
-    // overview → Identity: Personal Details renders, and the three new tabs show.
+    // overview → Identity: Personal Details renders, and the two current tabs show.
     await screen.findByRole('heading', { name: 'Personal Details' });
     const tablist = screen.getByRole('tablist');
     const tabs = within(tablist).getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual([
       'Overview',
-      'Abilities & Skills',
       'Class & Features',
     ]);
   });

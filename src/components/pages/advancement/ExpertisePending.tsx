@@ -74,7 +74,7 @@ export function ExpertiseOverNote({ status }: { status: ExpertiseStatus }) {
     <p className={styles.warning} role="note" data-testid="expertise-over-note">
       Expertise: {status.chosen} skills marked, but your class features grant {status.owed}. Feats,
       subclass features or house rules can account for the difference; otherwise untick the extras
-      on Abilities &amp; Skills.
+      in the Overview's Abilities, Saves &amp; Skills card (Edit).
     </p>
   );
 }

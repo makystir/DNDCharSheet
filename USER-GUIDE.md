@@ -232,7 +232,7 @@ On a touch screen, tap to open a tooltip and tap elsewhere to close it.
 
 ## 5. The Character page
 
-The Character page has three sub-tabs: **Overview**, **Abilities & Skills**, and **Class & Features**.
+The Character page has two sub-tabs: **Overview** and **Class & Features**.
 
 ### Overview
 
@@ -248,14 +248,8 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 - **Resources:** limited-use abilities such as "uses per rest".
 - **Attacks:** your weapons and their attack and damage numbers.
 - **Spellcasting:** your spell save DC and spell attack bonus (spellcasters only).
-- **Skills:** a quick-reference list.
+- **Abilities, Saves & Skills:** your six ability scores with their modifiers, your six saving throws, and all 18 skills with your total bonus. Hover over any number to see how it's worked out. A **P** marks a save or skill you're proficient in (your proficiency bonus is added); an **E** marks **Expertise**, which doubles that bonus for chosen skills. Press **Edit** in the card's header to change your base ability scores and tick proficiencies; press **Done** when you're finished. Increases from feats are added on top of the base score automatically, and proficiencies your class, species or feats give you are ticked and locked.
 - **Traits and feats:** what your species, class and feats give you, plus the languages you know.
-
-### Abilities & Skills
-
-- **Ability Scores:** each score with its modifier. Hover over a modifier to see how it's worked out.
-- **Saving Throws:** your bonus for each of the six, with a marker where you're proficient.
-- **Skills:** all skills with your total bonus. Proficient skills get your proficiency bonus added. Some characters get **Expertise**, which doubles that bonus for chosen skills.
 
 ### Class & Features
 

@@ -1,6 +1,6 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, within, fireEvent } from '@testing-library/react';
-import { OverviewSkills } from '../OverviewSkills';
+import { OverviewAbilities } from '../OverviewAbilities';
 import { createCharacter } from '../../../../storage/character-store';
 import type { Character } from '../../../../types/character';
 import { ABILITIES, SKILLS } from '../../../../types/character';
@@ -22,9 +22,9 @@ const character: Character = {
   },
 };
 
-describe('OverviewSkills', () => {
+describe('OverviewAbilities', () => {
   it('renders all 18 skills and 6 saves, each with a CalculatedValue equal to the logic', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     const skills = allSkillBreakdowns(character);
     const saves = allSavingThrowBreakdowns(character);
     expect(SKILLS).toHaveLength(18);
@@ -41,7 +41,7 @@ describe('OverviewSkills', () => {
   });
 
   it('lists skills alphabetically', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     const names = within(screen.getByRole('list', { name: 'Skills' }))
       .getAllByRole('listitem')
       .map((li) => li.getAttribute('data-testid'));
@@ -52,7 +52,7 @@ describe('OverviewSkills', () => {
   });
 
   it('marks proficient and expert rows and proficient saves with text markers', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     expect(
       within(screen.getByTestId('overview-skill-athletics')).getByLabelText('expertise'),
     ).toHaveTextContent('E');
@@ -71,20 +71,19 @@ describe('OverviewSkills', () => {
       ...createCharacter('Wiz'),
       classes: [{ id: 'wizard', level: 1 }],
     };
-    render(<OverviewSkills character={wizard} />);
+    render(<OverviewAbilities character={wizard} onChange={vi.fn()} />);
     expect(within(screen.getByTestId('overview-save-int')).getByLabelText('proficient')).toBeInTheDocument();
     expect(within(screen.getByTestId('overview-save-wis')).getByLabelText('proficient')).toBeInTheDocument();
     expect(within(screen.getByTestId('overview-save-str')).queryByRole('img')).toBeNull();
   });
   it('has a single header that is also the collapse toggle (persisted)', () => {
     localStorage.removeItem('dnd-collapse-overview-skills');
-    render(<OverviewSkills character={character} />);
-    const headings = screen.getAllByRole('heading');
-    expect(headings.map((h) => h.textContent)).toEqual(['Skills & Saves']);
-    expect(screen.queryByText(/Saves and skills/i)).toBeNull();
-    const toggle = screen.getByRole('button', { name: 'Skills & Saves' });
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings.map((h) => h.textContent)).toEqual(['Abilities, Saves & Skills']);
+    const toggle = screen.getByRole('button', { name: 'Abilities, Saves & Skills' });
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('region', { name: 'Skills & Saves' })).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Abilities, Saves & Skills' })).toBeVisible();
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(localStorage.getItem('dnd-collapse-overview-skills')).toBe('false');
@@ -92,7 +91,7 @@ describe('OverviewSkills', () => {
   });
 
   it('renders the six saves in one grid container', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     const grid = screen.getByTestId('overview-saves-grid');
     expect(grid).toHaveAccessibleName('Saving throws');
     expect(grid.children).toHaveLength(6);
@@ -101,16 +100,35 @@ describe('OverviewSkills', () => {
     }
   });
 
-  it('links to Abilities & Skills to edit proficiencies', () => {
-    render(<OverviewSkills character={character} />);
-    expect(
-      screen.getByRole('link', { name: 'Edit proficiencies on Abilities & Skills' }),
-    ).toHaveAttribute('href', '#character/abilities');
+  it('renders the six ability tiles with modifier and effective score', () => {
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
+    const grid = screen.getByTestId('overview-abilities-grid');
+    expect(grid.children).toHaveLength(6);
+    const str = screen.getByTestId('overview-ability-str');
+    expect(within(str).getByRole('button', { name: /Strength Modifier/ })).toHaveTextContent('+3');
+    expect(within(str).getByRole('button', { name: /Strength Score/ })).toHaveTextContent('16');
   });
 
-  it('matches the Abilities & Skills tab skill modifiers (parity)', () => {
+  it('Edit opens the collapsed card and reveals the editors; editing a score emits it', () => {
+    localStorage.setItem('dnd-collapse-overview-skills', 'false');
+    const onChange = vi.fn();
+    render(<OverviewAbilities character={character} onChange={onChange} />);
+    expect(screen.getByRole('button', { name: 'Abilities, Saves & Skills' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByRole('button', { name: 'Abilities, Saves & Skills' })).toHaveAttribute('aria-expanded', 'true');
+    // 6 save ticks + 18 skills x (Prof + Exp).
+    expect(screen.getAllByRole('checkbox')).toHaveLength(6 + 18 * 2);
+    fireEvent.change(screen.getByLabelText('Wisdom score'), { target: { value: '14' } });
+    expect(onChange.mock.calls.at(-1)?.[0].abilities.wis).toBe(14);
+    fireEvent.click(screen.getByLabelText('Stealth proficiency'));
+    expect(onChange.mock.calls.at(-1)?.[0].skills.stealth).toEqual(expect.objectContaining({ proficient: true }));
+    localStorage.removeItem('dnd-collapse-overview-skills');
+  });
+
+  it('matches the skill logic modifiers and markers (parity)', () => {
     // Both views read allSkillBreakdowns; proficiency state comes from getSkillTraining.
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     const tab = allSkillBreakdowns(character);
     for (const skill of SKILLS) {
       const row = screen.getByTestId(`overview-skill-${skill.id}`);
@@ -122,9 +140,9 @@ describe('OverviewSkills', () => {
   });
 });
 
-describe('OverviewSkills content tooltips', () => {
+describe('OverviewAbilities content tooltips', () => {
   it('opens a skill tooltip with its ability, example uses and the character\u2019s training', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'About Acrobatics' }));
     expect(screen.getByText('Acrobatics (Dexterity)')).toBeInTheDocument();
     expect(screen.getByText(/Stay on your feet in a tricky situation/)).toBeInTheDocument();
@@ -132,7 +150,7 @@ describe('OverviewSkills content tooltips', () => {
   });
 
   it('opens a saving throw tooltip describing what the save is for', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'About Dexterity saving throw' }));
     expect(screen.getByText(/dodge out of harm.s way/i)).toBeInTheDocument();
   });

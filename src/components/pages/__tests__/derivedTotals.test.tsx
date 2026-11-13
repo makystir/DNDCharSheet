@@ -36,14 +36,15 @@ describe('derived totals survive the page split', () => {
     ]) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument();
     }
-    cleanup();
 
-    // P3 Abilities & Skills: ability modifiers + every saving throw + every skill
-    // check (scores now sit WITH the saves/skills derived from them).
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="abilities" />);
+    // Same Overview, its Abilities, Saves & Skills card: ability modifiers and
+    // scores + every saving throw + every skill check.
     for (const ability of ABILITIES) {
       expect(
         screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Modifier`) }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(`${ABILITY_NAMES[ability]} Score`) }),
       ).toBeInTheDocument();
     }
     for (const ability of ABILITIES) {

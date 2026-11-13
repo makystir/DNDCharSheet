@@ -26,7 +26,7 @@ describe('Navigation subTabHint affordance (desktop expanded)', () => {
     renderNav(<Navigation activePage="character" onPageChange={vi.fn()} />);
     const character = screen.getByRole('button', { name: 'Character' });
     expect(
-      within(character).getByText('Overview · Abilities & Skills · Class & Features'),
+      within(character).getByText('Overview · Class & Features'),
     ).toBeInTheDocument();
   });
 

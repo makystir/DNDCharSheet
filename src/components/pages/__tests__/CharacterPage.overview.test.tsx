@@ -59,7 +59,7 @@ describe('CharacterPage Overview order', () => {
       'Resources',
       'Attacks',
       'Spellcasting',
-      'Skills & Saves',
+      'Abilities, Saves & Skills',
       'Traits & Feats',
     ];
     const positions = expected.map((title) => order.findIndex((h) => h.includes(title)));
@@ -77,7 +77,7 @@ describe('CharacterPage Overview order', () => {
     const order = headingOrder();
     expect(order.some((h) => h.includes('Spellcasting'))).toBe(false);
     const attacks = order.findIndex((h) => h.includes('Attacks'));
-    const skills = order.findIndex((h) => h.includes('Skills & Saves'));
+    const skills = order.findIndex((h) => h.includes('Abilities, Saves & Skills'));
     expect(skills).toBe(attacks + 1);
     // No empty placeholder is left in the "right now" column either: Attacks
     // is its last card.
@@ -107,7 +107,7 @@ describe('CharacterPage Overview order', () => {
       'Spell Slots',
     ]);
     // Right: the reference cards. Each has exactly ONE header.
-    expect(titlesIn('overview-column-reference')).toEqual(['Skills & Saves', 'Traits & Feats']);
+    expect(titlesIn('overview-column-reference')).toEqual(['Abilities, Saves & Skills', 'Traits & Feats']);
   });
 
   it('renders no SRD status text anywhere on the Overview', () => {

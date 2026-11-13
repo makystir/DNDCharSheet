@@ -5,15 +5,28 @@ import { CharacterPage } from '../CharacterPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
-// P3 (Option B): the Character page now has THREE sub-tabs. `SubTab` accepts a
-// legacy id too, so the migration/alias tests can deep-link an OLD id.
+// The Character page has TWO sub-tabs (Overview, Class & Features). `SubTab`
+// accepts legacy ids too, so the migration/alias tests can deep-link an OLD id.
+// The former Abilities & Skills tab ('abilities', and its older alias 'skills')
+// merged into the Overview's "Abilities, Saves & Skills" card.
 type SubTab = 'identity' | 'abilities' | 'build' | 'overview' | 'skills' | 'species' | 'class';
 
+/**
+ * Renders the page. For the legacy 'abilities' / 'skills' ids (which now land
+ * on the Overview) it also presses the merged card's Edit toggle, so tests that
+ * exercise the score / proficiency editors find them.
+ */
 function renderPage(overrides = {}, subTab: SubTab = 'identity') {
   const character = { ...createCharacter('Tester'), ...overrides };
   const onChange = vi.fn();
   render(<CharacterPage character={character} onChange={onChange} subTab={subTab} />);
+  if (subTab === 'abilities' || subTab === 'skills') openAbilitiesEditor();
   return { character, onChange };
+}
+
+/** Presses Edit on the Overview's Abilities, Saves & Skills card. */
+function openAbilitiesEditor() {
+  fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
 }
 
 /**
@@ -90,8 +103,9 @@ describe('CharacterPage', () => {
 
   it('renders all six ability cards', () => {
     renderPage({}, 'abilities');
+    const grid = screen.getByTestId('overview-abilities-grid');
     for (const abbr of ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']) {
-      expect(screen.getByText(abbr)).toBeInTheDocument();
+      expect(within(grid).getByText(abbr)).toBeInTheDocument();
     }
   });
 
@@ -216,9 +230,28 @@ describe('CharacterPage', () => {
       expect(species).toBeVisible();
     });
 
-    it('Ability Scores is NOT on identity (it moved to Abilities & Skills)', () => {
+    it('shows the merged Abilities, Saves & Skills card on identity, read-only until Edit', () => {
       renderPage();
-      expect(screen.queryByText('Ability Scores')).toBeNull();
+      expect(screen.getByText('Abilities, Saves & Skills')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
+      // View mode: no editors.
+      expect(screen.queryByLabelText('Strength score')).toBeNull();
+      expect(screen.queryByLabelText('Dexterity save proficiency')).toBeNull();
+      expect(screen.queryByLabelText('Stealth proficiency')).toBeNull();
+    });
+
+    it('the Edit toggle reveals the editors, and Done hides them again', () => {
+      renderPage();
+      const edit = screen.getByRole('button', { name: 'Edit' });
+      expect(edit).toHaveAttribute('aria-pressed', 'false');
+      fireEvent.click(edit);
+      const done = screen.getByRole('button', { name: 'Done' });
+      expect(done).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByLabelText('Strength score')).toBeInTheDocument();
+      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
+      expect(screen.getByLabelText('Stealth proficiency')).toBeInTheDocument();
+      fireEvent.click(done);
+      expect(screen.queryByLabelText('Strength score')).toBeNull();
     });
 
     it('has exactly one Character name control on identity (consolidated)', () => {
@@ -362,7 +395,9 @@ describe('CharacterPage', () => {
       const intTick = screen.getByLabelText('Intelligence save proficiency');
       expect(intTick).toBeChecked();
       expect(intTick).toBeDisabled();
-      expect(screen.getAllByText('from Wizard (class)')).toHaveLength(2);
+      // The locked tick names its source in its hover title.
+      expect(intTick).toHaveAttribute('title', 'from Wizard (class)');
+      expect(screen.getByLabelText('Wisdom save proficiency')).toHaveAttribute('title', 'from Wizard (class)');
       // Dex is neither class-granted nor ticked: editable and unchecked.
       const dexTick = screen.getByLabelText('Dexterity save proficiency');
       expect(dexTick).not.toBeChecked();
@@ -412,34 +447,31 @@ describe('CharacterPage', () => {
   });
 
   describe('sub-tabs', () => {
-    it('renders the SubTabBar with the three default tabs', () => {
+    it('renders the SubTabBar with the two default tabs', () => {
       renderPage();
       const tablist = screen.getByRole('tablist');
       const tabs = within(tablist).getAllByRole('tab');
       expect(tabs.map((t) => t.textContent)).toEqual([
         'Overview',
-        'Abilities & Skills',
         'Class & Features',
       ]);
     });
 
-    it('defaults to the Overview (Personal Details + Species + vitals, no other sections)', () => {
+    it('defaults to the Overview (Personal Details + Species + vitals + abilities, no class editor)', () => {
       renderPage();
       expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Proficiency Bonus/ })).toBeInTheDocument();
-      // Ability Scores / Species / Class / Saving Throws are gated to other tabs.
-      expect(screen.queryByText('Ability Scores')).toBeNull();
       expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument();
       expect(screen.queryByRole('combobox', { name: 'Class' })).toBeNull();
+      // Saves are shown read-only; their ticks wait for Edit.
+      expect(screen.getByRole('button', { name: /Dexterity Save/ })).toBeInTheDocument();
       expect(screen.queryByLabelText('Dexterity save proficiency')).toBeNull();
     });
 
-    it('Abilities & Skills shows scores WITH the saves and skills derived from them', () => {
-      renderPage({}, 'abilities');
-      // Ability Scores sit together with Saving Throws and Skills (the P3 win).
-      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    it('the Overview shows scores WITH the saves and skills derived from them', () => {
+      renderPage();
       expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
-      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Dexterity Save/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
     });
 
@@ -449,10 +481,13 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('combobox', { name: 'Class' })).toBeInTheDocument();
     });
 
-    it('deep-links to #character/abilities land on the Abilities & Skills sub-tab', () => {
-      renderPage({}, 'abilities');
-      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();
+    it('legacy deep link #character/abilities lands on the Overview (merged card)', () => {
+      render(
+        <CharacterPage character={createCharacter('Tester')} onChange={vi.fn()} subTab="abilities" />,
+      );
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
+      expect(screen.getByText('Abilities, Saves & Skills')).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true');
     });
 
     it('deep-links to #character/build land on the Class & Features sub-tab', () => {
@@ -464,13 +499,22 @@ describe('CharacterPage', () => {
     it('legacy deep link #character/overview aliases to Identity', () => {
       renderPage({}, 'overview');
       expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
-      expect(screen.queryByText('Ability Scores')).toBeNull();
     });
 
-    it('legacy deep link #character/skills aliases to Abilities & Skills', () => {
-      renderPage({}, 'skills');
-      expect(screen.getByLabelText('Dexterity save proficiency')).toBeInTheDocument();
-      expect(screen.getByText('Ability Scores')).toBeInTheDocument();
+    it('legacy deep link #character/skills aliases to the Overview', () => {
+      render(
+        <CharacterPage character={createCharacter('Tester')} onChange={vi.fn()} subTab="skills" />,
+      );
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
+      expect(screen.getByText('Abilities, Saves & Skills')).toBeInTheDocument();
+    });
+
+    it('a stored legacy lastSubTab (abilities) resolves to the Overview', () => {
+      localStorage.setItem('lastSubTab:character', 'abilities');
+      render(
+        <CharacterPage character={createCharacter('Tester')} onChange={vi.fn()} subTab={null} />,
+      );
+      expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     });
 
     it('legacy deep link #character/species aliases to Class & Features (id build); #character/class too', () => {
@@ -550,9 +594,7 @@ describe('CharacterPage', () => {
         expect(screen.getByRole('button', { name })).toBeInTheDocument();
       }
 
-      cleanup();
-      // Abilities & Skills: ability modifiers + saves + skill checks.
-      renderPage({ level: 3 }, 'abilities');
+      // Overview also: ability modifiers + saves + skill checks (merged card).
       expect(screen.getByRole('button', { name: /Strength Modifier/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Dexterity Save/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Stealth Check/ })).toBeInTheDocument();

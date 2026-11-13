@@ -1,21 +1,5 @@
-import type {
-  Character,
-  Ability,
-  SkillId,
-  SkillTraining,
-} from '../../types/character';
-import {
-  ABILITIES,
-  ABILITY_ABBR,
-  ABILITY_NAMES,
-  SKILLS,
-} from '../../types/character';
-import {
-  abilityModifierBreakdown,
-  clampAbilityScore,
-} from '../../logic/abilities';
-import { effectiveAbilityScores, abilityScoreBreakdown } from '../../logic/feats';
-import { formatSigned } from '../../logic/breakdown';
+import type { Character, SkillId } from '../../types/character';
+import { SKILLS } from '../../types/character';
 import {
   primaryClass,
   allClasses,
@@ -23,8 +7,6 @@ import {
   classProficiencies,
   classFeaturesByLevel,
 } from '../../logic/classes';
-import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
-import { allSkillBreakdowns, effectiveSkillTraining, getSkillTraining } from '../../logic/skills';
 import { shouldResetSpellcasting } from '../../logic/spellcasting';
 import { getSpecies } from '../../data/species';
 import type { SpeciesChoiceSpec } from '../../data/species';
@@ -32,9 +14,6 @@ import { CLASS_LIST, getClass } from '../../data/classes';
 import type { ClassData } from '../../data/classes';
 import type { ClassEntry, SpeciesSelection } from '../../types/character';
 import { useEffect, useState } from 'react';
-import { CalculatedValue } from '../shared/CalculatedValue';
-import { MaybeContentTooltip } from '../shared/ContentTooltip';
-import { resolveAbilityTooltip, resolveSaveTooltip, resolveSkillTooltip } from '../../logic/tooltip-content';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { PersonalDetailsSection } from './character/PersonalDetailsSection';
@@ -50,7 +29,7 @@ import { OverviewSpellcasting } from './character/OverviewSpellcasting';
 import { OverviewConditions } from './character/OverviewConditions';
 import { OverviewReactions } from './character/OverviewReactions';
 import { OverviewResources } from './character/OverviewResources';
-import { OverviewSkills } from './character/OverviewSkills';
+import { OverviewAbilities } from './character/OverviewAbilities';
 import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
 import { useTabOrder } from '../../hooks/useTabOrder';
@@ -74,28 +53,29 @@ export interface CharacterPageProps {
   onNotify?: (message: string) => void;
 }
 
-// The Character page has THREE sub-tabs: Overview (id 'identity'), Abilities &
-// Skills (id 'abilities') and Class & Features (id 'build'). The ids are stable;
-// the older ids (overview/skills/species/class) alias to them below.
-type CharSubTab = 'identity' | 'abilities' | 'build';
+// The Character page has TWO sub-tabs: Overview (id 'identity') and Class &
+// Features (id 'build'). The ids are stable; older ids alias to them below. The
+// former Abilities & Skills tab ('abilities') was merged into the Overview's
+// Abilities, Saves & Skills card, which showed the same saves and skills twice.
+type CharSubTab = 'identity' | 'build';
 
 // Stable identity (module scope) so it stays out of effect dependency arrays.
-const VALID_SUBTABS: CharSubTab[] = ['identity', 'abilities', 'build'];
+const VALID_SUBTABS: CharSubTab[] = ['identity', 'build'];
 
 const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
   { id: 'identity', label: 'Overview' },
-  { id: 'abilities', label: 'Abilities & Skills' },
   { id: 'build', label: 'Class & Features' },
 ];
 
 /**
- * P3 migration: the sub-tab ids changed from the old four-tab set
- * {overview,skills,species,class} to the new three-tab set
- * {identity,abilities,build}. A stored `lastSubTab:character` or a deep-link
+ * Sub-tab migrations: the old four-tab set {overview,skills,species,class}
+ * became {identity,abilities,build} (P3), and 'abilities' then merged into
+ * 'identity'. A stored `lastSubTab:character` or a deep-link
  * hash (#character/<old-id>) holding an OLD id is mapped to its NEW home so the
  * page opens on the equivalent tab instead of a blank/broken state:
  *   overview → identity   (personal details + level live on the Overview, id 'identity')
- *   skills   → abilities  (saves & skills live on Abilities & Skills)
+ *   skills    → identity  (saves & skills live on the Overview)
+ *   abilities → identity  (ability scores, saves & skills live on the Overview)
  *   species  → build      (species now lives on the Overview)
  *   class    → build      (class & features live on Class & Features, id 'build')
  * Any id not in this map and not a current valid id falls back to the default
@@ -106,7 +86,9 @@ const DEFAULT_SUBTABS: { id: CharSubTab; label: string }[] = [
  */
 const OLD_SUBTAB_ALIASES: Record<string, CharSubTab> = {
   overview: 'identity',
-  skills: 'abilities',
+  skills: 'identity',
+  // Abilities & Skills was merged into the Overview's Abilities, Saves & Skills card.
+  abilities: 'identity',
   species: 'build',
   class: 'build',
 };
@@ -121,9 +103,8 @@ function aliasSubTab(value: string | null | undefined): CharSubTab | null {
 /**
  * The Character tab. Overview is the one-page session sheet, top to bottom:
  * Personal Details + portrait, Species, Vitals, Heroic Inspiration, then a grid
- * of read-only cards (Conditions, Reactions, Attacks, Spellcasting for casters,
- * Skills & Saves, Traits & Feats). Abilities & Skills holds the six ability
- * scores with the saving throws and skills derived from them. Class & Features
+ * of cards (Conditions, Reactions, Attacks, Spellcasting for casters, then
+ * Abilities, Saves & Skills with its Edit toggle, and Traits & Feats). Class & Features
  * holds class, subclass, skill choices and the feature list. Every
  * CalculatedValue keeps its breakdown tooltip.
  */
@@ -192,28 +173,8 @@ export function CharacterPage({
   // spellcasting reconcile). Character → Overview now shows it READ-ONLY, so the
   // duplicate editor and its hand-rolled reconcile path are gone.
 
-  const setScore = (ability: Ability, raw: string) => {
-    const score = clampAbilityScore(Number.parseInt(raw, 10));
-    onChange({
-      ...character,
-      abilities: { ...character.abilities, [ability]: score },
-    });
-  };
-
-  const setSkill = (id: SkillId, patch: Partial<SkillTraining>) => {
-    const current = getSkillTraining(character, id);
-    onChange({
-      ...character,
-      skills: { ...character.skills, [id]: { ...current, ...patch } },
-    });
-  };
-
-  const setSaveProficiency = (ability: Ability, proficient: boolean) => {
-    onChange({
-      ...character,
-      saveProficiencies: { ...character.saveProficiencies, [ability]: proficient },
-    });
-  };
+  // Ability scores, save proficiencies and skill proficiencies are edited in
+  // the Overview's Abilities, Saves & Skills card (OverviewAbilities).
 
   // Selecting a class starts a fresh selection (dropping a stale subclass/skill
   // choice from a previous class); the empty value clears the class entirely.
@@ -328,13 +289,6 @@ export function CharacterPage({
     onChange({ ...character, species: next });
   };
 
-  // Effective ability scores (base + feat increases) drive the displayed
-  // modifier and every derived total; the base-score editor stays the creation
-  // value (A6b). effectiveAbilityScores is pure and never mutates abilities.
-  const effective = effectiveAbilityScores(character);
-  const saveBreakdowns = allSavingThrowBreakdowns(character);
-  const skillBreakdowns = allSkillBreakdowns(character);
-
   const selectedClass: ClassData | undefined = resolveClass(character);
   const classProfs = classProficiencies(character);
   const featuresByLevel = classFeaturesByLevel(character);
@@ -421,7 +375,8 @@ export function CharacterPage({
               card never leaves a hole beside a tall one): the "right now"
               cards on the left, the reference cards on the right. On a narrow
               page the columns stack in DOM order, so mobile reads Conditions,
-              Reactions, Attacks, Spellcasting, then Skills & Saves, Traits. */}
+              Reactions, Attacks, Spellcasting, then Abilities, Saves & Skills,
+              Traits. */}
           <div className={styles.overviewGrid} data-testid="overview-grid">
             <div className={styles.overviewColumns}>
               <div className={styles.overviewColumn} data-testid="overview-column-now">
@@ -432,200 +387,11 @@ export function CharacterPage({
                 <OverviewSpellcasting character={character} />
               </div>
               <div className={styles.overviewColumn} data-testid="overview-column-reference">
-                <OverviewSkills character={character} />
+                <OverviewAbilities character={character} onChange={onChange} />
                 <OverviewTraits character={character} />
               </div>
             </div>
           </div>
-        </>
-      )}
-
-      {activeSubTab === 'abilities' && (
-        <>
-      <Card>
-        {/* Same shared header as the Saving Throws / Skills cards beside it. */}
-        <CollapsibleSection title="Ability Scores" storageKey="dnd-collapse-ability-scores">
-        <div className={styles.abilityGrid}>
-          {ABILITIES.map((ability) => {
-            // The base score is the point-buy/creation value the input edits; it
-            // is NEVER mutated by feats. The EFFECTIVE score (base + feat
-            // increases) is what the modifier and every derived total use, and is
-            // shown with a Base + each feat source breakdown (calculated-totals +
-            // the A6b user decision). PHB 2024 "Ability Scores"/"Ability Score
-            // Improvement".
-            const baseScore = character.abilities[ability];
-            const effectiveScore = effective[ability];
-            const modBreakdown = abilityModifierBreakdown(ability, effectiveScore);
-            const scoreBreakdown = abilityScoreBreakdown(character, ability);
-            return (
-              <div key={ability} className={styles.abilityCard}>
-                <span className={styles.abilityName}>
-                  <MaybeContentTooltip
-                    content={resolveAbilityTooltip(ability)}
-                    ariaLabel={`About ${ABILITY_NAMES[ability]}`}
-                  >
-                    {ABILITY_ABBR[ability]}
-                  </MaybeContentTooltip>
-                </span>
-                <span className={styles.abilityMod}>
-                  <CalculatedValue
-                    label={`${ABILITY_NAMES[ability]} Modifier`}
-                    breakdown={modBreakdown}
-                  >
-                    {formatSigned(modBreakdown.total)}
-                  </CalculatedValue>
-                </span>
-                {/* The EFFECTIVE score, with a Base + each feat source breakdown. */}
-                <span className={styles.abilityScoreTotal}>
-                  <CalculatedValue
-                    label={`${ABILITY_NAMES[ability]} Score`}
-                    breakdown={scoreBreakdown}
-                  >
-                    {effectiveScore}
-                  </CalculatedValue>
-                </span>
-                {/* The base-score EDITOR stays the creation value (never a running
-                    total). When a feat has raised the score, the editable base is
-                    labelled so it is clear this is the base, not the effective. */}
-                <label className={styles.abilityBaseLabel} htmlFor={`ability-base-${ability}`}>
-                  {effectiveScore !== baseScore ? 'Base' : 'Score'}
-                </label>
-                <input
-                  id={`ability-base-${ability}`}
-                  className={styles.abilityScore}
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={baseScore}
-                  // WCAG 2.5.3 (Label in Name): the accessible name must contain
-                  // the visible label, which reads "Base" once a feat has raised
-                  // the score, and "Score" otherwise.
-                  aria-label={`${ABILITY_NAMES[ability]} ${effectiveScore !== baseScore ? 'base ' : ''}score`}
-                  onChange={(e) => setScore(ability, e.target.value)}
-                />
-              </div>
-            );
-          })}
-        </div>
-        </CollapsibleSection>
-      </Card>
-
-      <Card>
-        <CollapsibleSection title="Saving Throws" storageKey="dnd-collapse-saves">
-          <ul className={styles.statList}>
-            {ABILITIES.map((ability) => {
-              const breakdown = saveBreakdowns[ability];
-              // Class-granted saves (initial class only, PHB Core <Class> Traits)
-              // show ticked and locked; the editable tick is for manual extras
-              // such as feats.
-              const profInfo = savingThrowProficiency(character, ability);
-              const fromClass = profInfo.source === 'class';
-              const fromFeat = profInfo.source === 'feat';
-              return (
-                <li key={ability} className={styles.statRow}>
-                  <span className={styles.statName}>
-                    <MaybeContentTooltip
-                      content={resolveSaveTooltip(ability, character)}
-                      ariaLabel={`About ${ABILITY_NAMES[ability]} saving throw`}
-                    >
-                      {ABILITY_NAMES[ability]}
-                    </MaybeContentTooltip>
-                    {fromClass && (
-                      <span className={styles.saveSource}>from {profInfo.classLabel} (class)</span>
-                    )}
-                    {fromFeat && <span className={styles.saveSource}>from Resilient (feat)</span>}
-                  </span>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={profInfo.proficient}
-                      disabled={fromClass}
-                      aria-label={`${ABILITY_NAMES[ability]} save proficiency`}
-                      onChange={(e) => setSaveProficiency(ability, e.target.checked)}
-                    />
-                    <span className={styles.checkboxText}>Prof</span>
-                  </label>
-                  <span className={styles.statValue}>
-                    <CalculatedValue
-                      label={`${ABILITY_NAMES[ability]} Save`}
-                      breakdown={breakdown}
-                    >
-                      {formatSigned(breakdown.total)}
-                    </CalculatedValue>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </CollapsibleSection>
-      </Card>
-
-      <Card>
-        <CollapsibleSection title="Skills" storageKey="dnd-collapse-skills">
-          <ul className={styles.statList}>
-            {SKILLS.map((skill) => {
-              const breakdown = skillBreakdowns[skill.id];
-              // Effective view: class- and species-granted skills show ticked and
-              // locked (like class saving throws); the tick is editable otherwise.
-              const training = effectiveSkillTraining(character, skill.id);
-              const proficient = training.proficient;
-              const expertise = training.expertise;
-              const granted =
-                training.source === 'class' || training.source === 'species' || training.source === 'feat';
-              return (
-                <li key={skill.id} className={styles.statRow}>
-                  <span className={styles.statName}>
-                    <MaybeContentTooltip
-                      content={resolveSkillTooltip(skill.id, character)}
-                      ariaLabel={`About ${skill.name}`}
-                    >
-                      {skill.name}
-                    </MaybeContentTooltip>{' '}
-                    <span className={styles.statAbility}>
-                      ({ABILITY_ABBR[skill.ability]})
-                    </span>
-                    {granted && (
-                      <span className={styles.saveSource}>from {training.sourceLabel}</span>
-                    )}
-                  </span>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={proficient}
-                      disabled={granted}
-                      aria-label={`${skill.name} proficiency`}
-                      onChange={(e) =>
-                        setSkill(skill.id, { proficient: e.target.checked })
-                      }
-                    />
-                    <span className={styles.checkboxText}>Prof</span>
-                  </label>
-                  <label className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={expertise}
-                      disabled={!proficient}
-                      aria-label={`${skill.name} expertise`}
-                      onChange={(e) =>
-                        setSkill(skill.id, { expertise: e.target.checked })
-                      }
-                    />
-                    <span className={styles.checkboxText}>Exp</span>
-                  </label>
-                  <span className={styles.statValue}>
-                    <CalculatedValue label={`${skill.name} Check`} breakdown={breakdown}>
-                      {formatSigned(breakdown.total)}
-                    </CalculatedValue>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </CollapsibleSection>
-      </Card>
         </>
       )}
 

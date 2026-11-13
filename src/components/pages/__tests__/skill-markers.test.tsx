@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, within, cleanup, fireEvent } from '@testing-library/react';
 import { CharacterPage } from '../CharacterPage';
-import { OverviewSkills } from '../character/OverviewSkills';
+import { OverviewAbilities } from '../character/OverviewAbilities';
 import { buildSkills } from '../../layout/printLayoutGenerators';
 import { createCharacter } from '../../../storage/character-store';
 import type { Character } from '../../../types/character';
@@ -19,7 +19,7 @@ const character: Character = {
 
 describe('skill proficiency markers show class- and species-granted skills', () => {
   it('Overview: P marker on class, species and manual skills, none on others', () => {
-    render(<OverviewSkills character={character} />);
+    render(<OverviewAbilities character={character} onChange={vi.fn()} />);
     for (const id of ['arcana', 'insight', 'history']) {
       const row = screen.getByTestId(`overview-skill-${id}`);
       expect(within(row).getByRole('img', { name: 'proficient' })).toHaveTextContent('P');
@@ -36,8 +36,9 @@ describe('skill proficiency markers show class- and species-granted skills', () 
     expect(rows.stealth.expertise).toBe(false);
   });
 
-  it('Abilities & Skills tab: granted skills are checked, locked and labelled; others stay manual', () => {
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="abilities" />);
+  it('Overview Edit mode: granted skills are checked, locked and labelled; others stay manual', () => {
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="identity" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     const arcana = screen.getByLabelText('Arcana proficiency') as HTMLInputElement;
     expect(arcana.checked).toBe(true);
     expect(arcana.disabled).toBe(true);
@@ -56,7 +57,8 @@ describe('skill proficiency markers show class- and species-granted skills', () 
   });
 
   it('Expertise becomes available whenever the skill is effectively proficient', () => {
-    render(<CharacterPage character={character} onChange={vi.fn()} subTab="abilities" />);
+    render(<CharacterPage character={character} onChange={vi.fn()} subTab="identity" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     expect((screen.getByLabelText('Arcana expertise') as HTMLInputElement).disabled).toBe(false);
     expect((screen.getByLabelText('Insight expertise') as HTMLInputElement).disabled).toBe(false);
     expect((screen.getByLabelText('Stealth expertise') as HTMLInputElement).disabled).toBe(true);

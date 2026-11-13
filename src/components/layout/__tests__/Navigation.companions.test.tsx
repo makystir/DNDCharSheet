@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, beforeAll } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import App from '../../../App';
 import { _resetDbForTests, createCharacter, saveCharacter } from '../../../storage/character-store';
@@ -29,6 +29,15 @@ afterEach(() => {
   cleanup();
   history.replaceState(null, '', '#');
 });
+
+/**
+ * App loads the Companions page with React.lazy. Preload it so the first visit
+ * in a worker does not transform the page module graph inside a findBy wait,
+ * which overruns under full-suite load.
+ */
+beforeAll(async () => {
+  await import('../../pages/CompanionsPage');
+}, 60_000);
 
 async function renderApp() {
   await seedCharacter();

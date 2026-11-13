@@ -1,0 +1,260 @@
+/* Abilities, Saves & Skills on the Overview. The body is an inline-size
+   container so the grids size to the CARD, not the viewport (the card sits in a
+   half-width column on desktop). */
+.body {
+  container-type: inline-size;
+}
+.body[hidden] {
+  display: none;
+}
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+  background: transparent;
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.editBtn[aria-pressed='true'] {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+}
+.editBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+.editHint {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.subheading {
+  margin: 14px 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Ability scores: 3 x 2 by default, 6 in a row when the card is wide. */
+.abilities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@container (min-width: 520px) {
+  .abilities {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.abilityTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.abilityName {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+.abilityMod {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--accent-gold);
+  font-variant-numeric: tabular-nums;
+}
+.abilityScore {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.baseField {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+.baseLabel {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.baseInput {
+  width: 56px;
+  min-height: 32px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+}
+.baseInput:focus-visible,
+.checkbox:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Saves: an even grid so rows are always balanced: 3 x 2 by default, 6 in a
+   row when the card is wide, 2 x 3 when it is very narrow. */
+.saves {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@container (min-width: 520px) {
+  .saves {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+@container (max-width: 260px) {
+  .saves {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-variant-numeric: tabular-nums;
+}
+.chipName {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Skills: one column in a narrow card, two balanced columns (9 + 9) when there
+   is room. Every row has the same height and its modifier at the same x. */
+.skills {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@container (min-width: 440px) {
+  .skills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-template-rows: repeat(9, auto);
+  }
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border-bottom: 1px solid var(--border);
+  /* Transparent bar on every row so trained rows do not shift their text. */
+  border-left: 3px solid transparent;
+}
+/* Subtle highlight; the P / E text marker carries the meaning too. */
+.trained {
+  background: var(--bg-tertiary);
+  border-left-color: var(--accent-gold);
+}
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ability {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.source {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: normal;
+}
+.markerSlot {
+  flex: 0 0 1.5ch;
+  display: inline-flex;
+  justify-content: center;
+}
+.marker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+.ticks {
+  display: inline-flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.tick {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-gold);
+}
+.value {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+  text-align: right;
+}
+.legend {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+@media (hover: none), (max-width: 767px) {
+  .row {
+    min-height: 44px;
+  }
+  .editBtn,
+  .baseInput {
+    min-height: 44px;
+  }
+  .checkbox {
+    width: 24px;
+    height: 24px;
+  }
+}

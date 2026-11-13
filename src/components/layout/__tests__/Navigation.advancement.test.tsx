@@ -39,8 +39,7 @@ afterEach(() => {
 async function renderApp() {
   await seedCharacter();
   render(<App />);
-  // P3: the Character tab defaults to the Overview sub-tab (Personal Details);
-  // Ability Scores moved to the Abilities & Skills sub-tab.
+  // The Character tab defaults to the Overview sub-tab (Personal Details).
   await screen.findByRole('heading', { name: 'Personal Details' });
 }
 
