@@ -29,6 +29,7 @@ import type { StatBlockModel, StatFeature } from '../../logic/stat-block-model';
 import { resolveCompanionRuleTooltip, resolveSidekickFeatureTooltip } from '../../logic/tooltip-content';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { companionPortraitKey } from '../../storage/companion-portraits';
 import { BlurInput } from './BlurInput';
 import { RecordCard } from './RecordCard';
 import { SidekickDeathSaves } from './SidekickDeathSaves';
@@ -137,6 +138,18 @@ export function SidekickCard({ record, character, onPatch, onDelete, rng }: Side
       }
       hp={{ current: cur, max: hpMax }}
       muted={record.dead === true}
+      portrait={{
+        storeKey: companionPortraitKey(character.id, record.id),
+        prompt: {
+          subject: 'creature',
+          name,
+          creatureName: creature.name,
+          size: creature.size ?? undefined,
+          creatureType: creature.creatureType ?? undefined,
+          role: `${cls.name} sidekick`,
+        },
+        appearance: { value: record.appearance, onChange: (v) => patch({ appearance: v }) },
+      }}
       onDelete={() => onDelete(record.id)}
     >
       {() => (

@@ -22,6 +22,8 @@ export interface BackupCharacterEntry {
   id: string;
   character: Record<string, unknown>; // Full character JSON (single-export format)
   portrait: string; // base64 data-URL or empty string
+  /** Companion portraits by record id (base64 data-URLs); absent when there are none. */
+  companionPortraits?: Record<string, string>;
 }
 
 /** Metadata extracted during validation */

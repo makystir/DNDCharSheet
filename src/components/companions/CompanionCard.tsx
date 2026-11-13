@@ -8,6 +8,7 @@ import { trackedHpOf } from '../../logic/companions-actions';
 import { capacityStatus, mountCapacity } from '../../logic/companions';
 import { OTHERWORLDLY_STEED_MAX_SPELL_LEVEL, OTHERWORLDLY_STEED_MIN_SPELL_LEVEL, OTHERWORLDLY_STEED_TYPES } from '../../logic/primal-companion';
 import { zeroHpRuleKeyForOrigin } from '../../logic/tooltip-content';
+import { companionPortraitKey } from '../../storage/companion-portraits';
 import { BlurInput } from './BlurInput';
 import { RecordCard } from './RecordCard';
 import { RidingPackingSection } from './RidingPackingSection';
@@ -59,6 +60,29 @@ export function CompanionCard({ record, character, onPatch, onDelete }: Companio
     </>
   );
 
+  // The spirit type chosen for a familiar or the Otherworldly Steed (Wild
+  // Companion is always Fey), else the stat block's own type.
+  const spirit = record.origin === 'wild-companion' ? 'Fey' : (record.familiarType ?? record.steedType);
+  const primal = record.origin === 'primal-companion';
+  const portrait = {
+    storeKey: companionPortraitKey(character.id, record.id),
+    prompt: {
+      subject: 'creature' as const,
+      name,
+      creatureName: creature.name,
+      size: creature.size ?? undefined,
+      creatureType: spirit ?? (creature.id === 'otherworldly-steed' ? undefined : (creature.creatureType ?? undefined)),
+      // PHB 2024 Beast Master (L5583): the beast bears primal markings showing its supernatural origin.
+      flavor: primal ? ['It bears primal markings that show its supernatural origin.'] : undefined,
+    },
+    appearance: {
+      value: record.appearance,
+      onChange: (v: string | undefined) => patch({ appearance: v }),
+      label: primal ? 'Kind of animal and appearance' : 'Appearance',
+      hint: primal ? 'You choose what kind of animal it is, one that fits its stat block (PHB, Beast Master).' : undefined,
+    },
+  };
+
   return (
     <RecordCard
       testId={`companion-${record.id}`}
@@ -67,6 +91,7 @@ export function CompanionCard({ record, character, onPatch, onDelete }: Companio
       meta={meta}
       hp={cur !== null && hpMax !== null ? { current: cur, max: hpMax } : null}
       muted={dismissed}
+      portrait={portrait}
       onDelete={() => onDelete(record.id)}
     >
       {() => (

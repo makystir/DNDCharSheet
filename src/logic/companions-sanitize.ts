@@ -59,6 +59,7 @@ import { isTrackedConditionId } from './conditions';
 const ID_MAX = 80;
 const NAME_MAX = 80;
 const NOTES_MAX = 2000;
+const APPEARANCE_MAX = 300;
 const ENTRY_DESCRIPTION_MAX = 2000;
 const STAT_TEXT_MAX = 500;
 const CR_TEXT_MAX = 10;
@@ -176,6 +177,7 @@ function sanitizeTracked(raw: Raw, target: TrackedCreature): void {
   assign(target, 'conditions', sanitizeTrackedConditions(raw.conditions));
   assign(target, 'exhaustionLevel', intInRange(raw.exhaustionLevel, 1, 6));
   assign(target, 'notes', nonEmptyString(raw.notes, NOTES_MAX));
+  assign(target, 'appearance', nonEmptyString(raw.appearance, APPEARANCE_MAX));
 }
 
 // ─── Companions ──────────────────────────────────────────────────────────────

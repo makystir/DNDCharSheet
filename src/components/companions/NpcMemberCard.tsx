@@ -4,6 +4,7 @@ import type { RNG } from '../../logic/random';
 import { trackedHpOf } from '../../logic/companions-actions';
 import { resolveCompanionRuleTooltip } from '../../logic/tooltip-content';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { companionPortraitKey } from '../../storage/companion-portraits';
 import { BlurInput } from './BlurInput';
 import { CustomStatBlockEditor } from './CustomStatBlockEditor';
 import { LoyaltyControl } from './LoyaltyControl';
@@ -13,6 +14,8 @@ import styles from './CompanionsShared.module.css';
 
 export interface NpcMemberCardProps {
   record: NpcPartyMemberRecord;
+  /** The owning character's id (portrait store key). */
+  ownerId: string;
   /** The character's level: the party level for the Challenge Rating guideline. */
   partyLevel: number;
   /** Present only while the Loyalty house rule is on. */
@@ -29,7 +32,7 @@ export interface NpcMemberCardProps {
  * Challenge Rating guideline (no higher than half the characters' level) is a
  * warning only and never blocks.
  */
-export function NpcMemberCard({ record, partyLevel, loyalty, onPatch, onDelete, rng }: NpcMemberCardProps) {
+export function NpcMemberCard({ record, ownerId, partyLevel, loyalty, onPatch, onDelete, rng }: NpcMemberCardProps) {
   const patch = (p: Partial<NpcPartyMemberRecord>) => onPatch(record.id, p);
   const crCheck = npcChallengeRatingCheck(record.stats?.cr, partyLevel);
   const hpMax = record.stats?.hpMax !== undefined && record.stats.hpMax > 0 ? record.stats.hpMax : null;
@@ -47,6 +50,11 @@ export function NpcMemberCard({ record, partyLevel, loyalty, onPatch, onDelete, 
         </>
       }
       hp={hpMax !== null ? { current: trackedHpOf(record, hpMax), max: hpMax } : null}
+      portrait={{
+        storeKey: companionPortraitKey(ownerId, record.id),
+        prompt: { subject: 'person', name: record.name, role: record.role?.trim() || 'NPC party member', size: record.stats?.size, creatureType: record.stats?.creatureType },
+        appearance: { value: record.appearance, onChange: (v) => patch({ appearance: v }) },
+      }}
       onDelete={() => onDelete(record.id)}
     >
       {() => (

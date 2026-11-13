@@ -25,6 +25,7 @@ import { listSummaries } from './character-manager';
 import { getCharacter } from './character-store';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64 } from './portrait-codec';
+import { collectCompanionPortraits } from './companion-portraits';
 import { recordBackup } from './backup-reminder';
 
 /**
@@ -90,12 +91,16 @@ export async function assembleBackup(
       portrait = '';
     }
 
+    // Companion portraits (Companions page records), keyed by record id.
+    const companionPortraits = await collectCompanionPortraits(character);
+
     // Assemble the entry.
     try {
       const entry: BackupCharacterEntry = {
         id: summary.id,
         character: JSON.parse(JSON.stringify(character)) as Record<string, unknown>,
         portrait,
+        ...(companionPortraits ? { companionPortraits } : {}),
       };
       entries.push(entry);
     } catch (err) {

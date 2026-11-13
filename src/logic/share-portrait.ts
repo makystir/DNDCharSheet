@@ -25,7 +25,8 @@ export type ShareLinkLength = 'none' | 'soft' | 'hard';
 
 /**
  * Produce the link variant of an export-envelope JSON string: the embedded
- * `portrait` field is removed so the compressed URL stays small. Pure: it never
+ * `portrait` and `companionPortraits` fields are removed so the compressed URL
+ * stays small. Pure: it never
  * mutates the input. A payload that is not a JSON object, or has no portrait, is
  * returned unchanged (best-effort — the caller still bounds the link length).
  */
@@ -40,11 +41,12 @@ export function trimForLink(envelopeJson: string): string {
     return envelopeJson;
   }
   const obj = parsed as Record<string, unknown>;
-  if (!('portrait' in obj)) {
+  if (!('portrait' in obj) && !('companionPortraits' in obj)) {
     return envelopeJson;
   }
-  const { portrait: _portrait, ...rest } = obj;
+  const { portrait: _portrait, companionPortraits: _companions, ...rest } = obj;
   void _portrait;
+  void _companions;
   return JSON.stringify(rest);
 }
 

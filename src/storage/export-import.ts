@@ -29,6 +29,7 @@ import { isConcentrating, sanitizeConditionDurations } from '../logic/condition-
 import { sanitizeEffects } from '../logic/combat-effects';
 import { getPortraitStore } from './portrait-store';
 import { blobToBase64, isValidPortraitDataUrl } from './portrait-codec';
+import { collectCompanionPortraits, sanitizeCompanionPortraitMap } from './companion-portraits';
 import { runMigration } from './migration';
 
 /**
@@ -40,8 +41,8 @@ import { runMigration } from './migration';
  */
 const REQUIRED_TOP_LEVEL_KEYS = ['name', 'level', 'abilities'] as const;
 
-/** The envelope embedded in an export: the character JSON plus its portrait. */
-type ExportEnvelope = Character & { portrait?: string };
+/** The envelope embedded in an export: the character JSON plus its portraits. */
+type ExportEnvelope = Character & { portrait?: string; companionPortraits?: Record<string, string> };
 
 /**
  * Serialise a character to a pretty-printed JSON string.
@@ -78,9 +79,14 @@ export async function exportCharacter(
     portrait = undefined;
   }
 
-  const envelope: ExportEnvelope = portrait
-    ? { ...character, portrait }
-    : { ...character };
+  // Companion portraits (keyed by record id) travel in the same envelope.
+  const companionPortraits = await collectCompanionPortraits(character, characterId);
+
+  const envelope: ExportEnvelope = {
+    ...character,
+    ...(portrait ? { portrait } : {}),
+    ...(companionPortraits ? { companionPortraits } : {}),
+  };
   return JSON.stringify(envelope, null, 2);
 }
 
@@ -128,6 +134,8 @@ export interface ImportResult {
   character?: Character;
   /** The portrait data-URL extracted from the import, if any (for the store). */
   portraitDataUrl?: string;
+  /** Companion portraits by record id (validated data-URLs for records that exist). */
+  companionPortraits?: Record<string, string>;
   /** A helpful message when `success` is false. */
   error?: string;
 }
@@ -188,7 +196,7 @@ export function importFromJSON(json: string): ImportResult {
   }
   // Strip the portrait field regardless of validity so it never lands on the
   // character record (the image belongs in the Portrait Store).
-  const { portrait: _portrait, ...characterData } = data;
+  const { portrait: _portrait, companionPortraits: rawCompanionPortraits, ...characterData } = data;
   void _portrait;
 
   // Fill missing fields from BLANK_CHARACTER so a leaner/older export loads.
@@ -235,7 +243,15 @@ export function importFromJSON(json: string): ImportResult {
     updatedAt: 0,
   };
 
-  return { success: true, character, portraitDataUrl };
+  // Companion portraits: only valid image data-URLs for records that survived
+  // sanitizing are kept; the map never lands on the character record.
+  const companionPortraits = sanitizeCompanionPortraitMap(rawCompanionPortraits, character);
+  return {
+    success: true,
+    character,
+    portraitDataUrl,
+    ...(companionPortraits ? { companionPortraits } : {}),
+  };
 }
 
 /**

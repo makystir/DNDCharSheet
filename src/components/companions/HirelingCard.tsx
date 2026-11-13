@@ -18,6 +18,7 @@ import { trackedHpOf } from '../../logic/companions-actions';
 import { resolveCompanionRuleTooltip } from '../../logic/tooltip-content';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
+import { companionPortraitKey } from '../../storage/companion-portraits';
 import { BlurInput } from './BlurInput';
 import { CustomStatBlockEditor } from './CustomStatBlockEditor';
 import { LoyaltyControl } from './LoyaltyControl';
@@ -27,6 +28,8 @@ import styles from './CompanionsShared.module.css';
 
 export interface HirelingCardProps {
   record: HirelingRecord;
+  /** The owning character's id (portrait store key). */
+  ownerId: string;
   /** Present only while the Loyalty house rule is on. */
   loyalty: { max: number } | null;
   onPatch: (id: string, patch: Partial<HirelingRecord>) => void;
@@ -40,7 +43,7 @@ export interface HirelingCardProps {
  * instead of upkeep; the 12-characteristic grid is the 2024 stat block, which
  * starts EMPTY and is typed in by hand (the PHB gives hirelings no stats).
  */
-export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: HirelingCardProps) {
+export function HirelingCard({ record, ownerId, loyalty, onPatch, onDelete, rng }: HirelingCardProps) {
   const patch = (p: Partial<HirelingRecord>) => onPatch(record.id, p);
   const unit = hirelingUnitName(record.kind);
   const units = clampHirelingUnits(record.units);
@@ -61,6 +64,11 @@ export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: Hireli
       kind={HIRELING_KIND_LABELS[record.kind]}
       meta={<span className={styles.chip}>{`${units} ${unit}${units === 1 ? '' : 's'}: ${formatCopper(total)}`}</span>}
       hp={hpMax !== null ? { current: trackedHpOf(record, hpMax), max: hpMax } : null}
+      portrait={{
+        storeKey: companionPortraitKey(ownerId, record.id),
+        prompt: { subject: 'person', name: record.name, role: HIRELING_KIND_LABELS[record.kind], size: record.stats?.size, creatureType: record.stats?.creatureType },
+        appearance: { value: record.appearance, onChange: (v) => patch({ appearance: v }) },
+      }}
       onDelete={() => onDelete(record.id)}
     >
       {() => (

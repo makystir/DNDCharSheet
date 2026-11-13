@@ -27,6 +27,7 @@ import { newCharacterId } from './character-store';
 import { getPortraitStore } from './portrait-store';
 import { base64ToBlob, isValidPortraitDataUrl } from './portrait-codec';
 import { runMigration } from './migration';
+import { restoreCompanionPortraits } from './companion-portraits';
 
 /**
  * Parse and validate a backup file string (treated as UNTRUSTED input).
@@ -236,6 +237,14 @@ export async function restoreCharacters(
             break;
           }
         }
+      }
+
+      // Companion portraits follow the character to its new id.
+      const companions = await restoreCompanionPortraits(saved, entry.companionPortraits);
+      if (companions.quota) {
+        stoppedByQuota = true;
+        imported++;
+        break;
       }
 
       imported++;

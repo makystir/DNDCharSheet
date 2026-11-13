@@ -117,6 +117,7 @@ describe('assembleBackup — failure isolation', () => {
       getPortraitURL: vi.fn().mockResolvedValue({ ok: true, value: null }),
       getPortraitBlob: vi.fn().mockRejectedValue(new Error('portrait boom')),
       deletePortrait: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+      listKeysWithPrefix: vi.fn().mockResolvedValue({ ok: true, value: [] }),
       revokeURL: vi.fn(),
     });
 

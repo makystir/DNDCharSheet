@@ -95,7 +95,7 @@ export function PeopleTab({ character, onChange, undo, filter, onFilterChange, t
   const renderKind = (kind: PersonKind) => {
     if (kind === 'hirelings') {
       return hirelings.list.map((rec) => (
-        <HirelingCard key={rec.id} record={rec} loyalty={loyaltyOn ? loyaltyCard : null} onPatch={hirelings.patch} onDelete={hirelings.requestDelete} rng={rng} />
+        <HirelingCard key={rec.id} record={rec} ownerId={character.id} loyalty={loyaltyOn ? loyaltyCard : null} onPatch={hirelings.patch} onDelete={hirelings.requestDelete} rng={rng} />
       ));
     }
     if (kind === 'npc') {
@@ -103,6 +103,7 @@ export function PeopleTab({ character, onChange, undo, filter, onFilterChange, t
         <NpcMemberCard
           key={rec.id}
           record={rec}
+          ownerId={character.id}
           partyLevel={character.level}
           loyalty={loyaltyOn ? loyaltyCard : null}
           onPatch={npcs.patch}

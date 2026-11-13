@@ -402,6 +402,8 @@ This page is for everyone who travels with you. A strip at the top shows how man
 
 Every card works the same way: tap its header to open it, and use **Remove** at the bottom to delete it (you can undo for a few seconds).
 
+**Portraits.** Each creature and person can have a portrait. Open the card and press **Upload portrait**; square pictures work best, and big ones are shrunk to save space. The picture also shows as a small circle on the card's header. Fill in **Appearance** (for a Primal Companion, **Kind of animal and appearance**: you choose what animal your beast is) and press **Portrait prompt** to get text you can paste into an AI image generator. Portraits are included when you export or back up the character, but left out of share links to keep them short.
+
 Temporary summoned creatures from spells are not tracked here. Companion hit points and conditions are edited on this page only.
 
 ---

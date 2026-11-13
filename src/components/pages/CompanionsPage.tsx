@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Character } from '../../types/character';
 import { partyRoster } from '../../logic/party-roster';
+import { pruneCompanionPortraits } from '../../storage/companion-portraits';
 import { loadLastSubTab, saveLastSubTab } from '../../logic/sub-tab-store';
 import { useTabOrder } from '../../hooks/useTabOrder';
 import { useUndoToast } from '../../hooks/useUndoToast';
@@ -66,6 +67,17 @@ export function CompanionsPage({ character, onChange, subTab, onSubTabChange }: 
     defaultTabs: DEFAULT_SUBTABS,
   });
   const undoToast = useUndoToast();
+
+  // Drop portraits of records removed on an earlier visit. Only on mount (and
+  // a character switch): a record removed now keeps its image while its undo
+  // toast is showing.
+  const latestCharacter = useRef(character);
+  useEffect(() => {
+    latestCharacter.current = character;
+  });
+  useEffect(() => {
+    void pruneCompanionPortraits(latestCharacter.current);
+  }, [character.id]);
 
   const resolveInitial = (): { tab: CompanionsSubTab; filter?: PeopleFilter } => {
     const fromHash = resolveId(subTab);

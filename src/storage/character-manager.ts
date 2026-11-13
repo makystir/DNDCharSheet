@@ -33,6 +33,7 @@ import {
   deleteCharacter as storeDeleteCharacter,
 } from './character-store';
 import { getPortraitStore } from './portrait-store';
+import { copyCompanionPortraits, deleteCompanionPortraits } from './companion-portraits';
 import { CLASS_CATALOG } from '../data/classes';
 import { primaryClass, resolveClasses } from '../logic/classes';
 
@@ -214,6 +215,8 @@ export async function duplicateCharacter(id: string): Promise<Character | null> 
   if (blobResult.ok && blobResult.value) {
     await portraits.savePortrait(saved.id, blobResult.value);
   }
+  // Companion portraits too: the copy keeps the same record ids.
+  await copyCompanionPortraits(id, saved.id);
 
   setActiveCharacterId(saved.id);
   return saved;
@@ -251,6 +254,7 @@ export async function deleteCharacter(id: string): Promise<DeleteResult> {
   await storeDeleteCharacter(id);
   // Portrait cleanup (WFRP deleteCharacterFull parity). Degrades gracefully.
   await getPortraitStore().deletePortrait(id);
+  await deleteCompanionPortraits(id);
 
   const remaining = await storeListCharacters();
   let nextActiveId = getActiveCharacterId();

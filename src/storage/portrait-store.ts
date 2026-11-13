@@ -37,6 +37,11 @@ export interface IPortraitStore {
   getPortraitBlob(characterId: string): Promise<PortraitResult<Blob | null>>;
   /** Delete a portrait for a character (deleting a missing id is a no-op). */
   deletePortrait(characterId: string): Promise<PortraitResult<void>>;
+  /**
+   * Every stored key that starts with `prefix` (companion portraits are keyed
+   * `<characterId>:<recordId>`, so `<characterId>:` lists one sheet's set).
+   */
+  listKeysWithPrefix(prefix: string): Promise<PortraitResult<string[]>>;
   /** Revoke a previously created object URL (cleanup). */
   revokeURL(url: string): void;
 }
@@ -177,6 +182,24 @@ const store: IPortraitStore = {
       return { ok: true, value: undefined };
     } catch (err) {
       return { ok: false, error: `Failed to delete portrait: ${errorMessage(err)}` };
+    }
+  },
+
+  async listKeysWithPrefix(prefix) {
+    const opened = await openOrError();
+    if (!opened.ok) return opened;
+    try {
+      const keys = await new Promise<string[]>((resolve, reject) => {
+        const tx = opened.db.transaction(STORE_NAME, 'readonly');
+        // Every key from `prefix` up to `prefix` + the highest BMP character.
+        const range = IDBKeyRange.bound(prefix, `${prefix}\uffff`);
+        const request = tx.objectStore(STORE_NAME).getAllKeys(range);
+        request.onsuccess = () => resolve(request.result.filter((k): k is string => typeof k === 'string'));
+        request.onerror = () => reject(request.error ?? new Error('Key listing failed.'));
+      });
+      return { ok: true, value: keys };
+    } catch (err) {
+      return { ok: false, error: `Failed to list portraits: ${errorMessage(err)}` };
     }
   },
 

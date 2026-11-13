@@ -6,15 +6,23 @@ import {
   PORTRAIT_MOODS,
   PORTRAIT_STYLES,
 } from '../../logic/portrait-prompt';
-import type { PortraitFraming, PortraitMood, PortraitStyle } from '../../logic/portrait-prompt';
+import type { PortraitFraming, PortraitMood, PortraitPromptOptions, PortraitStyle } from '../../logic/portrait-prompt';
 import { loadPortraitPrefs, savePortraitPrefs } from '../../logic/portrait-prompt-prefs';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import styles from './PortraitPromptDialog.module.css';
 
-interface PortraitPromptDialogProps {
-  character: Character;
+type PortraitPromptDialogProps = {
   onClose: () => void;
-}
+} & (
+  | { character: Character; buildPrompt?: undefined; hint?: undefined }
+  | {
+      character?: undefined;
+      /** Builds the prompt for another subject (a companion record). */
+      buildPrompt: (options: PortraitPromptOptions) => string;
+      /** Intro line under the title. */
+      hint: string;
+    }
+);
 
 const EXTRA_DETAILS_MAX = 300;
 
@@ -23,7 +31,7 @@ const EXTRA_DETAILS_MAX = 300;
  * portrait. It only shows/copies text: it never changes the character. Style,
  * framing and mood are remembered in localStorage.
  */
-export function PortraitPromptDialog({ character, onClose }: PortraitPromptDialogProps) {
+export function PortraitPromptDialog({ character, buildPrompt, hint, onClose }: PortraitPromptDialogProps) {
   const [initialPrefs] = useState(loadPortraitPrefs);
   const [framing, setFraming] = useState<PortraitFraming>(initialPrefs.framing);
   const [style, setStyle] = useState<PortraitStyle>(initialPrefs.style);
@@ -39,10 +47,10 @@ export function PortraitPromptDialog({ character, onClose }: PortraitPromptDialo
   const overlayRef = useRef<HTMLDivElement>(null);
   useFocusTrap(overlayRef, true);
 
-  const prompt = useMemo(
-    () => buildPortraitPrompt(character, { framing, style, mood, extraDetails }),
-    [character, framing, style, mood, extraDetails],
-  );
+  const prompt = useMemo(() => {
+    const options = { framing, style, mood, extraDetails };
+    return buildPrompt ? buildPrompt(options) : buildPortraitPrompt(character as Character, options);
+  }, [character, buildPrompt, framing, style, mood, extraDetails]);
 
   useEffect(() => {
     savePortraitPrefs({ style, framing, mood });
@@ -96,7 +104,7 @@ export function PortraitPromptDialog({ character, onClose }: PortraitPromptDialo
         </div>
 
         <p className={styles.hint}>
-          Copy this prompt into an AI image generator to create a portrait for your character.
+          {hint ?? 'Copy this prompt into an AI image generator to create a portrait for your character.'}
         </p>
 
         <div className={styles.framingGroup} role="radiogroup" aria-label="Framing">

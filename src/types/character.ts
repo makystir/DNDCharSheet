@@ -384,6 +384,12 @@ export interface TrackedCreature {
   /** Exhaustion level 0..6; absent = 0. */
   exhaustionLevel?: number;
   notes?: string;
+  /**
+   * What it looks like, in the player's words (feeds the portrait prompt). For
+   * a Primal Companion this is where the chosen kind of animal goes: the
+   * Ranger decides what animal it is (PHB 2024 Beast Master, L5583).
+   */
+  appearance?: string;
 }
 
 /** How a companion came to the character. */

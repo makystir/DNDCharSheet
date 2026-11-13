@@ -7,6 +7,7 @@ import { RestoreConfirmDialog } from '../shared/RestoreConfirmDialog';
 import { exportToFile, importFromJSON } from '../../storage/export-import';
 import { base64ToBlob } from '../../storage/portrait-codec';
 import { getPortraitStore } from '../../storage/portrait-store';
+import { restoreCompanionPortraits } from '../../storage/companion-portraits';
 import { assembleBackup, downloadBackup } from '../../storage/backup-service';
 import { getLastBackupAt, getBackupReminder } from '../../storage/backup-reminder';
 import { isAutoBackupEnabled, setAutoBackupEnabled } from '../../storage/snapshot-settings';
@@ -202,6 +203,8 @@ export function DataBackupCard({ character, onAdopt, onRestored }: DataBackupCar
           await getPortraitStore().savePortrait(saved.id, blob);
         }
       }
+      // Companion portraits follow the character to its new id.
+      await restoreCompanionPortraits(saved, result.companionPortraits);
 
       setStatus({ kind: 'ok', text: `Imported “${saved.name || 'character'}” as a new character.` });
     } catch {

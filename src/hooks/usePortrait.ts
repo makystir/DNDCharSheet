@@ -26,7 +26,13 @@ export interface UsePortraitResult {
   removePortrait: () => Promise<void>;
 }
 
-export function usePortrait(characterId: string): UsePortraitResult {
+/**
+ * @param characterId the store key: a character id, or `<characterId>:<recordId>`
+ *   for a companion portrait (storage/companion-portraits.ts).
+ * @param prepare optional transform applied to a valid file before it is saved
+ *   (companion portraits are downscaled).
+ */
+export function usePortrait(characterId: string, prepare?: (file: File) => Promise<Blob>): UsePortraitResult {
   const [portraitURL, setPortraitURL] = useState<string>('');
   const [portraitError, setPortraitError] = useState<string | null>(null);
   const portraitURLRef = useRef<string>(portraitURL);
@@ -69,7 +75,8 @@ export function usePortrait(characterId: string): UsePortraitResult {
         return;
       }
       const store = getPortraitStore();
-      const result = await store.savePortrait(characterId, file);
+      const blob = prepare ? await prepare(file) : file;
+      const result = await store.savePortrait(characterId, blob);
       if (!result.ok) {
         setPortraitError('Portrait could not be saved.');
         return;
@@ -83,7 +90,7 @@ export function usePortrait(characterId: string): UsePortraitResult {
         setPortraitURL(urlResult.value);
       }
     },
-    [characterId],
+    [characterId, prepare],
   );
 
   const removePortrait = useCallback(async () => {
