@@ -483,3 +483,17 @@ describe('names and pronouns in the description', () => {
     }
   });
 });
+
+describe('random character gender odds', () => {
+  it('mostly picks male or female, with neutral about one in ten', () => {
+    const counts = { male: 0, female: 0, neutral: 0 };
+    const N = 1000;
+    for (let seed = 1; seed <= N; seed++) {
+      counts[generateRandomCharacter(createSeededRng(seed)).gender as keyof typeof counts]++;
+    }
+    expect(counts.neutral).toBeGreaterThan(N * 0.05);
+    expect(counts.neutral).toBeLessThan(N * 0.16);
+    expect(counts.male).toBeGreaterThan(N * 0.38);
+    expect(counts.female).toBeGreaterThan(N * 0.38);
+  });
+});

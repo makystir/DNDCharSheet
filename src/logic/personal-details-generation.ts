@@ -164,7 +164,26 @@ export interface RandomCharacterOptions {
   name?: string;
 }
 
-const GENDERS: NameGender[] = ['male', 'female', 'neutral'];
+/**
+ * Random gender odds: male and female 45% each, neutral 10%. A flat
+ * one-in-three neutral made random characters feel samey (user report).
+ * The weights are an app choice, not a rules matter.
+ */
+const GENDER_WEIGHTS: readonly (readonly [NameGender, number])[] = [
+  ['male', 0.45],
+  ['female', 0.45],
+  ['neutral', 0.1],
+];
+
+function pickGender(rng: RNG): NameGender {
+  const roll = rng();
+  let acc = 0;
+  for (const [g, w] of GENDER_WEIGHTS) {
+    acc += w;
+    if (roll < acc) return g;
+  }
+  return 'neutral';
+}
 
 /** Fill any required species sub-choices with a legal value (first option). */
 function applySpeciesSubChoices(
@@ -225,7 +244,7 @@ export function generateRandomCharacter(
   const speciesId = options.speciesId ?? pick(rng, [...SPECIES_LIST]).id;
   const classId = options.classId ?? pick(rng, [...CLASS_LIST]).id;
   const backgroundId = options.backgroundId ?? pick(rng, [...BACKGROUND_LIST]).id;
-  const gender = options.gender ?? pick(rng, GENDERS);
+  const gender = options.gender ?? pickGender(rng);
 
   const name = options.name ?? generateName(speciesId, gender, rng);
   let character = createCharacter(name);
