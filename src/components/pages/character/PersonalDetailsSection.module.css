@@ -226,6 +226,19 @@
   line-height: 1.5;
 }
 
+/* Ideal / Flaw / Short-term goal / Long-term goal: two per row on a wide card,
+   one per row on a narrow one. */
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px 16px;
+  margin-top: 12px;
+}
+
+.profileGrid .personalityField {
+  margin-top: 0;
+}
+
 .textarea:focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 1px;

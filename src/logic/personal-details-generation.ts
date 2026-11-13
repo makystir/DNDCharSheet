@@ -44,14 +44,7 @@ import {
 import { rollTrinket } from '../data/trinkets';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
 import { createSeededRng, pick, type RNG } from './random';
-import {
-  ALIGNMENT_TRAITS,
-  BONDS,
-  FLAWS,
-  IDEALS,
-  QUIRKS,
-  type AlignmentPart,
-} from '../data/personality-tables';
+import { generateProfile, speciesLineage } from './character-description';
 import { speciesGrantedSkills } from './skills';
 import { CREATION_LANGUAGE_CHOICES, LANGUAGES, featureLanguageGrants, knownLanguages } from './languages';
 import { speciesLanguageSuggestions, suggestedBackgroundIncrease, toolChoicesFor } from './creation-guidance';
@@ -142,54 +135,9 @@ export function generateAlignment(rng: RNG): Alignment {
   return pick(rng, [...ALIGNMENTS]);
 }
 
-/**
- * The parts of an alignment the PHB 2024 "Personality Traits by Alignment"
- * table is keyed by (L1886-1896): "Lawful Good" is Lawful + Good, "Neutral
- * Good" is Neutral + Good, "True Neutral" is Neutral. Unaligned (or none) has
- * no parts.
- */
-export function alignmentParts(alignment: string | undefined): AlignmentPart[] {
-  if (!alignment || alignment === 'Unaligned') return [];
-  if (alignment === 'True Neutral' || alignment === 'Neutral') return ['Neutral'];
-  const parts = alignment.split(' ').filter((p): p is AlignmentPart => p in ALIGNMENT_TRAITS);
-  return [...new Set(parts)];
-}
-
-const ALL_PARTS = Object.keys(ALIGNMENT_TRAITS) as AlignmentPart[];
-
-/** Two distinct items from a list (or the one item when the list has one). */
-function pickTwo<T>(rng: RNG, items: readonly T[]): [T, T] {
-  const first = Math.floor(rng() * items.length);
-  let second = Math.floor(rng() * (items.length - 1));
-  if (second >= first) second += 1;
-  return [items[first], items[Math.min(second, items.length - 1)]];
-}
-
-/**
- * A short personality sketch (flavor only, no mechanic; the player edits it
- * freely): two traits from the PHB 2024 "Personality Traits by Alignment" table
- * for the character's alignment, a habit, and an ideal (matched to the
- * alignment), a bond and a flaw from the app's own tables
- * (data/personality-tables.ts). With no alignment, the two traits come from any
- * row. Example: "Loyal and kind. Hums old songs when nervous. Ideal: ...
- * Bond: ... Flaw: ...".
- */
-export function generatePersonality(rng: RNG, alignment?: string): string {
-  const parts = alignmentParts(alignment);
-  let traits: [string, string];
-  if (parts.length === 2) {
-    traits = [pick(rng, [...ALIGNMENT_TRAITS[parts[0]]]), pick(rng, [...ALIGNMENT_TRAITS[parts[1]]])];
-  } else {
-    const pool = parts.length === 1 ? ALIGNMENT_TRAITS[parts[0]] : ALL_PARTS.flatMap((p) => ALIGNMENT_TRAITS[p]);
-    traits = pickTwo(rng, pool);
-  }
-  const idealPart = parts.length > 0 ? pick(rng, parts) : pick(rng, ALL_PARTS);
-  const quirk = pick(rng, [...QUIRKS]);
-  const ideal = pick(rng, [...IDEALS[idealPart]]);
-  const bond = pick(rng, [...BONDS]);
-  const flaw = pick(rng, [...FLAWS]);
-  return `${traits[0]} and ${traits[1].toLowerCase()}. ${quirk} Ideal: ${ideal} Bond: ${bond} Flaw: ${flaw}`;
-}
+// The personality / description generator lives in ./character-description
+// (description, ideal, flaw, short- and long-term goals by class and alignment).
+export { alignmentParts } from './character-description';
 
 /**
  * Pick a deity NAME from the Gods of Greyhawk catalog (DMG 2024, src/data/
@@ -300,9 +248,26 @@ export function generateRandomCharacter(
     gender,
     alignment,
     faith: generateDeity(rng),
-    // One draw seeds the personality generator, as the single trait pick did
-    // before, so every later seeded result is unchanged.
-    personality: generatePersonality(createSeededRng(Math.floor(rng() * 2 ** 32)), alignment),
+    // One draw seeds the description generator (as the single personality
+    // draw did before), so every later seeded result is unchanged. The
+    // description is stored in `personality` (shown as "Character description").
+    ...(() => {
+      const profile = generateProfile(createSeededRng(Math.floor(rng() * 2 ** 32)), {
+        name,
+        gender,
+        classId,
+        alignment,
+        speciesId: character.species?.id,
+        lineage: speciesLineage(character.species),
+      });
+      return {
+        personality: profile.description,
+        ideal: profile.ideal,
+        flaw: profile.flaw,
+        shortTermGoal: profile.shortTermGoal,
+        longTermGoal: profile.longTermGoal,
+      };
+    })(),
   };
 
   // Appearance + age (flavor).

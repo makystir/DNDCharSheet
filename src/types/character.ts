@@ -1170,8 +1170,20 @@ export interface Character {
    * modelled here.
    */
   background?: string;
-  /** Free-text personality notes, rendered as a multiline textarea. */
+  /**
+   * The free-text CHARACTER DESCRIPTION (labelled "Character description" in
+   * the UI; the field keeps its original name so saved characters carry their
+   * text over). Rendered as a multiline textarea.
+   */
   personality?: string;
+  /** Free-text ideal (what the character believes in). Flavor only. */
+  ideal?: string;
+  /** Free-text flaw (a weakness, vice or fear). Flavor only. */
+  flaw?: string;
+  /** Free-text short-term goal (the next few adventures). Flavor only. */
+  shortTermGoal?: string;
+  /** Free-text long-term goal (the ambition of a lifetime). Flavor only. */
+  longTermGoal?: string;
 
   // ── Stage A7: Character Creation (background / languages / generation) ─────
   // Additive-optional, no CURRENT_VERSION bump: absent = a valid prior state

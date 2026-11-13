@@ -55,10 +55,17 @@ import {
 import {
   generateName,
   generateAppearance,
-  generatePersonality,
   generateDeity,
   generateAge,
 } from '../../logic/personal-details-generation';
+import {
+  generateDescription,
+  generateFlaw,
+  generateIdeal,
+  generateLongTermGoal,
+  generateProfile,
+  generateShortTermGoal,
+} from '../../logic/character-description';
 import { allDeityOptions } from '../../logic/deity-recommendations';
 import { DeitySuggestions } from './DeitySuggestions';
 import type { NameGender } from '../../data/name-tables';
@@ -226,8 +233,26 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     hair: string;
     skin: string;
     faith: string;
+    /** The character description (stored as `personality`). */
     personality: string;
-  }>({ age: '', height: '', weight: '', eyes: '', hair: '', skin: '', faith: '', personality: '' });
+    ideal: string;
+    flaw: string;
+    shortTermGoal: string;
+    longTermGoal: string;
+  }>({
+    age: '',
+    height: '',
+    weight: '',
+    eyes: '',
+    hair: '',
+    skin: '',
+    faith: '',
+    personality: '',
+    ideal: '',
+    flaw: '',
+    shortTermGoal: '',
+    longTermGoal: '',
+  });
 
   // Step 5: Equipment.
   const [equipmentChoice, setEquipmentChoice] = useState<EquipmentChoice>('A');
@@ -605,7 +630,47 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
   const setDetail = (field: keyof typeof details, value: string) =>
     setDetails((prev) => ({ ...prev, [field]: value }));
-  const genPersonality = () => setDetails((prev) => ({ ...prev, personality: generatePersonality(rng, alignment || undefined) }));
+  // Character description, ideal, flaw and goals: shaped by class and alignment.
+  const profileCtx = () => ({
+    name: name.trim(),
+    gender,
+    classId: classId || undefined,
+    alignment: alignment || undefined,
+    speciesId: speciesId || undefined,
+    // The lineage / ancestry / legacy sub-choice, when the species has one.
+    lineage:
+      speciesChoices.draconicAncestry ||
+      speciesChoices.elvenLineage ||
+      speciesChoices.gnomishLineage ||
+      speciesChoices.giantAncestry ||
+      speciesChoices.fiendishLegacy ||
+      undefined,
+  });
+  const genProfileField = (field: 'personality' | 'ideal' | 'flaw' | 'shortTermGoal' | 'longTermGoal') => {
+    const ctx = profileCtx();
+    const value =
+      field === 'personality'
+        ? generateDescription(rng, ctx)
+        : field === 'ideal'
+          ? generateIdeal(rng, ctx)
+          : field === 'flaw'
+            ? generateFlaw(rng, ctx)
+            : field === 'shortTermGoal'
+              ? generateShortTermGoal(rng, ctx)
+              : generateLongTermGoal(rng, ctx);
+    setDetails((prev) => ({ ...prev, [field]: value }));
+  };
+  const genWholeProfile = () => {
+    const p = generateProfile(rng, profileCtx());
+    setDetails((prev) => ({
+      ...prev,
+      personality: p.description,
+      ideal: p.ideal,
+      flaw: p.flaw,
+      shortTermGoal: p.shortTermGoal,
+      longTermGoal: p.longTermGoal,
+    }));
+  };
   const genAlignment = () => setAlignment(ALIGNMENTS[Math.floor(rng() * ALIGNMENTS.length)]);
   const genFaith = () => setDetails((prev) => ({ ...prev, faith: generateDeity(rng) }));
 
@@ -644,6 +709,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       ...(details.skin ? { skin: details.skin } : {}),
       ...(details.faith ? { faith: details.faith } : {}),
       ...(details.personality ? { personality: details.personality } : {}),
+      ...(details.ideal ? { ideal: details.ideal } : {}),
+      ...(details.flaw ? { flaw: details.flaw } : {}),
+      ...(details.shortTermGoal ? { shortTermGoal: details.shortTermGoal } : {}),
+      ...(details.longTermGoal ? { longTermGoal: details.longTermGoal } : {}),
     };
 
     // Languages (Common is implicit; store only the chosen extras). Feature
@@ -1702,21 +1771,43 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         </div>
       </fieldset>
 
-      <div className={styles.genRow}>
-        <label className={styles.fieldLabel} htmlFor="wiz-personality">
-          Personality
-        </label>
-        <textarea
-          id="wiz-personality"
-          className={styles.textarea}
-          value={details.personality}
-          rows={5}
-          onChange={(e) => setDetails((prev) => ({ ...prev, personality: e.target.value }))}
-        />
-        <button type="button" className={styles.genBtn} onClick={genPersonality} aria-label="Generate personality">
-          🎲
+      <p className={styles.hint}>
+        The 🎲 buttons write a description, ideal, flaw and goals that fit your class and alignment (pick those
+        first for the best fit). Change anything you like.{' '}
+        <button type="button" className={styles.linkBtn} onClick={genWholeProfile}>
+          Roll all five
         </button>
-      </div>
+      </p>
+      {(
+        [
+          { field: 'personality', label: 'Character description', rows: 5 },
+          { field: 'ideal', label: 'Ideal', rows: 2 },
+          { field: 'flaw', label: 'Flaw', rows: 2 },
+          { field: 'shortTermGoal', label: 'Short-term goal', rows: 2 },
+          { field: 'longTermGoal', label: 'Long-term goal', rows: 2 },
+        ] as const
+      ).map((f) => (
+        <div key={f.field} className={styles.genRow}>
+          <label className={styles.fieldLabel} htmlFor={`wiz-${f.field}`}>
+            {f.label}
+          </label>
+          <textarea
+            id={`wiz-${f.field}`}
+            className={styles.textarea}
+            value={details[f.field]}
+            rows={f.rows}
+            onChange={(e) => setDetail(f.field, e.target.value)}
+          />
+          <button
+            type="button"
+            className={styles.genBtn}
+            onClick={() => genProfileField(f.field)}
+            aria-label={`Generate ${f.label.toLowerCase()}`}
+          >
+            🎲
+          </button>
+        </div>
+      ))}
       <details className={styles.bgCompare}>
         <summary className={styles.bgCompareSummary}>Stuck? Questions to imagine your past</summary>
         <ul className={styles.promptList}>

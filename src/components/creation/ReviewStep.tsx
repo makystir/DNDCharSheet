@@ -374,6 +374,20 @@ export function ReviewStep({ character, onEdit }: ReviewStepProps) {
             {details.length > 0 ? details.join(' · ') : 'Nothing filled in yet. That is fine; you can add it on the sheet.'}
           </p>
           {character.personality && <p className={styles.hint}>{character.personality}</p>}
+          {(
+            [
+              ['Ideal', character.ideal],
+              ['Flaw', character.flaw],
+              ['Short-term goal', character.shortTermGoal],
+              ['Long-term goal', character.longTermGoal],
+            ] as const
+          )
+            .filter(([, v]) => v && v.trim() !== '')
+            .map(([label, v]) => (
+              <p key={label} className={styles.hint} data-testid={`review-${label.toLowerCase().replaceAll(' ', '-')}`}>
+                <strong>{label}:</strong> {v}
+              </p>
+            ))}
         </>,
       )}
 

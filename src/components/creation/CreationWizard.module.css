@@ -155,6 +155,23 @@
   padding: 0.5rem 1rem;
 }
 
+/* "Roll all five": an inline text button in the details hint. */
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  min-height: 44px;
+  color: var(--accent-gold);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.linkBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
 .genRow {
   display: flex;
   align-items: center;

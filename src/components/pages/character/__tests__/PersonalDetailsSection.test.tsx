@@ -27,7 +27,7 @@ describe('PersonalDetailsSection', () => {
     renderSection();
     expect(screen.getByRole('heading', { name: 'Personal Details' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Alignment' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Personality')).toBeInTheDocument();
+    expect(screen.getByLabelText('Character description')).toBeInTheDocument();
     // Faith / Deity is now a combo (text input with a <datalist>, so its
     // implicit ARIA role is combobox).
     expect(screen.getByRole('combobox', { name: 'Faith / Deity' })).toBeInTheDocument();
@@ -80,9 +80,9 @@ describe('PersonalDetailsSection', () => {
     expect(onChange.mock.calls.at(-1)?.[0].faith).toBeTruthy();
   });
 
-  it('editing the Personality textarea emits the updated value', () => {
+  it('editing the Character description textarea emits the updated value', () => {
     const { onChange } = renderSection();
-    fireEvent.change(screen.getByLabelText('Personality'), {
+    fireEvent.change(screen.getByLabelText('Character description'), {
       target: { value: 'Brave and reckless' },
     });
     expect(onChange.mock.calls.at(-1)?.[0].personality).toBe('Brave and reckless');
@@ -132,10 +132,30 @@ describe('PersonalDetailsSection', () => {
     }
   });
 
-  it('rolling personality fills the personality field', () => {
+  it('rolling the character description fills the description field', () => {
     const { onChange } = renderSection();
-    fireEvent.click(screen.getByRole('button', { name: 'Roll personality' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll character description' }));
     expect(onChange.mock.calls.at(-1)?.[0].personality).toBeTruthy();
+  });
+
+  it('has Ideal, Flaw and both goals, each rolled on its own and editable', () => {
+    const { onChange } = renderSection({ classes: [{ id: 'paladin', level: 1 }], alignment: 'Lawful Good' });
+    expect(screen.queryByLabelText('Bond')).toBeNull();
+    const fields = [
+      ['Ideal', 'ideal'],
+      ['Flaw', 'flaw'],
+      ['Short-term goal', 'shortTermGoal'],
+      ['Long-term goal', 'longTermGoal'],
+    ] as const;
+    for (const [label, key] of fields) {
+      fireEvent.click(screen.getByRole('button', { name: `Roll ${label.toLowerCase()}` }));
+      const next = onChange.mock.calls.at(-1)?.[0];
+      expect(next?.[key], label).toBeTruthy();
+      // Only that one field changes.
+      for (const [, other] of fields) if (other !== key) expect(next?.[other]).toBeUndefined();
+      fireEvent.change(screen.getByLabelText(label), { target: { value: `My ${label}` } });
+      expect(onChange.mock.calls.at(-1)?.[0][key]).toBe(`My ${label}`);
+    }
   });
 
   // ── Even grid layout ──────────────────────────────────────────────────────
@@ -235,7 +255,7 @@ describe('PersonalDetailsSection dice on filled fields', () => {
       eyes: 'Grey',
       personality: 'Gruff but kind.',
     });
-    for (const label of ['Roll name', 'Roll alignment', 'Roll deity', 'Roll age', 'Roll eyes', 'Roll personality']) {
+    for (const label of ['Roll name', 'Roll alignment', 'Roll deity', 'Roll age', 'Roll eyes', 'Roll character description']) {
       expect(screen.queryByRole('button', { name: label }), label).toBeNull();
     }
     // Empty fields still offer the dice.

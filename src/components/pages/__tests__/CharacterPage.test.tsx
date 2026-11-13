@@ -208,7 +208,7 @@ describe('CharacterPage', () => {
         screen.getByRole('heading', { name: 'Personal Details' }),
       ).toBeInTheDocument();
       expect(screen.getByRole('combobox', { name: 'Alignment' })).toBeInTheDocument();
-      expect(screen.getByLabelText('Personality')).toBeInTheDocument();
+      expect(screen.getByLabelText('Character description')).toBeInTheDocument();
       expect(screen.getByText('No portrait set')).toBeInTheDocument();
     });
 

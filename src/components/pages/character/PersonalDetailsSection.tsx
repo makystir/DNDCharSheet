@@ -19,12 +19,16 @@ import { getBackground } from '../../../data/backgrounds';
 import { User } from 'lucide-react';
 import { PortraitPromptDialog } from '../../shared/PortraitPromptDialog';
 import type { NameGender } from '../../../data/name-tables';
+import { generateName, generateAppearance, generateAge } from '../../../logic/personal-details-generation';
 import {
-  generateName,
-  generateAppearance,
-  generateAge,
-  generatePersonality,
-} from '../../../logic/personal-details-generation';
+  descriptionContextFor,
+  generateDescription,
+  generateFlaw,
+  generateIdeal,
+  generateLongTermGoal,
+  generateShortTermGoal,
+} from '../../../logic/character-description';
+import { primaryClass } from '../../../logic/classes';
 import { createDefaultRng } from '../../../logic/random';
 import styles from './PersonalDetailsSection.module.css';
 
@@ -73,6 +77,17 @@ function RollButton({ label, title, onClick, disabled, filled }: RollButtonProps
 
 /** A field counts as filled once it holds anything but whitespace. */
 const isFilled = (value: string | undefined): boolean => (value ?? '').trim() !== '';
+
+/** The description field (stored as `personality`) and the four profile prompts. */
+type ProfileFieldKey = 'personality' | 'ideal' | 'flaw' | 'shortTermGoal' | 'longTermGoal';
+
+/** The prompts under the description, in display order. */
+const PROFILE_FIELDS: { field: Exclude<ProfileFieldKey, 'personality'>; label: string; article: string }[] = [
+  { field: 'ideal', label: 'Ideal', article: 'an' },
+  { field: 'flaw', label: 'Flaw', article: 'a' },
+  { field: 'shortTermGoal', label: 'Short-term goal', article: 'a' },
+  { field: 'longTermGoal', label: 'Long-term goal', article: 'a' },
+];
 
 /**
  * An empty slot the same size as a RollButton, for fields with nothing to roll
@@ -162,8 +177,23 @@ export function PersonalDetailsSection({
     if (!speciesId) return;
     onChange({ ...character, age: generateAge(speciesId, createDefaultRng()) });
   };
-  const rollPersonality = () =>
-    onChange({ ...character, personality: generatePersonality(createDefaultRng(), character.alignment) });
+  // Roll one of the description / ideal / flaw / goal fields from the class +
+  // alignment aware generator (flavor only; fills just that field).
+  const rollProfileField = (field: ProfileFieldKey) => {
+    const ctx = descriptionContextFor(character, primaryClass(character)?.id);
+    const rng = createDefaultRng();
+    const value =
+      field === 'personality'
+        ? generateDescription(rng, ctx)
+        : field === 'ideal'
+          ? generateIdeal(rng, ctx)
+          : field === 'flaw'
+            ? generateFlaw(rng, ctx)
+            : field === 'shortTermGoal'
+              ? generateShortTermGoal(rng, ctx)
+              : generateLongTermGoal(rng, ctx);
+    onChange({ ...character, [field]: value });
+  };
   const rollAlignment = () => {
     const next = ALIGNMENTS[Math.floor(createDefaultRng()() * ALIGNMENTS.length)];
     onChange({ ...character, alignment: next });
@@ -518,13 +548,13 @@ export function PersonalDetailsSection({
               <div className={styles.personalityField}>
                 <div className={styles.personalityHeader}>
                   <label className={styles.fieldLabel} htmlFor={personalityId}>
-                    Personality
+                    Character description
                   </label>
                   {!isFilled(character.personality) && (
                     <RollButton
-                      label="Roll personality"
-                      title="Roll a personality sketch that fits your alignment"
-                      onClick={rollPersonality}
+                      label="Roll character description"
+                      title="Roll a description that fits your class and alignment"
+                      onClick={() => rollProfileField('personality')}
                     />
                   )}
                 </div>
@@ -532,9 +562,35 @@ export function PersonalDetailsSection({
                   id={personalityId}
                   className={styles.textarea}
                   value={character.personality ?? ''}
-                  rows={4}
+                  rows={5}
                   onChange={(e) => setField('personality', e.target.value)}
                 />
+              </div>
+
+              <div className={styles.profileGrid} data-testid="pd-profile">
+                {PROFILE_FIELDS.map((f) => (
+                  <div key={f.field} className={styles.personalityField}>
+                    <div className={styles.personalityHeader}>
+                      <label className={styles.fieldLabel} htmlFor={`${personalityId}-${f.field}`}>
+                        {f.label}
+                      </label>
+                      {!isFilled(character[f.field]) && (
+                        <RollButton
+                          label={`Roll ${f.label.toLowerCase()}`}
+                          title={`Roll ${f.article} ${f.label.toLowerCase()} that fits your class and alignment`}
+                          onClick={() => rollProfileField(f.field)}
+                        />
+                      )}
+                    </div>
+                    <textarea
+                      id={`${personalityId}-${f.field}`}
+                      className={styles.textarea}
+                      value={character[f.field] ?? ''}
+                      rows={2}
+                      onChange={(e) => setField(f.field, e.target.value)}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </Card>

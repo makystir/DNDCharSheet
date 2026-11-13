@@ -87,8 +87,8 @@ describe('Equipment packages', () => {
   });
 });
 
-describe('Personality on the Details step', () => {
-  it('rolls a sketch that fits the chosen alignment', () => {
+describe('Character description on the Details step', () => {
+  function toDetails() {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     throughSpecies();
     goTo(/Ability Scores/);
@@ -97,9 +97,22 @@ describe('Personality on the Details step', () => {
     });
     goTo(/Alignment & Details/);
     fireEvent.change(screen.getByLabelText('Alignment'), { target: { value: 'Lawful Good' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Generate personality' }));
-    const text = (screen.getByLabelText('Personality') as HTMLTextAreaElement).value;
-    expect(text).toMatch(/^(Cooperative|Loyal|Judgmental|Methodical) and (compassionate|helpful|honest|kind)\./);
-    expect(text).toMatch(/Ideal: .+ Bond: .+ Flaw: .+/);
+  }
+
+  it('rolls a description that weaves in traits from the chosen alignment', () => {
+    toDetails();
+    fireEvent.click(screen.getByRole('button', { name: 'Generate character description' }));
+    const text = (screen.getByLabelText('Character description') as HTMLTextAreaElement).value.toLowerCase();
+    expect(text).toMatch(/cooperative|loyal|judgmental|methodical/);
+    expect(text).toMatch(/compassionate|helpful|honest|kind/);
+    expect(text).not.toMatch(/[{}]/);
+  });
+
+  it('fills the ideal, flaw and both goals with Roll all five', () => {
+    toDetails();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll all five' }));
+    for (const label of ['Character description', 'Ideal', 'Flaw', 'Short-term goal', 'Long-term goal']) {
+      expect((screen.getByLabelText(label) as HTMLTextAreaElement).value, label).not.toBe('');
+    }
   });
 });
