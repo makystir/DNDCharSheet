@@ -35,16 +35,18 @@ function clampInt(n: number, min: number, max: number): number {
 
 // -- Cardinality caps ---------------------------------------------------------
 
-/** Sanitizer / UI guards (plan D12). The books set no cap. */
-export const COMPANIONS_MAX = 20;
-export const MOUNTS_MAX = 20;
+/**
+ * Sanitizer / UI guards (plan D12). The books set no cap. Creatures holds the
+ * former Companions (20) and Mounts (20) lists, so its cap is their sum: the
+ * v3 migration never has to drop a record.
+ */
+export const COMPANIONS_MAX = 40;
 export const HIRELINGS_MAX = 30;
 export const NPC_PARTY_MAX = 10;
 export const SIDEKICKS_MAX = 10;
 
 export const COMPANION_CAPS = {
   companions: COMPANIONS_MAX,
-  mounts: MOUNTS_MAX,
   hirelings: HIRELINGS_MAX,
   npcPartyMembers: NPC_PARTY_MAX,
   sidekicks: SIDEKICKS_MAX,

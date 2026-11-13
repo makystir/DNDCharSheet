@@ -395,13 +395,12 @@ A history of your level-ups and XP awards, if you want to look back.
 
 ## 10. The Companions page
 
-This page is for permanent followers. It has five sub-tabs:
+This page is for everyone who travels with you. A strip at the top shows how many creatures and people you track, who is at 0 HP and who has a condition. It has two sub-tabs:
 
-- **Companions:** a familiar, a steed, a Primal Companion or another permanent creature, chosen from a catalog. Each has its own hit points and conditions.
-- **Mounts & Animals:** riding and pack animals, with carrying capacity.
-- **Hirelings:** people you pay for help. You can fill in a stat block of your own.
-- **NPC Party Members:** non-player characters who travel with the party.
-- **Sidekicks:** simple companion characters. This sub-tab is an optional rule and must be turned on in Settings.
+- **Creatures:** a Primal Companion, a familiar, a steed, Animate Dead servants, or a pet, mount or pack animal, chosen from a catalog. Each has its own hit points, conditions and stat block. Mounts and pack animals also get **Riding & packing** (open on their card): carrying capacity, weight carried, saddle, barding and pulling a vehicle. Any creature with a size and Strength can open it. Dismissed creatures move into their own **Dismissed** group.
+- **People:** hirelings (people you pay, with the PHB rates and a running total), NPC party members who travel with the party, and sidekicks. Use the chips at the top (**All**, **Hirelings**, **NPC party members**, **Sidekicks**) to show one kind. **Add Person** asks which kind first. Hirelings and NPCs have a stat block you fill in yourself. Sidekicks are an optional rule and must be turned on in Settings.
+
+Every card works the same way: tap its header to open it, and use **Remove** at the bottom to delete it (you can undo for a few seconds).
 
 Temporary summoned creatures from spells are not tracked here. Companion hit points and conditions are edited on this page only.
 

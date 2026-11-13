@@ -404,7 +404,7 @@ export type CompanionSpiritType = 'Celestial' | 'Fey' | 'Fiend';
  * creature catalog (and the owner's live level, Wisdom and spellcasting for the
  * Primal Companion and the Otherworldly Steed).
  */
-export interface CompanionRecord extends TrackedCreature {
+export interface CompanionRecord extends TrackedCreature, RidingDetails {
   /** Instance id. */
   id: string;
   /** CREATURE_CATALOG key; an unknown id drops the record on import. */
@@ -428,12 +428,13 @@ export interface CompanionRecord extends TrackedCreature {
 /** Saddle kinds (PHB 2024 "Mounts and Vehicles" equipment, L10388). */
 export type SaddleKind = 'none' | 'riding' | 'military' | 'exotic';
 
-/** A mount or pack animal. */
-export interface MountRecord {
-  id: string;
-  /** CREATURE_CATALOG key; an unknown id drops the record on import. */
-  creatureId: string;
-  nickname?: string;
+/**
+ * Riding and packing details of a creature companion (PHB 2024 "Mounts and
+ * Vehicles", L10372-10401). Until schema v3 these lived on a separate `mounts`
+ * list; storage/migration.ts MIGRATIONS[2] folds those records into
+ * `companions` (origin 'pet') with these fields.
+ */
+export interface RidingDetails {
   /** Weight carried, in pounds. */
   carriedLb?: number;
   saddle?: SaddleKind;
@@ -444,7 +445,6 @@ export interface MountRecord {
   pullsVehicle?: boolean;
   /** Weight of the vehicle this animal helps pull (lb). */
   vehicleWeightLb?: number;
-  notes?: string;
 }
 
 /** A user-typed named stat block entry (trait, action, bonus action or reaction). */
@@ -904,7 +904,7 @@ export interface RollEventPayload {
  * flat per-class selections (cantrips/prepared/spellbook) under `byClass`.
  * `MIGRATIONS[1]` upgrades v1 records transparently (src/storage/migration.ts).
  */
-export const CURRENT_VERSION = 2;
+export const CURRENT_VERSION = 3;
 
 /**
  * A single character sheet.
@@ -988,13 +988,13 @@ export interface Character {
    */
   resourcesSpent?: Record<string, number>;
   /**
-   * Permanent creature companions (Companions page). Additive-optional; no
-   * CURRENT_VERSION bump; not in BLANK_CHARACTER. Sanitized on import and share
-   * (logic/companions-sanitize.ts). Temporary summons are deliberately not tracked.
+   * Permanent creature companions, including mounts and pack animals
+   * (Companions page, Creatures tab). Not in BLANK_CHARACTER. Sanitized on
+   * import and share (logic/companions-sanitize.ts). The former `mounts` list
+   * was folded in here by the v2 -> v3 migration. Temporary summons are
+   * deliberately not tracked.
    */
   companions?: CompanionRecord[];
-  /** Mounts and pack animals (Companions page). Additive-optional; no `_v` bump. */
-  mounts?: MountRecord[];
   /** Hirelings (Companions page). Additive-optional; no `_v` bump. */
   hirelings?: HirelingRecord[];
   /** NPC party members (Companions page). Additive-optional; no `_v` bump. */

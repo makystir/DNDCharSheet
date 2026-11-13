@@ -1,36 +1,18 @@
-import { useState } from 'react';
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
-import { MountsTab } from '../MountsTab';
-import { HirelingsTab } from '../HirelingsTab';
-import { NpcPartyTab } from '../NpcPartyTab';
-import { SidekicksTab } from '../SidekicksTab';
+import { describe, it, expect, afterEach } from 'vitest';
+import { screen, fireEvent, cleanup, within } from '@testing-library/react';
 import { createCharacter } from '../../../storage/character-store';
 import type { Character } from '../../../types/character';
+import type { PeopleFilter } from '../PeopleTab';
+import { renderPeople } from './PeopleHarness';
 
 afterEach(cleanup);
 
-type TabComponent = typeof MountsTab;
-
-function renderTab(Tab: TabComponent | typeof SidekicksTab | typeof NpcPartyTab | typeof HirelingsTab, initial: Character, rng?: () => number) {
-  let latest = initial;
-  function Harness() {
-    const [character, setCharacter] = useState<Character>(initial);
-    const T = Tab as TabComponent;
-    return (
-      <T
-        character={character}
-        onChange={(next) => {
-          latest = next;
-          setCharacter(next);
-        }}
-        undo={{ show: vi.fn() }}
-        {...(rng ? { rng } : {})}
-      />
-    );
-  }
-  render(<Harness />);
-  return { get: () => latest };
+function renderTab(filter: PeopleFilter, initial: Character, rng?: () => number) {
+  // The Sidekicks filter exists only while the Tasha's house rule is on.
+  const start = filter === 'sidekicks' ? { ...initial, houseRules: { ...initial.houseRules, sidekicks: true } } : initial;
+  const latest = { current: start };
+  renderPeople(start, { latest, filter, rng });
+  return { get: () => latest.current };
 }
 
 function base(): Character {
@@ -41,51 +23,9 @@ function expand(name: RegExp) {
   fireEvent.click(screen.getAllByRole('button', { name })[0]);
 }
 
-describe('MountsTab', () => {
-  it('adds a Pony, shows its table capacity and warns only past 225 lb', () => {
-    const { get } = renderTab(MountsTab, base());
-    fireEvent.click(screen.getByRole('button', { name: /Add Mount or Animal/ }));
-    const dialog = screen.getByRole('dialog', { name: 'Add mount or animal' });
-    fireEvent.change(within(dialog).getByLabelText('Animal'), { target: { value: 'pony' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Add animal' }));
-    expect(get().mounts).toHaveLength(1);
-
-    expand(/^Pony/);
-    expect(screen.getByRole('button', { name: /^Pony carrying capacity:/ })).toHaveTextContent('225 lb');
-    const input = screen.getByLabelText('Pony weight carried');
-    fireEvent.change(input, { target: { value: '225' } });
-    fireEvent.blur(input);
-    expect(screen.queryByRole('alert')).toBeNull();
-    const again = screen.getByLabelText('Pony weight carried');
-    fireEvent.change(again, { target: { value: '226' } });
-    fireEvent.blur(again);
-    expect(screen.getByRole('alert')).toHaveTextContent('Over carrying capacity by 1 lb');
-  });
-
-  it('adds capacities of several animals pulling one vehicle (five times the sum)', () => {
-    const c = {
-      ...base(),
-      mounts: [
-        { id: 'a', creatureId: 'draft-horse', pullsVehicle: true, vehicleWeightLb: 600 },
-        { id: 'b', creatureId: 'draft-horse', pullsVehicle: true },
-      ],
-    } as Character;
-    renderTab(MountsTab, c);
-    const summary = screen.getByTestId('vehicle-summary');
-    expect(within(summary).getByRole('button', { name: /^Vehicle pull limit:/ })).toHaveTextContent('5400 lb');
-    expect(summary).toHaveTextContent(/4800 lb/);
-  });
-
-  it('shows the Mule table capacity without a second size step', () => {
-    renderTab(MountsTab, { ...base(), mounts: [{ id: 'm', creatureId: 'mule' }] } as Character);
-    expand(/^Mule/);
-    expect(screen.getByRole('button', { name: /^Mule carrying capacity:/ })).toHaveTextContent('420 lb');
-  });
-});
-
-describe('HirelingsTab', () => {
+describe('People: hirelings', () => {
   it('adds hirelings and shows the running total for all', () => {
-    const { get } = renderTab(HirelingsTab, base());
+    const { get } = renderTab('hirelings', base());
     const add = (kind: string, name: string, units: string) => {
       fireEvent.click(screen.getByRole('button', { name: /Add Hireling/ }));
       const dialog = screen.getByRole('dialog', { name: 'Add hireling' });
@@ -103,7 +43,7 @@ describe('HirelingsTab', () => {
 
   it('warns (without blocking) when your pay is below the table minimum, and hides Loyalty when the rule is off', () => {
     const c = { ...base(), hirelings: [{ id: 'h', name: 'Ana', kind: 'skilled', units: 2 }] } as Character;
-    renderTab(HirelingsTab, c);
+    renderTab('hirelings', c);
     expand(/^Ana/);
     expect(screen.queryByTestId('loyalty-control')).toBeNull();
     const rate = screen.getByLabelText('Ana pay per day in copper');
@@ -114,7 +54,7 @@ describe('HirelingsTab', () => {
 
   it('starts with an empty stat block and lets you enter one by hand', () => {
     const c = { ...base(), hirelings: [{ id: 'h', name: 'Ana', kind: 'skilled', units: 1 }] } as Character;
-    const { get } = renderTab(HirelingsTab, c);
+    const { get } = renderTab('hirelings', c);
     expand(/^Ana/);
     expect(screen.getByText(/No stats entered yet/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Edit stat block/ }));
@@ -129,23 +69,23 @@ describe('HirelingsTab', () => {
   });
 });
 
-describe('NpcPartyTab', () => {
+describe('People: NPC party members', () => {
   const npc = (cr: string) => ({ id: 'n', name: 'Guard', stats: { cr } });
 
   it('warns about a CR above half the level and never blocks, boundary at half', () => {
     const lvl3 = { ...base(), level: 3, npcPartyMembers: [npc('2')] } as Character;
-    renderTab(NpcPartyTab, lvl3);
+    renderTab('npc', lvl3);
     expand(/^Guard/);
     expect(screen.getByText(/above half your level \(max CR 1.5\)/)).toBeInTheDocument();
     cleanup();
-    renderTab(NpcPartyTab, { ...base(), level: 1, npcPartyMembers: [npc('1/2')] } as Character);
+    renderTab('npc', { ...base(), level: 1, npcPartyMembers: [npc('1/2')] } as Character);
     expand(/^Guard/);
     expect(screen.queryByText(/above half your level/)).toBeNull();
   });
 
   it('hides Loyalty when the toggle is off and shows it (clamped, rolled) when on', () => {
     const off = { ...base(), npcPartyMembers: [npc('1/8')] } as Character;
-    renderTab(NpcPartyTab, off);
+    renderTab('npc', off);
     expand(/^Guard/);
     expect(screen.queryByTestId('loyalty-control')).toBeNull();
     expect(screen.queryByTestId('loyalty-maximum')).toBeNull();
@@ -157,7 +97,7 @@ describe('NpcPartyTab', () => {
       houseRules: { loyalty: true },
       npcPartyMembers: [{ ...npc('1/8'), loyalty: 19 }],
     } as Character;
-    const { get } = renderTab(NpcPartyTab, on, () => 0.99);
+    const { get } = renderTab('npc', on, () => 0.99);
     expect(screen.getByTestId('loyalty-maximum')).toHaveTextContent('14');
     expand(/^Guard/);
     // stored 19 is clamped to the maximum 14 when shown
@@ -169,7 +109,7 @@ describe('NpcPartyTab', () => {
   });
 
   it('shows an empty state pointing at the editable stat block and no template button', () => {
-    renderTab(NpcPartyTab, base());
+    renderTab('npc', base());
     expect(screen.getByText('No NPC party members yet')).toBeInTheDocument();
     expect(screen.getByText(/Edit stat block/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Add NPC Party Member/ }));
@@ -177,10 +117,10 @@ describe('NpcPartyTab', () => {
   });
 });
 
-describe('SidekicksTab', () => {
+describe('People: sidekicks', () => {
   it('marks the tab as Tasha 2014 rules, defaults the level to the character level and records a level up', () => {
     const c = { ...base(), level: 4 } as Character;
-    const { get } = renderTab(SidekicksTab, c);
+    const { get } = renderTab('sidekicks', c);
     expect(screen.getAllByText(/Tasha's 2020 \(5e, 2014 rules\)/).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: /Add Sidekick/ }));
     const dialog = screen.getByRole('dialog', { name: 'Add sidekick' });
@@ -209,7 +149,7 @@ describe('SidekicksTab', () => {
       level: 6,
       sidekicks: [{ id: 's', creatureId: 'cat', classId: 'expert', level: 4, baseHpMax: 20, levelUps: [] }],
     } as Character;
-    renderTab(SidekicksTab, c);
+    renderTab('sidekicks', c);
     expand(/^Cat/);
     expect(screen.getByText(/Your level is 6; this sidekick is level 4/)).toBeInTheDocument();
   });

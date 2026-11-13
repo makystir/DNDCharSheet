@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { createCharacter } from '../../../storage/character-store';
 import type { Character } from '../../../types/character';
-import type { UndoSink } from '../CompanionsTab';
+import type { UndoSink } from '../useRecordList';
 
 export const undoStub = (): UndoSink => ({ show: vi.fn() });
 

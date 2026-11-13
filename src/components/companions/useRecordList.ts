@@ -3,13 +3,16 @@ import type { Character } from '../../types/character';
 import { addRecord, recordsOf, removeRecord, restoreRecord, updateRecord } from '../../logic/companions-actions';
 import type { CompanionListKey, CompanionListMap } from '../../logic/companions-actions';
 import { canAddRecord } from '../../logic/companions';
-import type { UndoSink } from './CompanionsTab';
+
+/** The page's undo toast, shown after a delete. */
+export interface UndoSink {
+  show: (message: string, item: unknown, index: number, restore: (item: unknown, index: number) => void) => void;
+}
 
 /**
- * List plumbing shared by the Mounts, Hirelings, NPC Party and Sidekicks tabs:
- * add, patch, and delete with a confirm step and the WFRP-style undo toast
- * (mirrors the RetinuePage delete flow the Companions tab already uses).
- * Every edit goes through the single `onChange` of the page.
+ * List plumbing shared by the Creatures and People tabs: add, patch, and delete
+ * with a confirm step and the WFRP-style undo toast (mirrors the RetinuePage
+ * delete flow). Every edit goes through the single `onChange` of the page.
  */
 export function useRecordList<K extends CompanionListKey>(
   character: Character,

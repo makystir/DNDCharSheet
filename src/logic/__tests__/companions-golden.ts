@@ -755,8 +755,8 @@ export const SIDEKICK_START_LEVEL_ROWS: ReadonlyArray<{ characterLevel: number; 
 
 /** Sanitizer / UI guard caps (plan D12; the books set no cap). */
 export const CAPS = {
-  companions: 20,
-  mounts: 20,
+  // Creatures holds the former Companions (20) and Mounts (20) lists (v3 merge).
+  companions: 40,
   hirelings: 30,
   npcPartyMembers: 10,
   sidekicks: 10,
@@ -767,11 +767,9 @@ export type GoldenCapKind = keyof typeof CAPS;
 /** canAddRecord(kind, currentCount): true while currentCount is below the cap. */
 export const CAP_ROWS: ReadonlyArray<{ kind: GoldenCapKind; count: number; canAdd: boolean }> = [
   { kind: 'companions', count: 0, canAdd: true },
-  { kind: 'companions', count: 19, canAdd: true },
-  { kind: 'companions', count: 20, canAdd: false },
-  { kind: 'companions', count: 21, canAdd: false },
-  { kind: 'mounts', count: 19, canAdd: true },
-  { kind: 'mounts', count: 20, canAdd: false },
+  { kind: 'companions', count: 39, canAdd: true },
+  { kind: 'companions', count: 40, canAdd: false },
+  { kind: 'companions', count: 41, canAdd: false },
   { kind: 'hirelings', count: 29, canAdd: true },
   { kind: 'hirelings', count: 30, canAdd: false },
   { kind: 'npcPartyMembers', count: 9, canAdd: true },

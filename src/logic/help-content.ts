@@ -19,7 +19,7 @@ const helpContent: Record<string, string> = {
   'advancement-tab':
     'Record level-ups on the Advancement page. Changing your level updates the derived values across the sheet automatically.',
   'companions-tab':
-    'Track permanent companions here: a Primal Companion, familiar, steed or pet, plus mounts, hirelings and NPC party members. Companion HP and conditions are edited on this page only.',
+    'Track everyone who travels with you. Creatures: a Primal Companion, familiar, steed, or a pet, mount or pack animal. People: hirelings, NPC party members and sidekicks. Their HP and conditions are edited on this page only.',
   'theme-toggle':
     'Switch between the dark and light colour themes from Settings. Your choice is saved on this device for next time.',
 };

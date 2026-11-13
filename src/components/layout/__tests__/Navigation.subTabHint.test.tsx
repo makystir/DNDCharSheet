@@ -45,7 +45,7 @@ describe('Navigation subTabHint affordance (desktop expanded)', () => {
   it('renders the Companions sub-tab hint', () => {
     renderNav(<Navigation activePage="character" onPageChange={vi.fn()} />);
     const companions = screen.getByRole('button', { name: /Companions/ });
-    expect(within(companions).getByText(/Companions\s.\sMounts\s.\sHirelings\s.\sNPC Party/)).toBeInTheDocument();
+    expect(within(companions).getByText(/Creatures\s.\sPeople/)).toBeInTheDocument();
   });
 
   it('does not render a hint for Combat or Settings', () => {

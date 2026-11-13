@@ -170,6 +170,38 @@ describe('migrateCharacter (read-path convenience)', () => {
   });
 });
 
+describe('MIGRATIONS[2]: v2 -> v3 folds mounts into companions', () => {
+  it('moves each mount into companions as a pet, keeping its riding fields', () => {
+    const v2 = makeChar({
+      _v: 2,
+      companions: [{ id: 'c1', creatureId: 'wolf', origin: 'pet' }],
+    }) as unknown as Record<string, unknown>;
+    v2.mounts = [
+      { id: 'm1', creatureId: 'warhorse', bardingArmorId: 'plate-armor', pullsVehicle: true, vehicleWeightLb: 400 },
+      'junk',
+      { id: 'no-creature' },
+    ];
+    const result = runMigration(v2);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const c = result.character as unknown as Record<string, unknown>;
+    expect('mounts' in c).toBe(false);
+    expect(c.companions).toEqual([
+      { id: 'c1', creatureId: 'wolf', origin: 'pet' },
+      { id: 'm1', creatureId: 'warhorse', origin: 'pet', bardingArmorId: 'plate-armor', pullsVehicle: true, vehicleWeightLb: 400 },
+    ]);
+    expect(result.character._v).toBe(3);
+  });
+
+  it('leaves a v2 record without mounts or companions without either', () => {
+    const result = runMigration(makeChar({ _v: 2 }));
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect('companions' in result.character).toBe(false);
+    expect('mounts' in result.character).toBe(false);
+  });
+});
+
 describe('MIGRATIONS framework invariant', () => {
   it('registers the first real step (v1 → v2) at CURRENT_VERSION 2', () => {
     // Stage M1 ("Multiclassing") is the first breaking change: MIGRATIONS[1]

@@ -11,7 +11,6 @@ import type {
   CompanionRecord,
   HirelingRecord,
   HouseRules,
-  MountRecord,
   NpcPartyMemberRecord,
   SidekickRecord,
   TrackedCreature,
@@ -37,7 +36,6 @@ import { effectiveAbilityScores } from './feats';
 /** The Character fields that hold record lists, and their record types. */
 export interface CompanionListMap {
   companions: CompanionRecord;
-  mounts: MountRecord;
   hirelings: HirelingRecord;
   npcPartyMembers: NpcPartyMemberRecord;
   sidekicks: SidekickRecord;

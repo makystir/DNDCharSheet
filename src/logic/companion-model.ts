@@ -8,7 +8,7 @@
  * Find Familiar (L13127), Find Steed (L13147), Wild Companion (L3704-3708).
  */
 
-import type { Character, CompanionRecord } from '../types/character';
+import type { Character, CompanionRecord, RidingDetails } from '../types/character';
 import { CREATURE_CATALOG, CREATURE_LIST } from '../data/creatures';
 import type { CreatureStatBlock } from '../data/creatures';
 import { PRIMAL_COMPANION_IDS, PRIMAL_COMPANION_UPGRADES } from './primal-companion';
@@ -24,8 +24,25 @@ export const ORIGIN_LABELS: Record<CompanionRecord['origin'], string> = {
   'wild-companion': 'Wild Companion',
   'find-steed': 'Find Steed',
   'animate-dead': 'Animate Dead',
-  pet: 'Pet or mount',
+  pet: 'Pet, mount or pack animal',
 };
+
+const RIDING_KEYS = ['carriedLb', 'saddle', 'bardingArmorId', 'bardingCustom', 'pullsVehicle', 'vehicleWeightLb'] as const;
+
+/** True when any riding or packing field has been filled in on the record. */
+export function hasRidingDetails(record: RidingDetails): boolean {
+  return RIDING_KEYS.some((k) => record[k] !== undefined);
+}
+
+/**
+ * Whether the Riding & packing section starts open on a creature's card: it
+ * already has riding details, or the creature is listed as a mount or steed
+ * (Mounts and Other Animals table, Find Steed / Phantom Steed). Any creature
+ * with a size and Strength can still open it.
+ */
+export function ridingOpenByDefault(record: RidingDetails, creature: CreatureStatBlock): boolean {
+  return hasRidingDetails(record) || creature.forms.mount === true || creature.forms.steed === true;
+}
 
 export interface CompanionModel {
   creature: CreatureStatBlock;
@@ -72,7 +89,7 @@ export function creatureOptionsForOrigin(origin: CompanionRecord['origin']): Cre
     case 'animate-dead':
       return CREATURE_LIST.filter((c) => c.id === 'skeleton' || c.id === 'zombie');
     default:
-      // Pet or mount: every catalog animal, plus the Riding Horse.
+      // Pet, mount or pack animal: every catalog animal, plus the Riding Horse.
       return CREATURE_LIST.filter((c) => c.kind === 'animal' || c.id === 'riding-horse');
   }
 }

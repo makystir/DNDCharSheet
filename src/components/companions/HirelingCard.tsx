@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { ChevronDown, Trash2 } from 'lucide-react';
 import type { CustomStatBlock, HirelingRecord } from '../../types/character';
 import {
   clampHirelingUnits,
@@ -23,6 +21,7 @@ import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { BlurInput } from './BlurInput';
 import { CustomStatBlockEditor } from './CustomStatBlockEditor';
 import { LoyaltyControl } from './LoyaltyControl';
+import { RecordCard } from './RecordCard';
 import { TrackedVitals } from './TrackedVitals';
 import styles from './CompanionsShared.module.css';
 
@@ -36,14 +35,12 @@ export interface HirelingCardProps {
 }
 
 /**
- * One hireling. Presentation mirrors the WFRP HirelingCard (collapsed two-line
- * header, expandable body). Deviations (D&D content): pay comes from the PHB
+ * One hireling (People tab), in the shared RecordCard shell. Deviations (D&D content): pay comes from the PHB
  * services table (2 GP/day skilled, 2 SP/day untrained, 2 CP/mile messenger)
  * instead of upkeep; the 12-characteristic grid is the 2024 stat block, which
  * starts EMPTY and is typed in by hand (the PHB gives hirelings no stats).
  */
 export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: HirelingCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const patch = (p: Partial<HirelingRecord>) => onPatch(record.id, p);
   const unit = hirelingUnitName(record.kind);
   const units = clampHirelingUnits(record.units);
@@ -51,7 +48,6 @@ export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: Hireli
   const total = hirelingTotalCp(record);
   const below = isBelowMinimumRate(record);
   const hpMax = record.stats?.hpMax !== undefined && record.stats.hpMax > 0 ? record.stats.hpMax : null;
-  const bodyId = `hireling-body-${record.id}`;
 
   const rateBreakdown = {
     total: rate,
@@ -59,19 +55,16 @@ export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: Hireli
   };
 
   return (
-    <div className={styles.card} data-testid={`hireling-${record.id}`}>
-      <button type="button" className={styles.header} aria-expanded={expanded} aria-controls={bodyId} onClick={() => setExpanded((v) => !v)}>
-        <span className={styles.nameLine}>{record.name}</span>
-        <span className={styles.metaLine}>
-          <span className={styles.badge}>{HIRELING_KIND_LABELS[record.kind]}</span>
-          <span className={styles.chip}>{`${units} ${unit}${units === 1 ? '' : 's'}: ${formatCopper(total)}`}</span>
-          {hpMax !== null && <span className={styles.chip}>{`HP ${trackedHpOf(record, hpMax)}/${hpMax}`}</span>}
-          <ChevronDown size={16} aria-hidden="true" className={expanded ? styles.chevronOpen : styles.chevron} />
-        </span>
-      </button>
-
-      {expanded && (
-        <div className={styles.body} id={bodyId}>
+    <RecordCard
+      testId={`hireling-${record.id}`}
+      name={record.name}
+      kind={HIRELING_KIND_LABELS[record.kind]}
+      meta={<span className={styles.chip}>{`${units} ${unit}${units === 1 ? '' : 's'}: ${formatCopper(total)}`}</span>}
+      hp={hpMax !== null ? { current: trackedHpOf(record, hpMax), max: hpMax } : null}
+      onDelete={() => onDelete(record.id)}
+    >
+      {() => (
+        <>
           <div className={styles.row}>
             <label className={styles.field}>
               Name
@@ -166,13 +159,8 @@ export function HirelingCard({ record, loyalty, onPatch, onDelete, rng }: Hireli
             />
           </label>
 
-          <div className={styles.footer}>
-            <button type="button" className={styles.deleteBtn} onClick={() => onDelete(record.id)}>
-              <Trash2 size={14} aria-hidden="true" /> {`Remove ${record.name}`}
-            </button>
-          </div>
-        </div>
+        </>
       )}
-    </div>
+    </RecordCard>
   );
 }

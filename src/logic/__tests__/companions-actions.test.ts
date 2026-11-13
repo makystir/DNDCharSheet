@@ -52,10 +52,10 @@ describe('record list actions', () => {
     expect(addRecord(c, 'companions', wolf('a'))).toBe(c);
   });
 
-  it('refuses the add that would pass the cap (the 21st companion, the 31st hireling)', () => {
+  it('refuses the add that would pass the cap (the 41st creature, the 31st hireling)', () => {
     let c = base();
     for (let i = 0; i < COMPANION_CAPS.companions; i++) c = addRecord(c, 'companions', wolf(`c${i}`));
-    expect(recordsOf(c, 'companions')).toHaveLength(20);
+    expect(recordsOf(c, 'companions')).toHaveLength(40);
     expect(addRecord(c, 'companions', wolf('extra'))).toBe(c);
     let h = base();
     for (let i = 0; i < COMPANION_CAPS.hirelings; i++) h = addRecord(h, 'hirelings', hireling(`h${i}`));

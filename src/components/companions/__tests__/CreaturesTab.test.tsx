@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
-import { CompanionsTab } from '../CompanionsTab';
+import { CreaturesTab } from '../CreaturesTab';
 import type { Character, CompanionRecord } from '../../../types/character';
 import { plainCharacter, rangerCharacter, track, undoStub } from './helpers';
 import { Stateful } from './Stateful';
@@ -13,7 +13,7 @@ const primal: CompanionRecord = { id: 'p1', creatureId: 'beast-of-the-land', ori
 function renderTab(initial: Character, latest?: { current: Character }, undo = undoStub()) {
   render(
     <Stateful initial={initial} onState={latest ? track(latest) : undefined}>
-      {(character, onChange) => <CompanionsTab character={character} onChange={onChange} undo={undo} />}
+      {(character, onChange) => <CreaturesTab character={character} onChange={onChange} undo={undo} />}
     </Stateful>,
   );
   return undo;
@@ -23,33 +23,34 @@ function expand(name: RegExp | string) {
   fireEvent.click(screen.getByRole('button', { name }));
 }
 
-describe('CompanionsTab: help popover', () => {
+describe('CreaturesTab: help popover', () => {
   it('does not open its help popover on load; the ? button opens it', () => {
     // localStorage is cleared, so a first-visit hint would have auto-opened.
     renderTab(plainCharacter());
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Help: companions-tab/ }));
-    expect(screen.getByRole('tooltip')).toHaveTextContent(/Track permanent companions here/);
+    expect(screen.getByRole('tooltip')).toHaveTextContent(/Track everyone who travels with you/);
   });
 });
-describe('CompanionsTab: add and remove', () => {
+describe('CreaturesTab: add and remove', () => {
   it('adds a companion through the creation dialog', () => {
     const latest = { current: plainCharacter() };
     renderTab(latest.current, latest);
-    expect(screen.getByText('No companions yet')).toBeInTheDocument();
+    expect(screen.getByText('No creatures yet')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add Companion' }));
-    const dialog = screen.getByRole('dialog', { name: 'Add companion' });
+    fireEvent.click(screen.getByRole('button', { name: 'Add Creature' }));
+    const dialog = screen.getByRole('dialog', { name: 'Add creature' });
     fireEvent.change(within(dialog).getByLabelText('Source'), { target: { value: 'pet' } });
     fireEvent.change(within(dialog).getByLabelText('Creature'), { target: { value: 'cat' } });
     fireEvent.change(within(dialog).getByLabelText('Nickname (optional)'), { target: { value: 'Mittens' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Add companion' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add creature' }));
 
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(latest.current.companions).toHaveLength(1);
     expect(latest.current.companions?.[0]).toMatchObject({ creatureId: 'cat', origin: 'pet', nickname: 'Mittens' });
-    expect(screen.queryByText('No companions yet')).toBeNull();
+    expect(screen.queryByText('No creatures yet')).toBeNull();
     expect(screen.getByText('Mittens')).toBeInTheDocument();
+    expect(screen.getByText('Pet, mount or pack animal')).toBeInTheDocument();
   });
 
   it('removes a companion after confirmation and offers undo', () => {
@@ -64,7 +65,7 @@ describe('CompanionsTab: add and remove', () => {
     fireEvent.click(screen.getByRole('button', { name: /Remove Beast of the Land/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
     expect(latest.current.companions ?? []).toHaveLength(0);
-    expect(screen.getByText('No companions yet')).toBeInTheDocument();
+    expect(screen.getByText('No creatures yet')).toBeInTheDocument();
     expect(undo.show).toHaveBeenCalledTimes(1);
 
     // Running the undo callback restores the record at its index.
@@ -74,11 +75,11 @@ describe('CompanionsTab: add and remove', () => {
   });
 });
 
-describe('CompanionsTab: live Primal Companion numbers', () => {
+describe('CreaturesTab: live Primal Companion numbers', () => {
   it('recomputes AC, HP and Hit Dice when the Ranger level and Wisdom change', () => {
     const lvl5 = rangerCharacter(5, 16); // Wis +3
     const { rerender } = render(
-      <CompanionsTab character={{ ...lvl5, companions: [primal] }} onChange={vi.fn()} undo={undoStub()} />,
+      <CreaturesTab character={{ ...lvl5, companions: [primal] }} onChange={vi.fn()} undo={undoStub()} />,
     );
     expand(/Beast of the Land/);
     // AC = 13 + Wis +3, HP = 5 + 5 x Ranger level, Hit Dice = Ranger level.
@@ -87,7 +88,7 @@ describe('CompanionsTab: live Primal Companion numbers', () => {
     expect(screen.getByRole('button', { name: /^Hit Dice:/ })).toHaveTextContent(/^5d/);
 
     const lvl9 = rangerCharacter(9, 20); // Wis +5
-    rerender(<CompanionsTab character={{ ...lvl9, companions: [primal] }} onChange={vi.fn()} undo={undoStub()} />);
+    rerender(<CreaturesTab character={{ ...lvl9, companions: [primal] }} onChange={vi.fn()} undo={undoStub()} />);
     expect(screen.getByRole('button', { name: /^Armor Class:/ })).toHaveTextContent('18');
     expect(screen.getByRole('button', { name: /^Hit Points maximum:/ })).toHaveTextContent('50');
     expect(screen.getByRole('button', { name: /^Hit Dice:/ })).toHaveTextContent(/^9d/);
@@ -101,7 +102,7 @@ describe('CompanionsTab: live Primal Companion numbers', () => {
   });
 });
 
-describe('CompanionsTab: HP damage and heal', () => {
+describe('CreaturesTab: HP damage and heal', () => {
   const hpOf = () => screen.getByLabelText(/hit points \d+ of \d+/).getAttribute('aria-label');
 
   it('damage drains temp HP first, heal is capped at the maximum', () => {
@@ -136,5 +137,34 @@ describe('CompanionsTab: HP damage and heal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Damage' }));
     expect(hpOf()).toBe('Beast of the Land hit points 0 of 30');
     expect(screen.getByText('0 HP')).toBeInTheDocument();
+  });
+});
+
+describe('CreaturesTab: dismissed group', () => {
+  it('lists dismissed creatures in their own collapsed group', () => {
+    renderTab(
+      plainCharacter({
+        companions: [
+          { id: 'a', creatureId: 'cat', origin: 'pet', nickname: 'Active' },
+          { id: 'd', creatureId: 'owl', origin: 'pet', nickname: 'Resting', dismissed: true },
+        ],
+      }),
+    );
+    expect(screen.getByTestId('companion-a')).toBeInTheDocument();
+    expect(screen.queryByTestId('companion-d')).toBeNull();
+    const toggle = screen.getByRole('button', { name: 'Dismissed (1)' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
+    expect(within(screen.getByTestId('companion-d')).getByText('Dismissed')).toBeInTheDocument();
+  });
+
+  it('edits the nickname with the same field as every other card', () => {
+    const latest = { current: plainCharacter({ companions: [{ id: 'a', creatureId: 'cat', origin: 'pet' }] }) };
+    renderTab(latest.current, latest);
+    expand(/^Cat/);
+    const nick = screen.getByLabelText('Cat nickname');
+    fireEvent.change(nick, { target: { value: 'Tom' } });
+    fireEvent.blur(nick);
+    expect(latest.current.companions?.[0].nickname).toBe('Tom');
   });
 });

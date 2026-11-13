@@ -1,111 +1,118 @@
 import { useState } from 'react';
-import { Plus, Users } from 'lucide-react';
-import type { Character, SidekickRecord } from '../../types/character';
+import type { Character, HirelingRecord, NpcPartyMemberRecord, SidekickRecord } from '../../types/character';
 import { CREATURE_LIST } from '../../data/creatures';
 import { SIDEKICK_CLASSES, SIDEKICK_CLASS_IDS, SIDEKICK_MAX_LEVEL, SIDEKICK_MIN_LEVEL } from '../../data/sidekicks';
 import type { SidekickClassId } from '../../data/sidekicks';
+import { clampHirelingUnits, HIRELING_RATES, HIRELING_UNITS_MAX, hirelingUnitName, sidekickDefaultStartLevel } from '../../logic/companions';
+import type { HirelingKind } from '../../logic/companions';
+import { HIRELING_KIND_LABELS } from '../../logic/companion-model';
+import type { NpcTemplate } from '../../logic/companion-model';
 import { sidekickEligibility } from '../../logic/sidekick';
-import { sidekickDefaultStartLevel } from '../../logic/companions';
-import { resolveCompanionRuleTooltip } from '../../logic/tooltip-content';
-import type { RNG } from '../../logic/random';
 import { generateUUID } from '../../logic/uuid';
-import { Card } from '../shared/Card';
-import { SectionHeader } from '../shared/SectionHeader';
-import { EmptyState } from '../shared/EmptyState';
-import { ConfirmDialog } from '../shared/ConfirmDialog';
-import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { AddDialog } from './AddDialog';
-import { EDITION_MARK, SidekickCard } from './SidekickCard';
-import { useRecordList } from './useRecordList';
-import type { UndoSink } from './CompanionsTab';
+import { EDITION_MARK } from './SidekickCard';
 import dialogStyles from './CompanionCreationFlow.module.css';
 import styles from './CompanionsShared.module.css';
 
-export interface SidekicksTabProps {
-  character: Character;
-  onChange: (next: Character) => void;
-  undo: UndoSink;
-  rng?: RNG;
-}
+/** Add a hireling (PHB 2024 services table, L10523-10533). */
+export function HirelingCreationFlow({ onConfirm, onCancel }: { onConfirm: (record: HirelingRecord) => void; onCancel: () => void }) {
+  const [kind, setKind] = useState<HirelingKind>('skilled');
+  const [name, setName] = useState('');
+  const [units, setUnits] = useState('1');
+  const unit = hirelingUnitName(kind);
 
-/**
- * The Sidekicks sub-tab. The page shows it only while the `sidekicks` house rule
- * is on. Tasha's Cauldron of Everything (2020), a 2014-edition (5e) optional
- * rule: every label and tooltip carries the "Tasha's 2020 (5e, 2014 rules)" mark.
- */
-export function SidekicksTab({ character, onChange, undo, rng }: SidekicksTabProps) {
-  const [creating, setCreating] = useState(false);
-  const { list, atMax, patch, add, deleting, requestDelete, cancelDelete, confirmDelete } = useRecordList(
-    character,
-    onChange,
-    undo,
-    'sidekicks',
-    'Sidekick removed',
-  );
+  const confirm = () => {
+    const n = name.trim().slice(0, 80);
+    if (!n) return;
+    const parsed = Number.parseInt(units, 10);
+    onConfirm({ id: generateUUID(), name: n, kind, units: Number.isFinite(parsed) ? clampHirelingUnits(parsed) : 0 });
+  };
 
   return (
-    <>
-      <Card>
-        <SectionHeader
-          icon={Users}
-          title={
-            <span className={styles.titleRow}>
-              Sidekicks
-              <MaybeContentTooltip content={resolveCompanionRuleTooltip('sidekick-edition')} className={styles.badge} ariaLabel="About sidekicks and their edition">
-                {EDITION_MARK}
-              </MaybeContentTooltip>
-            </span>
-          }
-          action={
-            <button type="button" className={styles.addBtn} disabled={atMax} onClick={() => setCreating(true)}>
-              <Plus size={14} aria-hidden="true" />
-              Add Sidekick
-            </button>
-          }
+    <AddDialog title="Add hireling" confirmLabel="Add hireling" confirmDisabled={name.trim() === ''} onConfirm={confirm} onCancel={onCancel}>
+      <label className={dialogStyles.field}>
+        Kind
+        <select className={dialogStyles.control} value={kind} onChange={(e) => setKind(e.target.value as HirelingKind)}>
+          {(Object.keys(HIRELING_KIND_LABELS) as HirelingKind[]).map((k) => (
+            <option key={k} value={k}>
+              {`${HIRELING_KIND_LABELS[k]} (${HIRELING_RATES[k].printed})`}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className={dialogStyles.field}>
+        Name
+        <input type="text" className={dialogStyles.control} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+      </label>
+      <label className={dialogStyles.field}>
+        {unit === 'day' ? 'Days hired' : 'Miles'}
+        <input
+          type="number"
+          className={dialogStyles.control}
+          min={0}
+          max={HIRELING_UNITS_MAX}
+          value={units}
+          onChange={(e) => setUnits(e.target.value)}
         />
-        <p className={styles.banner}>
-          {`${EDITION_MARK}. Optional rule. A sidekick is a creature with a challenge rating of 1/2 or lower that gains a sidekick class.`}
-        </p>
-
-        {list.length === 0 ? (
-          <EmptyState
-            icon={Users}
-            heading="No sidekicks yet"
-            description="Turn a friendly creature with a challenge rating of 1/2 or lower into an Expert, Spellcaster or Warrior sidekick."
-          />
-        ) : (
-          <div className={styles.list}>
-            {list.map((rec) => (
-              <SidekickCard key={rec.id} record={rec} character={character} onPatch={patch} onDelete={requestDelete} rng={rng} />
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {creating && (
-        <SidekickCreationFlow
-          character={character}
-          onCancel={() => setCreating(false)}
-          onConfirm={(record) => {
-            add(record);
-            setCreating(false);
-          }}
-        />
-      )}
-
-      {deleting && (
-        <ConfirmDialog
-          message={`Remove this sidekick? You can undo this for a few seconds.`}
-          confirmLabel="Remove"
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-        />
-      )}
-    </>
+      </label>
+    </AddDialog>
   );
 }
 
-function SidekickCreationFlow({
+/** Add an NPC party member (DMG 2024 L833, L3553-3557). */
+export function NpcCreationFlow({
+  templates,
+  onConfirm,
+  onCancel,
+}: {
+  templates: readonly NpcTemplate[];
+  onConfirm: (record: NpcPartyMemberRecord) => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [templateId, setTemplateId] = useState('');
+
+  const confirm = () => {
+    const n = name.trim().slice(0, 80);
+    if (!n) return;
+    const record: NpcPartyMemberRecord = { id: generateUUID(), name: n };
+    const r = role.trim().slice(0, 80);
+    if (r) record.role = r;
+    const template = templates.find((t) => t.id === templateId);
+    if (template) record.stats = template.stats;
+    onConfirm(record);
+  };
+
+  return (
+    <AddDialog title="Add NPC party member" confirmLabel="Add member" confirmDisabled={name.trim() === ''} onConfirm={confirm} onCancel={onCancel}>
+      <label className={dialogStyles.field}>
+        Name
+        <input type="text" className={dialogStyles.control} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+      </label>
+      <label className={dialogStyles.field}>
+        Role (optional)
+        <input type="text" className={dialogStyles.control} value={role} maxLength={80} onChange={(e) => setRole(e.target.value)} />
+      </label>
+      {templates.length > 0 && (
+        <label className={dialogStyles.field}>
+          Start from template
+          <select className={dialogStyles.control} value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+            <option value="">Blank stat block</option>
+            {templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </AddDialog>
+  );
+}
+
+/** Add a Tasha's sidekick (2020; 5e, 2014 rules; house rule). */
+export function SidekickCreationFlow({
   character,
   onConfirm,
   onCancel,

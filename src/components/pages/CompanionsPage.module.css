@@ -3,3 +3,30 @@
   flex-direction: column;
   gap: var(--section-gap);
 }
+
+/* At-a-glance roster strip above the tabs. */
+.roster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+.rosterItem,
+.rosterWarn {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+}
+.rosterWarn {
+  border-color: var(--accent-red);
+  font-weight: 600;
+}

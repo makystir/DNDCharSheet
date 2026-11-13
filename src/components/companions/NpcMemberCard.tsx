@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { ChevronDown, Trash2 } from 'lucide-react';
 import type { NpcPartyMemberRecord } from '../../types/character';
 import { npcChallengeRatingCheck } from '../../logic/companions';
 import type { RNG } from '../../logic/random';
@@ -9,6 +7,7 @@ import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { BlurInput } from './BlurInput';
 import { CustomStatBlockEditor } from './CustomStatBlockEditor';
 import { LoyaltyControl } from './LoyaltyControl';
+import { RecordCard } from './RecordCard';
 import { TrackedVitals } from './TrackedVitals';
 import styles from './CompanionsShared.module.css';
 
@@ -24,34 +23,34 @@ export interface NpcMemberCardProps {
 }
 
 /**
- * One NPC party member (DMG 2024 L833, L3553-3557). Same shape as the hireling
- * card: collapsed two-line header, expandable body with an editable stat block
+ * One NPC party member (DMG 2024 L833, L3553-3557), in the shared RecordCard
+ * shell (People tab): an editable stat block
  * (nothing pre-filled; Monster Manual templates are a later extension). The
  * Challenge Rating guideline (no higher than half the characters' level) is a
  * warning only and never blocks.
  */
 export function NpcMemberCard({ record, partyLevel, loyalty, onPatch, onDelete, rng }: NpcMemberCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const patch = (p: Partial<NpcPartyMemberRecord>) => onPatch(record.id, p);
   const crCheck = npcChallengeRatingCheck(record.stats?.cr, partyLevel);
   const hpMax = record.stats?.hpMax !== undefined && record.stats.hpMax > 0 ? record.stats.hpMax : null;
-  const bodyId = `npc-body-${record.id}`;
 
   return (
-    <div className={styles.card} data-testid={`npc-${record.id}`}>
-      <button type="button" className={styles.header} aria-expanded={expanded} aria-controls={bodyId} onClick={() => setExpanded((v) => !v)}>
-        <span className={styles.nameLine}>{record.name}</span>
-        <span className={styles.metaLine}>
-          {record.role && <span className={styles.badge}>{record.role}</span>}
+    <RecordCard
+      testId={`npc-${record.id}`}
+      name={record.name}
+      kind="NPC party member"
+      meta={
+        <>
+          {record.role?.trim() && <span className={styles.badge}>{record.role}</span>}
           {record.stats?.cr && <span className={styles.chip}>{`CR ${record.stats.cr}`}</span>}
           {crCheck.status === 'exceeds' && <span className={styles.badgeWarn}>CR above half level</span>}
-          {hpMax !== null && <span className={styles.chip}>{`HP ${trackedHpOf(record, hpMax)}/${hpMax}`}</span>}
-          <ChevronDown size={16} aria-hidden="true" className={expanded ? styles.chevronOpen : styles.chevron} />
-        </span>
-      </button>
-
-      {expanded && (
-        <div className={styles.body} id={bodyId}>
+        </>
+      }
+      hp={hpMax !== null ? { current: trackedHpOf(record, hpMax), max: hpMax } : null}
+      onDelete={() => onDelete(record.id)}
+    >
+      {() => (
+        <>
           <div className={styles.row}>
             <label className={styles.field}>
               Name
@@ -90,13 +89,8 @@ export function NpcMemberCard({ record, partyLevel, loyalty, onPatch, onDelete, 
             />
           </label>
 
-          <div className={styles.footer}>
-            <button type="button" className={styles.deleteBtn} onClick={() => onDelete(record.id)}>
-              <Trash2 size={14} aria-hidden="true" /> {`Remove ${record.name}`}
-            </button>
-          </div>
-        </div>
+        </>
       )}
-    </div>
+    </RecordCard>
   );
 }

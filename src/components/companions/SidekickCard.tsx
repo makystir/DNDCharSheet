@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ChevronDown, Trash2 } from 'lucide-react';
 import type { Character, SidekickRecord } from '../../types/character';
 import { ABILITY_NAMES } from '../../types/character';
 import { CREATURE_CATALOG } from '../../data/creatures';
@@ -31,6 +30,7 @@ import { resolveCompanionRuleTooltip, resolveSidekickFeatureTooltip } from '../.
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { BlurInput } from './BlurInput';
+import { RecordCard } from './RecordCard';
 import { SidekickDeathSaves } from './SidekickDeathSaves';
 import { StatBlockView } from './StatBlockView';
 import { TrackedVitals } from './TrackedVitals';
@@ -73,14 +73,13 @@ function adjustFeatures(features: StatFeature[], delta: number, attackExtra: num
 }
 
 /**
- * One sidekick (Tasha's 2020, 5e / 2014 rules). Same card pattern as the other
- * tabs. Shows the class table row, features by level with tooltips, the
+ * One sidekick (Tasha's 2020, 5e / 2014 rules), in the shared RecordCard shell
+ * (People tab). Shows the class table row, features by level with tooltips, the
  * Spellcaster numbers, the stat block with attack bonuses and DCs adjusted for
  * the sidekick's proficiency bonus, hit points, level-ups and death saves.
  * Ability score improvements are counted but not allocated (follow-up).
  */
 export function SidekickCard({ record, character, onPatch, onDelete, rng }: SidekickCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const [roll, setRoll] = useState('');
   const creature = CREATURE_CATALOG[record.creatureId];
   if (!creature) return null;
@@ -94,7 +93,6 @@ export function SidekickCard({ record, character, onPatch, onDelete, rng }: Side
   const cur = trackedHpOf(record, hpMax);
   const hitDie = creatureHitDie(creature);
   const conMod = creature.abilities.con.mod ?? 0;
-  const bodyId = `sidekick-body-${record.id}`;
 
   const adjustment = sidekickStatAdjustment(creature, record.classId, level);
   const attackExtra = record.classId === 'warrior' ? martialRoleAttackBonus(record.martialRole) : 0;
@@ -127,20 +125,22 @@ export function SidekickCard({ record, character, onPatch, onDelete, rng }: Side
   };
 
   return (
-    <div className={styles.card} data-testid={`sidekick-${record.id}`}>
-      <button type="button" className={styles.header} aria-expanded={expanded} aria-controls={bodyId} onClick={() => setExpanded((v) => !v)}>
-        <span className={styles.nameLine}>{name}</span>
-        <span className={styles.metaLine}>
-          <span className={styles.badge}>{`${cls.name} ${level}`}</span>
+    <RecordCard
+      testId={`sidekick-${record.id}`}
+      name={name}
+      kind={`${cls.name} ${level}`}
+      meta={
+        <>
           {record.nickname?.trim() && <span className={styles.badge}>{creature.name}</span>}
-          <span className={styles.chip}>{`HP ${cur}/${hpMax}`}</span>
           {record.dead && <span className={styles.badgeWarn}>Dead</span>}
-          <ChevronDown size={16} aria-hidden="true" className={expanded ? styles.chevronOpen : styles.chevron} />
-        </span>
-      </button>
-
-      {expanded && (
-        <div className={styles.body} id={bodyId}>
+        </>
+      }
+      hp={{ current: cur, max: hpMax }}
+      muted={record.dead === true}
+      onDelete={() => onDelete(record.id)}
+    >
+      {() => (
+        <>
           <p className={styles.notice}>{EDITION_MARK}</p>
           {character.level > level && (
             <p className={styles.hint} role="status">
@@ -333,13 +333,8 @@ export function SidekickCard({ record, character, onPatch, onDelete, rng }: Side
             <textarea className={styles.textarea} value={record.notes ?? ''} maxLength={2000} placeholder="Notes..." aria-label={`${name} notes`} onChange={(e) => patch({ notes: e.target.value || undefined })} />
           </label>
 
-          <div className={styles.footer}>
-            <button type="button" className={styles.deleteBtn} onClick={() => onDelete(record.id)}>
-              <Trash2 size={14} aria-hidden="true" /> {`Remove ${name}`}
-            </button>
-          </div>
-        </div>
+        </>
       )}
-    </div>
+    </RecordCard>
   );
 }

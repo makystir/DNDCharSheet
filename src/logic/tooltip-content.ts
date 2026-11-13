@@ -1090,7 +1090,7 @@ const COMPANION_HOUSE_RULE_TOOLTIPS: Record<CompanionHouseRuleKey, TooltipConten
     sections: [
       {
         label: 'Rule',
-        text: 'A sidekick is a creature with a challenge rating of 1/2 or lower that gains an Expert, Spellcaster or Warrior class and levels up with the group. Adds a Sidekicks tab to the Companions page.',
+        text: 'A sidekick is a creature with a challenge rating of 1/2 or lower that gains an Expert, Spellcaster or Warrior class and levels up with the group. Adds sidekicks to the Companions page\u2019s People tab.',
       },
       {
         label: 'Edition',

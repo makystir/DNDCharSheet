@@ -33,8 +33,44 @@ const SPELL_LEVELS = Array.from(
   (_, i) => OTHERWORLDLY_STEED_MIN_SPELL_LEVEL + i,
 );
 
+/** Creature picker options: table mounts first (with capacity), then the rest. */
+function CreatureOptions({ origin }: { origin: CompanionOrigin }) {
+  const options = creatureOptionsForOrigin(origin);
+  if (origin !== 'pet') {
+    return (
+      <>
+        {options.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </>
+    );
+  }
+  const table = options.filter((c) => c.mountTable);
+  const other = options.filter((c) => !c.mountTable);
+  return (
+    <>
+      <optgroup label="Mounts and Other Animals table">
+        {table.map((c) => (
+          <option key={c.id} value={c.id}>
+            {`${c.name} (carries ${c.mountTable?.carryingCapacityLb} lb)`}
+          </option>
+        ))}
+      </optgroup>
+      <optgroup label="Other animals">
+        {other.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </optgroup>
+    </>
+  );
+}
+
 /**
- * Modal for adding a companion. Deviation from the WFRP HirelingCreationFlow
+ * Modal for adding a creature (Creatures tab). Deviation from the WFRP HirelingCreationFlow
  * wizard: a single form step, because the choices are few (origin, creature and
  * a couple of origin options). The Primal Companion warning is shown here and on
  * the card; it never blocks adding.
@@ -50,12 +86,13 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
   const [spellSlotLevel, setSpellSlotLevel] = useState(OTHERWORLDLY_STEED_MIN_SPELL_LEVEL);
   const [spiritType, setSpiritType] = useState<CompanionSpiritType | ''>('');
 
-  const options = creatureOptionsForOrigin(origin);
   const ownerWarning = origin === 'primal-companion' ? primalCompanionOwner(character).warning : undefined;
 
   const changeOrigin = (next: CompanionOrigin) => {
     setOrigin(next);
-    setCreatureId(creatureOptionsForOrigin(next)[0]?.id ?? '');
+    const opts = creatureOptionsForOrigin(next);
+    // A pet starts on the first listed (table) mount, matching the picker order.
+    setCreatureId((next === 'pet' ? opts.find((c) => c.mountTable) : undefined)?.id ?? opts[0]?.id ?? '');
   };
 
   const confirm = () => {
@@ -72,7 +109,7 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
   };
 
   return (
-    <div className={styles.overlay} onClick={onCancel} role="dialog" aria-modal="true" aria-label="Add companion">
+    <div className={styles.overlay} onClick={onCancel} role="dialog" aria-modal="true" aria-label="Add creature">
       <div
         ref={dialogRef}
         className={styles.dialog}
@@ -81,7 +118,7 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
           if (e.key === 'Escape') onCancel();
         }}
       >
-        <h3 className={styles.title}>Add Companion</h3>
+        <h3 className={styles.title}>Add Creature</h3>
 
         <label className={styles.field}>
           Source
@@ -98,11 +135,7 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
           <label className={styles.field}>
             Creature
             <select className={styles.control} value={creatureId} onChange={(e) => setCreatureId(e.target.value)}>
-              {options.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              <CreatureOptions origin={origin} />
             </select>
           </label>
         )}
@@ -156,7 +189,7 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
             Cancel
           </button>
           <button type="button" className={styles.confirmBtn} disabled={!creatureId} onClick={confirm}>
-            Add companion
+            Add creature
           </button>
         </div>
       </div>

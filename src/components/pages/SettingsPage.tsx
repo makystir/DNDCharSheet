@@ -198,7 +198,7 @@ export function SettingsPage({
               </MaybeContentTooltip>
             </span>
             <span className={styles.settingHint}>
-              Adds a Sidekicks tab to the Companions page: a creature with a
+              Adds sidekicks to the Companions page's People tab: a creature with a
               challenge rating of 1/2 or lower gains an Expert, Spellcaster or
               Warrior class. Optional rules from Tasha's Cauldron of Everything
               (Docs/TashasCauldronOfEverything.md L6917-7275), a 2014-edition

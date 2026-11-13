@@ -1,6 +1,6 @@
 /**
  * Sanitizers for the Companions page's additive-optional Character fields
- * (`companions`, `mounts`, `hirelings`, `npcPartyMembers`, `sidekicks`,
+ * (`companions`, `hirelings`, `npcPartyMembers`, `sidekicks`,
  * `loyaltyMaxOverride`). They run on every IMPORTED and SHARED character, which
  * is untrusted data (storage/export-import.ts, logic/share-validate.ts).
  *
@@ -27,7 +27,7 @@ import type {
   CompanionSpiritType,
   CustomStatBlock,
   HirelingRecord,
-  MountRecord,
+  RidingDetails,
   NamedStatEntry,
   NpcPartyMemberRecord,
   SaddleKind,
@@ -47,7 +47,6 @@ import {
   HIRELINGS_MAX,
   LOYALTY_MAX,
   LOYALTY_MIN,
-  MOUNTS_MAX,
   NPC_PARTY_MAX,
   SIDEKICKS_MAX,
   HIRELING_UNITS_MAX,
@@ -195,6 +194,7 @@ function sanitizeCompanion(raw: Raw): CompanionRecord | undefined {
   assign(rec, 'steedType', oneOf(raw.steedType, SPIRIT_TYPES));
   assign(rec, 'familiarType', oneOf(raw.familiarType, SPIRIT_TYPES));
   assign(rec, 'castingClassId', nonEmptyString(raw.castingClassId, ID_MAX));
+  sanitizeRiding(raw, rec);
   sanitizeTracked(raw, rec);
   return rec;
 }
@@ -203,14 +203,9 @@ export function sanitizeCompanions(value: unknown): CompanionRecord[] | undefine
   return sanitizeList(value, COMPANIONS_MAX, sanitizeCompanion);
 }
 
-// ─── Mounts ──────────────────────────────────────────────────────────────────
+// ─── Riding and packing (formerly the separate mounts list) ─────────────────
 
-function sanitizeMount(raw: Raw): MountRecord | undefined {
-  const id = recordId(raw.id);
-  const creatureId = typeof raw.creatureId === 'string' ? raw.creatureId : undefined;
-  if (!id || !creatureId || !Object.hasOwn(CREATURE_CATALOG, creatureId)) return undefined;
-  const rec: MountRecord = { id, creatureId };
-  assign(rec, 'nickname', nonEmptyString(raw.nickname, NAME_MAX));
+function sanitizeRiding(raw: Raw, rec: RidingDetails): void {
   assign(rec, 'carriedLb', numberInRange(raw.carriedLb, 0, WEIGHT_MAX));
   assign(rec, 'saddle', oneOf(raw.saddle, SADDLES));
   if (typeof raw.bardingArmorId === 'string' && Object.hasOwn(ARMOR_CATALOG, raw.bardingArmorId)) {
@@ -223,12 +218,6 @@ function sanitizeMount(raw: Raw): MountRecord | undefined {
   }
   if (raw.pullsVehicle === true) rec.pullsVehicle = true;
   assign(rec, 'vehicleWeightLb', numberInRange(raw.vehicleWeightLb, 0, WEIGHT_MAX));
-  assign(rec, 'notes', nonEmptyString(raw.notes, NOTES_MAX));
-  return rec;
-}
-
-export function sanitizeMounts(value: unknown): MountRecord[] | undefined {
-  return sanitizeList(value, MOUNTS_MAX, sanitizeMount);
 }
 
 // ─── Custom stat block ───────────────────────────────────────────────────────
@@ -386,7 +375,9 @@ export function sanitizeCompanionsState<T extends object>(character: T): T {
     else target[key] = value;
   };
   apply('companions', sanitizeCompanions(target.companions));
-  apply('mounts', sanitizeMounts(target.mounts));
+  // The legacy `mounts` list is folded into `companions` by the v3 migration,
+  // which runs before this; a stray one (hand-edited file) is dropped.
+  delete target.mounts;
   apply('hirelings', sanitizeHirelings(target.hirelings));
   apply('npcPartyMembers', sanitizeNpcPartyMembers(target.npcPartyMembers));
   apply('sidekicks', sanitizeSidekicks(target.sidekicks));

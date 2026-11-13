@@ -15,8 +15,8 @@ export interface AddDialogProps {
 }
 
 /**
- * Modal shell for the add flows of the Mounts, Hirelings, NPC Party and
- * Sidekicks tabs. Same look and behaviour as CompanionCreationFlow (focus trap,
+ * Modal shell for the People tab's add flows (hireling, NPC party member,
+ * sidekick, and the kind chooser). Same look and behaviour as CompanionCreationFlow (focus trap,
  * scroll lock, Escape and overlay click cancel). Deviation from the WFRP
  * HirelingCreationFlow wizard: one form step, because the choices are few.
  */

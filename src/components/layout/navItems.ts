@@ -113,7 +113,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Companions',
     icon: PawPrint,
     shortcut: '7',
-    subTabHint: 'Companions · Mounts · Hirelings · NPC Party',
+    subTabHint: 'Creatures · People',
   },
   { id: 'settings', label: 'Settings', icon: Settings, shortcut: '3' },
 ];

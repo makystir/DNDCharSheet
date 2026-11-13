@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { runMigration } from '../../storage/migration';
+import { MIGRATIONS, runMigration } from '../../storage/migration';
 import { createCharacter } from '../../storage/character-store';
 import { primaryClass, allClasses, totalLevel } from '../classes';
 import type { Character, ClassEntry } from '../../types/character';
@@ -31,20 +31,27 @@ import {
 // level sum; only the count + per-entry level matter).
 const DISTINCT_CLASS_IDS: ClassId[] = ['fighter', 'wizard', 'rogue', 'cleric', 'bard'];
 
-describe('MIGRATION_V1_V2_CASES — runMigration(v1) deep-equals v2 + idempotence', () => {
+describe('MIGRATION_V1_V2_CASES — MIGRATIONS[1](v1) deep-equals v2 + idempotence', () => {
   it.each(MIGRATION_V1_V2_CASES)('$name', (c) => {
-    const result = runMigration(c.v1);
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-    // The migrated record must deep-equal the expected v2 record exactly.
-    expect(result.character).toEqual(c.v2);
+    // The v1 -> v2 step itself must produce the expected v2 record exactly.
+    // (CURRENT_VERSION has since moved past 2, so the full pipeline also runs
+    // the later steps; those are checked below as a composition.)
+    expect(MIGRATIONS[1]({ ...(c.v1 as Record<string, unknown>) })).toEqual(c.v2);
 
-    // Derived idempotence (golden's note): a second migration of the v2 result
-    // is a no-op — runMigration(runMigration(v1)) deep-equals runMigration(v1).
+    // The full pipeline from v1 lands where the pipeline from v2 lands.
+    const result = runMigration(c.v1);
+    const fromV2 = runMigration(c.v2);
+    expect(result.success).toBe(true);
+    expect(fromV2.success).toBe(true);
+    if (!result.success || !fromV2.success) return;
+    expect(result.character).toEqual(fromV2.character);
+
+    // Derived idempotence (golden's note): a second migration of the result is
+    // a no-op — runMigration(runMigration(v1)) deep-equals runMigration(v1).
     const again = runMigration(result.character);
     expect(again.success).toBe(true);
     if (!again.success) return;
-    expect(again.character).toEqual(c.v2);
+    expect(again.character).toEqual(result.character);
   });
 });
 

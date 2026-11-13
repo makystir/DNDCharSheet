@@ -93,6 +93,40 @@ export const MIGRATIONS: Record<number, MigrationStep> = {
     out._v = 2;
     return out;
   },
+
+  // v2 -> v3 (Companions page redesign): the separate `mounts` list merges into
+  // `companions`. Each mount becomes a creature companion with origin 'pet'
+  // that keeps its riding and packing fields (carried weight, saddle, barding,
+  // vehicle) and its nickname and notes. Shape only; validation stays with the
+  // import sanitizer. An id that collides with an existing companion gets a
+  // "-mount" suffix so neither record is lost. Pure and total.
+  2: (record) => {
+    const out: Record<string, unknown> = { ...record };
+    const companions = Array.isArray(record.companions) ? [...(record.companions as unknown[])] : [];
+    const taken = new Set(
+      companions.map((c) => (c && typeof c === 'object' ? (c as Record<string, unknown>).id : undefined)),
+    );
+    if (Array.isArray(record.mounts)) {
+      for (const raw of record.mounts as unknown[]) {
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
+        const m = raw as Record<string, unknown>;
+        if (typeof m.id !== 'string' || typeof m.creatureId !== 'string') continue;
+        let id = m.id;
+        while (taken.has(id)) id = `${id}-mount`;
+        taken.add(id);
+        const rec: Record<string, unknown> = { id, creatureId: m.creatureId, origin: 'pet' };
+        for (const key of ['nickname', 'notes', 'carriedLb', 'saddle', 'bardingArmorId', 'bardingCustom', 'pullsVehicle', 'vehicleWeightLb']) {
+          if (m[key] !== undefined) rec[key] = m[key];
+        }
+        companions.push(rec);
+      }
+    }
+    if (companions.length > 0) out.companions = companions;
+    else delete out.companions;
+    delete out.mounts;
+    out._v = 3;
+    return out;
+  },
 };
 
 /**

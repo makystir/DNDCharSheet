@@ -54,7 +54,7 @@ describe('Companions tab routing', () => {
   it('routes to Companions on click, moving aria-current and the hash', async () => {
     await renderApp();
     fireEvent.click(screen.getByRole('button', { name: /^Companions/ }));
-    await screen.findByRole('heading', { name: 'No companions yet' });
+    await screen.findByRole('heading', { name: 'No creatures yet' });
     expect(screen.getByRole('button', { name: /^Companions/ })).toHaveAttribute('aria-current', 'page');
     expect(window.location.hash).toMatch(/^#companions/);
   });
@@ -62,7 +62,7 @@ describe('Companions tab routing', () => {
   it('switches to Companions via its number-key shortcut (7)', async () => {
     await renderApp();
     fireEvent.keyDown(document.body, { key: '7' });
-    await screen.findByRole('heading', { name: 'No companions yet' });
+    await screen.findByRole('heading', { name: 'No creatures yet' });
     expect(screen.getByRole('button', { name: /^Companions/ })).toHaveAttribute('aria-current', 'page');
   });
 
@@ -70,14 +70,15 @@ describe('Companions tab routing', () => {
     await seedCharacter();
     history.replaceState(null, '', '#companions');
     render(<App />);
-    await screen.findByRole('heading', { name: 'No companions yet' });
+    await screen.findByRole('heading', { name: 'No creatures yet' });
     expect(window.location.hash).toMatch(/^#companions/);
   });
 
-  it('deep-links a sub-tab (#companions/hirelings)', async () => {
+  it('deep-links a legacy sub-tab (#companions/hirelings) to People, Hirelings filter', async () => {
     await seedCharacter();
     history.replaceState(null, '', '#companions/hirelings');
     render(<App />);
-    await screen.findByRole('tab', { name: 'Hirelings', selected: true });
+    await screen.findByRole('tab', { name: 'People', selected: true });
+    expect(screen.getByRole('button', { name: /^Hirelings \(/ })).toHaveAttribute('aria-pressed', 'true');
   });
 });

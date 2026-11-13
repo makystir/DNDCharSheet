@@ -1,28 +1,18 @@
 import { describe, it, expect, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
-import { HirelingsTab } from '../HirelingsTab';
-import { NpcPartyTab } from '../NpcPartyTab';
+import { screen, fireEvent, cleanup, within } from '@testing-library/react';
 import type { Character } from '../../../types/character';
-import { plainCharacter, track, undoStub, withHouseRule } from './helpers';
-import { Stateful } from './Stateful';
+import { plainCharacter, withHouseRule } from './helpers';
+import { renderPeople } from './PeopleHarness';
 
 beforeEach(() => localStorage.clear());
 afterEach(() => cleanup());
 
 function renderHirelings(initial: Character, latest?: { current: Character }, rng?: () => number) {
-  render(
-    <Stateful initial={initial} onState={latest ? track(latest) : undefined}>
-      {(character, onChange) => <HirelingsTab character={character} onChange={onChange} undo={undoStub()} rng={rng} />}
-    </Stateful>,
-  );
+  renderPeople(initial, { latest, rng, filter: 'hirelings' });
 }
 
 function renderNpcs(initial: Character, latest?: { current: Character }, rng?: () => number) {
-  render(
-    <Stateful initial={initial} onState={latest ? track(latest) : undefined}>
-      {(character, onChange) => <NpcPartyTab character={character} onChange={onChange} undo={undoStub()} rng={rng} />}
-    </Stateful>,
-  );
+  renderPeople(initial, { latest, rng, filter: 'npc' });
 }
 
 function openCard(testId: string) {
@@ -31,7 +21,7 @@ function openCard(testId: string) {
 
 const total = () => screen.getByRole('button', { name: /^Total for all hirelings:/ });
 
-describe('HirelingsTab', () => {
+describe('PeopleTab: hirelings', () => {
   it('adds a hireling and shows the PHB cost and the running total', () => {
     const latest = { current: plainCharacter() };
     renderHirelings(latest.current, latest);
@@ -135,11 +125,7 @@ describe('Loyalty gating and rolls', () => {
 
   it('shows Loyalty on NPC party members only while the rule is on', () => {
     const npc = { id: 'n1', name: 'Mira' };
-    const first = render(
-      <Stateful initial={plainCharacter({ npcPartyMembers: [npc] })}>
-        {(c, onChange) => <NpcPartyTab character={c} onChange={onChange} undo={undoStub()} />}
-      </Stateful>,
-    );
+    const first = renderPeople(plainCharacter({ npcPartyMembers: [npc] }), { filter: 'npc' });
     openCard('npc-n1');
     expect(screen.queryByTestId('loyalty-control')).toBeNull();
     first.unmount();
@@ -150,7 +136,7 @@ describe('Loyalty gating and rolls', () => {
   });
 });
 
-describe('NpcPartyTab', () => {
+describe('PeopleTab: NPC party members', () => {
   it('adds an NPC party member and warns when its CR is above half the level', () => {
     const latest = { current: plainCharacter({ level: 3 }) };
     renderNpcs(latest.current, latest);
@@ -173,5 +159,62 @@ describe('NpcPartyTab', () => {
     fireEvent.change(screen.getByLabelText('Mira Challenge Rating'), { target: { value: '2' } });
     fireEvent.blur(screen.getByLabelText('Mira Challenge Rating'));
     expect(screen.getByRole('status')).toHaveTextContent(/half/i);
+  });
+});
+
+describe('PeopleTab: one list with filters', () => {
+  const people = plainCharacter({
+    hirelings: [{ id: 'h1', name: 'Smith', kind: 'skilled', units: 1 }],
+    npcPartyMembers: [{ id: 'n1', name: 'Mira', role: 'Healer' }],
+  });
+
+  it('All lists every kind under its own heading; a filter narrows the list', () => {
+    renderPeople(people);
+    expect(screen.getByRole('button', { name: 'All (2)' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('region', { name: 'Hirelings' })).toContainElement(screen.getByTestId('hireling-h1'));
+    expect(screen.getByRole('region', { name: 'NPC party members' })).toContainElement(screen.getByTestId('npc-n1'));
+    // No Sidekicks chip while the house rule is off.
+    expect(screen.queryByRole('button', { name: /^Sidekicks/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'NPC party members (1)' }));
+    expect(screen.queryByTestId('hireling-h1')).toBeNull();
+    expect(screen.getByTestId('npc-n1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add NPC Party Member' })).toBeInTheDocument();
+  });
+
+  it('Add Person asks which kind first, then opens that form', () => {
+    const latest = { current: plainCharacter() };
+    renderPeople(latest.current, { latest });
+    expect(screen.getByText('No people yet')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Person' }));
+    const chooser = screen.getByRole('dialog', { name: 'Add a person' });
+    expect(within(chooser).queryByRole('radio', { name: /^Sidekick/ })).toBeNull();
+    fireEvent.click(within(chooser).getByRole('radio', { name: /^NPC party member/ }));
+    fireEvent.click(within(chooser).getByRole('button', { name: 'Next' }));
+    const form = screen.getByRole('dialog', { name: 'Add NPC party member' });
+    fireEvent.change(within(form).getByLabelText('Name'), { target: { value: 'Mira' } });
+    fireEvent.click(within(form).getByRole('button', { name: 'Add member' }));
+    expect(latest.current.npcPartyMembers?.[0]).toMatchObject({ name: 'Mira' });
+  });
+
+  it('every card uses the same header: name, kind badge and HP', () => {
+    renderPeople(
+      plainCharacter({
+        hirelings: [{ id: 'h1', name: 'Smith', kind: 'skilled', units: 1, stats: { hpMax: 11 }, hp: 4 }],
+        npcPartyMembers: [{ id: 'n1', name: 'Mira', role: 'Healer' }],
+      }),
+    );
+    const smith = within(screen.getByTestId('hireling-h1')).getByRole('button');
+    expect(smith).toHaveTextContent('Smith');
+    expect(smith).toHaveTextContent('Skilled hireling');
+    expect(smith).toHaveTextContent('HP 4/11');
+    const mira = within(screen.getByTestId('npc-n1')).getByRole('button');
+    expect(mira).toHaveTextContent('NPC party member');
+    expect(mira).toHaveTextContent('Healer');
+  });
+
+  it('shows the Loyalty maximum once for the whole tab', () => {
+    renderPeople(withHouseRule(people, 'loyalty'));
+    expect(screen.getAllByTestId('loyalty-maximum')).toHaveLength(1);
   });
 });

@@ -5,7 +5,6 @@ import {
   sanitizeCustomStatBlock,
   sanitizeHirelings,
   sanitizeLoyaltyMaxOverride,
-  sanitizeMounts,
   sanitizeNpcPartyMembers,
   sanitizeSidekicks,
 } from '../companions-sanitize';
@@ -107,12 +106,13 @@ describe('sanitizeCompanions', () => {
   });
 });
 
-describe('sanitizeMounts', () => {
-  it('keeps a valid mount and drops bad barding, saddle and weights', () => {
-    const out = sanitizeMounts([
+describe('sanitizeCompanions: riding and packing fields', () => {
+  it('keeps valid riding details and drops bad barding, saddle and weights', () => {
+    const out = sanitizeCompanions([
       {
         id: 'm1',
         creatureId: 'mule',
+        origin: 'pet',
         carriedLb: 120,
         saddle: 'military',
         bardingArmorId: 'padded-armor',
@@ -120,11 +120,12 @@ describe('sanitizeMounts', () => {
         pullsVehicle: true,
         vehicleWeightLb: 300,
       },
-      { id: 'm2', creatureId: 'mule', carriedLb: -1, saddle: 'golden', bardingArmorId: 'unobtainium', bardingCustom: { costGp: -1, weightLb: 1 }, vehicleWeightLb: 'heavy' },
+      { id: 'm2', creatureId: 'mule', origin: 'pet', carriedLb: -1, saddle: 'golden', bardingArmorId: 'unobtainium', bardingCustom: { costGp: -1, weightLb: 1 }, vehicleWeightLb: 'heavy' },
     ]);
     expect(out?.[0]).toEqual({
       id: 'm1',
       creatureId: 'mule',
+      origin: 'pet',
       carriedLb: 120,
       saddle: 'military',
       bardingArmorId: 'padded-armor',
@@ -132,13 +133,12 @@ describe('sanitizeMounts', () => {
       pullsVehicle: true,
       vehicleWeightLb: 300,
     });
-    expect(out?.[1]).toEqual({ id: 'm2', creatureId: 'mule' });
+    expect(out?.[1]).toEqual({ id: 'm2', creatureId: 'mule', origin: 'pet' });
   });
 
-  it('drops an unknown creature and caps at 20', () => {
-    expect(sanitizeMounts([{ id: 'm', creatureId: 'unicorn' }])).toBeUndefined();
-    const many = Array.from({ length: COMPANION_CAPS.mounts + 1 }, (_, i) => ({ id: `m${i}`, creatureId: 'pony' }));
-    expect(sanitizeMounts(many)).toHaveLength(COMPANION_CAPS.mounts);
+  it('caps the creature list at its cap (the former companions + mounts caps)', () => {
+    const many = Array.from({ length: COMPANION_CAPS.companions + 1 }, (_, i) => ({ id: `m${i}`, creatureId: 'pony', origin: 'pet' }));
+    expect(sanitizeCompanions(many)).toHaveLength(COMPANION_CAPS.companions);
   });
 });
 

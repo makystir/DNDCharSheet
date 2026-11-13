@@ -273,13 +273,12 @@ describe('resourcesSpent round trip (additive-optional, no version bump)', () =>
     expect(result.character && 'resourcesSpent' in result.character).toBe(false);
   });
 });
-describe('companions fields round trip (additive-optional, no version bump)', () => {
+describe('companions fields round trip', () => {
   const companion = { id: 'c1', creatureId: 'wolf', origin: 'pet', nickname: 'Fang', hp: 5 };
 
-  it('survives export then import unchanged, with no CURRENT_VERSION change', () => {
+  it('survives export then import unchanged', () => {
     const c = makeChar({
-      companions: [companion as never],
-      mounts: [{ id: 'm1', creatureId: 'mule', carriedLb: 100 }],
+      companions: [companion as never, { id: 'm1', creatureId: 'mule', origin: 'pet', carriedLb: 100 }],
       hirelings: [{ id: 'h1', name: 'Mara', kind: 'skilled', units: 3 }],
       npcPartyMembers: [{ id: 'n1', name: 'Scout' }],
       loyaltyMaxOverride: 12,
@@ -287,8 +286,7 @@ describe('companions fields round trip (additive-optional, no version bump)', ()
     });
     const result = importFromJSON(exportToJSON(c));
     expect(result.success).toBe(true);
-    expect(result.character?.companions).toEqual([companion]);
-    expect(result.character?.mounts).toHaveLength(1);
+    expect(result.character?.companions).toEqual([companion, { id: 'm1', creatureId: 'mule', origin: 'pet', carriedLb: 100 }]);
     expect(result.character?.hirelings?.[0].units).toBe(3);
     expect(result.character?.npcPartyMembers?.[0].name).toBe('Scout');
     expect(result.character?.loyaltyMaxOverride).toBe(12);
@@ -314,10 +312,32 @@ describe('companions fields round trip (additive-optional, no version bump)', ()
     expect(result.character && 'loyaltyMaxOverride' in result.character).toBe(false);
   });
 
-  it('caps the companion list at 20', () => {
-    const many = Array.from({ length: 25 }, (_, i) => ({ ...companion, id: `c${i}` }));
+  it('caps the companion list at 40', () => {
+    const many = Array.from({ length: 45 }, (_, i) => ({ ...companion, id: `c${i}` }));
     const result = importFromJSON(JSON.stringify({ ...makeChar(), companions: many }));
-    expect(result.character?.companions).toHaveLength(20);
+    expect(result.character?.companions).toHaveLength(40);
+  });
+
+  it('folds a v2 file\'s mounts into creature companions (v2 -> v3 migration)', () => {
+    const v2 = {
+      ...makeChar(),
+      _v: 2,
+      companions: [companion],
+      mounts: [
+        { id: 'm1', creatureId: 'mule', nickname: 'Ned', carriedLb: 100, saddle: 'riding', notes: 'stubborn' },
+        // Same id as the companion: renamed rather than lost.
+        { id: 'c1', creatureId: 'pony' },
+      ],
+    };
+    const result = importFromJSON(JSON.stringify(v2));
+    expect(result.success).toBe(true);
+    expect(result.character?._v).toBe(CURRENT_VERSION);
+    expect(result.character && 'mounts' in result.character).toBe(false);
+    expect(result.character?.companions).toEqual([
+      companion,
+      { id: 'm1', creatureId: 'mule', origin: 'pet', nickname: 'Ned', carriedLb: 100, saddle: 'riding', notes: 'stubborn' },
+      { id: 'c1-mount', creatureId: 'pony', origin: 'pet' },
+    ]);
   });
 
   it('leaves absent fields absent', () => {
