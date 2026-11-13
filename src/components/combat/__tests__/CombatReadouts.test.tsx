@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { CombatStatusStrip } from '../CombatStatusStrip';
-import { SpellSlotSummary } from '../SpellSlotSummary';
 import { HouseRuleIndicator } from '../HouseRuleIndicator';
 import { createCharacter } from '../../../storage/character-store';
 
@@ -41,24 +40,6 @@ describe('CombatStatusStrip', () => {
     );
     const ac = screen.getByRole('button', { name: /^Armor Class:/ });
     expect(ac).toHaveTextContent('15'); // 10 + 2 (Dex) + 3 (Con)
-  });
-});
-
-describe('SpellSlotSummary', () => {
-  it('renders nothing for a non-caster', () => {
-    const { container } = render(<SpellSlotSummary character={char({ classes: [{ id: 'fighter', level: 1 }] })} />);
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('lists standard spell-slot levels for a caster with available / max', () => {
-    render(
-      <SpellSlotSummary
-        character={char({ level: 1, classes: [{ id: 'wizard', level: 1 }] })}
-      />,
-    );
-    const list = screen.getByRole('list', { name: 'Spell slots' });
-    // A level-1 Wizard has level-1 slots.
-    expect(within(list).getByText('Level 1')).toBeInTheDocument();
   });
 });
 

@@ -28,7 +28,7 @@ const wizardWarlock = make({
 });
 
 describe('OverviewSpellcasting', () => {
-  it('shows the Spell Save DC, Spell Attack, slots and a Spells link for a caster', () => {
+  it('shows the Spell Save DC, Spell Attack and a Spells link for a caster (slots are on Right now)', () => {
     const { container } = render(<OverviewSpellcasting character={wizard} />);
     const dc = spellSaveDcBreakdown(wizard)!;
     const atk = spellAttackBreakdown(wizard)!;
@@ -36,8 +36,7 @@ describe('OverviewSpellcasting', () => {
     expect(screen.getByRole('button', { name: /Spell Attack/ })).toHaveTextContent(
       formatSigned(atk.total),
     );
-    // Spell slots come from the reused Combat summary.
-    expect(container.textContent).toMatch(/slot/i);
+    expect(container.textContent).not.toMatch(/slot/i);
     expect(screen.getByRole('link', { name: 'Manage spells' })).toHaveAttribute('href', '#spells');
     expect(screen.getAllByTestId('overview-spell-row')).toHaveLength(1);
   });

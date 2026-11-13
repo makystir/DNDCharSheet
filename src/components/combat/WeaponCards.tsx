@@ -6,7 +6,9 @@ import { proficiencyBonus } from '../../logic/abilities';
 import { effectiveAbilityScores } from '../../logic/feats';
 import { formatSigned } from '../../logic/breakdown';
 import { exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
+import { getCondition } from '../../data/conditions';
 import {
+  attackerConditionSuggestions,
   equippedWeapons,
   fireAmmo,
   matchingAmmunition,
@@ -67,6 +69,13 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
   const weapons = equippedWeapons(character);
   const pb = proficiencyBonus(character.level);
   const unresolved = (character.equipped?.weaponItemIds ?? []).length - weapons.length;
+  // Advantage / Disadvantage your own conditions suggest (PHB 2024 "Conditions"):
+  // a reminder only, the roll toggles stay manual.
+  const conditionLines = attackerConditionSuggestions(character).map((s) => {
+    const name = getCondition(s.conditionId)?.name ?? s.conditionId;
+    const side = s.side === 'advantage' ? 'Advantage' : 'Disadvantage';
+    return s.situational ? `${side} from ${name} (${s.situational.replace(/\.$/, '').toLowerCase()})` : `${side} from ${name}`;
+  });
 
   const renderMastery = (entry: EquippedWeapon, abilityMod: number) => {
     const status = itemMasteryStatus(character, entry.item);
@@ -311,6 +320,11 @@ export function WeaponCards({ character, onChange, onAmmoFired }: WeaponCardsPro
         </a>
         .
       </p>
+      {conditionLines.length > 0 && (
+        <p className={styles.conditionHint} role="note" data-testid="attack-condition-hint">
+          Your conditions: {conditionLines.join('; ')}. Toggle Advantage or Disadvantage when you roll.
+        </p>
+      )}
       <ul
         className={viewMode === 'list' ? styles.list : styles.cardGrid}
         aria-label="Equipped weapons"

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { CombatPage } from '../../pages/CombatPage';
-import { OverviewConditions } from '../../pages/character/OverviewConditions';
+import { OverviewNow } from '../../pages/character/OverviewNow';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
 
@@ -80,8 +80,8 @@ describe('structured condition duration on the Overview (read-only)', () => {
       ...createCharacter('Tester'),
       conditions: [{ id: 'poisoned' as const, duration: { kind: 'rounds' as const, rounds: 3 } }],
     };
-    render(<OverviewConditions character={character} />);
-    expect(screen.getByTestId('overview-duration-poisoned')).toHaveTextContent('3 rounds left');
+    render(<OverviewNow character={character} />);
+    expect(screen.getByTestId('now-condition-poisoned')).toHaveTextContent('3 rounds left');
     expect(screen.queryByRole('button', { name: /Take one round off/ })).toBeNull();
   });
 });

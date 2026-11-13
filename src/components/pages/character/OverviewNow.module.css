@@ -1,0 +1,129 @@
+/* The Overview "Right now" summary card. */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rowLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.rowBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.value {
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chipItem {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.fatal {
+  margin: 0;
+  font-weight: 600;
+  color: var(--accent-red);
+}
+
+.pips {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.success {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.failure {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.count {
+  padding: 4px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.countName {
+  font-weight: 600;
+}
+
+.countValue {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .badge {
+    min-height: 44px;
+  }
+}

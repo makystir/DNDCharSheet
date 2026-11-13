@@ -54,13 +54,10 @@ describe('CharacterPage Overview order', () => {
       'Personal Details',
       'Vitals',
       'Heroic Inspiration',
-      'Conditions & Effects',
-      'Reactions',
-      'Resources',
-      'Attacks',
+      'Right now',
       'Spellcasting',
-      'Abilities, Saves & Skills',
       'Traits & Feats',
+      'Abilities, Saves & Skills',
     ];
     const positions = expected.map((title) => order.findIndex((h) => h.includes(title)));
     expect(positions.every((p) => p >= 0)).toBe(true);
@@ -76,14 +73,26 @@ describe('CharacterPage Overview order', () => {
     renderOverview(fighter);
     const order = headingOrder();
     expect(order.some((h) => h.includes('Spellcasting'))).toBe(false);
-    const attacks = order.findIndex((h) => h.includes('Attacks'));
-    const skills = order.findIndex((h) => h.includes('Abilities, Saves & Skills'));
-    expect(skills).toBe(attacks + 1);
-    // No empty placeholder is left in the "right now" column either: Attacks
-    // is its last card.
-    const now = screen.getByTestId('overview-column-now');
-    const last = now.lastElementChild as HTMLElement;
-    expect(within(last).getByRole('heading', { level: 3 })).toHaveTextContent('Attacks');
+    const now = order.findIndex((h) => h.includes('Right now'));
+    const traits = order.findIndex((h) => h.includes('Traits & Feats'));
+    expect(traits).toBe(now + 1);
+    // No empty placeholder is left in the left column either: it holds exactly
+    // Right now and Traits & Feats.
+    const column = screen.getByTestId('overview-column-now');
+    expect(column.children).toHaveLength(2);
+  });
+
+  it('no longer repeats the Combat cards (conditions, reactions, resources, attacks) on the Overview', () => {
+    const fighter: Character = {
+      ...createCharacter('Fighter'),
+      level: 5,
+      classes: [{ id: 'fighter', level: 5 }],
+    };
+    renderOverview(fighter);
+    const order = headingOrder();
+    for (const gone of ['Conditions & Effects', 'Reactions', 'Resources', 'Attacks', 'Spell Slots']) {
+      expect(order.some((h) => h === gone)).toBe(false);
+    }
   });
 
   it('lays the grid cards out as two independent column stacks (no shared rows)', () => {
@@ -97,17 +106,10 @@ describe('CharacterPage Overview order', () => {
       within(screen.getByTestId(testId))
         .getAllByRole('heading', { level: 3 })
         .map((h) => h.textContent ?? '');
-    // Left: the "right now" cards (Spellcasting is followed by its Spell Slots card).
-    expect(titlesIn('overview-column-now')).toEqual([
-      'Conditions & Effects',
-      'Reactions',
-      'Resources',
-      'Attacks',
-      'Spellcasting',
-      'Spell Slots',
-    ]);
-    // Right: the reference cards. Each has exactly ONE header.
-    expect(titlesIn('overview-column-reference')).toEqual(['Abilities, Saves & Skills', 'Traits & Feats']);
+    // Left: the Right now summary, Spellcasting, then Traits & Feats (balance).
+    expect(titlesIn('overview-column-now')).toEqual(['Right now', 'Spellcasting', 'Traits & Feats']);
+    // Right: Abilities, Saves & Skills. Each card has exactly ONE header.
+    expect(titlesIn('overview-column-reference')).toEqual(['Abilities, Saves & Skills']);
   });
 
   it('renders no SRD status text anywhere on the Overview', () => {

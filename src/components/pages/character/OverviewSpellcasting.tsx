@@ -11,7 +11,6 @@ import type { Breakdown } from '../../../logic/breakdown';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
-import { SpellSlotSummary } from '../../combat/SpellSlotSummary';
 import { OverviewFooter } from './OverviewShared';
 import styles from './OverviewSpellcasting.module.css';
 
@@ -29,7 +28,7 @@ interface Row {
 /**
  * Read-only spellcasting summary (casters only). Spell Save DC and Spell Attack
  * come from logic/spellcasting; with two or more casting classes each class gets
- * its own row (perClassSpellcasting). Slots reuse the Combat SpellSlotSummary.
+ * its own row (perClassSpellcasting). Spell slots are on the "Right now" card.
  * Renders nothing for a non-caster. Spells are managed on the Spells page.
  */
 export function OverviewSpellcasting({ character }: OverviewSpellcastingProps) {
@@ -79,7 +78,6 @@ export function OverviewSpellcasting({ character }: OverviewSpellcastingProps) {
         </ul>
         <OverviewFooter links={[{ href: '#spells', text: 'Manage spells' }]} />
       </Card>
-      <SpellSlotSummary character={character} />
     </div>
   );
 }

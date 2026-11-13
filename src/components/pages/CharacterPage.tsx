@@ -24,11 +24,8 @@ import { SubclassDetails } from './character/SubclassDetails';
 import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
 import { masteryChoices } from '../../logic/weapon-mastery';
 import { OverviewInspiration } from './character/OverviewInspiration';
-import { OverviewAttacks } from './character/OverviewAttacks';
 import { OverviewSpellcasting } from './character/OverviewSpellcasting';
-import { OverviewConditions } from './character/OverviewConditions';
-import { OverviewReactions } from './character/OverviewReactions';
-import { OverviewResources } from './character/OverviewResources';
+import { OverviewNow } from './character/OverviewNow';
 import { OverviewAbilities } from './character/OverviewAbilities';
 import { OverviewTraits } from './character/OverviewTraits';
 import { SubTabBar } from '../shared/SubTabBar';
@@ -371,24 +368,24 @@ export function CharacterPage({
           <OverviewVitals character={character} onChange={onChange} />
           <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
           <OverviewInspiration character={character} onChange={onChange} />
-          {/* Two independent column stacks (no shared grid rows, so a short
-              card never leaves a hole beside a tall one): the "right now"
-              cards on the left, the reference cards on the right. On a narrow
-              page the columns stack in DOM order, so mobile reads Conditions,
-              Reactions, Attacks, Spellcasting, then Abilities, Saves & Skills,
-              Traits. */}
+          {/* Two independent column stacks on a wide page (no shared grid rows,
+              so a short card never leaves a hole beside a tall one). Left: the
+              "Right now" summary, Spellcasting, and Traits & Feats (here to
+              balance the tall Abilities card). Right: Abilities, Saves & Skills.
+              Fights are run on Combat, so nothing here repeats its cards. On a
+              narrow page it is one stack: Right now, Spellcasting, Abilities,
+              then Traits & Feats. */}
           <div className={styles.overviewGrid} data-testid="overview-grid">
             <div className={styles.overviewColumns}>
               <div className={styles.overviewColumn} data-testid="overview-column-now">
-                <OverviewConditions character={character} />
-                <OverviewReactions character={character} />
-                <OverviewResources character={character} />
-                <OverviewAttacks character={character} />
+                <OverviewNow character={character} />
                 <OverviewSpellcasting character={character} />
+                <div className={styles.overviewLast}>
+                  <OverviewTraits character={character} />
+                </div>
               </div>
               <div className={styles.overviewColumn} data-testid="overview-column-reference">
                 <OverviewAbilities character={character} onChange={onChange} />
-                <OverviewTraits character={character} />
               </div>
             </div>
           </div>

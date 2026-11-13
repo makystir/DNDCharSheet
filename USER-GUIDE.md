@@ -243,13 +243,10 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 - **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more. **Adjust** (closed at first) holds an Armor Class override and an initiative bonus, for anything the app doesn't know about.
 - **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets. If companions travel with you, the Long Rest dialog offers to rest them too (ticked, and you can untick it); anyone at 0 HP is named and left out.
 - **Heroic Inspiration:** a toggle. In D&D 2024 your DM may award you Heroic Inspiration, which lets you reroll a die once.
-- **Conditions:** anything currently affecting you, such as Poisoned or Prone.
-- **Reactions:** things you can do in response to an event on someone else's turn.
-- **Resources:** limited-use abilities such as "uses per rest".
-- **Attacks:** your weapons and their attack and damage numbers.
+- **Right now:** a short summary of what's affecting you and what you have left: your conditions (such as Poisoned or Prone; hover or tap one for what it does), Exhaustion and its penalties, the spell you're concentrating on, death saves at 0 HP, whether your Reaction is used, your limited-use abilities (such as "uses per rest") and your spell slots. Anything with nothing to show is left out. You change all of these on the Combat page (spell slots on the Spells page or with a rest). Your attacks and the full list of Reactions are on the Combat page too.
 - **Spellcasting:** your spell save DC and spell attack bonus (spellcasters only).
+- **Traits and feats:** what your species, class and feats give you, plus the languages you know. On a wide screen it sits under Right now, beside Abilities, Saves & Skills.
 - **Abilities, Saves & Skills:** your six ability scores with their modifiers, your six saving throws, and all 18 skills with your total bonus. Hover over any number to see how it's worked out. A **P** marks a save or skill you're proficient in (your proficiency bonus is added); an **E** marks **Expertise**, which doubles that bonus for chosen skills. Press **Edit** in the card's header to change your base ability scores and tick proficiencies; press **Done** when you're finished. Increases from feats are added on top of the base score automatically, and proficiencies your class, species or feats give you are ticked and locked.
-- **Traits and feats:** what your species, class and feats give you, plus the languages you know.
 
 ### Class & Features
 
@@ -298,7 +295,7 @@ The page only shows what applies to you right now. Death Saves appear at 0 HP, C
 
 ### Attacks
 
-The **Attacks** card has a row for each equipped weapon and one for your Unarmed Strike (with your Grapple and Shove DCs). Each row shows the attack bonus, damage, properties and mastery. Use the view switch in the card's header for bigger cards instead of rows. Each row has two buttons:
+The **Attacks** card has a row for each equipped weapon and one for your Unarmed Strike (with your Grapple and Shove DCs). Each row shows the attack bonus, damage, properties and mastery. Use the view switch in the card's header for bigger cards instead of rows. When one of your conditions gives Advantage or Disadvantage on your attacks, a note at the top of the card says which, and when it applies (Invisible, for example, doesn't help against a creature that can see you). Each row has two buttons:
 
 - **Attack** rolls a d20 with your attack bonus (or lets you type a physical die) and shows the total to tell your DM. The app doesn't check it against Armor Class; your DM says whether it hits. A natural 20 is a Critical Hit and a natural 1 misses. Conditions you have set the starting roll: Poisoned starts it with Disadvantage, for example. Exhaustion is applied.
 - **Damage** rolls the weapon's damage. Tick **Critical hit** to double the dice (it's ticked for you after a natural 20). With manual dice, it tells you what to roll instead.

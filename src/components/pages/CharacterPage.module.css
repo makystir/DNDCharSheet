@@ -316,17 +316,39 @@
   align-items: start;
 }
 
+/* Narrow page: the two column wrappers dissolve into ONE stack so the cards can
+   be reordered: Right now, Spellcasting, Abilities, then Traits & Feats (which
+   sits in the left column on a wide page only to balance the tall Abilities
+   card). */
+.overviewColumn {
+  display: contents;
+}
+
+.overviewLast {
+  order: 1;
+  min-width: 0;
+}
+
+.overviewLast > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 @container (min-width: 860px) {
   .overviewColumns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
 
-.overviewColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-gap);
-  min-width: 0;
+  .overviewColumn {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    min-width: 0;
+  }
+
+  .overviewLast {
+    order: 0;
+  }
 }
 
 /* The shared Card adds a sibling top margin (and a mobile bottom margin) for
