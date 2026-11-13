@@ -43,17 +43,43 @@ function fighter4(): Partial<Character> {
 }
 
 describe('AdvancementPage — level & mode', () => {
-  it('renders the authoritative Level control and Proficiency Bonus', () => {
+  it('shows the level read-only with Proficiency Bonus (no raw level editor)', () => {
     renderStateful(fighter4());
-    expect((screen.getByLabelText('Level') as HTMLInputElement).value).toBe('4');
+    expect(screen.getByTestId('adv-level')).toHaveTextContent('4');
+    expect(screen.queryByRole('spinbutton', { name: 'Level' })).toBeNull();
     // PB at level 4 is +2 (shown as a CalculatedValue trigger displaying "+2").
     expect(screen.getByText('+2')).toBeInTheDocument();
   });
 
-  it('setting the level routes through the logic clamp', () => {
-    const { get } = renderStateful(fighter4());
-    fireEvent.change(screen.getByLabelText('Level'), { target: { value: '25' } });
-    expect(get().level).toBe(20); // clampLevel caps at 20
+  it('disables Undo last level-up at level 1', () => {
+    renderStateful({ level: 1, classes: [{ id: 'fighter', level: 1 }] });
+    expect(screen.getByRole('button', { name: 'Undo last level-up' })).toBeDisabled();
+  });
+
+  it('undoes a level-up only after the confirmation, which lists what goes', () => {
+    const { get } = renderStateful({ level: 1, classes: [{ id: 'fighter', level: 1 }] });
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    expect(get().level).toBe(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Undo last level-up' }));
+    const dialog = screen.getByRole('dialog', { name: 'Undo last level-up' });
+    expect(dialog).toHaveTextContent('from level 2 to 1 (Fighter 2 to 1)');
+    expect(within(dialog).getByTestId('level-undo-removals')).toHaveTextContent('Hit points gained at level 2 (fixed value)');
+    // Cancel keeps everything.
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(get().level).toBe(2);
+    // Confirm applies it.
+    fireEvent.click(screen.getByRole('button', { name: 'Undo last level-up' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Undo last level-up' })).getByRole('button', { name: 'Undo level-up' }));
+    expect(get().level).toBe(1);
+    expect(get().classes?.[0].level).toBe(1);
+    expect(get().advancement?.levels ?? []).toEqual([]);
+  });
+
+  it('links a chosen subclass to Class & Features to change it', () => {
+    renderStateful({ level: 3, classes: [{ id: 'fighter', level: 3, subclassId: 'champion' }] });
+    const list = screen.getByTestId('adv-subclasses');
+    expect(list).toHaveTextContent('Fighter subclass Champion');
+    expect(within(list).getByRole('link', { name: 'Change on Class & Features' })).toHaveAttribute('href', '#character/build');
   });
 
   it('defaults to milestone mode (no XP controls shown)', () => {

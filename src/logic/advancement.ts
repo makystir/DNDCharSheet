@@ -282,7 +282,7 @@ export function nextLevelPreview(character: Character): NextLevelPreview | null 
 export interface AdvancementLogEntry {
   /** Epoch milliseconds from an injected clock (also used as the display key). */
   timestamp: number;
-  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award' | 'feat';
+  kind: 'level-up' | 'hp' | 'subclass' | 'xp-award' | 'feat' | 'level-undo';
   /** The level the entry concerns, when relevant. */
   level?: number;
   /** Human-readable detail, e.g. 'Level 4: HP +8 (fixed)'. */

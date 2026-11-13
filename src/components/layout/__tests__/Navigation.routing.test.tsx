@@ -271,14 +271,21 @@ describe('Conditional, level-gated Spells tab', () => {
   }
 
   /**
-   * Sets the character level via the authoritative Advancement-page control
-   * (P4 removed the duplicate Level editor from Character → Overview). Leaves
-   * the app on the Advancement tab; callers navigate on from there.
+   * Raises the character to `level` on the Advancement page by levelling up
+   * (fixed HP) one level at a time: the level is shown read-only, and lowering
+   * it goes through "Undo last level-up". Leaves the app on the Advancement
+   * tab; callers navigate on from there.
    */
   async function setLevelOnAdvancement(level: number) {
     fireEvent.click(navButton('Advancement'));
-    const input = (await screen.findByLabelText('Level')) as HTMLInputElement;
-    fireEvent.change(input, { target: { value: String(level) } });
+    const current = () => Number(screen.getByTestId('adv-level').textContent);
+    await screen.findByTestId('adv-level');
+    for (let step = 0; step < 20 && current() < level; step++) {
+      const before = current();
+      fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+      await waitFor(() => expect(current()).toBe(before + 1));
+    }
+    expect(current()).toBe(level);
   }
 
   it('hides the Spells tab for a non-caster (default class-less character)', async () => {

@@ -369,6 +369,22 @@ The top card shows your level and, in XP mode, your progress toward the next lev
 - **Ability Score Improvements or feats** at certain levels.
 - More spell slots or spells.
 
+Once you've chosen a subclass, it's listed in this card with a **Change on Class & Features** link, where you can pick a different one or clear it.
+
+### Changing your mind: Undo last level-up
+
+Made a mistake, or want to rebuild a level? Press **Undo last level-up** under your level. Before anything changes, a box tells you exactly what will be removed, for example:
+
+- the hit points you gained at that level;
+- a feat or Ability Score Improvement whose level slot you no longer have;
+- a Fighting Style, subclass or class option you are no longer high enough level for;
+- spells you can no longer have at the lower level;
+- a class you only had one level in.
+
+It also lists anything that's kept but is now more than you're owed (for example one Metamagic option too many), so you can tidy it up. Nothing happens until you press **Undo level-up**; **Cancel** leaves everything as it was. You can press it again to go back more levels. If you've multiclassed and the app doesn't know which class gained your last level, it asks you.
+
+Other choices can be changed at any time without undoing a level: feats and Fighting Styles have **Remove** buttons, class options (and the languages your class lets you pick) have an **Edit** list in **Class Choices**, Expertise is ticked in the Overview's Abilities, Saves & Skills card (**Edit**), and your subclass is on Class & Features.
+
 ### Progression
 
 The **Progression** card tells you where you stand and what is next. In XP mode it shows a progress bar toward your next level. **What to do now** lists anything waiting for you, such as a subclass or feat to choose or a level you can take, and each item has a link to the place where you do it. **Coming up** looks ahead to your next feat slot and your subclass choice.

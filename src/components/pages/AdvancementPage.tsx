@@ -32,18 +32,19 @@ import {
   levelingMode,
   levelingModeTooltip,
   nextLevelPreview,
-  setLevel as setLevelLogic,
   setLevelHp,
   xpForLevel,
   xpToLevel,
   type HpChoice,
   type LevelingMode,
 } from '../../logic/advancement';
+import { canUndoLevel } from '../../logic/level-undo';
+import { LevelUndoDialog } from './advancement/LevelUndoDialog';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { FightingStyleSection } from './advancement/FightingStyleSection';
 import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
 import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
-import { LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
+import { FeatureLanguagesSection, LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
 import {
   ClassChoicesPending,
   ClassChoicesOverNote,
@@ -137,10 +138,15 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // "Multiclassing: Hit Points".
   const rolledHpAvailable = !isMulticlass;
 
-  // ── Authoritative level control (logic setLevel: clamp + spellcasting reconcile).
-  const setLevel = (raw: string) => {
-    onChange(setLevelLogic(character, Number.parseInt(raw, 10)));
-  };
+  // Lowering the level always goes through "Undo last level-up" (logic/level-undo),
+  // which also removes what that level gave (HP record, feats in lost slots, a
+  // subclass the class is no longer high enough for, ...), never a raw level edit.
+  const [undoOpen, setUndoOpen] = useState(false);
+  const subclassLines = heldClasses.flatMap(({ entry, data }) => {
+    if (entry.subclassId === undefined) return [];
+    const subclassName = data.subclasses.find((s) => s.id === entry.subclassId)?.name ?? entry.subclassId;
+    return [{ classId: data.id, className: data.name, subclassName }];
+  });
 
   // ── Leveling mode toggle. Milestone is the default; switching to XP records the
   //    mode so canLevelUp consults the XP threshold from then on.
@@ -261,7 +267,14 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
           <p className={styles.placeholder}>No outstanding choices.</p>
         ) : (
           <ul className={styles.pendingList}>
-            {subclassDue && <li className={styles.pendingItem}>Subclass not chosen (due at level {cls?.subclassLevel})</li>}
+            {subclassDue && (
+              <li className={styles.pendingItem}>
+                Subclass not chosen (due at level {cls?.subclassLevel}).{' '}
+                <a className={styles.inlineLink} href="#character/build">
+                  Choose on Class &amp; Features
+                </a>
+              </li>
+            )}
             {unfilledFightingStyles.map((s) => (
               <li key={`fighting-style-${s.key}`} className={styles.pendingItem}>
                 Fighting Style feat not chosen ({s.className})
@@ -320,18 +333,18 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
 
         <div className={styles.levelRow}>
           <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="adv-level">
-              Level
-            </label>
-            <input
-              id="adv-level"
-              className={styles.levelInput}
-              type="number"
-              min={1}
-              max={20}
-              value={character.level}
-              onChange={(e) => setLevel(e.target.value)}
-            />
+            <span className={styles.fieldLabel}>Level</span>
+            <span className={styles.derivedValue} data-testid="adv-level">
+              {character.level}
+            </span>
+            <button
+              type="button"
+              className={styles.undoLevelBtn}
+              disabled={!canUndoLevel(character)}
+              onClick={() => setUndoOpen(true)}
+            >
+              Undo last level-up
+            </button>
           </div>
 
           <div className={styles.field}>
@@ -374,6 +387,22 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
             />
           </div>
         </div>
+
+        {/* Each class's subclass, once it is chosen, with the way to change it
+            (the subclass picker lives on Class & Features). */}
+        {subclassLines.length > 0 && (
+          <ul className={styles.subclassList} data-testid="adv-subclasses">
+            {subclassLines.map((line) => (
+              <li key={line.classId}>
+                <span className={styles.fieldLabel}>{line.className} subclass</span>{' '}
+                <span>{line.subclassName}</span>{' '}
+                <a className={styles.inlineLink} href="#character/build">
+                  Change on Class &amp; Features
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
 
         {mode === 'xp' && (
           <div className={styles.xpRow}>
@@ -748,10 +777,11 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       <FeatSlotsSection character={character} onChange={onChange} now={now} />
 
       {/* ── Class choices (Metamagic, Invocations, Maneuvers, orders, ...) ──── */}
-      {classChoices.length > 0 && (
+      {(classChoices.length > 0 || languagePicks.owed > 0 || languagePicks.chosen > 0) && (
         <Card>
           <SectionHeader icon={ScrollText} title={`Class Choices (${classChoices.length})`} />
           <ClassChoicesSection character={character} onChange={onChange} statuses={classChoices} />
+          <FeatureLanguagesSection character={character} onChange={onChange} />
         </Card>
       )}
 
@@ -814,6 +844,18 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
             }
           }}
           onClose={() => setHpRoll(null)}
+        />
+      )}
+
+      {undoOpen && (
+        <LevelUndoDialog
+          character={character}
+          now={now}
+          onCancel={() => setUndoOpen(false)}
+          onConfirm={(next) => {
+            setUndoOpen(false);
+            onChange(next);
+          }}
         />
       )}
 

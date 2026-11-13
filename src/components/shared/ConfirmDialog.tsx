@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import styles from './ConfirmDialog.module.css';
@@ -9,6 +10,12 @@ interface ConfirmDialogProps {
   onCancel: () => void;
   confirmLabel?: string;
   cancelLabel?: string;
+  /** Accessible name of the dialog (default "Confirmation"). */
+  title?: string;
+  /** Extra content under the message, e.g. a summary of what will change. */
+  children?: ReactNode;
+  /** Disable the confirm button (e.g. until a required pick is made). */
+  confirmDisabled?: boolean;
 }
 
 /**
@@ -22,6 +29,9 @@ export function ConfirmDialog({
   onCancel,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
+  title = 'Confirmation',
+  children,
+  confirmDisabled = false,
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, true);
@@ -43,15 +53,16 @@ export function ConfirmDialog({
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
-      aria-label="Confirmation"
+      aria-label={title}
     >
       <div ref={dialogRef} className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <p className={styles.message}>{message}</p>
+        {children && <div className={styles.details}>{children}</div>}
         <div className={styles.actions}>
           <button type="button" onClick={onCancel} className={styles.cancelBtn}>
             {cancelLabel}
           </button>
-          <button type="button" onClick={onConfirm} className={styles.confirmBtn}>
+          <button type="button" onClick={onConfirm} className={styles.confirmBtn} disabled={confirmDisabled}>
             {confirmLabel}
           </button>
         </div>
