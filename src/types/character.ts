@@ -476,6 +476,8 @@ export interface CustomStatBlock {
   saveProficiencies?: Ability[];
   proficiencyBonus?: number;
   skills?: string;
+  /** The MM 2024 "Gear" line (items the creature carries). */
+  gear?: string;
   senses?: string;
   languages?: string;
   resistances?: string;

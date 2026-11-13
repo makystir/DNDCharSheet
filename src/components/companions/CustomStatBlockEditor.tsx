@@ -28,11 +28,12 @@ const LIST_LABELS: Record<ListKey, { plural: string; singular: string }> = {
   reactions: { plural: 'Reactions', singular: 'Reaction' },
 };
 
-const TEXT_FIELDS: { key: 'creatureType' | 'alignment' | 'speed' | 'skills' | 'senses' | 'languages' | 'resistances' | 'immunities' | 'vulnerabilities'; label: string }[] = [
+const TEXT_FIELDS: { key: 'creatureType' | 'alignment' | 'speed' | 'skills' | 'gear' | 'senses' | 'languages' | 'resistances' | 'immunities' | 'vulnerabilities'; label: string }[] = [
   { key: 'creatureType', label: 'Creature type' },
   { key: 'alignment', label: 'Alignment' },
   { key: 'speed', label: 'Speed' },
   { key: 'skills', label: 'Skills' },
+  { key: 'gear', label: 'Gear' },
   { key: 'senses', label: 'Senses' },
   { key: 'languages', label: 'Languages' },
   { key: 'resistances', label: 'Resistances' },
@@ -57,10 +58,10 @@ function compact(block: CustomStatBlock): CustomStatBlock | undefined {
  * the SAME 2024 stat block view the creatures use (MOD and SAVE are derived from
  * the typed scores and Proficiency Bonus), with an editor underneath.
  *
- * NOTHING is pre-filled: the PHB gives hirelings no statistics and the NPC stat
- * blocks live in the Monster Manual, so the user types a Guard or Scout in by
- * hand. Extension point: Monster Manual NPC templates (Guard, Scout, Noble,
- * Commoner...) will pre-fill this same shape later (deferred by user request).
+ * The PHB gives hirelings no statistics, so a hireling's block is typed in by
+ * hand. An NPC party member can start from a Monster Manual 2024 template
+ * (src/data/npc-templates.ts, chosen in NpcCreationFlow) that fills this same
+ * shape; every field stays editable.
  */
 export function CustomStatBlockEditor({ subject, stats, onChange }: CustomStatBlockEditorProps) {
   const [editing, setEditing] = useState(false);
@@ -110,8 +111,8 @@ export function CustomStatBlockEditor({ subject, stats, onChange }: CustomStatBl
         hideName
         emptyHint={
           <p className={styles.hint}>
-            No stats entered yet. The PHB gives hirelings no statistics and NPC stat blocks are in the Monster Manual, so
-            nothing is filled in for you. Use Edit stat block to type one in by hand.
+            No stats entered yet. The PHB gives hirelings no statistics, and an NPC party member only starts from a
+            Monster Manual template if you pick one when adding it. Use Edit stat block to type one in by hand.
           </p>
         }
       />

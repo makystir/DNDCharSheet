@@ -176,19 +176,10 @@ export const HIRELING_KIND_LABELS: Record<'skilled' | 'untrained' | 'messenger',
   messenger: 'Messenger',
 };
 
-/** A starting stat block for an NPC party member (Monster Manual NPC). */
-export interface NpcTemplate {
-  id: string;
-  name: string;
-  stats: import('../types/character').CustomStatBlock;
-}
-
 /**
- * EXTENSION POINT (deferred by user request): Monster Manual 2024 NPC templates
- * (Guard, Scout, Noble, Commoner...) will be listed here and pre-fill the same
- * editable stat block shape (CustomStatBlock). While empty, the "Start from
- * template" choice is hidden and empty states point at the editable stat block.
- * Do not invent statistics: every entry must be transcribed from the Monster
- * Manual (Docs/DnD 5e 2024 Monster Manual Alternate Cover.md).
+ * Monster Manual 2024 NPC stat blocks (CR 10 or lower) that pre-fill the
+ * editable stat block (CustomStatBlock) of a new NPC party member. The data and
+ * its sources live in src/data/npc-templates.ts.
  */
-export const NPC_TEMPLATES: readonly NpcTemplate[] = [];
+export type { NpcTemplate } from '../data/npc-templates';
+export { NPC_TEMPLATE_LIST as NPC_TEMPLATES } from '../data/npc-templates';

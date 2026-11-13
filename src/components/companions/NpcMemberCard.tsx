@@ -28,7 +28,7 @@ export interface NpcMemberCardProps {
 /**
  * One NPC party member (DMG 2024 L833, L3553-3557), in the shared RecordCard
  * shell (People tab): an editable stat block
- * (nothing pre-filled; Monster Manual templates are a later extension). The
+ * (optionally pre-filled from a Monster Manual template when added). The
  * Challenge Rating guideline (no higher than half the characters' level) is a
  * warning only and never blocks.
  */

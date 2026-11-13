@@ -367,6 +367,7 @@ export function customStatBlockModel(name: string, stats: CustomStatBlock | unde
   lines.push(...nonEmptyLine('Vulnerabilities', s.vulnerabilities));
   lines.push(...nonEmptyLine('Resistances', s.resistances));
   lines.push(...nonEmptyLine('Immunities', s.immunities));
+  lines.push(...nonEmptyLine('Gear', s.gear));
   lines.push(...nonEmptyLine('Senses', s.senses));
   lines.push(...nonEmptyLine('Languages', s.languages));
   const challenge: string[] = [];

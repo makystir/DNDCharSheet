@@ -34,7 +34,7 @@ export interface PeopleTabProps {
   undo: UndoSink;
   filter: PeopleFilter;
   onFilterChange: (filter: PeopleFilter) => void;
-  /** Templates offered when adding an NPC party member; defaults to the (currently empty) catalog. */
+  /** Templates offered when adding an NPC party member; defaults to the Monster Manual NPC catalog. */
   templates?: readonly NpcTemplate[];
   /** Random source for Loyalty and Hit Die rolls (injected in tests). */
   rng?: RNG;
@@ -187,7 +187,7 @@ export function PeopleTab({ character, onChange, undo, filter, onFilterChange, t
             icon={Users}
             heading={empty.heading}
             description={empty.description}
-            tip="A hireling's or NPC's stat block is not in the PHB. Open one and use Edit stat block to enter a Monster Manual stat block (a Guard or Scout, for example) by hand. Templates will come later."
+            tip="An NPC party member can start from a Monster Manual stat block (Guard, Scout, Priest and more) when you add one. Hirelings have no stats in the PHB: open one and use Edit stat block to type one in."
           />
         ) : shown === 'all' ? (
           kinds
@@ -222,6 +222,7 @@ export function PeopleTab({ character, onChange, undo, filter, onFilterChange, t
       {creating === 'npc' && (
         <NpcCreationFlow
           templates={templates}
+          partyLevel={character.level}
           onCancel={() => setCreating(null)}
           onConfirm={(record) => {
             npcs.add(record);

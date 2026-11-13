@@ -3,6 +3,7 @@ import { screen, fireEvent, cleanup, within } from '@testing-library/react';
 import { createCharacter } from '../../../storage/character-store';
 import type { Character } from '../../../types/character';
 import type { PeopleFilter } from '../PeopleTab';
+import { NPC_TEMPLATES } from '../../../logic/companion-model';
 import { renderPeople } from './PeopleHarness';
 
 afterEach(cleanup);
@@ -108,12 +109,55 @@ describe('People: NPC party members', () => {
     expect(get().npcPartyMembers?.[0].loyalty).toBe(6);
   });
 
-  it('shows an empty state pointing at the editable stat block and no template button', () => {
+  it('shows an empty state pointing at the Monster Manual templates and the editable stat block', () => {
     renderTab('npc', base());
     expect(screen.getByText('No NPC party members yet')).toBeInTheDocument();
+    expect(screen.getByText(/can start from a Monster Manual stat block/)).toBeInTheDocument();
     expect(screen.getByText(/Edit stat block/)).toBeInTheDocument();
+  });
+
+  it('fills the stat block from a Monster Manual template (name, size, deep copy)', () => {
+    const { get } = renderTab('npc', { ...base(), level: 1 } as Character);
     fireEvent.click(screen.getByRole('button', { name: /Add NPC Party Member/ }));
-    expect(screen.queryByLabelText('Start from template')).toBeNull();
+    const dialog = screen.getByRole('dialog', { name: 'Add NPC party member' });
+    const select = within(dialog).getByLabelText('Start from template');
+    // Level 1: max CR 1/2, so the Guard is within the guideline and the Spy Master is above it.
+    const groups = within(select).getAllByRole('group');
+    expect(groups[0]).toHaveAttribute('label', 'Within the guideline (CR 1/2 or lower)');
+    expect(within(groups[0]).getByRole('option', { name: 'Guard (CR 1/8)' })).toBeInTheDocument();
+    expect(within(groups[1]).getByRole('option', { name: 'Spy Master (CR 10)' })).toBeInTheDocument();
+
+    fireEvent.change(select, { target: { value: 'guard' } });
+    expect(within(dialog).getByLabelText('Name')).toHaveValue('Guard');
+    expect(within(dialog).getByTestId('npc-template-summary')).toHaveTextContent('Guard: CR 1/8, AC 16, HP 11 (2d8 + 2), Monster Manual p.162.');
+    fireEvent.change(within(dialog).getByLabelText(/^Size/), { target: { value: 'Small' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add member' }));
+
+    const stats = get().npcPartyMembers?.[0].stats;
+    const guard = NPC_TEMPLATES.find((t) => t.id === 'guard');
+    expect(stats).toEqual({ ...guard?.stats, size: 'Small' });
+    expect(stats).not.toBe(guard?.stats);
+    expect(stats?.actions).not.toBe(guard?.stats.actions);
+  });
+
+  it('warns when the chosen template is above half the level, without blocking', () => {
+    const { get } = renderTab('npc', { ...base(), level: 1 } as Character);
+    fireEvent.click(screen.getByRole('button', { name: /Add NPC Party Member/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Add NPC party member' });
+    fireEvent.change(within(dialog).getByLabelText('Start from template'), { target: { value: 'knight' } });
+    expect(within(dialog).getByRole('note')).toHaveTextContent(/CR 3 is above half your level/);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add member' }));
+    expect(get().npcPartyMembers?.[0].stats?.cr).toBe('3');
+  });
+
+  it('still adds a blank stat block when no template is picked', () => {
+    const { get } = renderTab('npc', base());
+    fireEvent.click(screen.getByRole('button', { name: /Add NPC Party Member/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Add NPC party member' });
+    fireEvent.change(within(dialog).getByLabelText('Name'), { target: { value: 'Mira' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Add member' }));
+    expect(get().npcPartyMembers?.[0]).toMatchObject({ name: 'Mira' });
+    expect(get().npcPartyMembers?.[0].stats).toBeUndefined();
   });
 });
 

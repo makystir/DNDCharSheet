@@ -261,6 +261,7 @@ export function sanitizeCustomStatBlock(value: unknown): CustomStatBlock | undef
   }
   assign(out, 'proficiencyBonus', intInRange(value.proficiencyBonus, 2, 9));
   assign(out, 'skills', nonEmptyString(value.skills, STAT_TEXT_MAX));
+  assign(out, 'gear', nonEmptyString(value.gear, STAT_TEXT_MAX));
   assign(out, 'senses', nonEmptyString(value.senses, STAT_TEXT_MAX));
   assign(out, 'languages', nonEmptyString(value.languages, STAT_TEXT_MAX));
   assign(out, 'resistances', nonEmptyString(value.resistances, STAT_TEXT_MAX));
