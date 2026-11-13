@@ -322,6 +322,44 @@ describe('SpellsPage — Browse filtering', () => {
     expect(screen.queryByText('Fireball')).not.toBeInTheDocument();
     expect(screen.getByText('Fire Bolt')).toBeInTheDocument();
   });
+
+  it('collapses every level by default and cites where the text comes from', () => {
+    renderStatefulPage(wizardLevel5);
+    fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
+    const headers = screen.getAllByRole('button', { name: /^(Cantrips|Level \d) \(\d+\)$/ });
+    expect(headers.length).toBeGreaterThan(1);
+    for (const h of headers) expect(h).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText(/Player's Handbook \(2024\), Chapter 7: Spells, "Spell Descriptions"/)).toBeInTheDocument();
+  });
+
+  it('shows the full spell text, components and duration', () => {
+    renderStatefulPage(wizardLevel5);
+    fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
+    const row = screen.getByTestId('browse-spell-fireball');
+    // The higher-level addendum is past the old 160-character snippet.
+    expect(within(row).getByText('Using a Higher-Level Spell Slot.')).toBeInTheDocument();
+    expect(row).toHaveTextContent('Components: V, S, M (a ball of bat guano and sulfur)');
+    expect(row).toHaveTextContent('Duration: Instantaneous');
+  });
+
+  it('searches names and full text, and opens the levels that match', () => {
+    renderStatefulPage(wizardLevel5);
+    fireEvent.click(screen.getByRole('tab', { name: 'Browse' }));
+    const search = screen.getByRole('searchbox', { name: 'Search spells' });
+    fireEvent.change(search, { target: { value: 'fireb' } });
+    expect(screen.getByTestId('browse-spell-fireball')).toBeInTheDocument();
+    expect(screen.queryByTestId('browse-spell-fire-bolt')).toBeNull();
+    for (const h of screen.getAllByRole('button', { name: /^(Cantrips|Level \d) \(\d+\)$/ })) {
+      expect(h).toHaveAttribute('aria-expanded', 'true');
+    }
+    // Words that only appear in the text or the material component still find it.
+    fireEvent.change(search, { target: { value: 'flammable objects' } });
+    expect(screen.getByTestId('browse-spell-fireball')).toBeInTheDocument();
+    fireEvent.change(search, { target: { value: 'bat guano' } });
+    expect(screen.getByTestId('browse-spell-fireball')).toBeInTheDocument();
+    fireEvent.change(search, { target: { value: 'zzzz-no-such-spell' } });
+    expect(screen.getByText(/No spell on your class list mentions "zzzz-no-such-spell"/)).toBeInTheDocument();
+  });
 });
 
 describe('SpellsPage — class spell list legality', () => {

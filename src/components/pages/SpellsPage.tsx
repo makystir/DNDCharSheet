@@ -65,6 +65,8 @@ import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EmptyState } from '../shared/EmptyState';
 import { SpellPickList } from '../shared/SpellPickList';
 import { SpellName, SpellNameList } from '../shared/SpellName';
+import { SpellText } from '../shared/SpellText';
+import { SPELL_SOURCE_NOTE } from '../../logic/spell-source';
 import { KnownSpellsCard } from './spells/KnownSpellsCard';
 import { SCHOOL_LABELS } from '../shared/spellSchoolLabels';
 import { SubTabBar } from '../shared/SubTabBar';
@@ -131,6 +133,13 @@ function IllegalSpellsNotice({
     </Card>
   );
 }
+/** "V, S, M (a tiny ball of bat guano and sulfur)" as printed. */
+function componentText(spell: CatalogSpell): string {
+  const c: { verbal: boolean; somatic: boolean; material?: string } = spell.components;
+  const parts = [c.verbal ? 'V' : '', c.somatic ? 'S' : '', c.material ? `M (${c.material})` : ''].filter(Boolean);
+  return parts.length > 0 ? parts.join(', ') : 'None';
+}
+
 function spellLevelLabel(level: number): string {
   return level === 0 ? 'Cantrips' : `Level ${level}`;
 }
@@ -524,16 +533,24 @@ export function SpellsPage({
   const [filterSchool, setFilterSchool] = useState<'all' | SpellSchool>('all');
   const [filterRitual, setFilterRitual] = useState(false);
   const [filterConcentration, setFilterConcentration] = useState(false);
+  // Free-text search over the spell's name and its full description.
+  const [browseQuery, setBrowseQuery] = useState('');
+  const searchTerm = browseQuery.trim().toLowerCase();
 
   const browseSpells = useMemo(() => {
     return classSpells.filter((s) => {
+      if (searchTerm) {
+        const material = (s.components as { material?: string }).material ?? '';
+        const haystack = `${s.name}\n${s.effect}\n${material}`.toLowerCase();
+        if (!haystack.includes(searchTerm)) return false;
+      }
       if (filterLevel !== 'all' && s.level !== filterLevel) return false;
       if (filterSchool !== 'all' && s.school !== filterSchool) return false;
       if (filterRitual && !s.ritual) return false;
       if (filterConcentration && !s.concentration) return false;
       return true;
     });
-  }, [classSpells, filterLevel, filterSchool, filterRitual, filterConcentration]);
+  }, [classSpells, searchTerm, filterLevel, filterSchool, filterRitual, filterConcentration]);
 
   const browseByLevel = useMemo(() => {
     const map = new Map<number, CatalogSpell[]>();
@@ -1032,6 +1049,18 @@ export function SpellsPage({
       {activeSubTab === 'browse' && (
         <Card>
           <div className={styles.filterRow}>
+            <label className={`${styles.filterField} ${styles.searchField}`}>
+              <span className={styles.fieldLabel}>Search</span>
+              <input
+                type="search"
+                className={styles.searchInput}
+                value={browseQuery}
+                placeholder="Spell name or any word in its text"
+                aria-label="Search spells"
+                onChange={(e) => setBrowseQuery(e.target.value)}
+              />
+            </label>
+
             <label className={styles.filterField}>
               <span className={styles.fieldLabel}>Level</span>
               <select
@@ -1093,32 +1122,47 @@ export function SpellsPage({
             <EmptyState
               icon={BookOpen}
               heading="No spells match"
-              description="Adjust the filters to see spells from your class list."
+              description={
+                searchTerm
+                  ? `No spell on your class list mentions "${browseQuery.trim()}". Try another word or clear the filters.`
+                  : 'Adjust the filters to see spells from your class list.'
+              }
             />
           ) : (
-            browseByLevel.map(([lvl, spells]) => (
-              <CollapsibleSection
-                key={lvl}
-                title={spellLevelLabel(lvl)}
-                storageKey={`dnd-collapse-browse-${lvl}`}
-              >
-                <ul className={styles.browseList} aria-label={`${spellLevelLabel(lvl)} spells`}>
-                  {spells.map((s) => (
-                    <li key={s.id} className={styles.browseRow}>
-                      <span className={styles.browseName}>
+            <>
+              <p className={styles.sourceNote}>{SPELL_SOURCE_NOTE}</p>
+              {browseByLevel.map(([lvl, spells]) => (
+                <CollapsibleSection
+                  key={lvl}
+                  title={spellLevelLabel(lvl)}
+                  titleSuffix={`(${spells.length})`}
+                  // Collapsed by default (a new key, so earlier saved "open" states don't apply);
+                  // forced open while searching so matches are never hidden.
+                  storageKey={`dnd-collapse-browse-v2-${lvl}`}
+                  defaultExpanded={false}
+                  forceExpanded={searchTerm.length > 0}
+                >
+                  <ul className={styles.browseList} aria-label={`${spellLevelLabel(lvl)} spells`}>
+                    {spells.map((s) => (
+                      <li key={s.id} className={styles.browseRow} data-testid={`browse-spell-${s.id}`}>
+                        <span className={styles.browseName}>
                           <SpellName id={s.id} />
                         </span>
-                      <span className={styles.browseMeta}>
-                        {SCHOOL_LABELS[s.school]} · {s.castingTime} · {s.range}
-                        {s.concentration ? ' · Concentration' : ''}
-                        {s.ritual ? ' · Ritual' : ''}
-                      </span>
-                      <span className={styles.browseDescription}>{s.description}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleSection>
-            ))
+                        <span className={styles.browseMeta}>
+                          {SCHOOL_LABELS[s.school]} · {s.castingTime} · {s.range}
+                          {s.concentration ? ' · Concentration' : ''}
+                          {s.ritual ? ' · Ritual' : ''}
+                        </span>
+                        <span className={styles.browseMeta}>
+                          Components: {componentText(s)} · Duration: {s.duration}
+                        </span>
+                        <SpellText text={s.effect} />
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleSection>
+              ))}
+            </>
           )}
         </Card>
       )}

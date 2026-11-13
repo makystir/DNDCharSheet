@@ -8,6 +8,14 @@ interface CollapsibleSectionProps {
   title: string;
   storageKey: string;
   defaultExpanded?: boolean;
+  /**
+   * Show the content regardless of the saved state (e.g. while a search is
+   * active, so matches are never hidden). The saved choice is kept and applies
+   * again once this is false.
+   */
+  forceExpanded?: boolean;
+  /** Optional suffix shown after the title, e.g. a count. */
+  titleSuffix?: string;
   children: ReactNode;
 }
 
@@ -22,9 +30,12 @@ export function CollapsibleSection({
   title,
   storageKey,
   defaultExpanded = true,
+  forceExpanded = false,
+  titleSuffix,
   children,
 }: CollapsibleSectionProps) {
-  const [expanded, toggle] = usePersistedExpanded(storageKey, defaultExpanded);
+  const [saved, toggle] = usePersistedExpanded(storageKey, defaultExpanded);
+  const expanded = forceExpanded || saved;
   const titleId = useId();
 
   return (
@@ -37,6 +48,7 @@ export function CollapsibleSection({
       >
         <h3 id={titleId} className={styles.title}>
           {title}
+          {titleSuffix ? ` ${titleSuffix}` : ''}
         </h3>
         {expanded ? (
           <ChevronDown size={18} className={styles.chevron} aria-hidden="true" />

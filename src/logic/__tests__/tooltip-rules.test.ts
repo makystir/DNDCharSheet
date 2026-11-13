@@ -114,6 +114,9 @@ describe('spell tooltips', () => {
     for (const spell of SPELL_CATALOG) {
       const tip = resolveSpellTooltip(spell.id);
       expect(tip, spell.id).not.toBeNull();
+      expect(section(tip, 'Source'), spell.id).toBe(
+        `Player's Handbook (2024), Chapter 7: Spells, Spell Descriptions (alphabetical): ${spell.name}`,
+      );
       for (const label of ['Level', 'Casting time', 'Range', 'Components', 'Duration', 'Effect']) {
         expect(section(tip, label), `${spell.id} ${label}`).toBeTruthy();
       }

@@ -182,10 +182,34 @@
   color: var(--text-secondary);
 }
 
-.browseDescription {
-  margin-top: 0.15rem;
-  font-size: 0.82rem;
+/* Search spans the row so the box is wide enough to type in. */
+.searchField {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
   color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.95rem;
+}
+
+.searchInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+/* Where the spell text comes from (book, chapter, section). */
+.sourceNote {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
 /* One-click clean-up of spell picks that are not on the class list. */

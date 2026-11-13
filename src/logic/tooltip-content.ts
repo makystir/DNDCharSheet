@@ -42,6 +42,7 @@ import type { ResourceState } from './resources';
 import { ABILITY_NAMES, SKILLS, type Ability, type SkillId } from '../types/character';
 import { ABILITY_INFO, SKILL_INFO, LANGUAGE_INFO, VITAL_INFO, type VitalId } from '../data/rules-text';
 import { getSpell, type SpellData } from '../data/spells';
+import { spellSourceCitation } from './spell-source';
 import { getBackground } from '../data/backgrounds';
 import { effectiveSkillTraining } from './skills';
 import { savingThrowProficiency } from './saving-throws';
@@ -938,6 +939,8 @@ export function resolveSpellTooltip(spellId: string): TooltipContent | null {
   ];
   if (flags) sections.push({ label: 'Tags', text: flags });
   sections.push({ label: 'Effect', text: spell.description });
+  // Where to find it in print (book, chapter, section; spells are alphabetical there).
+  sections.push({ label: 'Source', text: spellSourceCitation(spell) });
   return { title: spell.name, sections };
 }
 
