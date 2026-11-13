@@ -118,7 +118,22 @@ function partsFor(ctx: DescriptionContext): AlignmentPart[] {
 const FALLBACK_NAME = 'this adventurer';
 
 /** Fill the name / pronoun / trait tokens of one template. */
+/** Brackets around a verb that must agree with "they" when the subject becomes "they". */
+const VERB_OPEN = '\u0002';
+const VERB_CLOSE = '\u0003';
+const VERB_MARK = new RegExp(`${VERB_OPEN}([a-z]+)${VERB_CLOSE}`, 'g');
+
+/**
+ * `{s:has}` in a template marks a SECOND verb that shares the subject ("{N}
+ * gestures wildly and {s:has} knocked over a tankard"). With keepMarks the marker
+ * survives until varyNameRepeats knows whether the subject became "they" (then
+ * the verb is conjugated: "they have"); otherwise it becomes the plain word.
+ */
 function fill(template: string, ctx: DescriptionContext, traits: [string, string] = ['', '']): string {
+  return fillWith(template, ctx, traits, false);
+}
+
+function fillWith(template: string, ctx: DescriptionContext, traits: [string, string], keepMarks: boolean): string {
   const name = ctx.name?.trim() || FALLBACK_NAME;
   const p =
     ctx.gender === 'male'
@@ -136,7 +151,8 @@ function fill(template: string, ctx: DescriptionContext, traits: [string, string
     .replaceAll('{them}', p.them)
     .replaceAll('{T1}', t1.charAt(0).toUpperCase() + t1.slice(1))
     .replaceAll('{t1}', t1)
-    .replaceAll('{t2}', t2);
+    .replaceAll('{t2}', t2)
+    .replace(/\{s:([a-z]+)\}/g, (_m, w: string) => (keepMarks ? `${VERB_OPEN}${w}${VERB_CLOSE}` : w));
   // A sentence that starts with the fallback name gets a capital letter.
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -181,44 +197,100 @@ export function generateDescription(rng: RNG, ctx: DescriptionContext): string {
   // Mannerism: a species one about a third of the time.
   const manner = sp && rng() < 0.3 ? pick(rng, [...sp.manners]) : pick(rng, [...MANNERS]);
   const parts = [opener, demeanor, ...(heritageLine ? [heritageLine] : []), past, color, quirk, manner];
-  const sentences = parts.map((s) => fill(s, ctx, traits));
+  const sentences = parts.map((s) => fillWith(s, ctx, traits, true));
   return varyNameRepeats(sentences, ctx).join(' ');
 }
 
-/** Words after which a bare "they" reads correctly ("they can", never "they is"). */
-const THEY_SAFE_NEXT = new Set(['can', 'could', 'would', 'will', 'should', 'might', 'must', 'may', 'had', 'did']);
+/** Adverbs that can sit between "they" and its verb ("they always keep"). */
+const ADVERBS = new Set([
+  'always', 'never', 'often', 'sometimes', 'usually', 'still', 'also', 'just', 'even', 'barely', 'hardly',
+  'almost', 'only', 'already', 'ever', 'once', 'soon', 'now', 'then', 'not',
+]);
+
+const IRREGULAR_THEY: Record<string, string> = { is: 'are', has: 'have', was: 'were', does: 'do', goes: 'go' };
 
 /**
- * Keep the paragraph from saying the name in every sentence. The opener keeps
- * the name; after that, sentences that start with the name alternate between
- * the name and he / she, and a second mention inside one sentence becomes he /
- * she. For "they" characters a pronoun is used only before a modal verb such
- * as "can" or "would", where "they" needs no other verb change.
+ * A third-person singular verb as it reads after "they" ("turns" -> "turn",
+ * "has" -> "have", "is" -> "are"). Past tense and modal verbs ("ran", "can",
+ * "would") already agree and come back unchanged.
+ */
+export function theyVerb(word: string): string {
+  const lower = word.toLowerCase();
+  if (lower in IRREGULAR_THEY) return IRREGULAR_THEY[lower];
+  if (lower.length > 4 && lower.endsWith('ies')) return word.slice(0, -3) + 'y';
+  if (/(ch|sh|ss|x|z)es$/.test(lower) || (lower.endsWith('oes') && lower.length > 4)) return word.slice(0, -2);
+  if (lower.endsWith('s') && !/(ss|us|is)$/.test(lower)) return word.slice(0, -1);
+  return word;
+}
+
+/** Conjugate the verb that follows "they": skip adverbs, then fix the first real word. */
+function conjugateAfterThey(rest: string): string {
+  let i = 0;
+  const WORD = /^(\s+)([A-Za-z']+)/;
+  for (;;) {
+    const m = WORD.exec(rest.slice(i));
+    if (!m) return rest;
+    const word = m[2];
+    const lower = word.toLowerCase();
+    if (ADVERBS.has(lower) || lower.endsWith('ly')) {
+      i += m[0].length;
+      continue;
+    }
+    const start = i + m[1].length;
+    return rest.slice(0, start) + theyVerb(word) + rest.slice(start + word.length);
+  }
+}
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Keep the paragraph from repeating the name. The first sentence introduces
+ * the character by name; after that every mention becomes a pronoun: "Vip
+ * turns" -> "she turns", "Vip's legacy" -> "her legacy", and for "they"
+ * characters the verb is conjugated ("Vip has" -> "they have"). One later
+ * sentence (the fourth or after) may keep its name as a reminder.
  */
 function varyNameRepeats(sentences: string[], ctx: DescriptionContext): string[] {
   const name = ctx.name?.trim();
-  if (!name) return sentences;
+  // No name: nothing to swap, and no subject became "they", so verbs stay as written.
+  if (!name) return sentences.map((s) => s.replace(VERB_MARK, '$1'));
   const subject = ctx.gender === 'male' ? 'he' : ctx.gender === 'female' ? 'she' : 'they';
-  const canUse = (rest: string) => subject !== 'they' || THEY_SAFE_NEXT.has(rest.trimStart().split(/[\s,.]/)[0] ?? '');
+  const possessive = ctx.gender === 'male' ? 'his' : ctx.gender === 'female' ? 'her' : 'their';
   const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
-  let startsWithName = 0;
+  const mention = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegex(name)}(?:'s)?(?![\\p{L}\\p{N}])`, 'gu');
+  let keptReminder = false;
+  const MARK = '\u0001';
+
+  /** Replace every mention except the first `keep` ones with a pronoun. */
+  const swap = (sentence: string, keep: number): string => {
+    let seen = 0;
+    // Whether the sentence's FIRST mention (its subject) became "they": then every
+    // verb marked {s:...} in the sentence agrees with "they".
+    let subjectIsThey = false;
+    const replaced = sentence.replace(mention, (match, offset: number) => {
+      seen += 1;
+      if (seen <= keep) return match;
+      const isPossessive = match.endsWith("'s");
+      const word = isPossessive ? possessive : subject;
+      const out = offset === 0 ? cap(word) : word;
+      if (seen === 1 && !isPossessive && subject === 'they') subjectIsThey = true;
+      // After "they", the verb that follows must be conjugated (done below).
+      return !isPossessive && subject === 'they' ? out + MARK : out;
+    });
+    const settle = (text: string) => text.replace(VERB_MARK, (_m, w: string) => (subjectIsThey ? theyVerb(w) : w));
+    if (!replaced.includes(MARK)) return settle(replaced);
+    const [head, ...pieces] = replaced.split(MARK);
+    return settle(head + pieces.map(conjugateAfterThey).join(''));
+  };
+
   return sentences.map((sentence, i) => {
-    let out = sentence;
-    if (i > 0 && out.startsWith(`${name} `)) {
-      startsWithName += 1;
-      const rest = out.slice(name.length);
-      if (startsWithName % 2 === 1 && canUse(rest)) out = cap(subject) + rest;
-    }
-    // A second mention of the name inside the same sentence.
-    const first = out.indexOf(name);
-    if (first !== -1) {
-      const second = out.indexOf(name, first + name.length);
-      if (second !== -1) {
-        const rest = out.slice(second + name.length);
-        if (canUse(rest)) out = out.slice(0, second) + subject + rest;
-      }
-    }
-    return out;
+    // The introduction keeps its first mention; any later one becomes a pronoun.
+    if (i === 0) return swap(sentence, 1);
+    const startsWithName = sentence.startsWith(`${name} `) || sentence.startsWith(`${name}'s `);
+    // One later sentence (the fourth or after) may start with the name again.
+    const keep = startsWithName && i >= 3 && !keptReminder ? 1 : 0;
+    if (keep) keptReminder = true;
+    return swap(sentence, keep);
   });
 }
 

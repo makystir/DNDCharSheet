@@ -41,7 +41,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} has spent years wondering what the heavens expect of an aasimar like {them}.",
       "{Their} eyes catch the light a moment longer than anyone else's.",
       "A celestial heritage is a gift {N} has learned to carry quietly.",
-      "{N} hides the glow of {their} heritage in crowds and lets it shine in dark places.",
+      "{N} hides the glow of {their} heritage in crowds and {s:lets} it shine in dark places.",
       "Some days the celestial blood feels like a calling; on others, like a burden.",
       "{N} was raised by parents who never quite knew what to make of their luminous child.",
       "Temples have tried to claim {them} as a living sign more than once.",
@@ -82,7 +82,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "The breath of {their} ancestors is a gift {N} treats with respect.",
       "{N} believes every dragonborn must earn {their} place in the clan's history.",
       "Scales, horns and a rumbling voice make {them} hard to overlook, and {N} has stopped trying to be.",
-      "{N} measures {themself} against the legends of {their} clan and always finds room to grow.",
+      "{N} measures {themself} against the legends of {their} clan and always {s:finds} room to grow.",
       "{N} was taught that a dragonborn without a clan is a story without an ending.",
       "Other people see a dragon when they look at {them}; {N} sees a family name to uphold.",
       "{N} keeps the old draconic tongue alive, even when nobody else understands it.",
@@ -92,7 +92,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} once met a true dragon and walked away with {their} life and a story.",
       "A rival clan shamed {their} family name, and {N} has sworn to restore it.",
       "{N} was the first in {their} family to leave the clan lands in three generations.",
-      "{N} breathed {their} first gout of draconic power during a desperate fight and has never forgotten the taste of it.",
+      "{N} breathed {their} first gout of draconic power during a desperate fight and {s:has} never forgotten the taste of it.",
     ],
     manners: [
       "A low rumble rises in {their} chest when {N} is annoyed.",
@@ -172,7 +172,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
     ],
     pasts: [
       "{Their} clan hold fell to something from the deep, and {N} was among the last to leave.",
-      "{N} apprenticed at the great forges and still bears the burns to prove it.",
+      "{N} apprenticed at the great forges and still {s:bears} the burns to prove it.",
       "A grudge recorded in {their} family's ledger has waited three generations for {N} to settle it.",
       "{N} once spent a month lost in the deep tunnels, guided only by the feel of the stone.",
       "{N} was the first in the clan to choose adventure over the family craft, and the arguments still echo.",
@@ -181,7 +181,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} taps the walls of every new place, listening to the stone.",
       "{N} strokes {their} beard or braids when deep in thought.",
       "{Their} laugh is a deep rumble that shakes the tankards.",
-      "{N} grumbles about every meal and finishes every plate.",
+      "{N} grumbles about every meal and {s:finishes} every plate.",
       "{N} inspects the stonework of every building before entering.",
     ],
     shortTermGoals: [
@@ -200,7 +200,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
   },
   elf: {
     heritages: [
-      "{N} has lived long enough to see empires rise and fade, and is unimpressed by most of them.",
+      "{N} has lived long enough to see empires rise and fade, and {s:is} unimpressed by most of them.",
       "The elven trance leaves {them} with memories that are not entirely {their} own.",
       "{N} moves through the world with the patience of someone who expects to live for centuries.",
       "Elven grace comes naturally to {them}; elven patience took longer.",
@@ -208,7 +208,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} finds the short lives of other peoples both beautiful and heartbreaking.",
       "Music, starlight and old songs feel more real to {them} than any city.",
       "{N} was raised among elders who considered a century a short time.",
-      "{N} tries not to grow too attached to short-lived friends, and always fails.",
+      "{N} tries not to grow too attached to short-lived friends, and always {s:fails}.",
       "{N} sees the world in long arcs, while everyone else rushes past.",
     ],
     pasts: [
@@ -250,7 +250,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
         "Courtly manners from the high elven cities are hard for {them} to shake.",
       ],
       woodElf: [
-        "As a wood elf, {N} grew up among the treetops and still prefers branches to beds.",
+        "As a wood elf, {N} grew up among the treetops and still {s:prefers} branches to beds.",
         "{N} has the wood elf's quick feet and a deep distrust of cities.",
         "The forest taught {them}, as a wood elf, to listen more than to speak.",
       ],
@@ -265,12 +265,12 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} has never met a problem that could not be solved with enough tinkering.",
       "{N} treats every day as an experiment with an unknown result.",
       "A gnome's sense of humor is a survival tool, and {N} keeps that tool sharp.",
-      "{N} names every invention and mourns every one that explodes.",
+      "{N} names every invention and {s:mourns} every one that explodes.",
       "{N} was raised in a burrow full of clocks, songs and arguments.",
       "Being small has taught {them} to think big.",
     ],
     pasts: [
-      "{N} once built a device that worked perfectly, once, and has been trying to rebuild it ever since.",
+      "{N} once built a device that worked perfectly, once, and {s:has} been trying to rebuild it ever since.",
       "{Their} family workshop burned down in an experiment nobody talks about.",
       "{N} spent a summer living with a family of badgers and learned their language, after a fashion.",
       "A prank {N} pulled as a youth became a village legend.",
@@ -298,13 +298,13 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
     ],
     lineages: {
       forest: [
-        "As a forest gnome, {N} grew up among woodland creatures and talks to them like old friends.",
+        "As a forest gnome, {N} grew up among woodland creatures and {s:talks} to them like old friends.",
         "{N} has a forest gnome's gift for illusions and a fondness for hiding in plain sight.",
         "The deep woods taught {them}, as a forest gnome, to love quiet mischief.",
       ],
       rock: [
         "As a rock gnome, {N} cannot resist taking apart anything with moving parts.",
-        "{N} has a rock gnome's love of clockwork and carries a tiny device everywhere.",
+        "{N} has a rock gnome's love of clockwork and {s:carries} a tiny device everywhere.",
         "The workshops of the rock gnomes taught {them} that every failure is a lesson.",
       ],
     },
@@ -315,16 +315,16 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "Every day is a contest to {them}, and the opponent is usually {their} own last best effort.",
       "{N} grew up where the air is thin and only the strong reach the summit.",
       "Goliath fairness runs deep in {them}: everyone deserves a chance, and no one gets a free win.",
-      "{N} keeps careful track of {their} own deeds and is always trying to top them.",
+      "{N} keeps careful track of {their} own deeds and {s:is} always trying to top them.",
       "Towering over most folk has taught {them} to be careful with doorways and gentle with children.",
       "{N} believes a life without challenge is a life wasted.",
-      "{N} was raised on tales of {their} giant ancestors and wants to be worthy of them.",
+      "{N} was raised on tales of {their} giant ancestors and {s:wants} to be worthy of them.",
       "{N} has a mountain dweller's respect for weather, rock and endurance.",
       "{N} sees every failure as one more step up the slope.",
     ],
     pasts: [
       "{N} once climbed a peak no goliath of {their} clan had ever conquered.",
-      "{N} lost a great contest of strength and has trained every day since.",
+      "{N} lost a great contest of strength and {s:has} trained every day since.",
       "{Their} tribe moved on while {N} was injured, and {N} had to find {their} own way down the mountain.",
       "{N} carried a wounded clanmate across a glacier and earned a place of honor for it.",
       "A giant once spoke to {them} as kin, and {N} has never forgotten it.",
@@ -390,7 +390,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} carries the halfling belief that the world is mostly good, with some unfortunate exceptions.",
     ],
     pasts: [
-      "{N} was the first halfling in {their} village to see the ocean, and has been wandering since.",
+      "{N} was the first halfling in {their} village to see the ocean, and {s:has} been wandering since.",
       "A lucky stumble once saved {their} life during a goblin raid.",
       "{Their} family's inn hosted adventurers every night, and {N} listened to every tale.",
       "{N} hid an entire family of refugees in a pantry during a war.",
@@ -424,11 +424,11 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} grew up in a bustling human city full of every kind of people.",
       "Humans are restless, and {N} is more restless than most.",
       "{N} believes a short life is no excuse for a small one.",
-      "{N} was raised in a farming town and still measures time by harvests.",
+      "{N} was raised in a farming town and still {s:measures} time by harvests.",
       "{N} has the human habit of making plans for a future that might never come.",
-      "{N} comes from a long line of ordinary folk and intends to be the first extraordinary one.",
+      "{N} comes from a long line of ordinary folk and {s:intends} to be the first extraordinary one.",
       "{N} has a human's talent for finding common ground with strangers.",
-      "{N} knows that the years are few and means to make each one count.",
+      "{N} knows that the years are few and {s:means} to make each one count.",
     ],
     pasts: [
       "{N} grew up in a frontier town that was swallowed by a growing kingdom.",
@@ -438,10 +438,10 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
       "{N} has moved so many times that no place quite feels like home.",
     ],
     manners: [
-      "{N} talks with {their} hands and rarely sits still.",
+      "{N} talks with {their} hands and rarely {s:sits} still.",
       "{N} picks up local slang within a day of arriving anywhere.",
       "{Their} face shows every emotion before {N} can hide it.",
-      "{N} makes friends quickly and forgets enemies slowly.",
+      "{N} makes friends quickly and {s:forgets} enemies slowly.",
       "{N} always seems to be in a hurry, even when there is no rush.",
     ],
     shortTermGoals: [
@@ -460,7 +460,7 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
   },
   orc: {
     heritages: [
-      "{N} carries the relentless endurance of the orcs and never stays down for long.",
+      "{N} carries the relentless endurance of the orcs and never {s:stays} down for long.",
       "Orc tenacity runs in {their} blood: {N} keeps going long after others quit.",
       "{N} has spent years proving that an orc is far more than people expect.",
       "{N} was raised on stories of orc heroes who stood against impossible odds.",
@@ -480,9 +480,9 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
     ],
     manners: [
       "{N} grins widely, tusks and all, when {N} is truly happy.",
-      "{N} speaks bluntly and expects the same in return.",
+      "{N} speaks bluntly and {s:expects} the same in return.",
       "{Their} voice drops to a growl when {N} is protecting a friend.",
-      "{N} eats with gusto and laughs with even more.",
+      "{N} eats with gusto and {s:laughs} with even more.",
       "{N} touches a tribal token whenever danger looms.",
     ],
     shortTermGoals: [
@@ -501,12 +501,12 @@ export const SPECIES_DESCRIPTION_TABLES: Record<DescriptionSpeciesId, SpeciesDes
   },
   tiefling: {
     heritages: [
-      "{N} carries a fiendish legacy that {N} never asked for and refuses to be ruled by.",
+      "{N} carries a fiendish legacy that {N} never asked for and {s:refuses} to be ruled by.",
       "Horns and a tail draw stares wherever {N} goes, and {N} has learned to stare back.",
       "{N} has spent a lifetime proving that heritage is not destiny.",
       "The whispers of {their} fiendish ancestry are something {N} has learned to ignore, mostly.",
       "{N} has a tiefling's resilience, forged by years of suspicion from strangers.",
-      "{N} knows how it feels to be judged before speaking a word, and refuses to judge others that way.",
+      "{N} knows how it feels to be judged before speaking a word, and {s:refuses} to judge others that way.",
       "{N} was raised by a family that loved {them} fiercely and warned {them} constantly.",
       "{N} has turned the stares of strangers into a kind of stage presence.",
       "Being a tiefling has taught {them} that trust must be earned in both directions.",

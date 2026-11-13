@@ -12,9 +12,11 @@ import { SPECIES_LIST } from '../../data/species';
 import { createCharacter } from '../../storage/character-store';
 import { alignmentParts, generateRandomCharacter } from '../personal-details-generation';
 import {
+  theyVerb,
   descriptionCombinations,
   descriptionContextFor,
   generateDescription,
+  generateFlaw,
   generateIdeal,
   generateProfile,
 } from '../character-description';
@@ -55,10 +57,6 @@ function allPools(): [string, readonly string[]][] {
   return pools;
 }
 
-/** Fill tokens the way a neutral-gender character named Mira would get them. */
-const fillMira = (s: string) =>
-  s.replaceAll('{N}', 'Mira').replaceAll('{Their}', 'Their').replaceAll('{their}', 'their').replaceAll('{themself}', 'themself').replaceAll('{them}', 'them');
-
 describe('species in character descriptions', () => {
   it('gives every species its own heritages, pasts, manners and goals', () => {
     for (const sp of SPECIES_LIST) {
@@ -89,12 +87,19 @@ describe('species in character descriptions', () => {
     for (const sp of SPECIES_LIST) {
       const t = SPECIES_DESCRIPTION_TABLES[sp.id as keyof typeof SPECIES_DESCRIPTION_TABLES];
       const lineageId = t.lineages ? Object.keys(t.lineages)[0] : undefined;
-      const heritageLines = t.heritages.map(fillMira);
-      const lineageLines = lineageId ? (t.lineages?.[lineageId] ?? []).map(fillMira) : [];
+      // A line's longest stretch of plain text (no tokens): names become pronouns in
+      // the description, so only the untouched text can be matched. Male keeps verbs as written.
+      const stretch = (line: string) =>
+        line
+          .split(/\{[^}]+\}/)
+          .map((x) => x.replace(/^[\s,']+|[\s,.;]+$/g, ''))
+          .sort((a, b) => b.length - a.length)[0];
+      const heritageLines = t.heritages.map(stretch);
+      const lineageLines = lineageId ? (t.lineages?.[lineageId] ?? []).map(stretch) : [];
       let sawLineage = false;
       for (let seed = 1; seed <= 40; seed++) {
-        const d = generateDescription(createSeededRng(seed), { name: 'Mira', gender: 'neutral', speciesId: sp.id, lineage: lineageId });
-        const has = (lines: string[]) => lines.some((l) => d.includes(l.slice(5, 45)));
+        const d = generateDescription(createSeededRng(seed), { name: 'Mira', gender: 'male', speciesId: sp.id, lineage: lineageId });
+        const has = (lines: string[]) => lines.some((l) => l.length >= 12 && d.includes(l));
         expect(has(heritageLines) || has(lineageLines), `${sp.id}: ${d}`).toBe(true);
         if (has(lineageLines)) sawLineage = true;
       }
@@ -200,6 +205,7 @@ describe('character description generator', () => {
         const second = o.indexOf('{N}', 1);
         return (second === -1 ? o : o.slice(0, second))
           .replaceAll('{N}', 'Mira')
+          .replace(/\{s:([^}]+)\}/g, '$1')
           .replaceAll('{their}', 'their')
           .replaceAll('{them}', 'them')
           .replaceAll('{themself}', 'themself');
@@ -308,6 +314,172 @@ describe('alignment list sanity', () => {
   it('every alignment the app offers splits into known parts or none', () => {
     for (const a of ALIGNMENTS) {
       for (const part of alignmentParts(a)) expect(ALIGNMENT_TRAITS[part]).toBeDefined();
+    }
+  });
+});
+
+describe('names and pronouns in the description', () => {
+  const countName = (text: string, name: string) => text.split(new RegExp(`\\b${name}\\b`)).length - 1;
+
+  it('says the name at most twice: once to introduce the character, once as a reminder', () => {
+    for (const gender of GENDERS) {
+      for (const cls of [...CLASS_LIST.map((c) => c.id), undefined]) {
+        for (let seed = 1; seed <= 40; seed++) {
+          const d = generateDescription(createSeededRng(seed), {
+            name: 'Vip',
+            gender,
+            classId: cls,
+            alignment: ALIGNMENTS[seed % ALIGNMENTS.length],
+            speciesId: SPECIES_LIST[seed % SPECIES_LIST.length].id,
+          });
+          expect(countName(d, 'Vip'), `${gender} ${cls}: ${d}`).toBeLessThanOrEqual(2);
+          expect(d.startsWith('Vip '), d).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("turns the name into 's possessives and he / she subjects", () => {
+    const d = Array.from({ length: 300 }, (_, i) =>
+      generateDescription(createSeededRng(i + 1), { name: 'Vip', gender: 'female', speciesId: 'tiefling', lineage: 'infernal' }),
+    ).join(' ');
+    expect(d).not.toMatch(/Vip's/);
+    expect(d).toMatch(/\b(She|she) /);
+    // No sentence is about "he" or "they" (a mid-sentence "they" can still mean other people).
+    expect(d).not.toMatch(/(^|[.;] )(He|They) /);
+    expect(d).not.toMatch(/\b[Hh]e\b/);
+  });
+
+  it('never writes they / he / she about a character of another gender in a flaw', () => {
+    for (const gender of ['male', 'female'] as const) {
+      const bad = gender === 'male' ? /\b(she|her|herself)\b/i : /\b(he|him|his|himself)\b/i;
+      for (let seed = 1; seed <= 400; seed++) {
+        const f = generateFlaw(createSeededRng(seed), { name: 'Vip', gender, classId: CLASS_LIST[seed % CLASS_LIST.length].id, alignment: ALIGNMENTS[seed % ALIGNMENTS.length] });
+        expect(f, f).not.toMatch(bad);
+        // The character is never "they" in a flaw for a he / she character.
+        expect(f, f).not.toMatch(/\bthey (are|is|have|do|know|love|think)\b/i);
+      }
+    }
+  });
+
+  it('conjugates the verb after "they" for characters who use they', () => {
+    expect(theyVerb('turns')).toBe('turn');
+    expect(theyVerb('has')).toBe('have');
+    expect(theyVerb('is')).toBe('are');
+    expect(theyVerb('was')).toBe('were');
+    expect(theyVerb('does')).toBe('do');
+    expect(theyVerb('goes')).toBe('go');
+    expect(theyVerb('tries')).toBe('try');
+    expect(theyVerb('watches')).toBe('watch');
+    expect(theyVerb('passes')).toBe('pass');
+    expect(theyVerb('keeps')).toBe('keep');
+    // Past tense and modals already agree.
+    for (const w of ['ran', 'grew', 'can', 'would', 'learned', 'miss']) expect(theyVerb(w)).toBe(w);
+  });
+
+  it('never writes "they" with a singular verb, in any description', () => {
+    const ADV = /^(always|never|often|sometimes|usually|still|also|just|even|barely|hardly|almost|only|already|ever|once|soon|now|then|not|\w+ly)$/i;
+    for (let seed = 1; seed <= 600; seed++) {
+      const cls = CLASS_LIST[seed % CLASS_LIST.length].id;
+      const d = generateDescription(createSeededRng(seed), {
+        name: 'Vip',
+        gender: 'neutral',
+        classId: cls,
+        alignment: ALIGNMENTS[seed % ALIGNMENTS.length],
+        speciesId: SPECIES_LIST[seed % SPECIES_LIST.length].id,
+      });
+      for (const m of d.matchAll(/\b[Tt]hey((?:\s+[A-Za-z']+){1,3})/g)) {
+        const words = m[1].trim().split(/\s+/);
+        const verb = words.find((w) => !ADV.test(w)) ?? '';
+        expect(theyVerb(verb), `"they ${words.join(' ')}" in: ${d}`).toBe(verb);
+      }
+    }
+  });
+
+  it('writes every habit as a complete sentence with one subject and one verb', () => {
+    // Adverbs and nouns that end in "s" but are not verbs ("but always honest").
+    const NOT_VERBS = new Set<string>(['always', 'sometimes', 'serious', 'nervous']);
+    for (const q of QUIRKS) {
+      expect(q.startsWith('{N} '), q).toBe(true);
+      expect(q.endsWith('.'), q).toBe(true);
+      // No second third-person verb after a conjunction: it would not agree for "they".
+      for (const m of q.matchAll(/\b(?:and|but|or|then)\s+(?:never |always |also )?([a-z-]+s)\b/g)) {
+        expect(NOT_VERBS.has(m[1]), `${q} -> "${m[1]}"`).toBe(true);
+      }
+    }
+  });
+
+  it('turns a habit into a sentence about the character, for he, she and they', () => {
+    const habit = (gender: 'male' | 'female' | 'neutral', seed: number) => {
+      const d = generateDescription(createSeededRng(seed), { name: 'Vip', gender, classId: 'wizard', alignment: 'True Neutral' });
+      return d;
+    };
+    // Every description holds a sentence that begins with the subject (name or pronoun)
+    // and none starts with a bare verb (a leftover fragment such as "Keeps ...").
+    const FRAGMENT = /(?:^|[.;?!] )(Keeps|Collects|Hums|Speaks|Never|Always|Cannot|Treats|Writes|Is|Has|Gets|Takes|Makes|Loves|Finds|Sings|Asks|Tells|Names|Masks|Judges|Counts|Quotes|Wakes|Smiles|Prefers|Fidgets|Mimics|Trusts|Shares|Draws|Salutes|Picks|Carves|Dresses|Haggles|Brews|Repeats|Tastes|Mutters|Cries|Compares|Insists|Polishes|Overthinks|Grumbles|Prays|Uses|Assumes|Sleeps|Stares|Turns|Notices|Flinches|Will|Can|Remembers|Laughs|Believes) /;
+    for (const gender of ['male', 'female', 'neutral'] as const) {
+      for (let seed = 1; seed <= 200; seed++) {
+        const d = habit(gender, seed);
+        expect(d, `${gender}: ${d}`).not.toMatch(FRAGMENT);
+      }
+    }
+  });
+
+  it('marks every second verb that shares the name\'s subject, as {s:verb}', () => {
+    // Nouns, adjectives and adverbs that end in "s" and follow a conjunction.
+    const NOT_VERBS = new Set(['its', 'customs', 'braids', 'promises', 'tattoos', 'arguments', 'slights', 'serious', 'nervous', 'always', 'sometimes']);
+    const ADV = '(?:(?:never|always|also|still|often|quietly|rarely|barely) )?';
+    const CONJ = new RegExp(`\\b(?:and|but|or|then|yet|while|though)\\s+${ADV}(has|is|was|does|goes|[a-z]+(?:s|es))\\b`, 'g');
+    let marked = 0;
+    for (const [label, list] of allPools()) {
+      for (const s of list) {
+        if (!s.includes('{N}')) continue;
+        const after = s.slice(s.indexOf('{N}') + 3);
+        for (const m of after.matchAll(CONJ)) {
+          expect(NOT_VERBS.has(m[1]), `${label}: "${s}" has an unmarked verb "${m[1]}" (write {s:${m[1]}})`).toBe(true);
+        }
+        for (const m of s.matchAll(/\{s:([a-z]+)\}/g)) {
+          marked += 1;
+          // A marked word is a real third-person verb: "they" changes it.
+          expect(theyVerb(m[1]) !== m[1], `${label}: {s:${m[1]}} is not a third-person verb`).toBe(true);
+        }
+      }
+    }
+    expect(marked).toBeGreaterThanOrEqual(60);
+  });
+
+  it('conjugates a second verb for "they", and leaves it alone for he, she and a kept name', () => {
+    const CONJ_SINGULAR = /\b(?:and|but|or|then|yet|while|though) (?:\w+ly |never |always |also |still |often |rarely )?(has|is|was|does|goes)\b/;
+    let theySentences = 0;
+    for (let seed = 1; seed <= 500; seed++) {
+      const ctx = { name: 'Vip', classId: CLASS_LIST[seed % CLASS_LIST.length].id, alignment: ALIGNMENTS[seed % ALIGNMENTS.length], speciesId: SPECIES_LIST[seed % SPECIES_LIST.length].id };
+      const they = generateDescription(createSeededRng(seed), { ...ctx, gender: 'neutral' });
+      for (const sentence of they.split(/(?<=[.;?!]) /)) {
+        if (!/^They /.test(sentence)) continue;
+        theySentences += 1;
+        expect(sentence, sentence).not.toMatch(CONJ_SINGULAR);
+      }
+      // He and she keep the verbs as written, and no marker ever leaks into the text.
+      for (const gender of ['male', 'female'] as const) {
+        const d = generateDescription(createSeededRng(seed), { ...ctx, gender });
+        expect(d, d).not.toMatch(/[{}]/);
+        expect(d.includes('\u0002') || d.includes('\u0003'), d).toBe(false);
+      }
+      expect(they).not.toMatch(/[{}]/);
+      expect(they.includes('\u0002') || they.includes('\u0003')).toBe(false);
+    }
+    expect(theySentences).toBeGreaterThan(300);
+    // The exact case from a real description.
+    const sample = Array.from({ length: 800 }, (_, i) =>
+      generateDescription(createSeededRng(i + 1), { name: 'Vip', gender: 'neutral', classId: 'bard', speciesId: 'human' }),
+    ).join(' ');
+    expect(sample).toMatch(/They gesture wildly when telling a story and have knocked over/);
+  });
+
+  it('keeps names with punctuation or regex characters safe', () => {
+    for (const name of ["O'Brien", 'Zo\u00eb', 'Ana-Mar\u00eda', 'Mr. X']) {
+      const d = generateDescription(createSeededRng(5), { name, gender: 'neutral', classId: 'bard', alignment: 'Lawful Good' });
+      expect(d.startsWith(`${name} `), d).toBe(true);
     }
   });
 });
