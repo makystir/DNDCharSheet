@@ -384,3 +384,37 @@ describe('Long Rest dialog', () => {
     expect(changes).toBe(0);
   });
 });
+
+describe('Long Rest: companions rest too', () => {
+  const companions: Partial<Character> = {
+    companions: [
+      { id: 'c1', creatureId: 'wolf', origin: 'pet', nickname: 'Fang', hp: 3, tempHp: 2 },
+      { id: 'c2', creatureId: 'cat', origin: 'pet', nickname: 'Tom', hp: 0 },
+    ],
+  };
+
+  it('offers the companions (ticked), names who cannot rest at 0 HP, and restores the rest', () => {
+    renderPage(companions);
+    const dialog = openLongRest();
+    const box = within(dialog).getByTestId('long-rest-companions');
+    expect(within(box).getByRole('checkbox', { name: /Companions rest too: Fang\./ })).toBeChecked();
+    expect(box).toHaveTextContent("Tom is at 0 Hit Points and can't start a Long Rest.");
+    fireEvent.click(within(dialog).getByRole('button', { name: /Finish Long Rest|Rest anyway/ }));
+    expect(latest.companions?.[0]).toEqual({ id: 'c1', creatureId: 'wolf', origin: 'pet', nickname: 'Fang' });
+    expect(latest.companions?.[1].hp).toBe(0);
+    expect(notify).toHaveBeenCalledWith(expect.stringContaining('Companions rested too.'));
+  });
+
+  it('leaves the companions alone when unticked', () => {
+    renderPage(companions);
+    const dialog = openLongRest();
+    fireEvent.click(within(dialog).getByRole('checkbox', { name: /Companions rest too/ }));
+    fireEvent.click(within(dialog).getByRole('button', { name: /Finish Long Rest|Rest anyway/ }));
+    expect(latest.companions?.[0].hp).toBe(3);
+  });
+
+  it('shows nothing about companions when there are none', () => {
+    renderPage();
+    expect(within(openLongRest()).queryByTestId('long-rest-companions')).toBeNull();
+  });
+});

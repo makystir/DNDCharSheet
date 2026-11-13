@@ -1,0 +1,73 @@
+/* Allies glance on the Combat page. Tokens only. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.row,
+.rowDown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.rowDown {
+  border-color: var(--accent-red);
+}
+.name {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.kind {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.stats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.stat,
+.statWarn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.statWarn {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-red);
+  text-decoration-thickness: 2px;
+}
+.conditions {
+  flex-basis: 100%;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.links {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+}
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent-gold);
+}

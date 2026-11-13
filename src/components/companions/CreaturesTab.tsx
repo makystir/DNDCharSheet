@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ChevronDown, PawPrint, Plus } from 'lucide-react';
-import type { Character, CompanionRecord } from '../../types/character';
+import type { Character, CompanionOrigin, CompanionRecord } from '../../types/character';
 import { CREATURE_CATALOG } from '../../data/creatures';
 import { companionDisplayName, hasRidingDetails } from '../../logic/companion-model';
+import { companionSuggestions } from '../../logic/companion-play';
 import { mountCapacity, mountingCostFt, vehicleLoad, VEHICLE_PULL_FACTOR } from '../../logic/companions';
 import { getHelpContent } from '../../logic/help-content';
 import { speedBreakdown } from '../../logic/species';
@@ -47,7 +48,7 @@ function isRidingCreature(rec: CompanionRecord): boolean {
  * not tracked (user decision).
  */
 export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating] = useState<CompanionOrigin | null>(null);
   const [showDismissed, setShowDismissed] = useState(false);
   const { list, atMax, patch, add, deleting, requestDelete, cancelDelete, confirmDelete } = useRecordList(
     character,
@@ -83,9 +84,11 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
   const speed = speedBreakdown(character);
   const mountCost = mountingCostFt(speed.total);
   const showMounted = active.some(isRidingCreature);
+  // What the character's class features or spells give it that is not on the sheet yet.
+  const suggestions = companionSuggestions(character);
 
   const card = (rec: CompanionRecord) => (
-    <CompanionCard key={rec.id} record={rec} character={character} onPatch={patch} onDelete={requestDelete} />
+    <CompanionCard key={rec.id} record={rec} character={character} onPatch={patch} onDelete={requestDelete} onCharacterChange={onChange} />
   );
 
   return (
@@ -100,12 +103,29 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
             </span>
           }
           action={
-            <button type="button" className={styles.addBtn} disabled={atMax} onClick={() => setCreating(true)}>
+            <button type="button" className={styles.addBtn} disabled={atMax} onClick={() => setCreating('primal-companion')}>
               <Plus size={14} aria-hidden="true" />
               Add Creature
             </button>
           }
         />
+
+        {suggestions.length > 0 && (
+          <ul className={styles.suggestions} aria-label="Suggested creatures" data-testid="creature-suggestions">
+            {suggestions.map((s) => (
+              <li key={s.origin} className={styles.suggestion}>
+                <span>
+                  <strong>{s.label}</strong>
+                  <span className={styles.kindHint}>{s.reason}</span>
+                </span>
+                <button type="button" className={styles.btn} disabled={atMax} onClick={() => setCreating(s.origin)}>
+                  <Plus size={14} aria-hidden="true" />
+                  {`Add ${s.label}`}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         {showMounted && (
           <div className={styles.summary} data-testid="mounted-summary">
@@ -191,10 +211,11 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
       {creating && (
         <CompanionCreationFlow
           character={character}
-          onCancel={() => setCreating(false)}
+          initialOrigin={creating}
+          onCancel={() => setCreating(null)}
           onConfirm={(record) => {
             add(record);
-            setCreating(false);
+            setCreating(null);
           }}
         />
       )}

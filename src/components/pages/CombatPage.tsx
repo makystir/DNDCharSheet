@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Character } from '../../types/character';
 import { AffectingYouCard } from '../combat/AffectingYouCard';
+import { AlliesCard } from '../combat/AlliesCard';
 import { HitPointsCard } from '../combat/HitPointsCard';
 import { ConcentrationCard } from '../combat/ConcentrationCard';
 import { WeaponCards } from '../combat/WeaponCards';
@@ -37,7 +38,8 @@ export interface CombatPageProps {
  *  - the Fight card (round counter, Next round, Initiative roll);
  *  - Status: one Hit Points card (damage, healing, Temp HP and, at 0 HP, death
  *    saves), the six saving throws as a row of chips, "Affecting you"
- *    (conditions and tracked effects, one line when empty) and concentration;
+ *    (conditions and tracked effects, one line when empty), concentration,
+ *    and Allies (companions and people from the Companions page, read-only);
  *  - Attacks: one card with a row per weapon plus Unarmed Strike, and ammunition;
  *  - Spells and turn options;
  *  - Resources: limited-use features and spell slots spent in a fight.
@@ -102,6 +104,7 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
             <SavesPanel character={character} />
             <AffectingYouCard character={character} onChange={onChange} />
             <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
+            <AlliesCard character={character} />
           </section>
         </div>
 

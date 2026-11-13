@@ -227,6 +227,28 @@
   border-color: var(--accent-gold);
 }
 
+/* Suggested creatures (Creatures tab). */
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  border: 1px dashed var(--accent-gold);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
 /* Kind chooser (People tab Add). */
 .kindList {
   display: flex;

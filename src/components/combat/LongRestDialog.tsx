@@ -7,6 +7,7 @@ import {
   longRestHoursRequired,
   restInterruptOutcome,
 } from '../../logic/rests';
+import { companionRestPlan, companionsLongRest } from '../../logic/companion-play';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -53,6 +54,10 @@ export function LongRestDialog({
   const [showInterrupt, setShowInterrupt] = useState(false);
   const [hoursRaw, setHoursRaw] = useState('0');
   const [interruptionsRaw, setInterruptionsRaw] = useState('1');
+  // Companions who travel with you rest too (PHB L21242: any creature can take
+  // a Long Rest). Offered, ticked, and shown, never applied silently.
+  const companionPlan = companionRestPlan(character);
+  const [restCompanions, setRestCompanions] = useState(true);
 
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -83,7 +88,12 @@ export function LongRestDialog({
   const handleConfirm = () => {
     if (preview.outcome !== 'completed') return;
     const n = recovered.length;
-    onComplete(preview.character, `Long Rest finished. Resources restored.${n > 0 ? ` ${n} limited-use feature${n === 1 ? '' : 's'} recovered.` : ''}`);
+    const withCompanions = restCompanions && companionPlan.resting.length > 0;
+    const next = withCompanions ? companionsLongRest(preview.character) : preview.character;
+    onComplete(
+      next,
+      `Long Rest finished. Resources restored.${n > 0 ? ` ${n} limited-use feature${n === 1 ? '' : 's'} recovered.` : ''}${withCompanions ? ' Companions rested too.' : ''}`,
+    );
   };
 
   const blockedText =
@@ -166,6 +176,25 @@ export function LongRestDialog({
               <li>Death Saving Throw counters clear</li>
             </ul>
             {recovered.length > 0 && <RecoveredList recovered={recovered} testId="long-rest-recovered" />}
+
+            {(companionPlan.resting.length > 0 || companionPlan.atZero.length > 0) && (
+              <div className={styles.companions} data-testid="long-rest-companions">
+                {companionPlan.resting.length > 0 && (
+                  <label className={styles.checkRow}>
+                    <input type="checkbox" checked={restCompanions} onChange={(e) => setRestCompanions(e.target.checked)} />
+                    <span>
+                      {`Companions rest too: ${companionPlan.resting.join(', ')}.`}
+                      <span className={styles.muted}> Full Hit Points, no Temporary Hit Points, Exhaustion down 1.</span>
+                    </span>
+                  </label>
+                )}
+                {companionPlan.atZero.length > 0 && (
+                  <p className={styles.muted}>
+                    {`${companionPlan.atZero.join(', ')} ${companionPlan.atZero.length === 1 ? 'is' : 'are'} at 0 Hit Points and can't start a Long Rest.`}
+                  </p>
+                )}
+              </div>
+            )}
 
             {advisory && (
               <p className={styles.advisory} role="status" data-testid="long-rest-advisory">

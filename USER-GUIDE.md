@@ -241,7 +241,7 @@ Your at-a-glance page, and the one you'll use most during play. From top to bott
 - **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them. An empty field has a 🎲 that rolls a suggestion; once the field has something in it, the 🎲 goes away. Clear the field to get it back.
 - **Finish setting up:** a checklist of choices you haven't made yet, such as skills or spells. It disappears when everything is done.
 - **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more. **Adjust** (closed at first) holds an Armor Class override and an initiative bonus, for anything the app doesn't know about.
-- **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets.
+- **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets. If companions travel with you, the Long Rest dialog offers to rest them too (ticked, and you can untick it); anyone at 0 HP is named and left out.
 - **Heroic Inspiration:** a toggle. In D&D 2024 your DM may award you Heroic Inspiration, which lets you reroll a die once.
 - **Conditions:** anything currently affecting you, such as Poisoned or Prone.
 - **Reactions:** things you can do in response to an event on someone else's turn.
@@ -292,6 +292,7 @@ On a wide screen the page splits into two columns: **Status** (how you're doing)
   - **Add Condition:** pick a condition, read what it does, and give it a duration in rounds, minutes or hours, or until a rest or while you concentrate. Timed durations count down with **Next round**, and you can take a round off by hand.
   - **Track effect:** track spells and features that last a number of rounds, such as Bless or Rage (1 minute is 10 rounds). Give it a name and an optional number of rounds. **Next round** counts them down, **-1** and **+1** adjust by hand, and **End** removes one. The app doesn't apply what an effect does; it only keeps the count.
 - **Concentration:** appears while you are concentrating, shows on what, and ends it when you start another.
+- **Allies:** appears when you have companions, hirelings, NPC party members or sidekicks. Each shows HP, AC, its first attack and any conditions. It is read-only; the link takes you to the Companions page to change them.
 
 The page only shows what applies to you right now. Death Saves appear at 0 HP, Concentration while you concentrate, Ammunition when you have a weapon that uses it, Spellcasting if you cast spells, and Resources if you have limited-use features.
 
@@ -403,6 +404,10 @@ This page is for everyone who travels with you. A strip at the top shows how man
 Every card works the same way: tap its header to open it, and use **Remove** at the bottom to delete it (you can undo for a few seconds).
 
 **Portraits.** Each creature and person can have a portrait. Open the card and press **Upload portrait**; square pictures work best, and big ones are shrunk to save space. The picture also shows as a small circle on the card's header. Fill in **Appearance** (for a Primal Companion, **Kind of animal and appearance**: you choose what animal your beast is) and press **Portrait prompt** to get text you can paste into an AI image generator. Portraits are included when you export or back up the character, but left out of share links to keep them short.
+
+**Suggestions.** When your class or spells give you a companion you haven't added yet (a Beast Master's Primal Companion, Pact of the Chain, Find Familiar, Find Steed), the Creatures tab shows it with an **Add** button. A missing Primal Companion is also listed in **Finish setting up** on the Overview.
+
+**Primal Companion.** Its card has two buttons from the Beast Master rules: **Revive the beast** (at 0 HP: choose a spell slot to expend, and it comes back with all its HP) and **Summon instead** (after a Long Rest you can switch to a different primal beast).
 
 Temporary summoned creatures from spells are not tracked here. Companion hit points and conditions are edited on this page only.
 

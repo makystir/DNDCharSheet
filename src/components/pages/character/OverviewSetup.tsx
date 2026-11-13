@@ -3,6 +3,7 @@ import type { Character } from '../../../types/character';
 import { pendingFeaturePicks, pendingSetupChoices } from '../../../logic/starting-choices';
 import type { FeaturePickKind, PendingItem, PendingKind } from '../../../logic/starting-choices';
 import { pendingCreationChoices } from '../../../logic/class-choices';
+import { primalCompanionMissing } from '../../../logic/companion-play';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewLinkAnchor } from './OverviewShared';
@@ -43,7 +44,9 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
   // Advancement page; they are listed here as link rows only.
   const creationChoices = pendingCreationChoices(character);
   const featurePicks = pendingFeaturePicks(character);
-  if (pending.length === 0 && creationChoices.length === 0 && featurePicks.length === 0) return null;
+  // A Beast Master is owed a Primal Companion (PHB Beast Master level 3); it is added on the Companions page.
+  const primalMissing = primalCompanionMissing(character);
+  if (pending.length === 0 && creationChoices.length === 0 && featurePicks.length === 0 && !primalMissing) return null;
   return (
     <Card>
       <SectionHeader icon={ClipboardList} title="Finish setting up" />
@@ -94,6 +97,13 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
             <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
           </li>
         ))}
+        {primalMissing && (
+          <li className={styles.row} data-testid="overview-setup-primal-companion">
+            <span className={styles.label}>Primal Companion</span>
+            <span className={styles.count}>not added</span>
+            <OverviewLinkAnchor href="#companions/creatures" text="Add on Companions" />
+          </li>
+        )}
       </ul>
     </Card>
   );

@@ -10,6 +10,7 @@ import { OTHERWORLDLY_STEED_MAX_SPELL_LEVEL, OTHERWORLDLY_STEED_MIN_SPELL_LEVEL,
 import { zeroHpRuleKeyForOrigin } from '../../logic/tooltip-content';
 import { companionPortraitKey } from '../../storage/companion-portraits';
 import { BlurInput } from './BlurInput';
+import { PrimalCompanionActions } from './PrimalCompanionActions';
 import { RecordCard } from './RecordCard';
 import { RidingPackingSection } from './RidingPackingSection';
 import { TrackedVitals } from './TrackedVitals';
@@ -21,6 +22,8 @@ export interface CompanionCardProps {
   character: Character;
   onPatch: (id: string, patch: Partial<CompanionRecord>) => void;
   onDelete: (id: string) => void;
+  /** Whole-character changes (the Primal Companion's revive spends a spell slot). */
+  onCharacterChange: (next: Character) => void;
 }
 
 const SPELL_LEVELS = Array.from(
@@ -36,7 +39,7 @@ const SPELL_LEVELS = Array.from(
  * notes. All derived numbers are rebuilt from the live character on every
  * render.
  */
-export function CompanionCard({ record, character, onPatch, onDelete }: CompanionCardProps) {
+export function CompanionCard({ record, character, onPatch, onDelete, onCharacterChange }: CompanionCardProps) {
   const built = buildCompanionModel(record, character);
   const [ridingOpen, setRidingOpen] = useState(() => (built ? ridingOpenByDefault(record, built.creature) : false));
   if (!built) return null;
@@ -104,6 +107,8 @@ export function CompanionCard({ record, character, onPatch, onDelete }: Companio
           onToggleRiding={() => setRidingOpen((v) => !v)}
           built={{ creature, model, warning, formulaNote, notes }}
           patch={patch}
+          onCharacterChange={onCharacterChange}
+          down={cur === 0}
         />
       )}
     </RecordCard>
@@ -119,9 +124,11 @@ interface CompanionBodyProps {
   onToggleRiding: () => void;
   built: Pick<NonNullable<ReturnType<typeof buildCompanionModel>>, 'creature' | 'model' | 'warning' | 'formulaNote' | 'notes'>;
   patch: (p: Partial<CompanionRecord>) => void;
+  onCharacterChange: (next: Character) => void;
+  down: boolean;
 }
 
-function CompanionBody({ record, character, name, hpMax, ridingOpen, onToggleRiding, built, patch }: CompanionBodyProps) {
+function CompanionBody({ record, character, name, hpMax, ridingOpen, onToggleRiding, built, patch, onCharacterChange, down }: CompanionBodyProps) {
   const { creature, model, warning, formulaNote, notes } = built;
   const casters = resolveClasses(character).filter((r) => entryIsSpellcaster(r.entry));
   const showTypeChoice = record.origin === 'find-familiar' || record.origin === 'pact-of-the-chain';
@@ -228,6 +235,10 @@ function CompanionBody({ record, character, name, hpMax, ridingOpen, onToggleRid
         zeroHpRule={zeroHpRuleKeyForOrigin(record.origin)}
         onPatch={(p) => patch(p)}
       />
+
+      {record.origin === 'primal-companion' && hpMax !== null && (
+        <PrimalCompanionActions record={record} character={character} down={down} onCharacterChange={onCharacterChange} />
+      )}
 
       {canRide && (
         <div>

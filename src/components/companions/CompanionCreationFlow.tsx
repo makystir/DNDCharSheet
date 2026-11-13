@@ -14,6 +14,8 @@ import styles from './CompanionCreationFlow.module.css';
 
 export interface CompanionCreationFlowProps {
   character: Character;
+  /** Source to start on (a suggestion's Add button). Defaults to Primal Companion. */
+  initialOrigin?: CompanionOrigin;
   onConfirm: (record: CompanionRecord) => void;
   onCancel: () => void;
 }
@@ -32,6 +34,12 @@ const SPELL_LEVELS = Array.from(
   { length: OTHERWORLDLY_STEED_MAX_SPELL_LEVEL - OTHERWORLDLY_STEED_MIN_SPELL_LEVEL + 1 },
   (_, i) => OTHERWORLDLY_STEED_MIN_SPELL_LEVEL + i,
 );
+
+/** The picker's first option for a source: a pet starts on the first (table) mount. */
+function firstCreatureFor(origin: CompanionOrigin): string {
+  const opts = creatureOptionsForOrigin(origin);
+  return (origin === 'pet' ? opts.find((c) => c.mountTable) : undefined)?.id ?? opts[0]?.id ?? '';
+}
 
 /** Creature picker options: table mounts first (with capacity), then the rest. */
 function CreatureOptions({ origin }: { origin: CompanionOrigin }) {
@@ -75,13 +83,13 @@ function CreatureOptions({ origin }: { origin: CompanionOrigin }) {
  * a couple of origin options). The Primal Companion warning is shown here and on
  * the card; it never blocks adding.
  */
-export function CompanionCreationFlow({ character, onConfirm, onCancel }: CompanionCreationFlowProps) {
+export function CompanionCreationFlow({ character, initialOrigin = 'primal-companion', onConfirm, onCancel }: CompanionCreationFlowProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, true);
   useBodyScrollLock(true);
 
-  const [origin, setOrigin] = useState<CompanionOrigin>('primal-companion');
-  const [creatureId, setCreatureId] = useState<string>(() => creatureOptionsForOrigin('primal-companion')[0]?.id ?? '');
+  const [origin, setOrigin] = useState<CompanionOrigin>(initialOrigin);
+  const [creatureId, setCreatureId] = useState<string>(() => firstCreatureFor(initialOrigin));
   const [nickname, setNickname] = useState('');
   const [spellSlotLevel, setSpellSlotLevel] = useState(OTHERWORLDLY_STEED_MIN_SPELL_LEVEL);
   const [spiritType, setSpiritType] = useState<CompanionSpiritType | ''>('');
@@ -90,9 +98,7 @@ export function CompanionCreationFlow({ character, onConfirm, onCancel }: Compan
 
   const changeOrigin = (next: CompanionOrigin) => {
     setOrigin(next);
-    const opts = creatureOptionsForOrigin(next);
-    // A pet starts on the first listed (table) mount, matching the picker order.
-    setCreatureId((next === 'pet' ? opts.find((c) => c.mountTable) : undefined)?.id ?? opts[0]?.id ?? '');
+    setCreatureId(firstCreatureFor(next));
   };
 
   const confirm = () => {

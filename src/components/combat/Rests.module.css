@@ -281,3 +281,28 @@
     width: 100%;
   }
 }
+
+/* Long Rest: companions rest too. */
+.companions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.checkRow input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
