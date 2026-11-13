@@ -36,6 +36,8 @@ describe('CharacterPage Overview order', () => {
     const done: Character = {
       ...createCharacter('Done'),
       classes: [{ id: 'fighter', level: 1, skillChoices: ['athletics', 'acrobatics'] }],
+      // Fighter 1 also picks a Fighting Style feat.
+      advancement: { feats: [{ featId: 'archery', level: 0, grantedBy: 'fighter' }] },
     };
     renderOverview(done);
     expect(headingOrder().some((h) => h.includes('Finish setting up'))).toBe(false);

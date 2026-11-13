@@ -3,7 +3,13 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { CreationWizard } from '../CreationWizard';
 import { ABILITIES } from '../../../types/character';
 
-const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+function next() {
+  fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  // The Class Features step (classes with level 1 feature picks) never blocks: step over it.
+  if (screen.queryByRole('heading', { name: /Class Features/ })) {
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  }
+}
 const NAMES: Record<string, string> = {
   str: 'Strength',
   dex: 'Dexterity',

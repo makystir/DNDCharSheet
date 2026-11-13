@@ -41,6 +41,25 @@ export interface WizardDraft {
   classPicks: Record<string, string>;
   cart: Record<string, number>;
   trinketRoll: number | null;
+  /** Class Features step picks (optional: older drafts have none). */
+  features?: {
+    fightingStyle?: string;
+    classChoices?: Record<string, string[]>;
+    expertise?: string[];
+    weaponMasteries?: string[];
+  };
+}
+
+/** A well-formed (optional) Class Features block. */
+function isFeatures(v: unknown): boolean {
+  if (v === undefined) return true;
+  if (!isObj(v)) return false;
+  return (
+    (v.fightingStyle === undefined || typeof v.fightingStyle === 'string') &&
+    (v.classChoices === undefined || (isObj(v.classChoices) && Object.values(v.classChoices).every(isStrArr))) &&
+    (v.expertise === undefined || isStrArr(v.expertise)) &&
+    (v.weaponMasteries === undefined || isStrArr(v.weaponMasteries))
+  );
 }
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -87,7 +106,8 @@ export function isWizardDraft(value: unknown): value is WizardDraft {
     typeof d.classOption === 'string' &&
     isStrRecord(d.classPicks) &&
     isNumRecord(d.cart) &&
-    (d.trinketRoll === null || (isInt(d.trinketRoll, 1) && (d.trinketRoll as number) <= 100))
+    (d.trinketRoll === null || (isInt(d.trinketRoll, 1) && (d.trinketRoll as number) <= 100)) &&
+    isFeatures(d.features)
   );
 }
 

@@ -116,3 +116,46 @@ describe('Character description on the Details step', () => {
     }
   });
 });
+
+describe('Class Features step', () => {
+  it('asks a Fighter for a Fighting Style and Weapon Mastery, explained, and finishes with nothing owed', () => {
+    const onComplete = vi.fn();
+    render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
+    throughSpecies('fighter');
+    goTo(/Class Features/);
+    const style = within(screen.getByTestId('features-fighting-style'));
+    // The feature and every option are described before anything is picked.
+    expect(style.getByText(/Fighting Style/, { selector: 'h3 *, h3' })).toBeInTheDocument();
+    fireEvent.click(style.getByRole('radio', { name: 'Archery' }));
+    expect(style.getByText('1 of 1 chosen')).toBeInTheDocument();
+    // Weapon Mastery: the suggested starting weapons can be added in one tap.
+    const mastery = within(screen.getByTestId('features-weapon-mastery'));
+    for (const btn of mastery.queryAllByRole('button', { name: /^Add [A-Z]/ }).slice(0, 3)) fireEvent.click(btn);
+    goTo(/Ability Scores/);
+    ABILITIES.forEach((a, i) => {
+      fireEvent.change(screen.getByLabelText(`${NAMES[a]} score assignment`), { target: { value: String(i) } });
+    });
+    goTo(/Review/);
+    expect(screen.getByTestId('review-class-features')).toHaveTextContent('Fighting Style: Archery');
+    next();
+    const built = onComplete.mock.calls[0][0];
+    expect(built.advancement.feats.some((f: { featId: string; grantedBy?: string }) => f.featId === 'archery' && f.grantedBy === 'fighter')).toBe(true);
+  });
+
+  it('asks a Cleric for a Divine Order', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    throughSpecies('cleric');
+    goTo(/Class Features/);
+    const order = within(screen.getByTestId('features-cleric.divineOrder'));
+    fireEvent.click(order.getAllByRole('radio')[0]);
+    expect(order.getByText('1 of 1 chosen')).toBeInTheDocument();
+  });
+
+  it('has no Class Features step for a Wizard', () => {
+    render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
+    throughSpecies('wizard');
+    goTo(/Ability Scores/);
+    expect(screen.queryByTestId('class-features-step')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Class Features/ })).toBeNull();
+  });
+});

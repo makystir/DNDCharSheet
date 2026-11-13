@@ -11,6 +11,8 @@ describe('OverviewSetup', () => {
     const fighter: Character = {
       ...createCharacter('Done'),
       classes: [{ id: 'fighter', level: 1, skillChoices: ['athletics', 'acrobatics'] }],
+      // Fighter 1 also picks a Fighting Style feat.
+      advancement: { feats: [{ featId: 'archery', level: 0, grantedBy: 'fighter' }] },
     };
     const { container } = render(<OverviewSetup character={fighter} />);
     expect(container).toBeEmptyDOMElement();
@@ -85,5 +87,18 @@ describe('OverviewSetup', () => {
     render(<OverviewSetup character={multi} />);
     expect(screen.getByText('Wizard spellbook spells')).toBeInTheDocument();
     expect(screen.getByText('Cleric cantrips')).toBeInTheDocument();
+  });
+});
+
+describe('OverviewSetup Fighting Style', () => {
+  it('lists a missing Fighting Style with a link to where it is chosen', () => {
+    const fighter: Character = {
+      ...createCharacter('Style'),
+      classes: [{ id: 'fighter', level: 1, skillChoices: ['athletics', 'acrobatics'] }],
+    };
+    render(<OverviewSetup character={fighter} />);
+    const row = screen.getByTestId('overview-setup-fighting-style-fighter');
+    expect(row).toHaveTextContent('Fighter Fighting Style');
+    expect(within(row).getByRole('link', { name: 'Choose on Advancement' })).toHaveAttribute('href', '#advancement');
   });
 });

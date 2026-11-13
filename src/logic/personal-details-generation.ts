@@ -45,10 +45,12 @@ import { rollTrinket } from '../data/trinkets';
 import { applyBackground, type BackgroundAbilityAllocation } from './backgrounds';
 import { createSeededRng, pick, type RNG } from './random';
 import { generateProfile, speciesLineage } from './character-description';
+import { applyWizardFeatures, autoPickFeatures } from './creation-features';
+import { extraCantrips } from './class-choice-effects';
 import { speciesGrantedSkills } from './skills';
 import { CREATION_LANGUAGE_CHOICES, LANGUAGES, featureLanguageGrants, knownLanguages } from './languages';
 import { speciesLanguageSuggestions, suggestedBackgroundIncrease, toolChoicesFor } from './creation-guidance';
-import { pickStartingSpells } from './starting-spells';
+import { pickStartingSpells, startingSpellPools } from './starting-spells';
 
 /** Generated appearance fields (all NON-RAW flavor). */
 export interface GeneratedAppearance {
@@ -348,6 +350,29 @@ export function generateRandomCharacter(
     ...character,
     languages: { chosen, ...(granted.length > 0 ? { granted } : {}) },
   };
+
+  // Level 1 class-feature picks (Fighting Style, Divine / Primal Order,
+  // Invocations, Expertise, Weapon Mastery), the very last draws so every
+  // earlier seeded result is unchanged. Leaves nothing owed.
+  const features = autoPickFeatures(character, classId, (n) => Math.floor(rng() * n));
+  character = applyWizardFeatures(character, classId, features, character.createdAt);
+  // An Order that grants extra cantrips (Thaumaturge / Magician) gets them now.
+  const extra = extraCantrips(character, classId);
+  const classSpells = character.spellcasting?.byClass?.[classId];
+  const pools = startingSpellPools(classId);
+  if (extra > 0 && classSpells && pools) {
+    const have = classSpells.cantrips ?? [];
+    const options = pools.cantrips.map((s) => s.id).filter((id) => !have.includes(id));
+    const added: typeof have = [];
+    while (added.length < extra && options.length > 0) added.push(options.splice(Math.floor(rng() * options.length), 1)[0]);
+    character = {
+      ...character,
+      spellcasting: {
+        ...character.spellcasting,
+        byClass: { ...character.spellcasting?.byClass, [classId]: { ...classSpells, cantrips: [...have, ...added] } },
+      },
+    };
+  }
 
   return { ...character, abilityGenMethod: 'standard-array' };
 }

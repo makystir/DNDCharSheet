@@ -4,6 +4,10 @@ import { CreationWizard } from '../CreationWizard';
 
 function next() {
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  // The Class Features step (classes with level 1 feature picks) never blocks: step over it.
+  if (screen.queryByRole('heading', { name: /Class Features/ })) {
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  }
 }
 
 function toOrigin() {

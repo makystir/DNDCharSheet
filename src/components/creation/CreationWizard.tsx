@@ -112,6 +112,14 @@ import {
   type WizardDraft,
 } from '../../logic/wizard-draft';
 import { startingChoicesFor } from '../../logic/starting-choices';
+import {
+  applyWizardFeatures,
+  extractWizardFeatures,
+  hasCreationFeatures,
+  type WizardFeatures,
+} from '../../logic/creation-features';
+import { ClassFeaturesStep } from './ClassFeaturesStep';
+import { extraCantripLabel, extraCantrips } from '../../logic/class-choice-effects';
 import { startingSpellPools } from '../../logic/starting-spells';
 import styles from './CreationWizard.module.css';
 
@@ -132,6 +140,7 @@ type StepId =
   | 'background'
   | 'species'
   | 'skills'
+  | 'features'
   | 'abilities'
   | 'spells'
   | 'details'
@@ -144,6 +153,9 @@ const ALL_STEPS: { id: StepId; label: string }[] = [
   { id: 'background', label: 'Background' },
   { id: 'species', label: 'Species' },
   { id: 'skills', label: 'Skills' },
+  // Only for classes whose level 1 features ask for a pick (Fighting Style,
+  // Divine / Primal Order, Invocations, Expertise, Weapon Mastery).
+  { id: 'features', label: 'Class Features' },
   { id: 'abilities', label: 'Ability Scores' },
   // Only for classes with level 1 spellcasting (startingChoicesFor(...).spells).
   { id: 'spells', label: 'Spells' },
@@ -213,6 +225,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // Spells step (casters only): stored at spellcasting.byClass[classId] on finish.
   const [spellPicks, setSpellPicks] = useState<ClassSpellcasting>({});
+  // Class Features step: level 1 feature picks (Fighting Style, Divine Order, ...).
+  const [features, setFeatures] = useState<WizardFeatures>({});
 
   // Ability scores step.
   const [abilityMethod, setAbilityMethod] = useState<AbilityMethod>('standard-array');
@@ -331,9 +345,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // The Spells step exists only for a class with level 1 spellcasting.
   const hasSpellsStep = classId !== '' && startingChoicesFor(classId)?.spells != null;
+  const hasFeaturesStep = hasCreationFeatures(classId);
   const steps = useMemo(
-    () => ALL_STEPS.filter((s) => s.id !== 'spells' || hasSpellsStep),
-    [hasSpellsStep],
+    () =>
+      ALL_STEPS.filter(
+        (s) => (s.id !== 'spells' || hasSpellsStep) && (s.id !== 'features' || hasFeaturesStep),
+      ),
+    [hasSpellsStep, hasFeaturesStep],
   );
   const stepLabels = useMemo(() => steps.map((s) => s.label), [steps]);
   /** The 1-based number shown in a step's heading. */
@@ -409,6 +427,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     if (classOption !== 'A' || Object.keys(classPicks).length > 0 || Object.keys(cart).length > 0)
       out.push('your class equipment choices and purchases');
     if (grantedLanguages.length > 0) out.push('your class feature languages');
+    if (Object.keys(features).length > 0) out.push('your class feature picks');
     return out;
   };
   const listText = (items: string[]) =>
@@ -446,6 +465,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     setSkillChoices([]);
     // Spell picks belong to the class list; reset on change.
     setSpellPicks({});
+    // So do the class feature picks.
+    setFeatures({});
     // Starting equipment belongs to the class too.
     setClassOption('A');
     setClassPicks({});
@@ -676,6 +697,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // ─── Completion ─────────────────────────────────────────────────────────
 
+  /** The character the wizard would create now (also the Review / Class Features preview). */
   const buildCharacter = (): Character => {
     let character = createCharacter(name.trim());
 
@@ -792,6 +814,10 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       }
     }
 
+    // Level 1 class-feature picks from the Class Features step.
+    // The creation time (stamped by createCharacter) dates the Fighting Style log entry.
+    if (classId !== '') character = applyWizardFeatures(character, classId, features, character.createdAt);
+
     return character;
   };
 
@@ -825,6 +851,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     setClassPicks(d.classPicks);
     setCart(d.cart);
     setTrinketRoll(d.trinketRoll);
+    setFeatures((d.features ?? {}) as WizardFeatures);
     setFurthest(d.furthest);
     setStep(d.step);
     setSavedDraft(null);
@@ -867,12 +894,13 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       classPicks,
       cart,
       trinketRoll,
+      features: features as WizardDraft['features'],
     });
   }, [
     savedDraft, step, furthest, name, classId, backgroundId, allocation, speciesId, speciesChoices,
     chosenLanguages, grantedLanguages, toolProficiency, skillChoices, spellPicks, abilityMethod,
     arrayAssignment, pointBuyScores, rolledPool, rolledAssignment, gender, alignment, details,
-    equipmentChoice, classOption, classPicks, cart, trinketRoll,
+    equipmentChoice, classOption, classPicks, cart, trinketRoll, features,
   ]);
 
   // On a step change, scroll the new step's heading into view and move focus to
@@ -1853,10 +1881,28 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     </div>
   );
 
+  const renderFeaturesStep = () => (
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Step {stepNumber('features')}: Class Features</h2>
+      <ClassFeaturesStep
+        classId={classId}
+        preview={buildCharacter()}
+        onChange={(next) => setFeatures(extractWizardFeatures(next, classId))}
+      />
+    </div>
+  );
+
   const renderSpellsStep = () => (
     <div className={styles.stepBody}>
       <h2 className={styles.stepTitle}>Step {stepNumber('spells')}: Spells</h2>
-      <SpellsStep classId={classId} value={spellPicks} onChange={setSpellPicks} />
+      <SpellsStep
+        classId={classId}
+        value={spellPicks}
+        onChange={setSpellPicks}
+        // Divine Order Thaumaturge / Primal Order Magician (Class Features step) add a cantrip.
+        extraCantrips={classId ? extraCantrips(buildCharacter(), classId) : 0}
+        extraCantripSource={classId ? extraCantripLabel(buildCharacter(), classId) : undefined}
+      />
     </div>
   );
 
@@ -1872,6 +1918,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     background: renderBackgroundStep,
     species: renderSpeciesStep,
     skills: renderSkillsStep,
+    features: renderFeaturesStep,
     abilities: renderAbilitiesStep,
     details: renderDetailsStep,
     equipment: renderEquipmentStep,

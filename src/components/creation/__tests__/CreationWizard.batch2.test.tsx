@@ -4,7 +4,13 @@ import { CreationWizard } from '../CreationWizard';
 import { ABILITIES } from '../../../types/character';
 import { WIZARD_DRAFT_KEY } from '../../../logic/wizard-draft';
 
-const next = () => fireEvent.click(screen.getByRole('button', { name: /^(Next|Finish)$/ }));
+function next() {
+  fireEvent.click(screen.getByRole('button', { name: /^(Next|Finish)$/ }));
+  // The Class Features step (classes with level 1 feature picks) never blocks: step over it.
+  if (screen.queryByRole('heading', { name: /Class Features/ })) {
+    fireEvent.click(screen.getByRole('button', { name: /^(Next|Finish)$/ }));
+  }
+}
 const NAMES: Record<string, string> = {
   str: 'Strength',
   dex: 'Dexterity',

@@ -5,6 +5,7 @@ import { getSpell } from '../../data/spells';
 import type { ClassId } from '../../data/classes';
 import { pendingSetupChoices } from '../starting-choices';
 import { pickStartingSpells, startingSpellPools } from '../starting-spells';
+import { extraCantrips } from '../class-choice-effects';
 import { STARTING_CHOICES } from './starting-choices-golden';
 
 /** Small deterministic RNG (mulberry32). */
@@ -33,7 +34,8 @@ describe('generateRandomCharacter: starting spells', () => {
       expect(stored).toBeDefined();
       const cantrips = stored?.cantrips ?? [];
       const prepared = stored?.prepared ?? [];
-      expect(cantrips).toHaveLength(row.spells.cantrips);
+      // Plus any extra cantrips from the level 1 Order pick (Thaumaturge / Magician).
+      expect(cantrips).toHaveLength(row.spells.cantrips + extraCantrips(c, classId));
       expect(prepared).toHaveLength(row.spells.prepared);
       expect(new Set(cantrips).size).toBe(cantrips.length);
       expect(new Set(prepared).size).toBe(prepared.length);

@@ -39,6 +39,7 @@ import {
   type LevelingMode,
 } from '../../logic/advancement';
 import { canUndoLevel } from '../../logic/level-undo';
+import { ScrollLink } from '../shared/ScrollLink';
 import { LevelUndoDialog } from './advancement/LevelUndoDialog';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { FightingStyleSection } from './advancement/FightingStyleSection';
@@ -259,8 +260,8 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         />
         {owed && (
           <p className={styles.pendingIntro}>
-            Your character has choices to make. Work through each item below; the list shrinks as
-            you finish them.
+            Your character has choices to make. Each item says where to make it: pick right here when it shows options,
+            or follow its link. The list shrinks as you finish them.
           </p>
         )}
         {pendingCount === 0 ? (
@@ -276,18 +277,28 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
               </li>
             )}
             {unfilledFightingStyles.map((s) => (
-              <li key={`fighting-style-${s.key}`} className={styles.pendingItem}>
-                Fighting Style feat not chosen ({s.className})
+              <li key={`fighting-style-${s.key}`} className={styles.pendingItem} data-testid={`pending-fighting-style-${s.key}`}>
+                Fighting Style feat not chosen ({s.className}). Pick one in the Fighting Style card on this page.{' '}
+                <ScrollLink targetId="adv-section-fighting-style" fallbackHref="#advancement" className={styles.inlineLink}>
+                  Go to Fighting Style
+                </ScrollLink>
               </li>
             ))}
             {unfilledFeatLevels.map((l) => (
-              <li key={`feat-${l}`} className={styles.pendingItem}>
-                Feat not chosen for level {l}
+              <li key={`feat-${l}`} className={styles.pendingItem} data-testid={`pending-feat-${l}`}>
+                Feat not chosen for level {l}. Pick one in Feats &amp; Ability Score Improvements on this page.{' '}
+                <ScrollLink targetId="adv-section-feats" fallbackHref="#advancement" className={styles.inlineLink}>
+                  Go to Feats
+                </ScrollLink>
               </li>
             ))}
             {unrecordedHpLevels.map((l) => (
-              <li key={`hp-${l}`} className={styles.pendingItem}>
-                Hit Points not recorded for level {l} (using the fixed value)
+              <li key={`hp-${l}`} className={styles.pendingItem} data-testid={`pending-hp-${l}`}>
+                Hit Points not recorded for level {l}, so the fixed value is used. Record a choice in the Hit Points card on
+                this page.{' '}
+                <ScrollLink targetId="adv-section-hp" fallbackHref="#advancement" className={styles.inlineLink}>
+                  Go to Hit Points
+                </ScrollLink>
               </li>
             ))}
             <ExpertisePending character={character} onChange={onChange} status={expertise} />
@@ -301,7 +312,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 data-testid={`pending-spell-${item.kind}${item.spellLevel ? `-${item.spellLevel}` : ''}`}
               >
                 {spellPickLabel(item)}: {item.have} of {item.need} chosen.{' '}
-                <a href="#spells">Choose on Spells</a>
+                <a className={styles.inlineLink} href="#spells">
+                  Choose on the Spells page
+                </a>
               </li>
             ))}
             {illegalSpells.length > 0 && (
@@ -309,7 +322,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
                 class&apos;s spell list:{' '}
                 <SpellNameList ids={[...new Set(illegalSpells.map((s) => s.id))]} />.{' '}
-                <a href="#spells">Review on Spells</a>
+                <a className={styles.inlineLink} href="#spells">
+                  Review on the Spells page
+                </a>
               </li>
             )}
           </ul>
@@ -603,7 +618,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       <ProgressionAdvisor character={character} />
 
       {/* ── Hit Points ──────────────────────────────────────────────────────── */}
-      <Card>
+      <Card id="adv-section-hp">
         <SectionHeader icon={Heart} title="Hit Points" />
         {cls === undefined ? (
           <p className={styles.placeholder}>

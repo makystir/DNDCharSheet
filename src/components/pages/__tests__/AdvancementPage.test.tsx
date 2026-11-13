@@ -518,3 +518,23 @@ describe('AdvancementPage - combined Progression card', () => {
     expect(screen.queryByRole('heading', { level: 4, name: 'Coming up' })).toBeNull();
   });
 });
+
+describe('AdvancementPage — every pending item says where to act', () => {
+  it('links a missing Fighting Style, an open feat slot and an unrecorded HP level to their cards', () => {
+    renderStateful({
+      level: 4,
+      classes: [{ id: 'fighter', level: 4 }],
+      abilities: { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 },
+    });
+    const style = screen.getByTestId('pending-fighting-style-fighter');
+    expect(style).toHaveTextContent('Pick one in the Fighting Style card on this page');
+    expect(within(style).getByRole('link', { name: 'Go to Fighting Style' })).toHaveAttribute('href', '#advancement');
+    expect(document.getElementById('adv-section-fighting-style')).not.toBeNull();
+    const feat = screen.getByTestId('pending-feat-4');
+    expect(within(feat).getByRole('link', { name: 'Go to Feats' })).toBeInTheDocument();
+    expect(document.getElementById('adv-section-feats')).not.toBeNull();
+    const hp = screen.getByTestId('pending-hp-2');
+    expect(within(hp).getByRole('link', { name: 'Go to Hit Points' })).toBeInTheDocument();
+    expect(document.getElementById('adv-section-hp')).not.toBeNull();
+  });
+});

@@ -37,7 +37,7 @@ describe('Choices Pending: owed spell picks', () => {
     renderAdvancement({ level: 2, classes: [{ id: 'wizard', level: 2 }] });
     for (const kind of ['cantrips', 'spellbook', 'prepared']) {
       const item = screen.getByTestId(`pending-spell-${kind}`);
-      expect(within(item).getByRole('link', { name: 'Choose on Spells' })).toHaveAttribute('href', '#spells');
+      expect(within(item).getByRole('link', { name: 'Choose on the Spells page' })).toHaveAttribute('href', '#spells');
     }
   });
 

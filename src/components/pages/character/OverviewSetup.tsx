@@ -4,6 +4,7 @@ import { pendingFeaturePicks, pendingSetupChoices } from '../../../logic/startin
 import type { FeaturePickKind, PendingItem, PendingKind } from '../../../logic/starting-choices';
 import { pendingCreationChoices } from '../../../logic/class-choices';
 import { primalCompanionMissing } from '../../../logic/companion-play';
+import { fightingStyleSlots } from '../../../logic/feats';
 import { Card } from '../../shared/Card';
 import { SectionHeader } from '../../shared/SectionHeader';
 import { OverviewLinkAnchor } from './OverviewShared';
@@ -46,7 +47,16 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
   const featurePicks = pendingFeaturePicks(character);
   // A Beast Master is owed a Primal Companion (PHB Beast Master level 3); it is added on the Companions page.
   const primalMissing = primalCompanionMissing(character);
-  if (pending.length === 0 && creationChoices.length === 0 && featurePicks.length === 0 && !primalMissing) return null;
+  // A Fighting Style feature (Fighter 1, Paladin 2, Ranger 2) whose feat is not picked yet.
+  const openStyles = fightingStyleSlots(character).filter((s) => s.filled === undefined);
+  if (
+    pending.length === 0 &&
+    creationChoices.length === 0 &&
+    featurePicks.length === 0 &&
+    openStyles.length === 0 &&
+    !primalMissing
+  )
+    return null;
   return (
     <Card>
       <SectionHeader icon={ClipboardList} title="Finish setting up" />
@@ -94,6 +104,15 @@ export function OverviewSetup({ character }: OverviewSetupProps) {
             <span className={styles.count}>
               {item.have} of {item.need}
             </span>
+            <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
+          </li>
+        ))}
+        {openStyles.map((slot) => (
+          <li key={`style-${slot.key}`} className={styles.row} data-testid={`overview-setup-fighting-style-${slot.key}`}>
+            <span className={styles.label}>
+              {slot.className} Fighting Style{slot.subclassFeature ? ` (${slot.subclassFeature})` : ''}
+            </span>
+            <span className={styles.count}>0 of 1</span>
             <OverviewLinkAnchor href="#advancement" text="Choose on Advancement" />
           </li>
         ))}

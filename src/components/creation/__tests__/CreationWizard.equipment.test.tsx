@@ -5,6 +5,10 @@ import { ABILITIES } from '../../../types/character';
 
 function next() {
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  // The Class Features step (classes with level 1 feature picks) never blocks: step over it.
+  if (screen.queryByRole('heading', { name: /Class Features/ })) {
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  }
 }
 
 /** Walk the wizard to the Equipment step for the given class (acolyte + human). */

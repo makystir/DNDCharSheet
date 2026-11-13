@@ -39,7 +39,7 @@ export function FightingStyleSection({ character, onChange, now = Date.now }: Fi
   const pickingSlot = slots.find((s) => s.key === pickingClass);
 
   return (
-    <Card>
+    <Card id="adv-section-fighting-style">
       <SectionHeader icon={Swords} title="Fighting Style" />
       <ul className={styles.slotList}>
         {slots.map((slot) => {

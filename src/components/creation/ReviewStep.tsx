@@ -23,6 +23,8 @@ import { speedBreakdown } from '../../logic/species';
 import { knownLanguages } from '../../logic/languages';
 import { formatCopper, purseToCopper } from '../../logic/starting-equipment';
 import { pendingFeaturePicks, pendingSetupChoices } from '../../logic/starting-choices';
+import { CREATION_CHOICE_KEYS, choiceStatus, parseInvocationEntry } from '../../logic/class-choices';
+import { choiceOptionViews } from '../../logic/class-choice-options';
 import type { FeaturePickItem, PendingItem } from '../../logic/starting-choices';
 import {
   resolveArmorTooltip,
@@ -47,6 +49,7 @@ export type ReviewEditTarget =
   | 'background'
   | 'species'
   | 'skills'
+  | 'features'
   | 'abilities'
   | 'spells'
   | 'details'
@@ -122,6 +125,22 @@ export function ReviewStep({ character, onEdit }: ReviewStepProps) {
   const purse = character.coins ? formatCopper(purseToCopper(character.coins)) : '0 GP';
   const inventory = character.inventory ?? [];
   const wornIds = new Set([character.equipped?.armorItemId, character.equipped?.shieldItemId].filter(Boolean));
+
+  // Level 1 class-feature picks (Class Features step), one plain line each.
+  const featureLines: string[] = [];
+  const styleFeat = (character.advancement?.feats ?? []).find((f) => f.grantedBy !== undefined);
+  if (styleFeat) featureLines.push(`Fighting Style: ${getFeat(styleFeat.featId)?.name ?? styleFeat.featId}`);
+  for (const status of choiceStatus(character)) {
+    if (!CREATION_CHOICE_KEYS.includes(status.key) || status.entries.length === 0) continue;
+    const options = choiceOptionViews(character, status.key);
+    const names = status.entries.map((e) => options.find((o) => o.id === parseInvocationEntry(e).id)?.name ?? e);
+    featureLines.push(`${status.label}: ${names.join(', ')}`);
+  }
+  const expertiseNames = SKILLS.filter((s) => effectiveSkillTraining(character, s.id).expertise).map((s) => s.name);
+  if (expertiseNames.length > 0) featureLines.push(`Expertise: ${expertiseNames.join(', ')}`);
+  if ((character.weaponMasteries ?? []).length > 0) {
+    featureLines.push(`Weapon Mastery: ${(character.weaponMasteries ?? []).map((id) => getWeapon(id)?.name ?? id).join(', ')}`);
+  }
 
   const section = (title: string, target: ReviewEditTarget | null, children: ReactNode) => (
     <section className={styles.reviewSection} aria-label={title}>
@@ -330,6 +349,17 @@ export function ReviewStep({ character, onEdit }: ReviewStepProps) {
           </li>
         </ul>,
       )}
+
+      {featureLines.length > 0 &&
+        section(
+          'Class features',
+          'features',
+          <ul className={styles.grantedList} aria-label="Class feature picks" data-testid="review-class-features">
+            {featureLines.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>,
+        )}
 
       {spellGroups.length > 0 &&
         section(

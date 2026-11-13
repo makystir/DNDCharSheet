@@ -19,7 +19,13 @@ const NAMES: Record<string, string> = {
   cha: 'Charisma',
 };
 
-const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+function next() {
+  fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  // The Class Features step (classes with level 1 feature picks) never blocks: step over it.
+  if (screen.queryByRole('heading', { name: /Class Features/ })) {
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  }
+}
 
 /** Name + class, then Origin (acolyte + human), landing on the Skills step. */
 function toSkills(classId: string) {
@@ -84,7 +90,8 @@ describe('CreationWizard Spells step', () => {
     );
     toSkills(classId);
     toAfterAbilities(0);
-    expect(screen.getByRole('heading', { name: /Step 6: Spells/ })).toBeInTheDocument();
+    // Step 6, or 7 when the class has a Class Features step before it.
+    expect(screen.getByRole('heading', { name: /Step [67]: Spells/ })).toBeInTheDocument();
     expect(screen.getByText(/Casters prepare a list of spells\./)).toBeInTheDocument();
     expect(screen.getByText(/You can change your prepared spells after a Long Rest/)).toBeInTheDocument();
     expect(screen.queryByText(/memoriz/i)).toBeNull();

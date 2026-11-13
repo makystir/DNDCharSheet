@@ -140,6 +140,19 @@ Skills that use your class's main ability are tagged **Suggested**, because you'
 
 Not sure? You can move on and finish later. The Overview page will remind you.
 
+### Class Features (some classes only)
+
+Some classes make a few extra picks at level 1, and this step appears only for them. It asks for:
+
+- **Fighting Style:** Fighters choose one Fighting Style feat.
+- **Divine Order:** Clerics choose Protector or Thaumaturge.
+- **Primal Order:** Druids choose Magician or Warden.
+- **Eldritch Invocation:** Warlocks choose one.
+- **Expertise:** Rogues choose two of their skills.
+- **Weapon Mastery:** Barbarians, Fighters, Paladins, Rangers and Rogues choose the weapons whose mastery they can use.
+
+Each section starts with what the feature does and shows every option's description before you pick. Expertise marks the skills that use your class's main ability as **Suggested**. Weapon Mastery offers to add the weapons from your starting gear in one tap. If you choose Thaumaturge or Magician, the Spells step lets you pick the extra cantrip it gives you. Making these picks here means your character starts with nothing left to choose. You can still change them later on the Advancement page or on Class & Features.
+
 ### Step 5: Ability Scores
 
 The scores on this step already include the +2 and +1 from your background, so what you see is what you'll have. Hover over a score to see the base score and the increase.
@@ -399,7 +412,7 @@ You can take levels in a **second class** instead of your current one. The 2024 
 
 ### Choices Pending and Class Choices
 
-Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, a **subclass**, a **feat**, spells, or class options like **Metamagic** or **Eldritch Invocations**. When you owe any choices, the **Choices Pending** card moves to the **top** of the page with a gold border and the heading **Action needed**, so you can't miss it. Work through the items in it. Each one either lets you pick right there or links to the page where you make the choice. The list gets shorter as you finish, and when nothing is owed the card drops to a quiet note near the bottom. The **Advancement** tab in the main menu also shows a small gold badge with the number of choices you owe, on every page, so you know there is something to do before you open it. The Overview's **Finish setting up** card also reminds you.
+Some features ask you to make a choice, such as **Expertise** skills, a **Fighting Style**, a **language**, a **subclass**, a **feat**, spells, or class options like **Metamagic** or **Eldritch Invocations**. When you owe any choices, the **Choices Pending** card moves to the **top** of the page with a gold border and the heading **Action needed**, so you can't miss it. Work through the items in it. Each one says where the choice is made: it either lets you pick right there, or names the card or page and gives you a link that takes you to it (for example **Go to Fighting Style**, which jumps to the Fighting Style card further down this page). The list gets shorter as you finish, and when nothing is owed the card drops to a quiet note near the bottom. The **Advancement** tab in the main menu also shows a small gold badge with the number of choices you owe, on every page, so you know there is something to do before you open it. The Overview's **Finish setting up** card also reminds you.
 
 ### Advancement Log
 

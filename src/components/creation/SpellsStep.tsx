@@ -7,6 +7,8 @@ import { startingChoicesFor } from '../../logic/starting-choices';
 import { startingSpellPools } from '../../logic/starting-spells';
 import { SpellPickList } from '../shared/SpellPickList';
 import { SpellNameList } from '../shared/SpellName';
+import { CalculatedValue } from '../shared/CalculatedValue';
+import type { Breakdown } from '../../logic/breakdown';
 import styles from './CreationWizard.module.css';
 
 export interface SpellsStepProps {
@@ -14,6 +16,10 @@ export interface SpellsStepProps {
   /** The picks so far, in the shape stored at character.spellcasting.byClass[classId]. */
   value: ClassSpellcasting;
   onChange: (next: ClassSpellcasting) => void;
+  /** Extra cantrips from a Class Features pick (Divine Order Thaumaturge, Primal Order Magician). */
+  extraCantrips?: number;
+  /** The pick that grants them, for the breakdown. */
+  extraCantripSource?: string;
 }
 
 /**
@@ -27,11 +33,20 @@ export interface SpellsStepProps {
  * Always-prepared feature spells are shown locked and never count against the
  * prepared cap (same handling as the Spells page).
  */
-export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
+export function SpellsStep({ classId, value, onChange, extraCantrips = 0, extraCantripSource }: SpellsStepProps) {
   const choices = startingChoicesFor(classId)?.spells ?? null;
   const pools = useMemo(() => startingSpellPools(classId), [classId]);
   const className = getClass(classId)?.name ?? 'class';
   if (!choices || !pools) return <p className={styles.hint}>This class has no level 1 spells.</p>;
+  // The class table's cantrips plus any from the Class Features step (Thaumaturge / Magician).
+  const cantripCap = choices.cantrips + extraCantrips;
+  const cantripBreakdown: Breakdown = {
+    total: cantripCap,
+    components: [
+      { label: `${className} level 1 cantrips`, value: choices.cantrips },
+      { label: extraCantripSource ?? 'Extra cantrips', value: extraCantrips },
+    ],
+  };
 
   const usesBook = choices.spellbook !== null;
   const required = pools.required;
@@ -44,7 +59,7 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
   const toggleCantrip = (id: SpellId, checked: boolean) => {
     if (checked) {
       if (!pools.cantrips.some((s) => s.id === id)) return; // only the class cantrip list
-      if (cantrips.includes(id) || cantrips.length >= choices.cantrips) return;
+      if (cantrips.includes(id) || cantrips.length >= cantripCap) return;
       onChange({ ...value, cantrips: [...cantrips, id] });
     } else {
       if (required.includes(id)) return;
@@ -115,13 +130,23 @@ export function SpellsStep({ classId, value, onChange }: SpellsStepProps) {
       {choices.cantrips > 0 && (
         <fieldset className={styles.fieldset}>
           <legend className={styles.fieldLabel}>
-            {className} cantrips: choose {choices.cantrips}
+            {className} cantrips: choose{' '}
+            {extraCantrips > 0 ? (
+              <CalculatedValue label={`${className} cantrips to choose`} breakdown={cantripBreakdown}>
+                {cantripCap}
+              </CalculatedValue>
+            ) : (
+              cantripCap
+            )}
           </legend>
-          {counter('spells-cantrips-counter', cantrips.length, choices.cantrips)}
+          {extraCantrips > 0 && extraCantripSource && (
+            <p className={styles.hint}>Includes {extraCantrips} extra from {extraCantripSource}.</p>
+          )}
+          {counter('spells-cantrips-counter', cantrips.length, cantripCap)}
           <SpellPickList
             spells={pools.cantrips}
             selectedIds={cantrips}
-            atCap={cantrips.length >= choices.cantrips}
+            atCap={cantrips.length >= cantripCap}
             lockedIds={required}
             onToggle={toggleCantrip}
             showDetails
