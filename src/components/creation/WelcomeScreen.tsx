@@ -9,6 +9,8 @@ import styles from './WelcomeScreen.module.css';
 export interface WelcomeScreenProps {
   /** Called with a finished character from any of the three creation modes. */
   onCharacterReady: (character: Character) => void;
+  /** Switch the app to Dungeon Master mode (offered on first run, when no characters exist). */
+  onDungeonMaster?: () => void;
   /**
    * Abort the creation flow entirely, returning to the caller's prior view.
    * Supplied only when creation was launched over existing characters (from the
@@ -33,7 +35,7 @@ type Mode = 'initial' | 'wizard' | 'skip';
  * Accessible: the primary action is focused on mount, and the skip-mode name
  * input is focused when it opens.
  */
-export function WelcomeScreen({ onCharacterReady, onCancel }: WelcomeScreenProps) {
+export function WelcomeScreen({ onCharacterReady, onCancel, onDungeonMaster }: WelcomeScreenProps) {
   const [mode, setMode] = useState<Mode>('initial');
   const [name, setName] = useState('');
   const wizardBtnRef = useRef<HTMLButtonElement>(null);
@@ -135,6 +137,21 @@ export function WelcomeScreen({ onCharacterReady, onCancel }: WelcomeScreenProps
         <p id="welcome-skip-desc" className={styles.modeDesc}>
           For experienced players: start from a blank sheet and fill it in yourself.
         </p>
+        {onDungeonMaster && (
+          <>
+            <button
+              type="button"
+              className={styles.secondaryBtn}
+              aria-describedby="welcome-dm-desc"
+              onClick={onDungeonMaster}
+            >
+              I&apos;m a Dungeon Master
+            </button>
+            <p id="welcome-dm-desc" className={styles.modeDesc}>
+              Run a campaign instead: track your party, and open the DM tools. You can switch back any time in Settings.
+            </p>
+          </>
+        )}
         {/* Abort the whole flow back to the active character. Only rendered when
             creation was launched over existing characters (onCancel supplied). */}
         {onCancel && (

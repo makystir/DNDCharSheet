@@ -477,6 +477,17 @@ Your characters are stored **only in this browser, on this device**. Nothing is 
 
 **Print character sheet** produces a paper copy, for when you want a physical sheet at the table.
 
+### Dungeon Master mode
+
+If you run the game instead of playing in it, turn on **Dungeon Master mode** in Settings (or press **I'm a Dungeon Master** on the first-launch screen). The app then opens to a DM workspace instead of the character sheet. It is a setting for this device, and you can turn it off at any time under **Settings** in the DM workspace. Your characters stay saved, and **My characters** in the DM navigation opens them.
+
+The DM workspace has three pages:
+
+- **Campaign.** Name your campaign, keep notes, and switch between campaigns. Deleting a campaign asks first.
+- **Party.** One card per player, with the numbers you check most: Armor Class, Hit Points, Speed, passive Perception, Insight and Investigation, spell save DC, Darkvision, languages and conditions. Hover over or tap a number to see how it was worked out. A summary at the top shows the party's average level (rounded down), who has no Darkvision, and which languages everyone, or anyone, knows.
+- **Settings.** Switch the theme, turn DM mode off, and **Export DM data** to a file or **Import DM data** from one. Campaigns are stored in this browser only, so export a copy now and then.
+
+To add a player, press **Add member**. Ask them to open **Settings**, then **Share (read-only link)**, and send you the link. Paste it into the dialog. The card is a snapshot of their character at that moment, so when it changes, paste a fresh link (or press **Update from link** on their card). For a player with no shared character, choose **Enter by hand** and type their numbers. Those cards show exactly what you entered.
 ---
 
 ## 12. Tips and tricks

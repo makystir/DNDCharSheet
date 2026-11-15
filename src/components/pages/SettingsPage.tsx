@@ -1,4 +1,4 @@
-import { Dices, Download, Printer, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
+import { Crown, Dices, Download, Printer, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
 import { useInstallPrompt } from '../../hooks/useInstallPrompt';
@@ -31,6 +31,9 @@ export interface SettingsPageProps {
    * list without a reload.
    */
   onRestored: () => void;
+  /** Whether Dungeon Master mode is on, and how to turn it on. */
+  dmMode?: boolean;
+  onDmModeChange?: (on: boolean) => void;
 }
 
 /**
@@ -47,6 +50,8 @@ export function SettingsPage({
   onChange,
   onAdopt,
   onRestored,
+  dmMode = false,
+  onDmModeChange,
 }: SettingsPageProps) {
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   // App-wide dice-entry preference (localStorage), not a character house rule.
@@ -103,6 +108,29 @@ export function SettingsPage({
         </div>
       </Card>
 
+      {onDmModeChange && (
+        <Card>
+          <SectionHeader icon={Crown} title="Dungeon Master mode" />
+          <div className={styles.settingRow}>
+            <span className={styles.settingLabel}>
+              <span className={styles.settingName}>Run the app as a Dungeon Master</span>
+              <span className={styles.settingHint}>
+                Opens the DM workspace (campaigns and a party tracker) instead of the player sheet. A preference for this
+                device. Your characters stay saved, and you can reach them from the DM navigation.
+              </span>
+            </span>
+            <label className={styles.toggleControl}>
+              <input
+                type="checkbox"
+                checked={dmMode}
+                aria-label="Dungeon Master mode"
+                onChange={(e) => onDmModeChange(e.target.checked)}
+              />
+              <span>{dmMode ? 'On' : 'Off'}</span>
+            </label>
+          </div>
+        </Card>
+      )}
       <Card>
         <SectionHeader icon={Dices} title="Dice Rolling" />
         <div className={styles.settingRow}>

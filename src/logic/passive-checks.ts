@@ -9,7 +9,7 @@
  * Pure functions returning a Breakdown (calculated-totals steering).
  */
 
-import type { Character } from '../types/character';
+import type { Character, SkillId } from '../types/character';
 import { skillModifierBreakdown, getSkillTraining } from './skills';
 import type { Breakdown } from './breakdown';
 import { effectiveAbilityScores } from './feats';
@@ -38,5 +38,22 @@ export function passivePerceptionBreakdown(character: Character): Breakdown {
       { label: 'Base', value: 10 },
       ...perception.components,
     ],
+  };
+}
+/**
+ * Passive score for any skill: 10 + that skill's check modifier (PHB 2024
+ * "Passive Checks", same rule as Passive Perception). Used for the DM's party
+ * view (Insight, Investigation) with a full breakdown.
+ */
+export function passiveSkillBreakdown(character: Character, skillId: SkillId): Breakdown {
+  const skill = skillModifierBreakdown(
+    effectiveAbilityScores(character),
+    character.level,
+    skillId,
+    getSkillTraining(character, skillId),
+  );
+  return {
+    total: passiveCheck(skill.total),
+    components: [{ label: 'Base', value: 10 }, ...skill.components],
   };
 }

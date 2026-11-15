@@ -40,6 +40,9 @@ export function useHashRoute(): UseHashRouteResult {
     // Use replaceState to avoid polluting back-button history
     history.replaceState(null, '', hash);
     setState({ page, subTab: subTab ?? null });
+    // replaceState fires no event, so tell other hash readers (the Dungeon Master
+    // route switch) that the hash changed.
+    window.dispatchEvent(new Event('hashchange'));
   }, []);
 
   return { page: state.page, subTab: state.subTab, navigate };

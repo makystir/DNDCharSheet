@@ -11,6 +11,9 @@ import { CharacterManagementSheet } from './components/shared/CharacterManagemen
 import { CharacterNameHeader } from './components/shared/CharacterNameHeader';
 import { useHashRoute } from './hooks/useHashRoute';
 import { useViewRoute } from './hooks/useViewRoute';
+import { useDmRoute } from './hooks/useDmRoute';
+import { DmShell } from './components/dm/DmShell';
+import { formatDmHash, readDmMode, writeDmMode, DEFAULT_DM_PAGE } from './logic/dm-mode';
 import { SharedCharacterViewer } from './components/shared/SharedCharacterViewer';
 import { useConditionalRouteGuard } from './hooks/useConditionalRouteGuard';
 import { usePortrait } from './hooks/usePortrait';
@@ -133,6 +136,21 @@ function App() {
     }
   });
   const { page, subTab, navigate } = useHashRoute();
+
+  // Dungeon Master mode: an app-level setting on this device. While it is on,
+  // the DM workspace is the primary area and the player sheet is reached from
+  // its navigation (hash routes: #dm/<page> is DM, any player page is player).
+  const [dmMode, setDmMode] = useState(readDmMode);
+  const dmRoute = useDmRoute();
+  const changeDmMode = useCallback(
+    (on: boolean) => {
+      writeDmMode(on);
+      setDmMode(on);
+      if (on) window.location.hash = formatDmHash(DEFAULT_DM_PAGE);
+      else navigate('character');
+    },
+    [navigate],
+  );
 
   // Stage B5: read-only GM "view" route. When the hash is `#view/<payload>`,
   // render ONLY the SharedCharacterViewer — no Navigation, WelcomeScreen, or
@@ -508,6 +526,25 @@ function App() {
     return <SharedCharacterViewer encoded={viewPayload} />;
   }
 
+  // Dungeon Master workspace: replaces the whole player shell (it needs no
+  // character, so it also works on a device with none).
+  if (dmMode && dmRoute.area === 'dm') {
+    return (
+      <SWUpdateProvider>
+        <DmShell
+          page={dmRoute.page}
+          onNavigate={(p) => {
+            window.location.hash = formatDmHash(p);
+          }}
+          onOpenPlayer={() => navigate('character')}
+          onTurnOff={() => changeDmMode(false)}
+          theme={theme}
+          onThemeToggle={toggleTheme}
+        />
+      </SWUpdateProvider>
+    );
+  }
+
   return (
     <SWUpdateProvider>
       <CommandPaletteProvider
@@ -528,6 +565,7 @@ function App() {
             onOpenCharacterManager={() => openManager(desktopTriggerRef)}
             characterManagerTriggerRef={desktopTriggerRef}
             assistantCount={visibleAssistantSuggestions.length}
+            onOpenDungeonMaster={dmMode ? () => { window.location.hash = formatDmHash(DEFAULT_DM_PAGE); } : undefined}
           />
 
           <PageContainer pageKey={page}>
@@ -556,6 +594,7 @@ function App() {
                 // to return to, so no Cancel is shown. Cancelling clears `creating`,
                 // restoring the status:'ready' view of the active character.
                 onCancel={creating ? () => setCreating(false) : undefined}
+                onDungeonMaster={creating ? undefined : () => changeDmMode(true)}
               />
             )}
             {status === 'ready' && !showWelcome && character && (
@@ -619,6 +658,8 @@ function App() {
                       onChange={handleChange}
                       onAdopt={adoptCharacter}
                       onRestored={() => void reload()}
+                      dmMode={dmMode}
+                      onDmModeChange={changeDmMode}
                     />
                   </PageLoader>
                 )}

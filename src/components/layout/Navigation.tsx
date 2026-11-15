@@ -7,6 +7,7 @@ import {
   Users,
   Search,
   Keyboard,
+  Crown,
 } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { HelpPopover } from '../shared/HelpPopover';
@@ -43,6 +44,11 @@ interface NavigationProps {
    * AssistantContext; it never navigates.
    */
   assistantCount?: number;
+  /**
+   * Dungeon Master mode is on: shows a button that returns to the DM workspace.
+   * Omitted when DM mode is off.
+   */
+  onOpenDungeonMaster?: () => void;
 }
 
 /** Accessible name for a nav item, announcing its badge count when it has one. */
@@ -83,6 +89,7 @@ export function Navigation({
   onOpenCharacterManager,
   characterManagerTriggerRef,
   assistantCount = 0,
+  onOpenDungeonMaster,
 }: NavigationProps) {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -161,6 +168,20 @@ export function Navigation({
 
   const renderMobileNav = () => (
     <div className={styles.mobileScrollRow}>
+      {onOpenDungeonMaster && (
+        <button
+          type="button"
+          className={styles.navItem}
+          onClick={onOpenDungeonMaster}
+          aria-label="Back to Dungeon Master"
+          data-section="dungeon-master"
+        >
+          <span className={styles.iconWrapper}>
+            <Crown size={18} />
+          </span>
+          <span className={styles.mobileLabelRow}>DM</span>
+        </button>
+      )}
       {navItems.map((item) => {
         const isActive = activePage === item.id;
         const Icon = item.icon;
@@ -344,6 +365,22 @@ export function Navigation({
               <ChevronDown size={14} className={styles.characterSwitcherCaret} aria-hidden="true" />
             </>
           )}
+        </button>
+      )}
+
+      {!isMobile && onOpenDungeonMaster && (
+        <button
+          type="button"
+          className={`${styles.navItem} ${collapsed ? styles.navItemCollapsed : ''}`}
+          onClick={onOpenDungeonMaster}
+          aria-label="Back to Dungeon Master"
+          title={collapsed ? 'Back to Dungeon Master' : undefined}
+          data-section="dungeon-master"
+        >
+          <span className={styles.iconWrapper}>
+            <Crown size={18} />
+          </span>
+          {!collapsed && <span>Dungeon Master</span>}
         </button>
       )}
 
