@@ -3,7 +3,9 @@
  * dropped or coerced, and every imported character is re-validated through the
  * same path a share link takes, so stat calculations never see a bad shape.
  */
-import type { DmCampaign, DmData, DmManualStats, DmPartyMember } from '../types/dm';
+import type { DmCampaign, DmCombatCondition, DmCombatant, DmData, DmEncounter, DmManualStats, DmPartyMember } from '../types/dm';
+import { CONDITIONS } from '../data/conditions';
+import { MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
 import { clampManualStats, DEFAULT_MANUAL_STATS, emptyDmData } from './dm-campaign';
 import { validateSharedPayload } from './share-validate';
 
@@ -65,6 +67,83 @@ function sanitizeMember(raw: unknown): DmPartyMember | undefined {
   return undefined;
 }
 
+function int(v: unknown, fallback: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, Math.trunc(num(v, fallback))));
+}
+
+const CONDITION_IDS = new Set<string>(CONDITIONS.map((c) => c.id).filter((id) => id !== 'exhaustion'));
+
+function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
+  if (!isRecord(raw)) return undefined;
+  const id = str(raw.id);
+  if (id === '' || !isRecord(raw.hp)) return undefined;
+  const max = int(raw.hp.max, 1, 1, 99999);
+  const hp = int(raw.hp.hp, max, 0, max);
+  const saves = isRecord(raw.hp.deathSaves) ? raw.hp.deathSaves : {};
+  const conditions: DmCombatCondition[] = (Array.isArray(raw.conditions) ? raw.conditions : []).flatMap((x) => {
+    if (!isRecord(x) || typeof x.id !== 'string' || !CONDITION_IDS.has(x.id)) return [];
+    const rounds = typeof x.rounds === 'number' && Number.isInteger(x.rounds) && x.rounds >= 1 ? Math.min(x.rounds, 99999) : undefined;
+    const cond = { id: x.id as DmCombatCondition['id'] };
+    return [rounds === undefined ? cond : { ...cond, rounds }];
+  });
+  const conc = isRecord(raw.concentration) ? raw.concentration : {};
+  const out: DmCombatant = {
+    id,
+    name: str(raw.name, 'Creature').slice(0, 60) || 'Creature',
+    kind: raw.kind === 'pc' ? 'pc' : 'monster',
+    sourceLabel: str(raw.sourceLabel).slice(0, 120),
+    ac: int(raw.ac, 10, 0, 99),
+    hp: {
+      max,
+      hp,
+      temp: int(raw.hp.temp, 0, 0, 99999),
+      deathSaves: { successes: int(saves.successes, 0, 0, 3), failures: int(saves.failures, 0, 0, 3) },
+      stable: raw.hp.stable === true,
+      dead: raw.hp.dead === true,
+    },
+    initiative: raw.initiative === null || raw.initiative === undefined ? null : int(raw.initiative, 0, -20, 60),
+    initiativeMod: int(raw.initiativeMod, 0, -20, 40),
+    surprised: raw.surprised === true,
+    resistances: str(raw.resistances).slice(0, 200),
+    vulnerabilities: str(raw.vulnerabilities).slice(0, 200),
+    immunities: str(raw.immunities).slice(0, 200),
+    conditions,
+    concentration: { active: conc.active === true, label: str(conc.label).slice(0, 60) },
+    concentrationDcs: (Array.isArray(raw.concentrationDcs) ? raw.concentrationDcs : [])
+      .filter((x): x is number => typeof x === 'number' && Number.isFinite(x))
+      .map((x) => int(x, 10, 1, 30))
+      .slice(0, 20),
+    diesLikeCharacter: raw.diesLikeCharacter === true,
+    notes: str(raw.notes).slice(0, 1000),
+  };
+  if (typeof raw.memberId === 'string') out.memberId = raw.memberId;
+  if (typeof raw.groupId === 'string') out.groupId = raw.groupId;
+  if (typeof raw.conSaveMod === 'number' && Number.isFinite(raw.conSaveMod)) out.conSaveMod = int(raw.conSaveMod, 0, -20, 40);
+  return out;
+}
+
+function sanitizeEncounter(raw: unknown): DmEncounter | undefined {
+  if (!isRecord(raw)) return undefined;
+  const id = str(raw.id);
+  if (id === '') return undefined;
+  const combatants = (Array.isArray(raw.combatants) ? raw.combatants : [])
+    .map(sanitizeCombatant)
+    .filter((c): c is DmCombatant => c !== undefined)
+    .slice(0, MAX_COMBATANTS);
+  const status = raw.status === 'running' || raw.status === 'ended' ? raw.status : 'setup';
+  const activeId = typeof raw.activeId === 'string' && combatants.some((c) => c.id === raw.activeId) ? raw.activeId : null;
+  return {
+    id,
+    name: str(raw.name, 'Encounter').slice(0, 80) || 'Encounter',
+    status,
+    round: status === 'setup' ? 0 : int(raw.round, 1, 1, 9999),
+    activeId: status === 'running' ? activeId : null,
+    combatants,
+    log: strList(raw.log).slice(-MAX_LOG_LINES),
+    createdAt: num(raw.createdAt, 0),
+    updatedAt: num(raw.updatedAt, 0),
+  };
+}
 function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   if (!isRecord(raw)) return undefined;
   const id = str(raw.id);
@@ -72,11 +151,17 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   const party = (Array.isArray(raw.party) ? raw.party : [])
     .map(sanitizeMember)
     .filter((m): m is DmPartyMember => m !== undefined);
+  const encounters = (Array.isArray(raw.encounters) ? raw.encounters : [])
+    .map(sanitizeEncounter)
+    .filter((e): e is DmEncounter => e !== undefined);
+  const wantedEncounter = str(raw.activeEncounterId);
   return {
     id,
     name: str(raw.name, 'Campaign').slice(0, 80) || 'Campaign',
     notes: str(raw.notes).slice(0, 20000),
     party,
+    encounters,
+    activeEncounterId: encounters.some((e) => e.id === wantedEncounter) ? wantedEncounter : null,
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),
   };

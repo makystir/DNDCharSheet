@@ -19,7 +19,6 @@ export function useDmData() {
     }
     const result = saveDmData(data);
     // Reconciling React with the external storage write result.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveFailed(!result.ok);
   }, [data]);
 

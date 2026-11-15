@@ -23,7 +23,12 @@ export function writeDmMode(on: boolean): void {
   }
 }
 
-export const DM_PAGES = ['campaign', 'party', 'settings'] as const;
+/** The current time in ms, for event handlers (a component cannot call Date.now while rendering). */
+export function clockNow(): number {
+  return Date.now();
+}
+
+export const DM_PAGES = ['campaign', 'party', 'encounter', 'settings'] as const;
 export type DmPage = (typeof DM_PAGES)[number];
 export const DEFAULT_DM_PAGE: DmPage = 'party';
 
