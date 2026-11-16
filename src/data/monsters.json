@@ -65449,5 +65449,2682 @@
   "lairActions": [],
   "description": "A medium beast, encountered in Desert, Grassland, and Hill. It can fly and fights with Beak. Its challenge rating is 0.",
   "page": 372
+ },
+ {
+  "name": "Warhorse",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Survival": 3
+  },
+  "senses": {
+   "blindsight": 10,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "2d4 + 4"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "2d4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Urban. It can swim and fights with Hooves. Its challenge rating is 1/2.",
+  "page": 373
+ },
+ {
+  "name": "Warhorse Skeleton",
+  "size": "Large",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "3d10 + 6"
+  },
+  "speed": {
+   "walk": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Bludgeoning"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large undead of lawful evil alignment, encountered in Planar (Shadowfell), Underdark, and Urban. It fights with Hooves. Its challenge rating is 1/2.",
+  "page": 282
+ },
+ {
+  "name": "Warrior Commander",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 9,
+   "score": 19
+  },
+  "hp": {
+   "avg": 161,
+   "dice": "19d8 + 76"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "dex": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Athletics": 9,
+   "Insight": 7,
+   "Perception": 7
+  },
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Greatsword",
+     "Longbow"
+    ],
+    "summary": "Strings together 3 strikes using Greatsword, Longbow."
+   },
+   {
+    "name": "Greatsword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Slashing",
+      "dice": "4d6 + 5"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing slashing damage."
+   },
+   {
+    "name": "Maneuver",
+    "type": "utility",
+    "summary": "Special action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Longbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 9,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Piercing",
+      "dice": "3d8 + 5"
+     }
+    ],
+    "summary": "Ranged attack at +9 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Tactical Charge",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Counterattack",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Greatsword and Longbow. Its challenge rating is 10.",
+  "page": 321
+ },
+ {
+  "name": "Warrior Infantry",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 9,
+   "dice": "2d8"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Spear",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 3,
+     "reach": 5,
+     "range": "20/60"
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Piercing",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "summary": "Melee or ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Spear. Its challenge rating is 1/8.",
+  "page": 320
+ },
+ {
+  "name": "Warrior Veteran",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 65,
+   "dice": "10d8 + 20"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Athletics": 5,
+   "Perception": 2
+  },
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Greatsword",
+     "Heavy Crossbow"
+    ],
+    "summary": "Strings together 2 strikes using Greatsword, Heavy Crossbow."
+   },
+   {
+    "name": "Greatsword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Heavy Crossbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 3,
+     "range": "100/400"
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d10 + 1"
+     }
+    ],
+    "summary": "Ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Parry",
+    "type": "utility",
+    "summary": "Reaction that adds to its AC against a single melee attack."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Greatsword and Heavy Crossbow. Its challenge rating is 3.",
+  "page": 320
+ },
+ {
+  "name": "Water Elemental",
+  "size": "Large",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Coastal",
+   "Planar (Elemental Plane of Water)",
+   "Swamp",
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 114,
+   "dice": "12d10 + 48"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 90
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Acid",
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Primordial (Aquan)"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Freeze",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Water Form",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam"
+    ],
+    "summary": "Strings together 2 strikes using Slam."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning damage; can impose prone."
+   },
+   {
+    "name": "Whelm",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 22,
+      "dice": "4d8 + 4",
+      "type": "Bludgeoning"
+     },
+     {
+      "avg": 9,
+      "dice": "2d8",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 15 Str save; Inflicts bludgeoning damage; can impose grappled, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large elemental of neutral alignment, encountered in Coastal, Planar (Elemental Plane of Water), and Swamp. It can swim and fights with Slam and Whelm. Its challenge rating is 5.",
+  "page": 322
+ },
+ {
+  "name": "Water Weird",
+  "size": "Large",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 65,
+   "dice": "10d10 + 10"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Understands Primordial"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Invisible in Water",
+    "summary": "Can impose invisible."
+   },
+   {
+    "name": "Water Bound",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Surge",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Cold",
+      "dice": "3d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +5 dealing cold damage; can impose grappled, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large elemental of neutral alignment, encountered in Underdark and Urban. It can swim and fights with Surge. Its challenge rating is 3.",
+  "page": 323
+ },
+ {
+  "name": "Weasel",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 1,
+   "dice": "1d4 - 1"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Acrobatics": 5,
+   "Perception": 3,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Piercing"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Forest, Grassland, and Hill. It can climb and fights with Bite. Its challenge rating is 0.",
+  "page": 373
+ },
+ {
+  "name": "Werebear",
+  "size": "Medium or Small",
+  "type": "Monstrosity",
+  "tags": [
+   "Lycanthrope"
+  ],
+  "alignment": "Neutral Good",
+  "habitat": [
+   "Arctic",
+   "Forest",
+   "Hill"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 135,
+   "dice": "18d8 + 54"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Perception": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Handaxe",
+     "Rend"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Handaxe, Rend."
+   },
+   {
+    "name": "Bite",
+    "cost": "Bear or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Piercing",
+      "dice": "2d12 + 4"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing damage; Targets make a DC 14 Con save."
+   },
+   {
+    "name": "Handaxe",
+    "cost": "Humanoid or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 7
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Slashing",
+      "dice": "3d6 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +7 dealing slashing damage."
+   },
+   {
+    "name": "Rend",
+    "cost": "Bear or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Slashing",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small monstrosity of neutral good alignment, encountered in Arctic, Forest, and Hill. It can climb and fights with Bite, Handaxe, and Rend. Its challenge rating is 5.",
+  "page": 324
+ },
+ {
+  "name": "Wereboar",
+  "size": "Medium or Small",
+  "type": "Monstrosity",
+  "tags": [
+   "Lycanthrope"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 97,
+   "dice": "15d8 + 30"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Gore",
+     "Javelin",
+     "Tusk"
+    ],
+    "summary": "Strings together 2 strikes using Gore, Javelin, Tusk."
+   },
+   {
+    "name": "Gore",
+    "cost": "Boar or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; Targets make a DC 12 Con save."
+   },
+   {
+    "name": "Javelin",
+    "cost": "Humanoid or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Piercing",
+      "dice": "3d6 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +5 dealing piercing damage."
+   },
+   {
+    "name": "Tusk",
+    "cost": "Boar or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "2d6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small monstrosity of neutral evil alignment, encountered in Forest, Grassland, and Hill. It fights with Gore, Javelin, and Tusk. Its challenge rating is 4.",
+  "page": 325
+ },
+ {
+  "name": "Wererat",
+  "size": "Medium or Small",
+  "type": "Monstrosity",
+  "tags": [
+   "Lycanthrope"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Forest",
+   "Urban"
+  ],
+  "treasure": [
+   "Individual"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 60,
+   "dice": "11d8 + 11"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Scratch",
+     "Hand Crossbow"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Scratch, Hand Crossbow."
+   },
+   {
+    "name": "Bite",
+    "cost": "Rat or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "2d4 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 11
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; Targets make a DC 11 Con save."
+   },
+   {
+    "name": "Scratch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Hand Crossbow",
+    "cost": "Humanoid or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Ranged attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small monstrosity of lawful evil alignment, encountered in Forest and Urban. It can climb and fights with Bite, Scratch, and Hand Crossbow. Its challenge rating is 2.",
+  "page": 325
+ },
+ {
+  "name": "Weretiger",
+  "size": "Medium or Small",
+  "type": "Monstrosity",
+  "tags": [
+   "Lycanthrope"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 120,
+   "dice": "16d8 + 48"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Scratch",
+     "Longbow"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Scratch, Longbow."
+   },
+   {
+    "name": "Bite",
+    "cost": "Tiger or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; Targets make a DC 13 Con save."
+   },
+   {
+    "name": "Scratch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Longbow",
+    "cost": "Humanoid or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d8 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Prowl",
+    "cost": "Tiger or Hybrid Form Only",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small monstrosity of neutral alignment, encountered in Desert, Forest, and Grassland. It fights with Bite, Scratch, and Longbow. Its challenge rating is 4.",
+  "page": 326
+ },
+ {
+  "name": "Werewolf",
+  "size": "Medium or Small",
+  "type": "Monstrosity",
+  "tags": [
+   "Lycanthrope"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Forest",
+   "Hill"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 71,
+   "dice": "11d8 + 22"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Scratch",
+     "Longbow"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Scratch, Longbow."
+   },
+   {
+    "name": "Bite",
+    "cost": "Wolf or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; Targets make a DC 12 Con save."
+   },
+   {
+    "name": "Scratch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Longbow",
+    "cost": "Humanoid or Hybrid Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d8 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small monstrosity of chaotic evil alignment, encountered in Forest and Hill. It fights with Bite, Scratch, and Longbow. Its challenge rating is 3.",
+  "page": 327
+ },
+ {
+  "name": "White Dragon Wyrmling",
+  "size": "Medium",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 32,
+   "dice": "5d8 + 10"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 15,
+   "fly": 60,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 2
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "blindsight": 10,
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Draconic"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Ice Walk",
+    "summary": "Moves across icy surfaces without an ability check and ignores icy difficult terrain."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 2 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d8 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Cold",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing plus cold damage."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "damage": [
+     {
+      "avg": 22,
+      "dice": "5d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 12 Con save; Inflicts cold damage; affects a 15-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium dragon of chaotic evil alignment, encountered in Arctic. It can climb, fly, and swim and fights with Rend and Cold Breath. Its challenge rating is 2.",
+  "page": 328
+ },
+ {
+  "name": "Wight",
+  "size": "Medium",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Planar (Shadowfell)",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 82,
+   "dice": "11d8 + 33"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 4
+  },
+  "resistances": [
+   "Necrotic"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Sunlight Sensitivity",
+    "summary": "Suffers disadvantage on attacks and sight-based Perception checks while in direct sunlight."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Necrotic Sword",
+     "Necrotic Bow",
+     "Life Drain"
+    ],
+    "summary": "Strings together 2 strikes using Necrotic Sword, Necrotic Bow, Life Drain."
+   },
+   {
+    "name": "Necrotic Sword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d8 + 2"
+     },
+     {
+      "avg": 4,
+      "type": "Necrotic",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing plus necrotic damage."
+   },
+   {
+    "name": "Necrotic Bow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d8 + 2"
+     },
+     {
+      "avg": 4,
+      "type": "Necrotic",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing plus necrotic damage."
+   },
+   {
+    "name": "Life Drain",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 6,
+      "dice": "1d8 + 2",
+      "type": "Necrotic"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Con save; Inflicts necrotic damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium undead of neutral evil alignment, encountered in Desert, Planar (Shadowfell), and Swamp. It fights with Necrotic Sword, Necrotic Bow, and Life Drain. Its challenge rating is 3.",
+  "page": 332
+ },
+ {
+  "name": "Will-o'-Wisp",
+  "size": "Tiny",
+  "type": "Undead",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 19,
+  "initiative": {
+   "mod": 9,
+   "score": 19
+  },
+  "hp": {
+   "avg": 27,
+   "dice": "11d4"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 50,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "dex": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Acid",
+   "Bludgeoning",
+   "Cold",
+   "Fire",
+   "Necrotic",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "Lightning",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Ephemeral",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   },
+   {
+    "name": "Incorporeal Movement",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Force"
+     }
+    ],
+    "summary": "Moves through creatures and objects as difficult terrain, taking force damage if it ends its turn inside one."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Shock",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Lightning",
+      "dice": "2d8 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing lightning damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Consume Life",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 10
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 10 Con save; restores hit points."
+   },
+   {
+    "name": "Vanish",
+    "type": "utility",
+    "summary": "Can impose invisible."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny undead of chaotic evil alignment, encountered in Forest, Swamp, and Urban. It can fly and fights with Shock. Its challenge rating is 2.",
+  "page": 333
+ },
+ {
+  "name": "Winged Kobold",
+  "size": "Small",
+  "type": "Dragon",
+  "alignment": "Neutral",
+  "habitat": [
+   "Arctic",
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 10,
+   "dice": "4d6 - 4"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 8
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   },
+   {
+    "name": "Sunlight Sensitivity",
+    "summary": "Suffers disadvantage on attacks and sight-based Perception checks while in direct sunlight."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Dragon-Tooth Blade",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   },
+   {
+    "name": "Chromatic Spittle",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "30"
+    },
+    "summary": "Ranged attack at +5."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small dragon of neutral alignment, encountered in Arctic, Coastal, and Desert. It can fly and fights with Dragon-Tooth Blade and Chromatic Spittle. Its challenge rating is 1/4.",
+  "page": 185
+ },
+ {
+  "name": "Winter Wolf",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 75,
+   "dice": "10d10 + 20"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 5
+  },
+  "senses": {
+   "passivePerception": 15
+  },
+  "languages": [
+   "Common",
+   "Giant"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; can impose prone."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "damage": [
+     {
+      "avg": 18,
+      "dice": "4d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 12 Con save; Inflicts cold damage; affects a 15-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of neutral evil alignment, encountered in Arctic. It fights with Bite and Cold Breath. Its challenge rating is 3.",
+  "page": 334
+ },
+ {
+  "name": "Wolf",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +4 dealing piercing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Forest, Grassland, and Hill. It fights with Bite. Its challenge rating is 1/4.",
+  "page": 373
+ },
+ {
+  "name": "Worg",
+  "size": "Large",
+  "type": "Fey",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Feywild)"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 26,
+   "dice": "4d10 + 4"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Goblin",
+   "Worg"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fey of neutral evil alignment, encountered in Forest, Grassland, and Hill. It fights with Bite. Its challenge rating is 1/2.",
+  "page": 335
  }
 ]
