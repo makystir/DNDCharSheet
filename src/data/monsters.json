@@ -13159,5 +13159,2777 @@
   "lairActions": [],
   "description": "A medium fey of chaotic evil alignment, encountered in Forest, Grassland, and Planar (Feywild). It fights with Javelin and Morningstar. Its challenge rating is 3.",
   "page": 62
+ },
+ {
+  "name": "Bugbear Warrior",
+  "size": "Medium",
+  "type": "Fey",
+  "tags": [
+   "Goblinoid"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Planar ( Feywild)",
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 33,
+   "dice": "6d8 + 6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 6,
+   "Survival": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common",
+   "Goblin"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Abduct",
+    "summary": "Can carry a seized creature away while moving."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Grab",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage; can impose grappled."
+   },
+   {
+    "name": "Light Hammer",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 4
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "3d4 + 2"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee or ranged attack at +4 dealing bludgeoning damage; can impose grappled."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fey of chaotic evil alignment, encountered in Forest, Grassland, and Planar ( Feywild). It fights with Grab and Light Hammer. Its challenge rating is 1.",
+  "page": 62
+ },
+ {
+  "name": "Bulette",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [],
+  "ac": 17,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 94,
+   "dice": "9d10 + 45"
+  },
+  "speed": {
+   "walk": 40,
+   "burrow": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 6
+  },
+  "senses": {
+   "darkvision": 60,
+   "tremorsense": 120,
+   "passivePerception": 16
+  },
+  "languages": [],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Bite."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Piercing",
+      "dice": "2d12 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing damage."
+   },
+   {
+    "name": "Deadly Leap",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 19,
+      "dice": "3d12",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 15 Dex save; Inflicts bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Grassland, Hill, and Mountain. It can burrow and fights with Bite and Deadly Leap. Its challenge rating is 5.",
+  "page": 63
+ },
+ {
+  "name": "Bulette Pup",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [],
+  "ac": 16,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d8 + 18"
+  },
+  "speed": {
+   "walk": 30,
+   "burrow": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 4
+  },
+  "senses": {
+   "darkvision": 30,
+   "tremorsense": 60,
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Piercing",
+      "dice": "2d10 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity, encountered in Grassland, Hill, and Mountain. It can burrow and fights with Bite. Its challenge rating is 2.",
+  "page": 63
+ },
+ {
+  "name": "Bullywug Bog Sage",
+  "size": "Medium",
+  "type": "Fey",
+  "alignment": "Neutral",
+  "habitat": [
+   "Swamp"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "8d8 + 16"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Nature": 4,
+   "Stealth": 5
+  },
+  "senses": {
+   "passivePerception": 13
+  },
+  "languages": [
+   "Bullywug",
+   "Common",
+   "Sylvan"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Speak with Frogs and Toads",
+    "summary": "Can communicate with frogs and toads."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bog Staff",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Bog Staff, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Bog Staff",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Bludgeoning",
+      "dice": "1d8 + 3"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning plus poison damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "attackBonus": 5,
+    "spells": {
+     "atWill": [
+      "Dancing Lights",
+      "Druidcraft",
+      "Ray of Sickness"
+     ],
+     "perDay": {
+      "1": [
+       "Speak with Plants",
+       "Vitriolic Sphere"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Wis with save DC 13."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fey of neutral alignment, encountered in Swamp. It can swim and fights with Bog Staff. Its challenge rating is 4.",
+  "page": 64
+ },
+ {
+  "name": "Bullywug Warrior",
+  "size": "Medium",
+  "type": "Fey",
+  "alignment": "Neutral",
+  "habitat": [
+   "Swamp"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 4
+  },
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Bullywug",
+   "Common"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Speak with Frogs and Toads",
+    "summary": "Can communicate with frogs and toads."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Insectile Rapier",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d8 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Poison",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fey of neutral alignment, encountered in Swamp. It can swim and fights with Insectile Rapier. Its challenge rating is 1/4.",
+  "page": 64
+ },
+ {
+  "name": "Cambion",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 105,
+   "dice": "14d8 + 42"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Deception": 6,
+   "Perception": 4,
+   "Stealth": 7
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning",
+   "Poison"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Infernal"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw",
+     "Fire Ray"
+    ],
+    "summary": "Strings together 2 strikes using Claw, Fire Ray."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "1d8 + 4"
+     },
+     {
+      "avg": 7,
+      "type": "Fire",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Fire Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 7,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Fire",
+      "dice": "3d6 + 3"
+     }
+    ],
+    "summary": "Ranged attack at +7 dealing fire damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 14,
+    "components": "no Material",
+    "spells": {
+     "perDay": {
+      "2": [
+       "Alter Self",
+       "Command (level 3 version)",
+       "Detect Magic"
+      ],
+      "1": [
+       "Dominate Person (level 8 version)",
+       "Plane Shift (self only)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Cha with save DC 14, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of neutral evil alignment, encountered in Any. It can fly and fights with Claw and Fire Ray. Its challenge rating is 5.",
+  "page": 65
+ },
+ {
+  "name": "Camel",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 17,
+   "dice": "2d10 + 6"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Bludgeoning",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Desert. It fights with Bite. Its challenge rating is 1/8.",
+  "page": 351
+ },
+ {
+  "name": "Carrion Crawler",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 51,
+   "dice": "6d10 + 18"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Paralyzing Tentacles"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Paralyzing Tentacles."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "2d4 + 2"
+     },
+     {
+      "avg": 3,
+      "type": "Poison",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Paralyzing Tentacles",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Paralyzed",
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 12 Con save; can impose paralyzed, poisoned."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Underdark and Urban. It can climb and fights with Bite and Paralyzing Tentacles. Its challenge rating is 2.",
+  "page": 66
+ },
+ {
+  "name": "Cat",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 2,
+   "dice": "1d4"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Jumper",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Scratch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Slashing"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Desert, Forest, and Grassland. It can climb and fights with Scratch. Its challenge rating is 0.",
+  "page": 351
+ },
+ {
+  "name": "Centaur Trooper",
+  "size": "Large",
+  "type": "Fey",
+  "alignment": "Neutral Good",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Planar ( Feywild)"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Athletics": 6,
+   "Perception": 3
+  },
+  "senses": {
+   "passivePerception": 13
+  },
+  "languages": [
+   "Elvish",
+   "Sylvan"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Pike",
+     "Longbow"
+    ],
+    "summary": "Strings together 2 strikes using Pike, Longbow."
+   },
+   {
+    "name": "Pike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Piercing",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage."
+   },
+   {
+    "name": "Longbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Trampling Charge",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 7,
+      "dice": "1d6 + 4",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Str save; Inflicts bludgeoning damage; can impose prone."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fey of neutral good alignment, encountered in Forest, Grassland, and Planar ( Feywild). It fights with Pike and Longbow. Its challenge rating is 2.",
+  "page": 67
+ },
+ {
+  "name": "Centaur Warden",
+  "size": "Large",
+  "type": "Fey",
+  "alignment": "Neutral Good",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Planar ( Feywild)"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 105,
+   "dice": "14d10 + 28"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Athletics": 7,
+   "Nature": 2,
+   "Perception": 7
+  },
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Druidic",
+   "Elvish",
+   "Sylvan"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Forest Staff",
+     "Sun Ray"
+    ],
+    "summary": "Strings together 2 strikes using Forest Staff, Sun Ray."
+   },
+   {
+    "name": "Forest Staff",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     },
+     {
+      "avg": 14,
+      "type": "Poison",
+      "dice": "4d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning plus poison damage."
+   },
+   {
+    "name": "Sun Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 7,
+     "range": "90"
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Radiant",
+      "dice": "3d6 + 4"
+     }
+    ],
+    "conditions": [
+     "Blinded"
+    ],
+    "summary": "Ranged attack at +7 dealing radiant damage; can impose blinded."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 15,
+    "spells": {
+     "atWill": [
+      "Druidcraft",
+      "Speak with Animals"
+     ]
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 15."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Entangling Trail",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 11,
+      "dice": "2d6 + 4",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Str save; Inflicts bludgeoning damage; can impose restrained."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fey of neutral good alignment, encountered in Forest, Grassland, and Planar ( Feywild). It fights with Forest Staff and Sun Ray. Its challenge rating is 7.",
+  "page": 67
+ },
+ {
+  "name": "Chain Devil",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Devil"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Nine Hells)"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 85,
+   "dice": "10d8 + 40"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Cold",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Diabolical Restoration",
+    "summary": "If it dies away from the Nine Hells, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Chain",
+     "Conjure Infernal Chain"
+    ],
+    "summary": "Strings together 2 strikes using Chain, Conjure Infernal Chain."
+   },
+   {
+    "name": "Chain",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Slashing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage; can impose grappled, restrained."
+   },
+   {
+    "name": "Conjure Infernal Chain",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 9,
+      "dice": "2d4 + 4",
+      "type": "Fire"
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Dex save; Inflicts fire damage; can impose restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Unnerving Gaze",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Wis save; can impose frightened."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of lawful evil alignment, encountered in Planar (Nine Hells). It fights with Chain and Conjure Infernal Chain. Its challenge rating is 8.",
+  "page": 68
+ },
+ {
+  "name": "Chasme",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 78,
+   "dice": "12d10 + 12"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 10,
+   "darkvision": 120,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Proboscis",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Piercing",
+      "dice": "4d6 + 2"
+     },
+     {
+      "avg": 21,
+      "type": "Necrotic",
+      "dice": "6d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus necrotic damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Drone",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Unconscious"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 12 Con save; can impose unconscious; affects a 30-foot emanation."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It can fly and fights with Proboscis. Its challenge rating is 6.",
+  "page": 69
+ },
+ {
+  "name": "Chimera",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 114,
+   "dice": "12d10 + 48"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 8
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Understands Draconic"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Claw",
+     "Ram",
+     "Fire Breath"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Claw, Ram, Fire Breath."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the chimera had Advantage on the attack roll",
+     "avg": 18,
+     "type": "Piercing",
+     "dice": "4d6 + 4"
+    },
+    "summary": "Melee attack at +7 dealing piercing damage."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "1d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   },
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "1d12 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning damage; can impose prone."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 31,
+      "dice": "7d8",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Dex save; Inflicts fire damage; affects a 15-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Grassland, Hill, and Mountain. It can fly and fights with Bite, Claw, and Ram. Its challenge rating is 6.",
+  "page": 70
+ },
+ {
+  "name": "Chuul",
+  "size": "Large",
+  "type": "Aberration",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Coastal",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 76,
+   "dice": "9d10 + 27"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Understands Deep Speech"
+  ],
+  "cr": "16",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Sense Magic",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Pincer",
+     "Paralyzing Tentacles"
+    ],
+    "summary": "Strings together 2 strikes using Pincer, Paralyzing Tentacles."
+   },
+   {
+    "name": "Pincer",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage; can impose grappled."
+   },
+   {
+    "name": "Paralyzing Tentacles",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Paralyzed",
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Con save; can impose grappled, paralyzed, poisoned."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large aberration of chaotic evil alignment, encountered in Coastal, Swamp, and Underdark. It can swim and fights with Pincer and Paralyzing Tentacles. Its challenge rating is 16.",
+  "page": 71
+ },
+ {
+  "name": "Clay Golem",
+  "size": "Large",
+  "type": "Construct",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 123,
+   "dice": "13d10 + 52"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Acid Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Acid Absorption",
+    "summary": "Restores hit points."
+   },
+   {
+    "name": "Berserk",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Immutable Form",
+    "summary": "Cannot be forced out of its current shape."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam"
+    ],
+    "summary": "Strings together 2 strikes using Slam."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 5"
+     },
+     {
+      "avg": 6,
+      "type": "Acid",
+      "dice": "1d12"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning plus acid damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Hasten",
+    "recharge": "5-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 5-6."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large construct, encountered in Urban. It fights with Slam. Its challenge rating is 9.",
+  "page": 72
+ },
+ {
+  "name": "Cloaker",
+  "size": "Large",
+  "type": "Aberration",
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 91,
+   "dice": "14d10 + 14"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 5
+  },
+  "conditionImmunities": [
+   "Frightened"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Deep Speech",
+   "Undercommon"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Light Sensitivity",
+    "summary": "Has disadvantage on sight-based Perception checks and on attacks while in bright light."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Attach",
+     "Tail"
+    ],
+    "summary": "Strings together 1 strikes using Attach, Tail."
+   },
+   {
+    "name": "Attach",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Piercing",
+      "dice": "3d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Blinded"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; can impose blinded."
+   },
+   {
+    "name": "Tail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "1d10 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Moan",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 13
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Wis save; can impose frightened; affects a 60-foot emanation."
+   },
+   {
+    "name": "Phantasms",
+    "cost": "Recharge after a Short or Long Rest",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large aberration of chaotic neutral alignment, encountered in Underdark. It can fly and fights with Attach and Tail. Its challenge rating is 8.",
+  "page": 73
+ },
+ {
+  "name": "Cloud Giant",
+  "size": "Huge",
+  "type": "Giant",
+  "alignment": "Neutral",
+  "habitat": [
+   "Mountain"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 200,
+   "dice": "16d12 + 96"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 20,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 10
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Insight": 7,
+   "Perception": 11
+  },
+  "senses": {
+   "passivePerception": 21
+  },
+  "languages": [
+   "Common",
+   "Giant"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Thunderous Mace",
+     "Thundercloud",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Thunderous Mace, Thundercloud, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Thunderous Mace",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 12,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 21,
+      "type": "Bludgeoning",
+      "dice": "3d8 + 8"
+     },
+     {
+      "avg": 7,
+      "type": "Thunder",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +12 dealing bludgeoning plus thunder damage."
+   },
+   {
+    "name": "Thundercloud",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 12,
+     "range": "240"
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Thunder",
+      "dice": "3d6 + 8"
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "summary": "Ranged attack at +12 dealing thunder damage; can impose incapacitated."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Fog Cloud",
+      "Light"
+     ],
+     "perDay": {
+      "1": [
+       "Control Weather",
+       "Gaseous Form",
+       "Telekinesis"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Cha with save DC 15, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Misty Step",
+    "type": "utility",
+    "summary": "Teleports a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge giant of neutral alignment, encountered in Mountain. It can fly and fights with Thunderous Mace and Thundercloud. Its challenge rating is 9.",
+  "page": 74
+ },
+ {
+  "name": "Cockatrice",
+  "size": "Small",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "5d6 + 5"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Petrified"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Petrifying Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 3,
+      "type": "Piercing",
+      "dice": "1d4 + 1"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Petrified",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +3 dealing piercing damage; Targets make a DC 11 Con save; can impose petrified, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small monstrosity, encountered in Grassland. It can fly and fights with Petrifying Bite. Its challenge rating is 1/2.",
+  "page": 75
+ },
+ {
+  "name": "Cockatrice Regent",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 136,
+   "dice": "16d10 + 48"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Petrified"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Petrifying Bite",
+     "Talons"
+    ],
+    "summary": "Strings together 1 strikes using Petrifying Bite, Talons."
+   },
+   {
+    "name": "Petrifying Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Piercing",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "conditions": [
+     "Petrified",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +7 dealing piercing damage; Targets make a DC 14 Con save; can impose petrified, restrained."
+   },
+   {
+    "name": "Talons",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Slashing",
+      "dice": "4d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Magical Backlash",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "3d6 + 3",
+      "type": "Force"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 14 Dex save; Inflicts force damage."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Grassland. It can fly and fights with Petrifying Bite and Talons. Its challenge rating is 8.",
+  "page": 75
  }
 ]
