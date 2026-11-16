@@ -3,10 +3,21 @@
  * dropped or coerced, and every imported character is re-validated through the
  * same path a share link takes, so stat calculations never see a bad shape.
  */
-import type { DmCampaign, DmCombatCondition, DmCombatant, DmData, DmEncounter, DmManualStats, DmPartyMember } from '../types/dm';
+import type {
+  DmCampaign,
+  DmCombatCondition,
+  DmCombatant,
+  DmCustomMonster,
+  DmData,
+  DmEncounter,
+  DmManualStats,
+  DmMonsterEntry,
+  DmPartyMember,
+} from '../types/dm';
 import { CONDITIONS } from '../data/conditions';
 import { MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
 import { clampManualStats, DEFAULT_MANUAL_STATS, emptyDmData } from './dm-campaign';
+import { ABILITY_KEYS, blankCustomMonster } from './dm-library';
 import { validateSharedPayload } from './share-validate';
 
 function str(v: unknown, fallback = ''): string {
@@ -116,6 +127,10 @@ function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
     diesLikeCharacter: raw.diesLikeCharacter === true,
     notes: str(raw.notes).slice(0, 1000),
   };
+  if (isRecord(raw.legendary)) {
+    const max = int(raw.legendary.max, 0, 0, 20);
+    if (max > 0) out.legendary = { max, used: int(raw.legendary.used, 0, 0, max) };
+  }
   if (typeof raw.memberId === 'string') out.memberId = raw.memberId;
   if (typeof raw.groupId === 'string') out.groupId = raw.groupId;
   if (typeof raw.conSaveMod === 'number' && Number.isFinite(raw.conSaveMod)) out.conSaveMod = int(raw.conSaveMod, 0, -20, 40);
@@ -140,6 +155,61 @@ function sanitizeEncounter(raw: unknown): DmEncounter | undefined {
     activeId: status === 'running' ? activeId : null,
     combatants,
     log: strList(raw.log).slice(-MAX_LOG_LINES),
+    createdAt: num(raw.createdAt, 0),
+    updatedAt: num(raw.updatedAt, 0),
+  };
+}
+function sanitizeEntries(v: unknown): DmMonsterEntry[] {
+  return (Array.isArray(v) ? v : [])
+    .flatMap((x) =>
+      isRecord(x) && (typeof x.name === 'string' || typeof x.description === 'string')
+        ? [{ name: str(x.name).slice(0, 80), description: str(x.description).slice(0, 2000) }]
+        : [],
+    )
+    .slice(0, 40);
+}
+
+function sanitizeMonster(raw: unknown): DmCustomMonster | undefined {
+  if (!isRecord(raw)) return undefined;
+  const id = str(raw.id);
+  if (id === '') return undefined;
+  const base = blankCustomMonster(id, num(raw.createdAt, 0));
+  const scores = isRecord(raw.abilities) ? raw.abilities : {};
+  const abilities = { ...base.abilities };
+  for (const a of ABILITY_KEYS) abilities[a] = int(scores[a], 10, 1, 30);
+  const saves = (Array.isArray(raw.saveProficiencies) ? raw.saveProficiencies : []).filter(
+    (x): x is DmCustomMonster['saveProficiencies'][number] => typeof x === 'string' && (ABILITY_KEYS as readonly string[]).includes(x),
+  );
+  const text = (v: unknown, max: number) => str(v).slice(0, max);
+  return {
+    ...base,
+    name: text(raw.name, 80).trim() || 'Monster',
+    size: text(raw.size, 20) || base.size,
+    creatureType: text(raw.creatureType, 40) || base.creatureType,
+    alignment: text(raw.alignment, 40),
+    cr: text(raw.cr, 8),
+    ac: int(raw.ac, 10, 0, 40),
+    hpMax: int(raw.hpMax, 1, 1, 9999),
+    hpDice: text(raw.hpDice, 30),
+    speed: text(raw.speed, 120),
+    abilities,
+    saveProficiencies: [...new Set(saves)],
+    proficiencyBonus: int(raw.proficiencyBonus, 2, 0, 9),
+    initiativeMod: int(raw.initiativeMod, 0, -10, 30),
+    skills: text(raw.skills, 200),
+    senses: text(raw.senses, 200),
+    languages: text(raw.languages, 200),
+    resistances: text(raw.resistances, 200),
+    vulnerabilities: text(raw.vulnerabilities, 200),
+    immunities: text(raw.immunities, 200),
+    conditionImmunities: text(raw.conditionImmunities, 200),
+    traits: sanitizeEntries(raw.traits),
+    actions: sanitizeEntries(raw.actions),
+    bonusActions: sanitizeEntries(raw.bonusActions),
+    reactions: sanitizeEntries(raw.reactions),
+    legendaryActions: sanitizeEntries(raw.legendaryActions),
+    legendaryUses: int(raw.legendaryUses, 0, 0, 10),
+    basedOn: text(raw.basedOn, 160),
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),
   };
@@ -173,10 +243,15 @@ export function sanitizeDmData(raw: unknown): DmData {
   const campaigns = (Array.isArray(raw.campaigns) ? raw.campaigns : [])
     .map(sanitizeCampaign)
     .filter((c): c is DmCampaign => c !== undefined);
+  const customMonsters = (Array.isArray(raw.customMonsters) ? raw.customMonsters : [])
+    .map(sanitizeMonster)
+    .filter((m): m is DmCustomMonster => m !== undefined)
+    .slice(0, 500);
   const wanted = str(raw.activeCampaignId);
   return {
     v: 1,
     campaigns,
+    customMonsters,
     activeCampaignId: campaigns.some((c) => c.id === wanted) ? wanted : (campaigns[0]?.id ?? null),
   };
 }

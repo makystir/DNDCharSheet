@@ -25,7 +25,7 @@ import { primaryClass, resolveClass } from './classes';
 import { getCondition } from '../data/conditions';
 
 export function emptyDmData(): DmData {
-  return { v: 1, campaigns: [], activeCampaignId: null };
+  return { v: 1, campaigns: [], customMonsters: [], activeCampaignId: null };
 }
 
 export const DEFAULT_MANUAL_STATS: DmManualStats = {

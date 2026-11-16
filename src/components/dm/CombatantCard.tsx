@@ -5,6 +5,9 @@ import { CONDITIONS, getCondition } from '../../data/conditions';
 import { DAMAGE_TYPES } from '../../data/damage-types';
 import {
   addCondition,
+  canTakeLegendary,
+  resetLegendary,
+  spendLegendaryAction,
   dealDamage,
   giveTempHp,
   healCombatant,
@@ -227,6 +230,29 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
               </button>
               <button type="button" className={styles.btn} onClick={() => onCommit(resolveConcentration(encounter, c.id, false))}>
                 Lost it
+              </button>
+            </span>
+          </div>
+        )}
+
+        {c.legendary && encounter.status === 'running' && !out && (
+          <div className={enc.alert}>
+            <span>
+              Legendary actions: {c.legendary.max - c.legendary.used} of {c.legendary.max} left.{' '}
+              <span className={styles.muted}>Taken after another creature's turn; all return at the start of this creature's turn.</span>
+            </span>
+            <span className={styles.row}>
+              <button
+                type="button"
+                className={styles.btn}
+                disabled={!canTakeLegendary(c)}
+                onClick={() => onCommit(spendLegendaryAction(encounter, c.id))}
+                aria-label={`Use a legendary action for ${c.name}`}
+              >
+                Use one
+              </button>
+              <button type="button" className={styles.btn} onClick={() => onCommit(resetLegendary(encounter, c.id))}>
+                Refill
               </button>
             </span>
           </div>

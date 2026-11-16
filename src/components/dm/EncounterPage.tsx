@@ -341,6 +341,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
       {adding && (
         <AddCombatantsDialog
           party={campaign.party}
+          customMonsters={dm.data.customMonsters}
           presentMemberIds={presentMemberIds}
           onAdd={(list) => {
             commit(addCombatants(open, list));

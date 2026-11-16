@@ -59,6 +59,8 @@ export interface DmData {
   /** Storage format version. */
   v: 1;
   campaigns: DmCampaign[];
+  /** The DM's own monsters, shared by every campaign. */
+  customMonsters: DmCustomMonster[];
   activeCampaignId: string | null;
 }
 
@@ -104,6 +106,8 @@ export interface DmCombatant {
   concentrationDcs: number[];
   /** Constitution saving throw modifier, when known (enables the Roll button). */
   conSaveMod?: number;
+  /** Legendary action uses: max per round, used so far (they refill at the start of its turn). */
+  legendary?: { max: number; used: number };
   /** Monster only: make Death Saving Throws at 0 HP instead of dying outright. */
   diesLikeCharacter: boolean;
   notes: string;
@@ -123,6 +127,51 @@ export interface DmEncounter {
   combatants: DmCombatant[];
   /** Newest last, capped. */
   log: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+// ----------------------------------------------------------- custom monsters
+
+export interface DmMonsterEntry {
+  name: string;
+  description: string;
+}
+
+/** A monster the DM wrote or copied from the library, kept across campaigns. */
+export interface DmCustomMonster {
+  id: string;
+  name: string;
+  size: string;
+  creatureType: string;
+  alignment: string;
+  /** Challenge Rating as printed, e.g. "1/4", "5". */
+  cr: string;
+  ac: number;
+  hpMax: number;
+  /** Hit Point dice for display, e.g. "4d8 + 8". Optional. */
+  hpDice: string;
+  speed: string;
+  abilities: { str: number; dex: number; con: number; int: number; wis: number; cha: number };
+  saveProficiencies: ('str' | 'dex' | 'con' | 'int' | 'wis' | 'cha')[];
+  proficiencyBonus: number;
+  initiativeMod: number;
+  skills: string;
+  senses: string;
+  languages: string;
+  resistances: string;
+  vulnerabilities: string;
+  immunities: string;
+  conditionImmunities: string;
+  traits: DmMonsterEntry[];
+  actions: DmMonsterEntry[];
+  bonusActions: DmMonsterEntry[];
+  reactions: DmMonsterEntry[];
+  legendaryActions: DmMonsterEntry[];
+  /** Legendary action uses per round (0 = none). */
+  legendaryUses: number;
+  /** Where the numbers came from, e.g. "Copy of Guard (Monster Manual 2024, p.250)". */
+  basedOn: string;
   createdAt: number;
   updatedAt: number;
 }

@@ -198,7 +198,9 @@ export function combatantFromCreature(cr: CreatureStatBlock, id: string, name?: 
     id,
     name ?? cr.name,
     'monster',
-    `${cr.name} (Player's Handbook 2024)`,
+    cr.source.printedPage !== undefined
+      ? `${cr.name} (${cr.source.book}, p.${cr.source.printedPage})`
+      : `${cr.name} (${cr.source.book})`,
     cr.ac,
     monsterHp(cr.hp.average),
     cr.initiative?.modifier ?? cr.abilities.dex.mod ?? 0,
@@ -260,6 +262,10 @@ export function makeCopies(
     name: `${base.name} ${i + 1}`,
     groupId,
     hp: { ...base.hp },
+    conditions: [...base.conditions],
+    concentration: { ...base.concentration },
+    concentrationDcs: [...base.concentrationDcs],
+    legendary: base.legendary ? { ...base.legendary } : undefined,
   }));
 }
 
@@ -436,6 +442,13 @@ function tickConditions(enc: DmEncounter): DmEncounter {
   return withLog({ ...enc, combatants }, ...lines);
 }
 
+/** A legendary-action user regains every expended use at the start of its own turn (MM 2024 "Legendary Actions", L566). */
+function refillLegendary(enc: DmEncounter, id: string): DmEncounter {
+  const c = findCombatant(enc, id);
+  if (!c?.legendary || c.legendary.used === 0) return enc;
+  return mapCombatant(enc, id, (x) => ({ ...x, legendary: x.legendary ? { ...x.legendary, used: 0 } : undefined }));
+}
+
 /** Pass the turn to the next combatant who is not dead. A new round starts after the last one. */
 export function nextTurn(enc: DmEncounter): DmEncounter {
   if (enc.status !== 'running') return enc;
@@ -450,7 +463,7 @@ export function nextTurn(enc: DmEncounter): DmEncounter {
     if (wrapped) {
       next = withLog(tickConditions({ ...next, round: enc.round + 1 }), `Round ${enc.round + 1}.`);
     }
-    return withLog(next, `${c.name}'s turn.`);
+    return withLog(refillLegendary(next, c.id), `${c.name}'s turn.`);
   }
   return enc;
 }
@@ -615,6 +628,40 @@ export function removeCondition(enc: DmEncounter, id: string, condition: DmComba
     mapCombatant(enc, id, (x) => ({ ...x, conditions: x.conditions.filter((y) => y.id !== condition) })),
     `${c.name} is no longer ${getCondition(condition)?.name ?? condition}.`,
   );
+}
+
+// ------------------------------------------------------- legendary actions
+
+function isIncapacitated(c: DmCombatant): boolean {
+  return c.conditions.some(
+    (x) => x.id === 'incapacitated' || (getCondition(x.id)?.implies ?? []).includes('incapacitated'),
+  );
+}
+
+/**
+ * Whether a legendary action can be taken now. MM 2024 "Legendary Actions"
+ * (Docs L564-566): one at a time, only after another creature's turn, none
+ * while Incapacitated; each use is expended and all come back at the start of
+ * the monster's own turn. At 0 Hit Points a creature is Unconscious, hence
+ * Incapacitated.
+ */
+export function canTakeLegendary(c: DmCombatant): boolean {
+  return c.legendary !== undefined && c.legendary.used < c.legendary.max && !isOut(c) && !isDown(c) && !isIncapacitated(c);
+}
+
+export function spendLegendaryAction(enc: DmEncounter, id: string): DmEncounter {
+  const c = findCombatant(enc, id);
+  if (!c?.legendary || !canTakeLegendary(c)) return enc;
+  const used = c.legendary.used + 1;
+  const max = c.legendary.max;
+  return withLog(
+    mapCombatant(enc, id, (x) => ({ ...x, legendary: { max, used } })),
+    `${c.name} uses a legendary action (${used}/${max}).`,
+  );
+}
+
+export function resetLegendary(enc: DmEncounter, id: string): DmEncounter {
+  return refillLegendary(enc, id);
 }
 
 // ------------------------------------------------------------ concentration

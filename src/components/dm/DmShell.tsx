@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollText, Users, Settings, User, Swords } from 'lucide-react';
+import { ScrollText, Users, Settings, User, Swords, BookOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { DmPage } from '../../logic/dm-mode';
 import { useDmData } from '../../hooks/useDmData';
@@ -11,6 +11,7 @@ import { UpdateBanner } from '../shared/UpdateBanner';
 import { CampaignPage } from './CampaignPage';
 import { PartyPage } from './PartyPage';
 import { EncounterPage } from './EncounterPage';
+import { LibraryPage } from './LibraryPage';
 import { DmSettingsPage } from './DmSettingsPage';
 import navStyles from '../layout/Navigation.module.css';
 import appStyles from '../../App.module.css';
@@ -37,7 +38,8 @@ const DM_NAV: DmNavItem[] = [
   { id: 'campaign', label: 'Campaign', icon: ScrollText, shortcut: '1' },
   { id: 'party', label: 'Party', icon: Users, shortcut: '2' },
   { id: 'encounter', label: 'Encounter', icon: Swords, shortcut: '3' },
-  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '4' },
+  { id: 'library', label: 'Library', icon: BookOpen, shortcut: '4' },
+  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '5' },
 ];
 
 /**
@@ -129,6 +131,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
           <PartyPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />
         )}
         {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
+        {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
         )}

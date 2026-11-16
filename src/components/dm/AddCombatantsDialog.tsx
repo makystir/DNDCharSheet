@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { DmCombatant, DmPartyMember } from '../../types/dm';
-import { NPC_TEMPLATE_LIST } from '../../data/npc-templates';
-import {
-  combatantFromCreature,
-  combatantFromMember,
-  combatantFromTemplate,
-  customCombatant,
-  makeCopies,
-  usableCreatures,
-  MAX_COMBATANTS,
-} from '../../logic/dm-encounter';
+import type { DmCombatant, DmCustomMonster, DmPartyMember } from '../../types/dm';
+import { combatantFromMember, customCombatant, makeCopies, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { combatantFromLibrary, libraryMonsters, type LibraryMonster } from '../../logic/dm-library';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import styles from './dm.module.css';
@@ -21,11 +13,13 @@ interface LibraryEntry {
   key: string;
   name: string;
   detail: string;
-  make: (id: string) => DmCombatant | undefined;
+  monster: LibraryMonster;
 }
 
 export interface AddCombatantsDialogProps {
   party: DmPartyMember[];
+  /** The DM's own monsters, offered alongside the built-in creatures. */
+  customMonsters: DmCustomMonster[];
   /** Party members already in this encounter. */
   presentMemberIds: string[];
   onAdd: (combatants: DmCombatant[]) => void;
@@ -34,24 +28,19 @@ export interface AddCombatantsDialogProps {
 
 const newId = () => crypto.randomUUID();
 
-function libraryEntries(): LibraryEntry[] {
-  const npcs: LibraryEntry[] = NPC_TEMPLATE_LIST.map((t) => ({
-    key: `npc:${t.id}`,
-    name: t.name,
-    detail: `Monster Manual 2024 p.${t.page} · CR ${t.stats.cr ?? '?'} · AC ${t.stats.ac ?? '?'} · HP ${t.stats.hpMax ?? '?'}`,
-    make: (id) => combatantFromTemplate(t, id),
-  }));
-  const creatures: LibraryEntry[] = usableCreatures().map((c) => ({
-    key: `creature:${c.id}`,
-    name: c.name,
-    detail: `Player's Handbook 2024 · CR ${c.challenge.cr ?? '?'} · AC ${String(c.ac)} · HP ${'average' in c.hp ? String(c.hp.average) : '?'}`,
-    make: (id) => combatantFromCreature(c, id),
-  }));
-  return [...npcs, ...creatures].sort((a, b) => a.name.localeCompare(b.name));
+function libraryEntries(customMonsters: DmCustomMonster[]): LibraryEntry[] {
+  return libraryMonsters({ customMonsters })
+    .filter((m) => m.addable)
+    .map((m) => ({
+      key: m.key,
+      name: m.name,
+      detail: `${m.source} · CR ${m.cr ?? '?'} · AC ${m.ac ?? '?'} · HP ${m.hpAverage ?? '?'}`,
+      monster: m,
+    }));
 }
 
 /** Adds party members, library creatures, or a custom creature to an encounter. */
-export function AddCombatantsDialog({ party, presentMemberIds, onAdd, onClose }: AddCombatantsDialogProps) {
+export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, onAdd, onClose }: AddCombatantsDialogProps) {
   const ref = useRef<HTMLDivElement>(null);
   useFocusTrap(ref, true);
   useBodyScrollLock(true);
@@ -81,7 +70,7 @@ export function AddCombatantsDialog({ party, presentMemberIds, onAdd, onClose }:
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const entries = useMemo(() => libraryEntries(), []);
+  const entries = useMemo(() => libraryEntries(customMonsters), [customMonsters]);
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     return q === '' ? entries : entries.filter((e) => e.name.toLowerCase().includes(q));
@@ -104,7 +93,7 @@ export function AddCombatantsDialog({ party, presentMemberIds, onAdd, onClose }:
     if (tab === 'library') {
       const entry = entries.find((e) => e.key === chosen);
       if (!entry) return setError('Pick a creature from the list.');
-      const base = entry.make(newId());
+      const base = combatantFromLibrary(entry.monster, newId());
       if (!base) return setError('That creature has no fixed Armor Class or Hit Points to track.');
       return onAdd(makeCopies(base, count, newId, group));
     }
