@@ -546,6 +546,26 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
                 Surprised (Disadvantage on the Initiative roll)
               </label>
               {c.kind === 'monster' && (
+                <label className={styles.field} style={{ flex: '0 1 220px' }}>
+                  <span className={styles.fieldLabel}>XP value{c.cr ? ` (CR ${c.cr})` : ''}</span>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    aria-label={`XP value for ${c.name}`}
+                    value={c.xp ?? ''}
+                    placeholder="Not set"
+                    onChange={(e) =>
+                      onCommit(
+                        updateCombatant(encounter, c.id, {
+                          xp: e.target.value === '' ? undefined : Math.max(0, Math.trunc(Number(e.target.value)) || 0),
+                        }),
+                      )
+                    }
+                  />
+                </label>
+              )}
+              {c.kind === 'monster' && (
                 <label className={enc.checkRow}>
                   <input
                     type="checkbox"

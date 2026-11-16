@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Swords } from 'lucide-react';
 import type { DmCombatant, DmEncounter } from '../../types/dm';
 import type { DmApi } from './dmApi';
-import { activeCampaign } from '../../logic/dm-campaign';
+import { activeCampaign, memberStats } from '../../logic/dm-campaign';
+import type { BudgetMember } from '../../logic/dm-balance';
 import {
   activeEncounter,
   addCombatants,
@@ -27,6 +28,8 @@ import { SectionHeader } from '../shared/SectionHeader';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { AddCombatantsDialog } from './AddCombatantsDialog';
 import { CombatantCard } from './CombatantCard';
+import { EncounterBalance } from './EncounterBalance';
+import { XpAwardCard } from './XpAwardCard';
 import styles from './dm.module.css';
 import enc from './encounter.module.css';
 
@@ -196,6 +199,21 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
     commit(result.encounter);
   };
 
+  // Budget for the characters in this fight, or the whole party until some are added.
+  const levelOf = (memberId: string) => {
+    const m = campaign.party.find((p) => p.id === memberId);
+    return m ? memberStats(m) : undefined;
+  };
+  const inFight: BudgetMember[] = open.combatants.flatMap((c) => {
+    const s = c.kind === 'pc' && c.memberId ? levelOf(c.memberId) : undefined;
+    return s ? [{ name: c.name, level: s.level }] : [];
+  });
+  const wholeParty: BudgetMember[] = campaign.party.flatMap((m) => {
+    const s = memberStats(m);
+    return s ? [{ name: m.name, level: s.level }] : [];
+  });
+  const budgetMembers = inFight.length > 0 ? inFight : wholeParty;
+
   const survivors = open.combatants.filter((c) => !isOut(c));
   const defeated = open.combatants.filter((c) => isOut(c));
   const pcs = open.combatants.filter((c) => c.kind === 'pc');
@@ -316,6 +334,10 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
           </div>
         </Card>
       )}
+
+      {!ended && <EncounterBalance members={budgetMembers} combatants={open.combatants} />}
+
+      {ended && <XpAwardCard encounter={open} defaultSharers={budgetMembers.length} onCommit={commit} />}
 
       {open.combatants.length === 0 ? (
         <Card>

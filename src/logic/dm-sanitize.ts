@@ -133,6 +133,9 @@ function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
   }
   if (typeof raw.memberId === 'string') out.memberId = raw.memberId;
   if (typeof raw.groupId === 'string') out.groupId = raw.groupId;
+  if (typeof raw.cr === 'string' && raw.cr.trim() !== '') out.cr = raw.cr.trim().slice(0, 8);
+  if (typeof raw.xp === 'number' && Number.isFinite(raw.xp)) out.xp = int(raw.xp, 0, 0, 1000000);
+  if (typeof raw.xpCounts === 'boolean') out.xpCounts = raw.xpCounts;
   if (typeof raw.conSaveMod === 'number' && Number.isFinite(raw.conSaveMod)) out.conSaveMod = int(raw.conSaveMod, 0, -20, 40);
   return out;
 }

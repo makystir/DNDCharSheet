@@ -40,6 +40,7 @@ import type { NpcTemplate } from '../data/npc-templates';
 import type { ConditionId } from '../data/conditions';
 import { getCondition } from '../data/conditions';
 import { abilityModifier } from './abilities';
+import { xpForCr } from './dm-balance';
 import { concentrationCheck } from './concentration';
 import { rollD20, type D20Mode } from './dice';
 import {
@@ -177,6 +178,9 @@ export function combatantFromTemplate(t: NpcTemplate, id: string, name?: string)
   c.resistances = s.resistances ?? '';
   c.vulnerabilities = s.vulnerabilities ?? '';
   c.immunities = s.immunities ?? '';
+  if (s.cr) c.cr = s.cr;
+  const templateXp = s.xp ?? xpForCr(s.cr);
+  if (templateXp !== null && templateXp !== undefined) c.xp = templateXp;
   const con = s.abilities?.con;
   if (con !== undefined) {
     const proficient = (s.saveProficiencies ?? []).includes('con' as Ability);
@@ -208,6 +212,9 @@ export function combatantFromCreature(cr: CreatureStatBlock, id: string, name?: 
   c.resistances = cr.damageResistances.join('; ');
   c.vulnerabilities = cr.damageVulnerabilities.join('; ');
   c.immunities = cr.damageImmunities.join('; ');
+  if (cr.challenge.cr) c.cr = cr.challenge.cr;
+  const creatureXp = cr.challenge.xp ?? xpForCr(cr.challenge.cr);
+  if (creatureXp !== null) c.xp = creatureXp;
   if (cr.abilities.con.save !== null) c.conSaveMod = cr.abilities.con.save;
   return c;
 }
@@ -221,6 +228,9 @@ export interface CustomCombatantInput {
   vulnerabilities?: string;
   immunities?: string;
   conSaveMod?: number;
+  /** Challenge Rating and XP, when the DM knows them. */
+  cr?: string;
+  xp?: number;
 }
 
 export function customCombatant(id: string, input: CustomCombatantInput): DmCombatant {
@@ -239,6 +249,8 @@ export function customCombatant(id: string, input: CustomCombatantInput): DmComb
   c.vulnerabilities = (input.vulnerabilities ?? '').slice(0, 200);
   c.immunities = (input.immunities ?? '').slice(0, 200);
   if (input.conSaveMod !== undefined && Number.isFinite(input.conSaveMod)) c.conSaveMod = int(input.conSaveMod, -10, 30);
+  if (input.cr && input.cr.trim()) c.cr = input.cr.trim().slice(0, 8);
+  if (input.xp !== undefined && Number.isFinite(input.xp)) c.xp = int(input.xp, 0, 1000000);
   return c;
 }
 

@@ -106,6 +106,12 @@ export interface DmCombatant {
   concentrationDcs: number[];
   /** Constitution saving throw modifier, when known (enables the Roll button). */
   conSaveMod?: number;
+  /** Challenge Rating as printed, when known (monsters). */
+  cr?: string;
+  /** XP this creature is worth (monsters); the DM can change it. */
+  xp?: number;
+  /** After combat: whether its XP counts as overcome. Unset means it counts when it is dead. */
+  xpCounts?: boolean;
   /** Legendary action uses: max per round, used so far (they refill at the start of its turn). */
   legendary?: { max: number; used: number };
   /** Monster only: make Death Saving Throws at 0 HP instead of dying outright. */

@@ -15,6 +15,7 @@ import type { DmCombatant, DmCustomMonster, DmData, DmMonsterEntry } from '../ty
 import { CREATURE_LIST, type CreatureStatBlock } from '../data/creatures';
 import { NPC_TEMPLATE_LIST, type NpcTemplate } from '../data/npc-templates';
 import { abilityModifier } from './abilities';
+import { xpForCr } from './dm-balance';
 import { combatantFromCreature, combatantFromTemplate, customCombatant } from './dm-encounter';
 
 export const ABILITY_KEYS: readonly Ability[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
@@ -441,6 +442,8 @@ export function combatantFromLibrary(m: LibraryMonster, id: string): DmCombatant
     vulnerabilities: m.vulnerabilities,
     immunities: m.immunities,
     conSaveMod: m.conSaveMod ?? undefined,
+    cr: m.cr ?? undefined,
+    xp: m.xp ?? xpForCr(m.cr) ?? undefined,
   });
   base.sourceLabel = `${m.name} (custom)`;
   if (m.legendaryUses > 0) base.legendary = { max: m.legendaryUses, used: 0 };

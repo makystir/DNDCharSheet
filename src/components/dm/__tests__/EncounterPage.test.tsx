@@ -185,4 +185,60 @@ describe('Encounter page', () => {
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Delete encounter' })).getByRole('button', { name: 'Delete' }));
     expect(screen.queryByText('First')).not.toBeInTheDocument();
   });
-});
+
+  it('sets the encounter XP against the budget for the party', () => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add whole party' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ogre' } });
+    fireEvent.change(screen.getByLabelText(/^XP value/), { target: { value: '75' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+
+    // One level 1 character: budgets 50 / 75 / 100.
+    expect(screen.getByTestId('balance-fit')).toHaveTextContent('Fits the Moderate budget');
+    expect(within(screen.getByTestId('budget-low')).getByText('25 over')).toBeInTheDocument();
+    expect(within(screen.getByTestId('budget-moderate')).getByText('0')).toBeInTheDocument();
+    expect(within(screen.getByTestId('budget-high')).getByText('25')).toBeInTheDocument();
+    // Each total explains itself.
+    expect(screen.getByRole('button', { name: /^Encounter XP: .*Ogre/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Moderate XP budget: .*Borin \(level 1\)/ })).toBeInTheDocument();
+  });
+
+  it('flags a creature with no XP value and counts it once it has one', () => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add whole party' }));
+    addCustom('Mystery', '9');
+    expect(screen.getByText(/No XP value for Mystery/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Show more for Mystery' }));
+    fireEvent.change(screen.getByLabelText('XP value for Mystery'), { target: { value: '30' } });
+    expect(screen.queryByText(/No XP value for/)).not.toBeInTheDocument();
+    expect(screen.getByTestId('balance-fit')).toHaveTextContent('Fits the Low budget');
+  });
+
+  it('shares the XP of the defeated creatures when combat ends', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Orc' } });
+    fireEvent.change(screen.getByLabelText(/^XP value/), { target: { value: '100' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+    fireEvent.change(screen.getByLabelText('Initiative for Orc'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    fireEvent.change(screen.getByLabelText('Amount for Orc'), { target: { value: '99' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Damage Orc' }));
+    fireEvent.click(screen.getByRole('button', { name: 'End combat' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'End combat' })).getByRole('button', { name: 'End combat' }));
+
+    expect(screen.getByLabelText('Count Orc for XP')).toBeChecked();
+    fireEvent.change(screen.getByLabelText('Characters sharing the XP'), { target: { value: '3' } });
+    expect(screen.getByTestId('xp-share')).toHaveTextContent('33');
+    fireEvent.click(screen.getByLabelText('Count Orc for XP'));
+    expect(screen.getByTestId('xp-share')).toHaveTextContent('0');
+  });});

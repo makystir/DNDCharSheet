@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DmCombatant, DmCustomMonster, DmPartyMember } from '../../types/dm';
 import { combatantFromMember, customCombatant, makeCopies, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { xpForCr } from '../../logic/dm-balance';
 import { combatantFromLibrary, libraryMonsters, type LibraryMonster } from '../../logic/dm-library';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
@@ -57,6 +58,8 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
     hpMax: '10',
     initiativeMod: '0',
     conSaveMod: '',
+    cr: '',
+    xp: '',
     resistances: '',
     vulnerabilities: '',
     immunities: '',
@@ -104,6 +107,8 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
       hpMax: Number(custom.hpMax),
       initiativeMod: Number(custom.initiativeMod),
       conSaveMod: custom.conSaveMod.trim() === '' ? undefined : Number(custom.conSaveMod),
+      cr: custom.cr,
+      xp: custom.xp.trim() === '' ? (xpForCr(custom.cr.trim()) ?? undefined) : Number(custom.xp),
       resistances: custom.resistances,
       vulnerabilities: custom.vulnerabilities,
       immunities: custom.immunities,
@@ -247,6 +252,14 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Constitution save modifier (optional)</span>
                 <input className={styles.input} type="number" value={custom.conSaveMod} onChange={(e) => setC('conSaveMod', e.target.value)} />
+              </label>
+              <label className={styles.field}>
+                <span className={styles.fieldLabel}>Challenge Rating (optional)</span>
+                <input className={styles.input} value={custom.cr} onChange={(e) => setC('cr', e.target.value)} />
+              </label>
+              <label className={styles.field}>
+                <span className={styles.fieldLabel}>XP value (optional; filled in from the CR if left empty)</span>
+                <input className={styles.input} type="number" value={custom.xp} onChange={(e) => setC('xp', e.target.value)} />
               </label>
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Resistances (for example Fire; Cold)</span>
