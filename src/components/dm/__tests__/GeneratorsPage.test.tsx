@@ -67,6 +67,18 @@ describe('Generators page', () => {
     expect(journal()[0].body).toContain('Long-term goal: ');
   });
 
+  it('names the chosen NPC stat block in the saved entry', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    expect(screen.queryByLabelText('Use as a stat block (optional)')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Generate NPC' }));
+    const pick = screen.getByLabelText('Use as a stat block (optional)') as HTMLSelectElement;
+    expect(pick.options.length).toBe(36); // None + the 35 Monster Manual NPC templates
+    fireEvent.change(pick, { target: { value: pick.options[1].value } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    expect(journal()[0].body).toMatch(/Stat block: .+ \(Monster Manual 2024, p\.\d+\), in the Library\./);
+  });
+
   it('tells you to create a campaign before saving', () => {
     render(<Routed initial="generators" />);
     fireEvent.click(screen.getByRole('button', { name: 'Generate NPC' }));

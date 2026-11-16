@@ -241,6 +241,7 @@ export function saveNpcToJournal(
   npc: GeneratedNpc,
   ids: { npc: string },
   now: number,
+  statBlock?: { name: string; source: string },
 ): { data: DmData; title: string } {
   const journal = data.campaigns.find((c) => c.id === campaignId)?.journal ?? [];
   const title = uniqueTitle(journal, npc.name);
@@ -248,7 +249,8 @@ export function saveNpcToJournal(
     id: ids.npc,
     kind: 'npc',
     title,
-    body: npcJournalBody(npc),
+    // The stat block is a Library entry, not a journal entry, so it is named in plain text rather than as a [[link]].
+    body: npcJournalBody(npc, statBlock ? `Stat block: ${statBlock.name} (${statBlock.source}), in the Library.` : ''),
     status: 'open',
     sessionNumber: null,
     createdAt: now,

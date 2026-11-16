@@ -3,6 +3,7 @@ import { Dices } from 'lucide-react';
 import { ALIGNMENTS, type Alignment } from '../../types/character';
 import { CLASS_LIST, type ClassId } from '../../data/classes';
 import { getSpecies, type SpeciesId } from '../../data/species';
+import { NPC_TEMPLATE_LIST } from '../../data/npc-templates';
 import { SHOP_TYPES } from '../../data/dm-flavor-tables';
 import type { NameGender } from '../../data/name-tables';
 import type { DmApi } from './dmApi';
@@ -114,6 +115,7 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
   const [classId, setClassId] = useState<ClassId | ''>('');
   const [role, setRole] = useState('');
   const [npc, setNpc] = useState<GeneratedNpc | null>(null);
+  const [templateId, setTemplateId] = useState('');
 
   const roll = () =>
     setNpc(
@@ -129,7 +131,9 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
   const save = () => {
     if (!npc || !campaign) return;
     const now = clockNow();
-    const result = saveNpcToJournal(dm.data, campaign.id, npc, { npc: crypto.randomUUID() }, now);
+    const template = NPC_TEMPLATE_LIST.find((t) => t.id === templateId);
+    const statBlock = template ? { name: template.name, source: `Monster Manual 2024, p.${template.page}` } : undefined;
+    const result = saveNpcToJournal(dm.data, campaign.id, npc, { npc: crypto.randomUUID() }, now, statBlock);
     dm.replace(result.data);
     onNotify(`${result.title} saved to the journal of ${campaign.name}.`);
   };
@@ -217,6 +221,25 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
         )}
         {npc && !campaign && <span className={styles.muted}>Create a campaign to save NPCs to its journal.</span>}
       </div>
+      {npc && (
+        <div className={styles.stack}>
+          <label className={styles.field} style={{ maxWidth: 420 }}>
+            <span className={styles.fieldLabel}>Use as a stat block (optional)</span>
+            <select className={styles.input} value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+              <option value="">None</option>
+              {NPC_TEMPLATE_LIST.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} (CR {t.stats.cr ?? '?'})
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className={styles.muted}>
+            Picks an existing Monster Manual NPC stat block. The journal entry names it, and the same block is in the Library
+            for combat. The generated NPC gets no stats of its own.
+          </span>
+        </div>
+      )}
       {npc && <NpcCard npc={npc} onReroll={(part) => setNpc((cur) => (cur ? rerollNpcPart(createDefaultRng(), cur, part) : cur))} />}
       <p className={styles.muted}>
         Names, looks and the description come from the same generators as the character wizard. Class flavor only changes how

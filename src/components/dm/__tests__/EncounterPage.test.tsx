@@ -265,6 +265,57 @@ describe('Encounter page', () => {
   });
 });
 
+describe('Encounter page: after combat', () => {
+  const endFightWithOrc = (cr: string) => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Orc' } });
+    fireEvent.change(screen.getByLabelText('Hit Points'), { target: { value: '5' } });
+    if (cr) fireEvent.change(screen.getByLabelText('Challenge Rating (optional)'), { target: { value: cr } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+    fireEvent.change(screen.getByLabelText('Initiative for Orc'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    fireEvent.change(screen.getByLabelText('Amount for Orc'), { target: { value: '99' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Damage Orc' }));
+    fireEvent.click(screen.getByRole('button', { name: 'End combat' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'End combat' })).getByRole('button', { name: 'End combat' }));
+  };
+
+  it('opens Treasure with the CRs of the defeated monsters', () => {
+    endFightWithOrc('1/2');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll treasure for this encounter' }));
+    const panel = screen.getByTestId('encounter-crs');
+    expect(panel).toHaveTextContent('CR 1/2: 1 creature');
+    expect(screen.getByLabelText("Monster's CR")).toHaveValue('1/2');
+    fireEvent.click(within(panel).getByRole('button', { name: 'Hoard for CR 1/2' }));
+    expect(screen.getByRole('tab', { name: 'Hoard' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('says so instead of leaving when no counted monster has a CR', () => {
+    endFightWithOrc('');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll treasure for this encounter' }));
+    expect(screen.queryByTestId('encounter-crs')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Roll treasure for this encounter' })).toBeInTheDocument();
+  });
+
+  it('adds the combat summary to a new session note, then to the same one again', () => {
+    endFightWithOrc('1/2');
+    const journal = () => JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal as { kind: string; body: string }[];
+    fireEvent.click(screen.getByRole('button', { name: 'Add combat summary to the session note' }));
+    expect(journal()).toHaveLength(1);
+    expect(journal()[0].kind).toBe('session');
+    expect(journal()[0].body).toContain('Combat: Ambush');
+    expect(journal()[0].body).toContain('Combat ends after round');
+    fireEvent.click(screen.getByRole('button', { name: 'Add combat summary to the session note' }));
+    expect(journal()).toHaveLength(1);
+    expect(journal()[0].body.match(/Combat: Ambush/g)).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Open journal' })).toBeInTheDocument();
+  });
+});
+
 describe('Encounter page: DM quality of life', () => {
   it('shows whose turn it is next to the round', () => {
     seedCampaign(false);
