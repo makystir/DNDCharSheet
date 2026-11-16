@@ -3,7 +3,8 @@ import { Swords } from 'lucide-react';
 import type { DmCombatant, DmEncounter } from '../../types/dm';
 import type { DmApi } from './dmApi';
 import { activeCampaign, memberStats } from '../../logic/dm-campaign';
-import type { BudgetMember } from '../../logic/dm-balance';
+import { difficultyFit, encounterXp, fitLabel, xpBudget, type BudgetMember } from '../../logic/dm-balance';
+import { DIFFICULTIES } from '../../data/xp-tables';
 import {
   activeEncounter,
   addCombatants,
@@ -11,6 +12,7 @@ import {
   combatantFromMember,
   createEncounter,
   deleteEncounter,
+  duplicateEncounter,
   endEncounter,
   isOut,
   nextTurn,
@@ -70,6 +72,26 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
 
   const open = activeEncounter(campaign);
 
+  // Budget for the characters in a fight, or the whole party until some are added.
+  const budgetMembersFor = (combatants: DmCombatant[]): BudgetMember[] => {
+    const inFight: BudgetMember[] = combatants.flatMap((c) => {
+      const m = c.kind === 'pc' && c.memberId ? campaign.party.find((p) => p.id === c.memberId) : undefined;
+      const s = m ? memberStats(m) : undefined;
+      return s ? [{ name: c.name, level: s.level }] : [];
+    });
+    if (inFight.length > 0) return inFight;
+    return campaign.party.flatMap((m) => {
+      const s = memberStats(m);
+      return s ? [{ name: m.name, level: s.level }] : [];
+    });
+  };
+  /** Encounter XP and where it sits against the DMG 2024 budgets (same math as the balance card). */
+  const summaryOf = (e: DmEncounter) => {
+    const xp = encounterXp(e.combatants).total.total;
+    const [low, moderate, high] = DIFFICULTIES.map((d) => xpBudget(budgetMembersFor(e.combatants), d).total);
+    return { xp, fit: fitLabel(difficultyFit(xp, { low, moderate, high })) };
+  };
+
   const commit = (next: DmEncounter) => {
     const now = clockNow();
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
@@ -97,7 +119,9 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
               <p className={styles.muted}>No encounters yet. Name one below to set up a fight.</p>
             ) : (
               <ul className={styles.campaignList}>
-                {campaign.encounters.map((e) => (
+                {campaign.encounters.map((e) => {
+                  const sum = summaryOf(e);
+                  return (
                   <li key={e.id} className={styles.campaignItem}>
                     <span>
                       <span className={styles.campaignName}>{e.name}</span>
@@ -105,6 +129,10 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
                         {' '}
                         · {STATUS_LABEL[e.status]} · {e.combatants.length} {e.combatants.length === 1 ? 'combatant' : 'combatants'}
                         {e.status !== 'setup' && ` · round ${e.round}`}
+                      </span>
+                      <span className={styles.muted} data-testid="encounter-summary">
+                        {' '}
+                        · {sum.xp.toLocaleString()} XP · {sum.fit}
                       </span>
                     </span>
                     <span className={styles.row}>
@@ -118,6 +146,17 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
                       </button>
                       <button
                         type="button"
+                        className={styles.btn}
+                        onClick={() => {
+                          const now = clockNow();
+                          dm.update((d) => saveEncounter(d, campaign.id, duplicateEncounter(e, () => crypto.randomUUID(), now), now));
+                        }}
+                        aria-label={`Duplicate encounter ${e.name}`}
+                      >
+                        Duplicate
+                      </button>
+                      <button
+                        type="button"
                         className={styles.btnDanger}
                         onClick={() => setDeleting(e)}
                         aria-label={`Delete encounter ${e.name}`}
@@ -126,7 +165,8 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
                       </button>
                     </span>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
             <form
@@ -174,6 +214,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
   const running = open.status === 'running';
   const ended = open.status === 'ended';
   const presentMemberIds = open.combatants.flatMap((c) => (c.memberId ? [c.memberId] : []));
+  const activeName = running ? open.combatants.find((c) => c.id === open.activeId)?.name : undefined;
 
   const addWholeParty = () => {
     const made = campaign.party
@@ -275,6 +316,11 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
             <span className={enc.roundBadge} aria-live="polite">
               Round {open.round}
             </span>
+            {activeName && (
+              <span className={enc.roundBadge} data-testid="active-turn" aria-live="polite">
+                Turn: {activeName}
+              </span>
+            )}
             <button type="button" className={styles.btn} onClick={() => commit(previousTurn(open))}>
               Previous turn
             </button>
@@ -365,9 +411,9 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
           party={campaign.party}
           customMonsters={dm.data.customMonsters}
           presentMemberIds={presentMemberIds}
-          onAdd={(list) => {
+          onAdd={(list, keepOpen) => {
             commit(addCombatants(open, list));
-            setAdding(false);
+            if (!keepOpen) setAdding(false);
           }}
           onClose={() => setAdding(false)}
         />

@@ -181,3 +181,12 @@ describe('DmShell', () => {
     await waitFor(() => expect(JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].name).toBe('From file'));
   });
 });
+
+describe('DM navigation shortcuts', () => {
+  it('shows the number key of each page on its nav button', () => {
+    render(<Harness />);
+    const encounter = document.querySelector('[data-section="encounter"]')!;
+    expect(encounter).toHaveAttribute('aria-keyshortcuts', '3');
+    expect(encounter).toHaveAttribute('title', 'Encounter (press 3)');
+  });
+});

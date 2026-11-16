@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { DmCombatCondition, DmCombatant, DmEncounter } from '../../types/dm';
 import { CONDITIONS, getCondition } from '../../data/conditions';
@@ -9,6 +9,7 @@ import {
   resetLegendary,
   spendLegendaryAction,
   dealDamage,
+  duplicateCombatant,
   giveTempHp,
   healCombatant,
   isDown,
@@ -24,12 +25,15 @@ import {
   rollConcentrationSave,
   setConcentration,
   setInitiative,
+  setLegendaryInLair,
   stabilizeCombatant,
   updateCombatant,
 } from '../../logic/dm-encounter';
 import { createDefaultRng } from '../../logic/random';
 import type { Breakdown } from '../../logic/breakdown';
+import { resolveConditionTooltip } from '../../logic/tooltip-content';
 import { Card } from '../shared/Card';
+import { ContentTooltip } from '../shared/ContentTooltip';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './dm.module.css';
 import enc from './encounter.module.css';
@@ -70,6 +74,13 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
   const [condRounds, setCondRounds] = useState('');
   const [saveD20, setSaveD20] = useState('');
   const [concLabel, setConcLabel] = useState(c.concentration.label);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Keep the active combatant's card on screen when the turn passes to it.
+  useEffect(() => {
+    const el = cardRef.current;
+    if (isActive && el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [isActive]);
 
   const setup = encounter.status === 'setup';
   const ended = encounter.status === 'ended';
@@ -117,6 +128,8 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
     onCommit(resolveConcentration(encounter, c.id, roll.success));
   };
 
+  const duplicate = () => onCommit(duplicateCombatant(encounter, c.id, () => crypto.randomUUID()));
+
   const dc = c.concentrationDcs[0];
   const defences = [
     c.resistances && `Resists ${c.resistances}`,
@@ -152,7 +165,15 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
           )}
           <div className={enc.name}>
             {c.name}
-            <div className={styles.muted}>{c.sourceLabel}</div>
+            <div className={styles.muted}>
+              {c.cr && <strong>CR {c.cr} · </strong>}
+              {c.sourceLabel}
+            </div>
+            {c.notes.trim() !== '' && (
+              <div className={enc.notesPreview} title={c.notes} data-testid="notes-preview">
+                {c.notes}
+              </div>
+            )}
           </div>
           {isActive && <span className={enc.turnTag}>Turn</span>}
           {out && <span className={enc.outTag}>{c.kind === 'pc' ? 'Dead' : 'Defeated'}</span>}
@@ -187,18 +208,27 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
           <div className={styles.chips}>
             {c.conditions.map((x) => {
               const name = getCondition(x.id)?.name ?? x.id;
+              const tip = resolveConditionTooltip(x.id);
+              const label = `${name}${x.rounds !== undefined ? ` (${x.rounds})` : ''}`;
               return (
-                <button
-                  key={x.id}
-                  type="button"
-                  className={enc.chipButton}
-                  onClick={() => onCommit(removeCondition(encounter, c.id, x.id))}
-                  aria-label={`Remove ${name} from ${c.name}`}
-                  title="Tap to remove"
-                >
-                  {name}
-                  {x.rounds !== undefined && ` (${x.rounds})`} ✕
-                </button>
+                <span key={x.id} className={enc.chipGroup}>
+                  {tip ? (
+                    <ContentTooltip content={tip} className={enc.chipName} ariaLabel={`${label}: rules for ${name}`}>
+                      {label}
+                    </ContentTooltip>
+                  ) : (
+                    <span className={enc.chipName}>{label}</span>
+                  )}
+                  <button
+                    type="button"
+                    className={enc.chipRemove}
+                    onClick={() => onCommit(removeCondition(encounter, c.id, x.id))}
+                    aria-label={`Remove ${name} from ${c.name}`}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </span>
               );
             })}
             {c.concentration.active && (
@@ -242,6 +272,17 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
               <span className={styles.muted}>Taken after another creature's turn; all return at the start of this creature's turn.</span>
             </span>
             <span className={styles.row}>
+              {c.legendaryLair && (
+                <label className={enc.checkRow}>
+                  <input
+                    type="checkbox"
+                    checked={c.legendaryLair.active}
+                    aria-label={`In Lair for ${c.name}`}
+                    onChange={(e) => onCommit(setLegendaryInLair(encounter, c.id, e.target.checked))}
+                  />{' '}
+                  In Lair ({c.legendaryLair.inLair} uses)
+                </label>
+              )}
               <button
                 type="button"
                 className={styles.btn}
@@ -286,6 +327,11 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
               </>
             )}
             <span className={enc.spacer} />
+            {c.kind === 'monster' && (
+              <button type="button" className={styles.btn} onClick={duplicate} aria-label={`Duplicate ${c.name}`}>
+                Duplicate
+              </button>
+            )}
             <button
               type="button"
               className={styles.btn}

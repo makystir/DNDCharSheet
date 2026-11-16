@@ -136,6 +136,17 @@ function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
     const max = int(raw.legendary.max, 0, 0, 20);
     if (max > 0) out.legendary = { max, used: int(raw.legendary.used, 0, 0, max) };
   }
+  if (out.legendary && isRecord(raw.legendaryLair)) {
+    const normal = int(raw.legendaryLair.normal, 0, 0, 20);
+    const inLair = int(raw.legendaryLair.inLair, 0, 0, 20);
+    if (normal > 0 && inLair > 0 && normal !== inLair) {
+      const active = raw.legendaryLair.active === true;
+      out.legendaryLair = { normal, inLair, active };
+      // Keep the live maximum consistent with the toggle.
+      const max = active ? inLair : normal;
+      out.legendary = { max, used: Math.min(out.legendary.used, max) };
+    }
+  }
   if (typeof raw.memberId === 'string') out.memberId = raw.memberId;
   if (typeof raw.groupId === 'string') out.groupId = raw.groupId;
   if (typeof raw.cr === 'string' && raw.cr.trim() !== '') out.cr = raw.cr.trim().slice(0, 8);

@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DmCombatant, DmCustomMonster, DmPartyMember } from '../../types/dm';
 import { combatantFromMember, customCombatant, makeCopies, MAX_COMBATANTS } from '../../logic/dm-encounter';
 import { xpForCr } from '../../logic/dm-balance';
-import { combatantFromLibrary, libraryMonsters, type LibraryMonster } from '../../logic/dm-library';
+import {
+  combatantFromLibrary,
+  crOptions,
+  filterMonsters,
+  libraryMonsters,
+  typeOptions,
+  type LibraryMonster,
+} from '../../logic/dm-library';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import styles from './dm.module.css';
@@ -23,11 +30,15 @@ export interface AddCombatantsDialogProps {
   customMonsters: DmCustomMonster[];
   /** Party members already in this encounter. */
   presentMemberIds: string[];
-  onAdd: (combatants: DmCombatant[]) => void;
+  /** keepOpen is true for the library's "Add and keep browsing" button: the caller should not close the dialog. */
+  onAdd: (combatants: DmCombatant[], keepOpen?: boolean) => void;
   onClose: () => void;
 }
 
 const newId = () => crypto.randomUUID();
+
+/** Rows are not virtualised, so only this many matches are drawn; narrow the filters to reach the rest. */
+const MAX_SHOWN = 100;
 
 function libraryEntries(customMonsters: DmCustomMonster[]): LibraryEntry[] {
   return libraryMonsters({ customMonsters })
@@ -48,7 +59,10 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   const [tab, setTab] = useState<Tab>('party');
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState('');
+  const [cr, setCr] = useState('');
+  const [type, setType] = useState('');
   const [chosen, setChosen] = useState<string | null>(null);
+  const [added, setAdded] = useState<string | null>(null);
   const [qty, setQty] = useState('1');
   const [group, setGroup] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,15 +88,19 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   }, [onClose]);
 
   const entries = useMemo(() => libraryEntries(customMonsters), [customMonsters]);
-  const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q === '' ? entries : entries.filter((e) => e.name.toLowerCase().includes(q));
-  }, [entries, query]);
+  const crs = useMemo(() => crOptions(entries.map((e) => e.monster)), [entries]);
+  const types = useMemo(() => typeOptions(entries.map((e) => e.monster)), [entries]);
+  const matches = useMemo(() => {
+    const keys = new Set(filterMonsters(entries.map((e) => e.monster), { query, cr, type }).map((m) => m.key));
+    return entries.filter((e) => keys.has(e.key));
+  }, [entries, query, cr, type]);
+  const shown = matches.slice(0, MAX_SHOWN);
 
   const count = Math.min(MAX_COMBATANTS, Math.max(1, Math.trunc(Number(qty)) || 1));
 
-  const submit = () => {
+  const submit = (keepOpen = false) => {
     setError(null);
+    setAdded(null);
     if (tab === 'party') {
       const made = party
         .filter((m) => picked.has(m.id))
@@ -98,7 +116,9 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
       if (!entry) return setError('Pick a creature from the list.');
       const base = combatantFromLibrary(entry.monster, newId());
       if (!base) return setError('That creature has no fixed Armor Class or Hit Points to track.');
-      return onAdd(makeCopies(base, count, newId, group));
+      onAdd(makeCopies(base, count, newId, group), keepOpen);
+      if (keepOpen) setAdded(`Added ${count > 1 ? `${count} x ` : ''}${entry.name}.`);
+      return;
     }
     if (custom.name.trim() === '') return setError('Give the creature a name.');
     const base = customCombatant(newId(), {
@@ -212,8 +232,32 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
               <span className={styles.fieldLabel}>Search creatures</span>
               <input className={styles.input} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="For example: guard" />
             </label>
+            <div className={styles.row}>
+              <label className={styles.field} style={{ flex: '0 1 140px' }}>
+                <span className={styles.fieldLabel}>Challenge Rating</span>
+                <select className={styles.input} value={cr} onChange={(e) => setCr(e.target.value)}>
+                  <option value="">Any</option>
+                  {crs.map((c) => (
+                    <option key={c} value={c}>
+                      CR {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.field} style={{ flex: '0 1 170px' }}>
+                <span className={styles.fieldLabel}>Creature type</span>
+                <select className={styles.input} value={type} onChange={(e) => setType(e.target.value)}>
+                  <option value="">Any</option>
+                  {types.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <ul className={enc.pickList} aria-label="Creatures">
-              {shown.length === 0 && <li className={styles.muted}>No creature matches that search.</li>}
+              {shown.length === 0 && <li className={styles.muted}>No creature matches those filters.</li>}
               {shown.map((e) => (
                 <li key={e.key}>
                   <label className={enc.pickItem}>
@@ -226,7 +270,17 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
                 </li>
               ))}
             </ul>
+            {matches.length > shown.length && (
+              <p className={styles.muted}>
+                Showing the first {shown.length} of {matches.length} matches. Narrow the search or filters to see the rest.
+              </p>
+            )}
             {copiesControls}
+            {added && (
+              <p className={styles.muted} role="status">
+                {added}
+              </p>
+            )}
           </div>
         )}
 
@@ -287,7 +341,12 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
           <button type="button" className={styles.btn} onClick={onClose}>
             Cancel
           </button>
-          <button type="button" className={styles.btnPrimary} onClick={submit}>
+          {tab === 'library' && (
+            <button type="button" className={styles.btn} onClick={() => submit(true)}>
+              Add and keep browsing
+            </button>
+          )}
+          <button type="button" className={styles.btnPrimary} onClick={() => submit()}>
             Add to encounter
           </button>
         </div>

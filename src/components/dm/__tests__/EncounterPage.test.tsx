@@ -153,7 +153,7 @@ describe('Encounter page', () => {
     fireEvent.change(screen.getByLabelText('Condition rounds for Ogre'), { target: { value: '3' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add condition' }));
     const chip = screen.getByRole('button', { name: 'Remove Poisoned from Ogre' });
-    expect(chip).toHaveTextContent('Poisoned (3)');
+    expect(screen.getByRole('button', { name: /^Poisoned \(3\)/ })).toBeInTheDocument();
     fireEvent.click(chip);
     expect(screen.queryByRole('button', { name: 'Remove Poisoned from Ogre' })).not.toBeInTheDocument();
   });
@@ -241,4 +241,99 @@ describe('Encounter page', () => {
     expect(screen.getByTestId('xp-share')).toHaveTextContent('33');
     fireEvent.click(screen.getByLabelText('Count Orc for XP'));
     expect(screen.getByTestId('xp-share')).toHaveTextContent('0');
-  });});
+  });
+});
+
+describe('Encounter page: DM quality of life', () => {
+  it('shows whose turn it is next to the round', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    addCustom('Ogre', '30');
+    fireEvent.change(screen.getByLabelText('Initiative for Ogre'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    expect(screen.getByTestId('active-turn')).toHaveTextContent('Turn: Ogre');
+  });
+
+  it('duplicates a monster with one click', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    addCustom('Goblin', '7');
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate Goblin' }));
+    expect(cards()).toHaveLength(2);
+    expect(screen.getByText('Goblin 2')).toBeInTheDocument();
+  });
+
+  it('shows CR and a notes preview on the collapsed card', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ogre' } });
+    fireEvent.change(screen.getByLabelText(/^Challenge Rating/), { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+    expect(within(cards()[0]).getByText(/CR 2/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Show more for Ogre' }));
+    const notes = within(cards()[0]).getByLabelText('Notes');
+    fireEvent.change(notes, { target: { value: 'Has the key' } });
+    fireEvent.blur(notes);
+    expect(screen.getByTestId('notes-preview')).toHaveTextContent('Has the key');
+  });
+
+  it('shows the condition rules on a chip without removing it', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    addCustom('Ogre', '30');
+    fireEvent.click(screen.getByRole('button', { name: 'Show more for Ogre' }));
+    fireEvent.change(screen.getByLabelText('Condition for Ogre'), { target: { value: 'poisoned' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add condition' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Poisoned: rules for Poisoned/ }));
+    expect(screen.getByRole('tooltip')).toHaveTextContent(/Poisoned/);
+    expect(screen.getByRole('button', { name: 'Remove Poisoned from Ogre' })).toBeInTheDocument();
+  });
+
+  it('lists encounter XP and fit, and duplicates an encounter as a fresh setup', () => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter('Ambush');
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ogre' } });
+    fireEvent.change(screen.getByLabelText(/^XP value/), { target: { value: '75' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+    fireEvent.click(screen.getByRole('button', { name: 'All encounters' }));
+    expect(screen.getByTestId('encounter-summary')).toHaveTextContent('75 XP');
+    expect(screen.getByTestId('encounter-summary')).toHaveTextContent('Fits the Moderate budget');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate encounter Ambush' }));
+    expect(screen.getByText('Ambush (copy)')).toBeInTheDocument();
+    const encounters = JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].encounters;
+    expect(encounters).toHaveLength(2);
+    expect(encounters[1].status).toBe('setup');
+    expect(encounters[1].combatants).toHaveLength(1);
+  });
+
+  it('filters the creature library by CR and keeps the dialog open to add more', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Creature library' }));
+    const list = () => within(screen.getByRole('list', { name: 'Creatures' })).getAllByRole('radio');
+    expect(list()).toHaveLength(100);
+    expect(screen.getByText(/Showing the first 100 of/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Search creatures'), { target: { value: 'Aboleth' } });
+    fireEvent.change(screen.getByLabelText('Challenge Rating'), { target: { value: '10' } });
+    expect(list()).toHaveLength(1);
+    fireEvent.click(list()[0]);
+    fireEvent.click(screen.getByRole('button', { name: 'Add and keep browsing' }));
+    expect(screen.getByRole('dialog', { name: 'Add combatants' })).toBeInTheDocument();
+    expect(screen.getByText('Added Aboleth.')).toBeInTheDocument();
+    expect(cards()).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Add and keep browsing' }));
+    expect(cards()).toHaveLength(2);
+  });
+});

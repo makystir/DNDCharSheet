@@ -133,6 +133,12 @@ export interface DmCombatant {
   xpCounts?: boolean;
   /** Legendary action uses: max per round, used so far (they refill at the start of its turn). */
   legendary?: { max: number; used: number };
+  /**
+   * Printed in-lair legendary count, when the stat block gives a different one ("3 (4 in Lair)",
+   * MM 2024 stat block field `legendaryActionUses`). `active` is the DM's "In Lair" toggle; while
+   * on, `legendary.max` is `inLair`, otherwise `normal`. Absent in older saves.
+   */
+  legendaryLair?: { normal: number; inLair: number; active: boolean };
   /** Monster only: make Death Saving Throws at 0 HP instead of dying outright. */
   diesLikeCharacter: boolean;
   notes: string;

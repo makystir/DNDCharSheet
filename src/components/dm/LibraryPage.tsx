@@ -17,7 +17,7 @@ import {
   type LibraryMonster,
   type LibraryOrigin,
 } from '../../logic/dm-library';
-import { addCombatants, makeCopies, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { addCombatants, createEncounter, makeCopies, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -92,6 +92,21 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
     const now = clockNow();
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
     onNotify(`${count > 1 ? `${count} × ` : ''}${m.name} added to ${chosenEncounter.name}.`);
+  };
+
+  /** No open encounter: make one (named for the creature) and put the creature straight into it. */
+  const createAndAdd = (m: LibraryMonster) => {
+    if (!campaign) return;
+    const base = combatantFromLibrary(m, crypto.randomUUID());
+    if (!base) {
+      onNotify(`${m.name} has no fixed Armor Class or Hit Points, so it cannot be added to an encounter.`);
+      return;
+    }
+    const now = clockNow();
+    const created = createEncounter(crypto.randomUUID(), `${m.name} encounter`, now);
+    const next = addCombatants(created, makeCopies(base, count, () => crypto.randomUUID(), group));
+    dm.update((d) => saveEncounter(d, campaign.id, next, now));
+    onNotify(`${count > 1 ? `${count} × ` : ''}${m.name} added to the new encounter "${next.name}".`);
   };
 
   return (
@@ -249,6 +264,11 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
                     {campaign
                       ? 'There is no open encounter to add to. '
                       : 'Create a campaign and an encounter first. '}
+                    {campaign && (
+                      <button type="button" className={styles.btnPrimary} onClick={() => createAndAdd(selected)}>
+                        Create encounter and add
+                      </button>
+                    )}{' '}
                     <button type="button" className={styles.btn} onClick={onOpenEncounter}>
                       Go to Encounter
                     </button>

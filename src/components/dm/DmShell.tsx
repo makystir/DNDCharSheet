@@ -85,6 +85,8 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         className={active ? navStyles.navItemActive : navStyles.navItem}
         onClick={() => onNavigate(item.id)}
         aria-current={active ? 'page' : undefined}
+        aria-keyshortcuts={item.shortcut}
+        title={`${item.label} (press ${item.shortcut})`}
         data-section={item.id}
       >
         <span className={navStyles.iconWrapper}>

@@ -94,6 +94,17 @@ describe('Library page', () => {
     expect(screen.getByRole('heading', { name: 'Encounter' })).toBeInTheDocument();
   });
 
+  it('creates an encounter and adds the creature when none is open', () => {
+    seed(false);
+    render(<Routed initial="library" />);
+    fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });
+    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain.*Monster Manual NPCs/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Create encounter and add' }));
+    const encounters = saved().campaigns[0].encounters;
+    expect(encounters).toHaveLength(1);
+    expect(encounters[0].combatants.map((c: { name: string }) => c.name)).toEqual(['Bandit Captain']);
+  });
+
   it('copies a creature into an editable monster, saves it, edits and deletes it', () => {
     render(<Routed initial="library" />);
     fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });

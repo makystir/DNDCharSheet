@@ -211,7 +211,17 @@ export function combatantFromMonsterManual(e: MonsterManual2024Entry, id: string
   c.cr = e.cr;
   c.xp = e.xp;
   c.conSaveMod = e.abilities.con.save;
-  if (e.legendaryActions.length > 0) c.legendary = { max: e.legendaryActionUses?.normal ?? 3, used: 0 };
+  // MM 2024 p.9 "Legendary Actions" (How to Use a Monster): the number of uses "is specified in the
+  // stat block". It is read from the stat block's `legendaryActionUses` (monsters.json) and never
+  // assumed; a creature whose entry carries no count gets no legendary tracker. The in-lair count
+  // ("Legendary Action Uses: 3 (4 in Lair)") is `legendaryActionUses.inLair`.
+  const uses = e.legendaryActionUses;
+  if (e.legendaryActions.length > 0 && uses) {
+    c.legendary = { max: uses.normal, used: 0 };
+    if (uses.inLair !== undefined && uses.inLair !== uses.normal) {
+      c.legendaryLair = { normal: uses.normal, inLair: uses.inLair, active: false };
+    }
+  }
   return c;
 }
 
@@ -304,6 +314,7 @@ export function makeCopies(
     concentration: { ...base.concentration },
     concentrationDcs: [...base.concentrationDcs],
     legendary: base.legendary ? { ...base.legendary } : undefined,
+    legendaryLair: base.legendaryLair ? { ...base.legendaryLair } : undefined,
   }));
 }
 
@@ -700,6 +711,81 @@ export function spendLegendaryAction(enc: DmEncounter, id: string): DmEncounter 
 
 export function resetLegendary(enc: DmEncounter, id: string): DmEncounter {
   return refillLegendary(enc, id);
+}
+
+/**
+ * Switch a creature between its normal and in-lair Legendary Action uses. Both
+ * numbers are the ones printed in the stat block ("3 (4 in Lair)", MM 2024
+ * `legendaryActionUses`). Does nothing for a creature that prints no in-lair count.
+ */
+export function setLegendaryInLair(enc: DmEncounter, id: string, active: boolean): DmEncounter {
+  const c = findCombatant(enc, id);
+  if (!c?.legendary || !c.legendaryLair || c.legendaryLair.active === active) return enc;
+  const lair = c.legendaryLair;
+  const max = active ? lair.inLair : lair.normal;
+  return withLog(
+    mapCombatant(enc, id, (x) => ({
+      ...x,
+      legendary: { max, used: Math.min(c.legendary?.used ?? 0, max) },
+      legendaryLair: { ...lair, active },
+    })),
+    `${c.name} ${active ? 'is now in its lair' : 'is no longer in its lair'} (${max} legendary action uses).`,
+  );
+}
+
+// ------------------------------------------------------------- duplication
+
+/** A combatant as it starts a fresh fight: full Hit Points, no conditions, nothing spent. */
+function freshCombatant(c: DmCombatant): DmCombatant {
+  return {
+    ...c,
+    hp: monsterHp(c.hp.max),
+    surprised: false,
+    conditions: [],
+    concentration: { active: false, label: '' },
+    concentrationDcs: [],
+    legendary: c.legendary
+      ? { max: c.legendaryLair ? c.legendaryLair.normal : c.legendary.max, used: 0 }
+      : undefined,
+    legendaryLair: c.legendaryLair ? { ...c.legendaryLair, active: false } : undefined,
+  };
+}
+
+/** Add one more fresh copy of a monster to the encounter ("Goblin 2" after "Goblin 1"). */
+export function duplicateCombatant(enc: DmEncounter, id: string, newId: () => string): DmEncounter {
+  const c = findCombatant(enc, id);
+  if (!c || c.kind !== 'monster') return enc;
+  const stem = c.name.replace(/ \d+$/, '');
+  let highest = 0;
+  for (const o of enc.combatants) {
+    if (o.name === stem) highest = Math.max(highest, 1);
+    else if (o.name.startsWith(`${stem} `) && /^\d+$/.test(o.name.slice(stem.length + 1))) {
+      highest = Math.max(highest, Number(o.name.slice(stem.length + 1)));
+    }
+  }
+  const [copy] = makeCopies(freshCombatant(c), 1, newId, false);
+  return addCombatants(enc, [{ ...copy, name: `${stem} ${highest + 1}`.slice(0, 60) }]);
+}
+
+/**
+ * A new encounter in setup built from an existing one, for reuse as a template:
+ * the same combatants at full Hit Points, Initiative cleared (to be rolled
+ * again), no round, no active turn and an empty log.
+ */
+export function duplicateEncounter(src: DmEncounter, newId: () => string, now: number): DmEncounter {
+  const groups = new Map<string, string>();
+  const combatants = src.combatants.map((c) => {
+    let groupId = c.groupId;
+    if (groupId !== undefined) {
+      if (!groups.has(groupId)) groups.set(groupId, newId());
+      groupId = groups.get(groupId);
+    }
+    return { ...freshCombatant(c), id: newId(), groupId, initiative: null };
+  });
+  return {
+    ...createEncounter(newId(), `${src.name} (copy)`.slice(0, 80), now),
+    combatants,
+  };
 }
 
 // ------------------------------------------------------------ concentration
