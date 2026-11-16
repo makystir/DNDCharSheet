@@ -77,8 +77,8 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const [noncombat, setNoncombat] = useState<EncounterDifficulty | 'typed'>('moderate');
   const [typed, setTyped] = useState('100');
   const [targetLevel, setTargetLevel] = useState('2');
-  // `key` ties a created code to the draft it came from; null for a code re-shown from history.
-  const [shownRaw, setShown] = useState<{ code: string; id: string; key: string | null } | null>(null);
+  // `key` ties a shown code to the draft that was current when it was made or re-shown; history marks a re-shown past award.
+  const [shownRaw, setShown] = useState<{ code: string; id: string; key: string; history: boolean } | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const codeRef = useRef<HTMLTextAreaElement>(null);
   const creating = useRef(false);
@@ -86,11 +86,15 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const encounters = campaign?.encounters ?? [];
   const encounter = encounters.find((e) => e.id === encounterId) ?? encounters[0];
   const partySize = Math.max(1, party.length);
-  const sharerCount = Math.max(1, Math.trunc(Number(sharers)) || partySize);
+  // Blank means the whole party. Anything else must be a whole number of at least 1 (no silent coercion).
+  const sharersText = sharers.trim();
+  const sharersValid = sharersText === '' || (/^\d+$/.test(sharersText) && Number(sharersText) >= 1);
+  const sharerCount = sharersText === '' || !sharersValid ? partySize : Number(sharersText);
   const cleanedLabel = cleanLabel(label);
 
   const amount: Amount = (() => {
     if (tab === 'fight') {
+      if (!sharersValid) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: 'Characters sharing the XP must be a whole number of 1 or more, or blank for the whole party.' };
       if (!encounter) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: 'Save an encounter on the Encounter page first.' };
       const counted = encounter.combatants.filter((c) => c.kind === 'monster' && countsForXp(c));
       const s = fightShare(counted, sharerCount);
@@ -138,12 +142,12 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   };
 
   const draftKey = JSON.stringify([amount.kind, amount.amount, amount.source, cleanedLabel]);
-  // A created code is shown only while the draft still matches the one it was made from.
-  const shown = shownRaw && (shownRaw.key === null || shownRaw.key === draftKey) ? shownRaw : null;
+  // A shown code (created or re-shown from history) is hidden as soon as the draft changes, so Copy never sends an award that differs from the form.
+  const shown = shownRaw && shownRaw.key === draftKey ? shownRaw : null;
 
   const create = async (another = false) => {
     if (problem) return;
-    if (!another && shown && shown.key === draftKey) return; // already created for this draft; reuse it
+    if (!another && shown && !shown.history) return; // already created for this draft; reuse it
     if (creating.current) return;
     creating.current = true;
     try {
@@ -170,7 +174,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     }
     setCreateError(null);
     if (campaign) dm.update((d) => addAward(d, campaign.id, award));
-    setShown({ code: encoded.code, id: award.id, key });
+    setShown({ code: encoded.code, id: award.id, key, history: false });
   };
 
   const showCode = async (award: DmAward) => {
@@ -180,7 +184,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
       return;
     }
     setCreateError(null);
-    setShown({ code: encoded.code, id: award.id, key: null });
+    setShown({ code: encoded.code, id: award.id, key: draftKey, history: true });
   };
 
   const copy = async () => {
@@ -439,7 +443,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                 <button type="button" className={styles.btn} onClick={() => void copy()}>
                   Copy
                 </button>
-                {shown.key !== null && (
+                {!shown.history && (
                   <button type="button" className={styles.btn} onClick={() => void create(true)}>
                     Create another award with these values
                   </button>

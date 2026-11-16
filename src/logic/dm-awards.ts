@@ -25,7 +25,7 @@ import type { DmCombatant, DmPartyMember } from '../types/dm';
 import type { Breakdown } from './breakdown';
 import type { EncounterDifficulty } from '../data/xp-tables';
 import { clampLevel } from './abilities';
-import { hitPointMaxOf } from './hit-points-state';
+import { applyHealingToCharacter, hitPointMaxOf } from './hit-points-state';
 import { appendLogEntry, awardXp, characterXp, levelingMode, setLevel, xpForLevel, xpToLevel } from './advancement';
 import { xpAward, xpBudget, type BudgetMember, type XpAward } from './dm-balance';
 import { isGzipSupported } from './gzip';
@@ -38,8 +38,6 @@ export const MAX_AWARD_XP = xpForLevel(20);
 export const MAX_LABEL = 40;
 /** DM award history cap per campaign. */
 export const MAX_AWARDS = 200;
-/** Replay list cap on a character. */
-export const MAX_APPLIED = 500;
 export const AWARD_PREFIX = 'AWARD-';
 export const ID_PATTERN = /^[a-z0-9]{8,32}$/;
 /** Input guard: longer pasted text is rejected before any decoding. */
@@ -257,19 +255,20 @@ export function fightShare(counted: DmCombatant[], sharers: number): XpAward {
 /**
  * The replay list as a clean string array. Imported or shared characters can carry
  * any value here, so every read goes through this: non-arrays give [], items that
- * are not valid award IDs are dropped, and the list is capped at MAX_APPLIED.
+ * are not valid award IDs are dropped. The list is never trimmed: dropping an old ID
+ * would let that award be applied twice (an ID never double-applies).
  */
 export function appliedAwardIds(character: Character): string[] {
   const raw: unknown = character.advancement?.appliedAwards;
   if (!Array.isArray(raw)) return [];
-  return raw.filter((x): x is string => typeof x === 'string' && ID_PATTERN.test(x)).slice(-MAX_APPLIED);
+  return raw.filter((x): x is string => typeof x === 'string' && ID_PATTERN.test(x));
 }
 
 function recordId(character: Character, id: string): Character {
   const existing = appliedAwardIds(character);
   return {
     ...character,
-    advancement: { ...character.advancement, appliedAwards: [...existing, id].slice(-MAX_APPLIED) },
+    advancement: { ...character.advancement, appliedAwards: [...existing, id] },
   };
 }
 
@@ -321,15 +320,13 @@ export function applyAward(
     next = setLevel(character, award.amount);
     // DMG 2024 "Leveling Up": current and maximum HP rise together outside a Long Rest, so
     // a stored current HP gains the same amount as the maximum (never above the new maximum).
+    // The gain goes through the healing writer so a character at 0 HP clears death saves and
+    // Stable like any other healing. A dead character (explicit flag) gets no HP change: the
+    // rulebooks do not say a level award revives, so the level rises and the life state stays.
     const maxAfter = hitPointMaxOf(next);
-    if (
-      maxBefore !== undefined &&
-      maxAfter !== undefined &&
-      maxAfter > maxBefore &&
-      next.currentHp !== undefined &&
-      Number.isFinite(next.currentHp)
-    ) {
-      next = { ...next, currentHp: Math.min(maxAfter, Math.max(0, next.currentHp) + (maxAfter - maxBefore)) };
+    if (maxBefore !== undefined && maxAfter !== undefined && maxAfter > maxBefore && next.currentHp !== undefined && Number.isFinite(next.currentHp)) {
+      const healed = applyHealingToCharacter(next, maxAfter - maxBefore);
+      if (healed) next = healed.character;
     }
     next = appendLogEntry(next, {
       timestamp: now,

@@ -122,6 +122,30 @@ describe('Party XP page', () => {
     expect((again as HTMLTextAreaElement).value).toBe((code as HTMLTextAreaElement).value);
   });
 
+  it('hides a code reopened from history once the form is edited', async () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    const first = render(<Page />);
+    typeAmount('150');
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    await screen.findByLabelText('Award code');
+    await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(1));
+    first.unmount();
+    render(<Page />);
+    fireEvent.click(screen.getByRole('button', { name: 'Show code' }));
+    await screen.findByLabelText('Award code');
+    fireEvent.change(screen.getByLabelText('Label (optional)'), { target: { value: 'Edited' } });
+    expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument();
+  });
+
+  it('rejects an invalid sharer count instead of coercing it', () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    render(<Page />);
+    for (const bad of ['0', '-2', '1.5']) {
+      fireEvent.change(screen.getByLabelText('Characters sharing the XP'), { target: { value: bad } });
+      expect(screen.getByRole('alert')).toHaveTextContent(/sharing the XP must be a whole number/);
+      expect(screen.getByRole('button', { name: 'Create code' })).toBeDisabled();
+    }
+  });
   it('lets the DM create a second award with identical values, with its own ID', async () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
     let i = 0;

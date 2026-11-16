@@ -21,7 +21,6 @@ import {
   fightShare,
   shareBreakdown,
   ID_PATTERN,
-  MAX_APPLIED,
   MAX_AWARD_XP,
   MAX_AWARDS,
   MAX_CODE_CHARS,
@@ -386,17 +385,36 @@ describe('applyAward', () => {
     expect(r.character.advancement?.log).toEqual(c.advancement?.log);
   });
 
-  it('drops the oldest IDs past the cap', () => {
+  it('never drops old IDs, so an old code cannot be applied twice', () => {
     let c = withMode(sheet(3), 'xp', 0);
-    for (let i = 0; i < MAX_APPLIED + 3; i += 1) {
+    const total = 520;
+    for (let i = 0; i < total; i += 1) {
       c = applyAward(c, xpAwardOf(1, `id${String(i).padStart(8, '0')}`), NOW).character;
     }
-    const ids = c.advancement!.appliedAwards!;
-    expect(ids).toHaveLength(MAX_APPLIED);
-    expect(ids).not.toContain('id00000000');
-    expect(ids.at(-1)).toBe(`id${String(MAX_APPLIED + 2).padStart(8, '0')}`);
+    expect(c.advancement!.appliedAwards).toHaveLength(total);
+    expect(applyAward(c, xpAwardOf(1, 'id00000000'), NOW).outcome).toBe('already-applied');
   });
 
+  it('level award at 0 HP clears death saves and Stable', () => {
+    const base = withMode(sheet(3), 'milestone');
+    const failing = { ...base, currentHp: 0, deathSaves: { successes: 1, failures: 2 } };
+    const r1 = applyAward(failing, levelAwardOf(5), NOW).character;
+    expect(r1.currentHp).toBeGreaterThan(0);
+    expect(r1.deathSaves).toBeUndefined();
+    const stable = { ...base, currentHp: 0, deathSaves: { successes: 0, failures: 0, stable: true } };
+    const r2 = applyAward(stable, levelAwardOf(5), NOW).character;
+    expect(r2.currentHp).toBeGreaterThan(0);
+    expect(r2.deathSaves).toBeUndefined();
+  });
+
+  it('level award keeps a dead character dead with no HP change', () => {
+    const dead = { ...withMode(sheet(3), 'milestone'), currentHp: 0, dead: true };
+    const r = applyAward(dead, levelAwardOf(5), NOW);
+    expect(r.outcome).toBe('applied');
+    expect(r.character.level).toBe(5);
+    expect(r.character.currentHp).toBe(0);
+    expect(r.character.dead).toBe(true);
+  });
   it('refuses a level award on a multiclass sheet but allows XP', () => {
     const c = withMode(twoClasses(sheet(5), 5), 'xp', 0);
     const r = applyAward(c, levelAwardOf(8), NOW);
