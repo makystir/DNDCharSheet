@@ -605,122 +605,122 @@
   {
    "name": "Colossus",
    "page": 76,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Commoner",
    "page": 77,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Constrictor Snake",
    "page": 351,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Copper Dragon Wyrmling",
    "page": 78,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Couatl",
    "page": 82,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Crab",
    "page": 351,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Crawling Claw",
    "page": 83,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Crocodile",
    "page": 352,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Cultist",
    "page": 84,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Cultist Fanatic",
    "page": 85,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Cultist Hierophant",
    "page": 85,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Cyclops Oracle",
    "page": 88,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Cyclops Sentry",
    "page": 88,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Dao",
    "page": 89,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Darkmantle",
    "page": 90,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Cultist",
    "page": 86,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Dog",
    "page": 91,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Knight",
    "page": 92,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Knight Aspirant",
    "page": 93,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Slaad",
    "page": 287,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Death Tyrant",
