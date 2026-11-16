@@ -68126,5 +68126,3022 @@
   "lairActions": [],
   "description": "A large fey of neutral evil alignment, encountered in Forest, Grassland, and Hill. It fights with Bite. Its challenge rating is 1/2.",
   "page": 335
+ },
+ {
+  "name": "Wraith",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 67,
+   "dice": "9d8 + 27"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 60,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Acid",
+   "Bludgeoning",
+   "Cold",
+   "Fire",
+   "Necrotic",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Incorporeal Movement",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Force"
+     }
+    ],
+    "summary": "Moves through creatures and objects as difficult terrain, taking force damage if it ends its turn inside one."
+   },
+   {
+    "name": "Sunlight Sensitivity",
+    "summary": "Suffers disadvantage on attacks and sight-based Perception checks while in direct sunlight."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Life Drain",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 21,
+      "type": "Necrotic",
+      "dice": "4d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing necrotic damage."
+   },
+   {
+    "name": "Create Specter",
+    "type": "utility",
+    "summary": "Special action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small undead of neutral evil alignment, encountered in Planar (Shadowfell) and Underdark. It can fly and fights with Life Drain. Its challenge rating is 5.",
+  "page": 336
+ },
+ {
+  "name": "Wyvern",
+  "size": "Large",
+  "type": "Dragon",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 127,
+   "dice": "15d10 + 45"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 7
+  },
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 6,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Sting"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Sting."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Piercing",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing damage."
+   },
+   {
+    "name": "Sting",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 24,
+      "type": "Poison",
+      "dice": "7d6"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus poison damage; can impose poisoned."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon, encountered in Hill and Mountain. It can fly and fights with Bite and Sting. Its challenge rating is 6.",
+  "page": 337
+ },
+ {
+  "name": "Xorn",
+  "size": "Medium",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Underdark",
+   "Planar (Elemental Plane of Earth)"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 84,
+   "dice": "8d8 + 48"
+  },
+  "speed": {
+   "walk": 20,
+   "burrow": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "tremorsense": 60,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Primordial (Terran)"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Earth Glide",
+    "summary": "Burrows through earth and stone without disturbing the material it passes through."
+   },
+   {
+    "name": "Treasure Sense",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Claw"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Claw."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Piercing",
+      "dice": "4d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "1d10 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Charge",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium elemental of neutral alignment, encountered in Underdark and Planar (Elemental Plane of Earth). It can burrow and fights with Bite and Claw. Its challenge rating is 5.",
+  "page": 338
+ },
+ {
+  "name": "Yeti",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 51,
+   "dice": "6d10 + 18"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 5
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Yeti"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Fear of Fire",
+    "summary": "Becomes frightened after taking fire damage until the end of its next turn."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw",
+     "Ice Throw",
+     "Chilling Gaze"
+    ],
+    "summary": "Strings together 2 strikes using Claw, Ice Throw, Chilling Gaze."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "1d6 + 4"
+     },
+     {
+      "avg": 3,
+      "type": "Cold",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing plus cold damage."
+   },
+   {
+    "name": "Ice Throw",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 6,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d4 + 4"
+     },
+     {
+      "avg": 2,
+      "type": "Cold",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Ranged attack at +6 dealing bludgeoning plus cold damage."
+   },
+   {
+    "name": "Chilling Gaze",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "2d4",
+      "type": "Cold"
+     }
+    ],
+    "conditions": [
+     "Paralyzed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Con save; Inflicts cold damage; can impose paralyzed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of chaotic evil alignment, encountered in Arctic. It can climb and fights with Claw, Ice Throw, and Chilling Gaze. Its challenge rating is 3.",
+  "page": 339
+ },
+ {
+  "name": "Yochlol",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 8,
+   "score": 18
+  },
+  "hp": {
+   "avg": 153,
+   "dice": "18d8 + 72"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Deception": 11,
+   "Insight": 6
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Abyssal",
+   "Elvish",
+   "Undercommon"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Web Walker",
+    "summary": "Ignores movement restrictions caused by webs."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Caustic Lash",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Caustic Lash, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Caustic Lash",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 8,
+     "reach": 10,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 25,
+      "type": "Acid",
+      "dice": "6d6 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +8 dealing acid damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Thoughts",
+      "Gaseous Form (self only)",
+      "Web"
+     ],
+     "perDay": {
+      "1": [
+       "Dominate Person"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Cha with save DC 15, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Toxic Escape",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Incapacitated",
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Con save; can impose incapacitated, poisoned; involves teleportation."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of chaotic evil alignment, encountered in Planar (Abyss). It can climb and fights with Caustic Lash. Its challenge rating is 10.",
+  "page": 341
+ },
+ {
+  "name": "Young Black Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Swamp"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 127,
+   "dice": "15d10 + 45"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Stealth": 5
+  },
+  "damageImmunities": [
+   "Acid"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "2d4 + 4"
+     },
+     {
+      "avg": 3,
+      "type": "Acid",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus acid damage."
+   },
+   {
+    "name": "Acid Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 49,
+      "dice": "14d6",
+      "type": "Acid"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Dex save; Inflicts acid damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of chaotic evil alignment, encountered in Swamp. It can fly and swim and fights with Rend and Acid Breath. Its challenge rating is 7.",
+  "page": 38
+ },
+ {
+  "name": "Young Blue Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Coastal",
+   "Desert"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 152,
+   "dice": "16d10 + 64"
+  },
+  "speed": {
+   "walk": 40,
+   "burrow": 20,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 4
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Perception": 9,
+   "Stealth": 4
+  },
+  "damageImmunities": [
+   "Lightning"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 19
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Slashing",
+      "dice": "2d6 + 5"
+     },
+     {
+      "avg": 5,
+      "type": "Lightning",
+      "dice": "1d10"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing slashing plus lightning damage."
+   },
+   {
+    "name": "Lightning Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 55,
+      "dice": "10d10",
+      "type": "Lightning"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 16 Dex save; Inflicts lightning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of lawful evil alignment, encountered in Coastal and Desert. It can burrow and fly and fights with Rend and Lightning Breath. Its challenge rating is 9.",
+  "page": 48
+ },
+ {
+  "name": "Young Brass Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Desert"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 110,
+   "dice": "13d10 + 39"
+  },
+  "speed": {
+   "walk": 40,
+   "burrow": 20,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Persuasion": 5,
+   "Stealth": 3
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Sleep Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Sleep Breath."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Slashing",
+      "dice": "2d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 38,
+      "dice": "11d6",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Dex save; Inflicts fire damage."
+   },
+   {
+    "name": "Sleep Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "conditions": [
+     "Incapacitated",
+     "Unconscious"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 14 Con save; can impose incapacitated, unconscious; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of chaotic good alignment, encountered in Desert. It can burrow and fly and fights with Rend, Fire Breath, and Sleep Breath. Its challenge rating is 6.",
+  "page": 54
+ },
+ {
+  "name": "Young Bronze Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Coastal"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 142,
+   "dice": "15d10 + 60"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Insight": 4,
+   "Perception": 7,
+   "Stealth": 3
+  },
+  "damageImmunities": [
+   "Lightning"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Repulsion Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Repulsion Breath."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 8,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Slashing",
+      "dice": "2d10 + 5"
+     }
+    ],
+    "summary": "Melee attack at +8 dealing slashing damage."
+   },
+   {
+    "name": "Lightning Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 49,
+      "dice": "9d10",
+      "type": "Lightning"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Dex save; Inflicts lightning damage."
+   },
+   {
+    "name": "Repulsion Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Str save; can impose prone; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of lawful good alignment, encountered in Coastal. It can fly and swim and fights with Rend, Lightning Breath, and Repulsion Breath. Its challenge rating is 8.",
+  "page": 58
+ },
+ {
+  "name": "Young Copper Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Hill"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 119,
+   "dice": "14d10 + 42"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Deception": 5,
+   "Perception": 7,
+   "Stealth": 4
+  },
+  "damageImmunities": [
+   "Acid"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Slowing Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Slowing Breath."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Slashing",
+      "dice": "2d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   },
+   {
+    "name": "Acid Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 40,
+      "dice": "9d8",
+      "type": "Acid"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Dex save; Inflicts acid damage."
+   },
+   {
+    "name": "Slowing Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 14 Con save; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of chaotic good alignment, encountered in Hill. It can climb and fly and fights with Rend, Acid Breath, and Slowing Breath. Its challenge rating is 7.",
+  "page": 78
+ },
+ {
+  "name": "Young Gold Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 178,
+   "dice": "17d10 + 85"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "cha": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   }
+  },
+  "skills": {
+   "Insight": 5,
+   "Perception": 9,
+   "Persuasion": 9,
+   "Stealth": 6
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 19
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Weakening Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Weakening Breath."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Slashing",
+      "dice": "2d10 + 6"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing slashing damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 55,
+      "dice": "10d10",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 17 Dex save; Inflicts fire damage; affects a 30-foot cone."
+   },
+   {
+    "name": "Weakening Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 17
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Str save; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of lawful good alignment, encountered in Grassland. It can fly and swim and fights with Rend, Fire Breath, and Weakening Breath. Its challenge rating is 10.",
+  "page": 144
+ },
+ {
+  "name": "Young Green Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 136,
+   "dice": "16d10 + 48"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Deception": 5,
+   "Perception": 7,
+   "Stealth": 4
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Slashing",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus poison damage."
+   },
+   {
+    "name": "Poison Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 42,
+      "dice": "12d6",
+      "type": "Poison"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Con save; Inflicts poison damage; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of lawful evil alignment, encountered in Forest. It can fly and swim and fights with Rend and Poison Breath. Its challenge rating is 8.",
+  "page": 152
+ },
+ {
+  "name": "Young Red Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 178,
+   "dice": "17d10 + 85"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 4
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 4
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   }
+  },
+  "skills": {
+   "Perception": 8,
+   "Stealth": 4
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Slashing",
+      "dice": "2d6 + 6"
+     },
+     {
+      "avg": 3,
+      "type": "Fire",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 56,
+      "dice": "16d6",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 17 Dex save; Inflicts fire damage; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of chaotic evil alignment, encountered in Hill and Mountain. It can climb and fly and fights with Rend and Fire Breath. Its challenge rating is 10.",
+  "page": 254
+ },
+ {
+  "name": "Young Remorhaz",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 93,
+   "dice": "11d10 + 33"
+  },
+  "speed": {
+   "walk": 30,
+   "burrow": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "damageImmunities": [
+   "Cold",
+   "Fire"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "tremorsense": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Heat Aura",
+    "damage": [
+     {
+      "avg": 11,
+      "dice": "2d10",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Radiates heat that harms creatures close to it."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Piercing",
+      "dice": "2d10 + 4"
+     },
+     {
+      "avg": 13,
+      "type": "Fire",
+      "dice": "3d8"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Arctic. It can burrow and fights with Bite. Its challenge rating is 5.",
+  "page": 258
+ },
+ {
+  "name": "Young Silver Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Mountain",
+   "Urban"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 168,
+   "dice": "16d10 + 80"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 4
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 4
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   }
+  },
+  "skills": {
+   "History": 6,
+   "Perception": 8,
+   "Stealth": 4
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Paralyzing Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Paralyzing Breath."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Slashing",
+      "dice": "2d8 + 6"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing slashing damage."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 49,
+      "dice": "11d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 17 Con save; Inflicts cold damage; affects a 30-foot cone."
+   },
+   {
+    "name": "Paralyzing Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 17
+     }
+    ],
+    "conditions": [
+     "Incapacitated",
+     "Paralyzed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Con save; can impose incapacitated, paralyzed; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of lawful good alignment, encountered in Mountain and Urban. It can fly and fights with Rend, Cold Breath, and Paralyzing Breath. Its challenge rating is 9.",
+  "page": 278
+ },
+ {
+  "name": "Young White Dragon",
+  "size": "Large",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 123,
+   "dice": "13d10 + 52"
+  },
+  "speed": {
+   "walk": 40,
+   "burrow": 20,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": 2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Stealth": 3
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Ice Walk",
+    "summary": "Moves across icy surfaces without an ability check and ignores icy difficult terrain."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "2d4 + 4"
+     },
+     {
+      "avg": 2,
+      "type": "Cold",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus cold damage."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 40,
+      "dice": "9d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Con save; Inflicts cold damage; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large dragon of chaotic evil alignment, encountered in Arctic. It can burrow, fly, and swim and fights with Rend and Cold Breath. Its challenge rating is 6.",
+  "page": 328
+ },
+ {
+  "name": "Yuan-ti Abomination",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 127,
+   "dice": "15d10 + 45"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 7,
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Draconic"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Constrict",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "7d6 + 4",
+      "type": "Bludgeoning"
+     }
+    ],
+    "summary": "Inflicts bludgeoning damage; can impose grappled, restrained."
+   },
+   {
+    "name": "Poison Spray",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 21,
+      "dice": "6d6",
+      "type": "Poison"
+     }
+    ],
+    "conditions": [
+     "Blinded",
+     "Poisoned"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Con save; Inflicts poison damage; can impose blinded, poisoned; affects a 30-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "cost": "Yuan-ti Form Only",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship (snakes only)"
+     ],
+     "perDay": {
+      "3": [
+       "Suggestion"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 15, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It can climb and fights with Bite and Poison Spray. Its challenge rating is 7.",
+  "page": 345
+ },
+ {
+  "name": "Yuan-ti Infiltrator",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 40,
+   "dice": "9d8"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Deception": 5,
+   "Perception": 4,
+   "Stealth": 3
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Draconic"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Scimitar"
+    ],
+    "summary": "Strings together 2 strikes using Scimitar."
+   },
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Slashing",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing slashing damage."
+   },
+   {
+    "name": "Poison Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Poison",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing poison damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 12,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship (snakes only)"
+     ],
+     "perDay": {
+      "2": [
+       "Suggestion"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 12, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It fights with Scimitar and Poison Ray. Its challenge rating is 1.",
+  "page": 342
+ },
+ {
+  "name": "Yuan-ti Malison (Type 1)",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 66,
+   "dice": "12d8 + 12"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Draconic"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Poison Ray",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Poison Ray, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Poison Ray",
+    "cost": "Yuan-ti Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Poison",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "summary": "Ranged attack at +5 dealing poison damage."
+   },
+   {
+    "name": "Spellcasting",
+    "cost": "Yuan-ti Form Only",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship (snakes only)"
+     ],
+     "perDay": {
+      "2": [
+       "Suggestion"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It can climb and fights with Bite and Poison Ray. Its challenge rating is 3.",
+  "page": 343
+ },
+ {
+  "name": "Yuan-ti Malison (Type 2)",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 66,
+   "dice": "12d8 + 12"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Draconic"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Bite, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Spellcasting",
+    "cost": "Yuan-ti Form Only",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship (snakes only)"
+     ],
+     "perDay": {
+      "2": [
+       "Suggestion"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It can climb and fights with Bite. Its challenge rating is 3.",
+  "page": 343
  }
 ]
