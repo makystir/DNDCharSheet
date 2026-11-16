@@ -46125,5 +46125,2535 @@
   "lairActions": [],
   "description": "A large fiend of neutral evil alignment, encountered in Planar (Lower Planes). It can fly and fights with Hooves. Its challenge rating is 3.",
   "page": 226
+ },
+ {
+  "name": "Noble",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 9,
+   "dice": "2d8"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Deception": 5,
+   "Insight": 4,
+   "Persuasion": 5
+  },
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Rapier",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d8 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Parry",
+    "type": "utility",
+    "summary": "Reaction that adds to its AC against a single melee attack."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Rapier. Its challenge rating is 1/8.",
+  "page": 227
+ },
+ {
+  "name": "Noble Prodigy",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 7,
+   "score": 17
+  },
+  "hp": {
+   "avg": 148,
+   "dice": "27d8 + 27"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Persuasion": 8
+  },
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Beguiling Strike"
+    ],
+    "summary": "Strings together 3 strikes using Beguiling Strike."
+   },
+   {
+    "name": "Beguiling Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 8,
+     "reach": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Psychic",
+      "dice": "4d6 + 4"
+     }
+    ],
+    "conditions": [
+     "Charmed"
+    ],
+    "summary": "Melee or ranged attack at +8 dealing psychic damage; can impose charmed."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 16,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Mage Armor (included in AC)",
+      "Mage Hand",
+      "Minor Illusion"
+     ],
+     "perDay": {
+      "1": [
+       "Befuddlement",
+       "Detect Thoughts",
+       "Fly",
+       "Scrying",
+       "Shatter (level 7 version)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (8 spells) using Cha with save DC 16, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Shield",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Reaction that grants a temporary AC boost against an attack or magic missile."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Beguiling Strike. Its challenge rating is 10.",
+  "page": 227
+ },
+ {
+  "name": "Nothic",
+  "size": "Medium",
+  "type": "Aberration",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d8 + 18"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Arcana": 3,
+   "Insight": 4,
+   "Perception": 4,
+   "Stealth": 5
+  },
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Undercommon"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw"
+    ],
+    "summary": "Strings together 2 strikes using Claw."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "1d10 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Rotting Gaze",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 17,
+      "dice": "5d6",
+      "type": "Necrotic"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 13 Con save; Inflicts necrotic damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Weird Insight",
+    "recharge": "6-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 14
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 6-6; Targets make a DC 14 Wis save."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of neutral evil alignment, encountered in Underdark. It fights with Claw and Rotting Gaze. Its challenge rating is 2.",
+  "page": 228
+ },
+ {
+  "name": "Nycaloth",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Yugoloth"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Gehenna)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 152,
+   "dice": "16d10 + 64"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 4
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Acid",
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Fiendish Restoration",
+    "summary": "If it dies away from its home plane, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Mercurial Axe"
+    ],
+    "summary": "Strings together 2 strikes using Mercurial Axe."
+   },
+   {
+    "name": "Mercurial Axe",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 9,
+     "reach": 10,
+     "range": "30/90"
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Slashing",
+      "dice": "2d12 + 5"
+     },
+     {
+      "avg": 10,
+      "type": "Force",
+      "dice": "3d6"
+     }
+    ],
+    "onHitOrMiss": "The axe magically returns to the nycaloth’s hand immediately after a ranged attack.",
+    "summary": "Melee or ranged attack at +9 dealing slashing plus force damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shadowy Teleport",
+    "type": "utility",
+    "summary": "Can impose invisible; involves teleportation."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of neutral evil alignment, encountered in Planar (Gehenna). It can fly and fights with Mercurial Axe. Its challenge rating is 9.",
+  "page": 229
+ },
+ {
+  "name": "Ochre Jelly",
+  "size": "Large",
+  "type": "Ooze",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 8,
+  "initiative": {
+   "mod": -2,
+   "score": 8
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "7d10 + 14"
+  },
+  "speed": {
+   "walk": 20,
+   "climb": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Acid"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Grappled"
+  ],
+  "damageImmunities": [
+   "Lightning",
+   "Slashing"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 8
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amorphous",
+    "summary": "Squeezes through spaces as narrow as one inch without penalty."
+   },
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Pseudopod",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Acid",
+      "dice": "3d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing acid damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Split",
+    "type": "utility",
+    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large ooze, encountered in Underdark. It can climb and fights with Pseudopod. Its challenge rating is 2.",
+  "page": 230
+ },
+ {
+  "name": "Octopus",
+  "size": "Small",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 3,
+   "dice": "1d6"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 2,
+   "Stealth": 6
+  },
+  "senses": {
+   "darkvision": 30,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Compression",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Tentacles",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Bludgeoning"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Ink Cloud",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day; affects a 5-foot cube."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small beast, encountered in Underwater. It can swim and fights with Tentacles. Its challenge rating is 0.",
+  "page": 365
+ },
+ {
+  "name": "Ogre",
+  "size": "Large",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 11,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 68,
+   "dice": "8d10 + 24"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 8
+  },
+  "languages": [
+   "Common",
+   "Giant"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Greatclub",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage."
+   },
+   {
+    "name": "Javelin",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 6,
+     "reach": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +6 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large giant of chaotic evil alignment, encountered in Arctic, Desert, and Forest. It fights with Greatclub and Javelin. Its challenge rating is 2.",
+  "page": 231
+ },
+ {
+  "name": "Ogre Zombie",
+  "size": "Large",
+  "type": "Undead",
+  "tags": [
+   "Zombie"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 8,
+  "initiative": {
+   "mod": -2,
+   "score": 8
+  },
+  "hp": {
+   "avg": 85,
+   "dice": "9d10 + 36"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 8
+  },
+  "languages": [
+   "Understands Common",
+   "Giant"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Undead Fortitude",
+    "summary": "May drop to 1 hit point instead of 0 after a successful Constitution save, unless hit by radiant damage or a critical hit."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large undead of neutral evil alignment, encountered in Planar (Shadowfell), Underdark, and Urban. It fights with Slam. Its challenge rating is 2.",
+  "page": 346
+ },
+ {
+  "name": "Ogrillon Ogre",
+  "size": "Large",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "7d10 + 14"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Common",
+   "Giant"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Battleaxe",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Javelin",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large giant of chaotic evil alignment, encountered in Arctic, Desert, and Forest. It fights with Battleaxe and Javelin. Its challenge rating is 1.",
+  "page": 231
+ },
+ {
+  "name": "Oni",
+  "size": "Large",
+  "type": "Fiend",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Forest",
+   "Urban"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 119,
+   "dice": "14d10 + 42"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Arcana": 5,
+   "Deception": 8,
+   "Perception": 4
+  },
+  "resistances": [
+   "Cold"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common",
+   "Giant"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Regeneration",
+    "summary": "Recovers hit points at the start of each of its turns unless it took certain damage types since its last turn."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw",
+     "Nightmare Ray",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Claw, Nightmare Ray, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "1d12 + 4"
+     },
+     {
+      "avg": 9,
+      "type": "Necrotic",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus necrotic damage."
+   },
+   {
+    "name": "Nightmare Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Psychic",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "summary": "Ranged attack at +5 dealing psychic damage; can impose frightened."
+   },
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "perDay": {
+      "1": [
+       "Charm Person (level 2 version)",
+       "Darkness",
+       "Gaseous Form",
+       "Sleep"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Cha with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Invisibility",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of lawful evil alignment, encountered in Forest and Urban. It can fly and fights with Claw and Nightmare Ray. Its challenge rating is 7.",
+  "page": 232
+ },
+ {
+  "name": "Otyugh",
+  "size": "Large",
+  "type": "Aberration",
+  "alignment": "Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 104,
+   "dice": "11d10 + 44"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Otyugh",
+   "Telepathy"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Tentacle"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Tentacle."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; Targets make a DC 15 Con save; can impose poisoned."
+   },
+   {
+    "name": "Tentacle",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Piercing",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; can impose grappled."
+   },
+   {
+    "name": "Tentacle Slam",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 16,
+      "dice": "3d8 + 3",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Stunned"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 14 Con save; Inflicts bludgeoning damage; can impose grappled, stunned."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large aberration of neutral alignment, encountered in Underdark. It fights with Bite, Tentacle, and Tentacle Slam. Its challenge rating is 5.",
+  "page": 233
+ },
+ {
+  "name": "Owl",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Arctic",
+   "Forest",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 1,
+   "dice": "1d4 - 1"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 15
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Talons",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Slashing"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Arctic, Forest, and Hill. It can fly and fights with Talons. Its challenge rating is 0.",
+  "page": 366
+ },
+ {
+  "name": "Owlbear",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 59,
+   "dice": "7d10 + 21"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 2 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Slashing",
+      "dice": "2d8 + 5"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Forest. It can climb and fights with Rend. Its challenge rating is 3.",
+  "page": 234
+ },
+ {
+  "name": "Panther",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 13,
+   "dice": "3d8"
+  },
+  "speed": {
+   "walk": 50,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 6
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Nimble Escape",
+    "type": "utility",
+    "summary": "Disengages or hides as a bonus action."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Forest, Grassland, and Hill. It can climb and fights with Rend. Its challenge rating is 1/4.",
+  "page": 366
+ },
+ {
+  "name": "Pegasus",
+  "size": "Large",
+  "type": "Celestial",
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Upper Planes)"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 59,
+   "dice": "7d10 + 21"
+  },
+  "speed": {
+   "walk": 60,
+   "fly": 90
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Perception": 6
+  },
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Understands Celestial",
+   "Common",
+   "Elvish",
+   "Sylvan"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 4"
+     },
+     {
+      "avg": 5,
+      "type": "Radiant",
+      "dice": "2d4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning plus radiant damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large celestial of chaotic good alignment, encountered in Forest, Grassland, and Hill. It can fly and fights with Hooves. Its challenge rating is 2.",
+  "page": 235
+ },
+ {
+  "name": "Performer",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 27,
+   "dice": "5d8 + 5"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   }
+  },
+  "skills": {
+   "Acrobatics": 7,
+   "Athletics": 3,
+   "Performance": 7
+  },
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Shortsword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Uncanny Dodge",
+    "type": "utility",
+    "summary": "Reaction that halves the damage from one attack it can see."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Shortsword. Its challenge rating is 1/2.",
+  "page": 236
+ },
+ {
+  "name": "Performer Legend",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 20,
+  "initiative": {
+   "mod": 9,
+   "score": 19
+  },
+  "hp": {
+   "avg": 162,
+   "dice": "25d8 + 50"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   }
+  },
+  "skills": {
+   "Acrobatics": 13,
+   "Athletics": 5,
+   "Perception": 7,
+   "Performance": 13,
+   "Stealth": 9
+  },
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "10",
+  "xp": 5900,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bejeweled Baton"
+    ],
+    "summary": "Strings together 3 strikes using Bejeweled Baton."
+   },
+   {
+    "name": "Bejeweled Baton",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "2d4 + 5"
+     },
+     {
+      "avg": 10,
+      "type": "Psychic",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning plus psychic damage."
+   },
+   {
+    "name": "Majestic Song",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 22,
+      "dice": "4d8 + 4",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Charmed",
+     "Frightened"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 17 Wis save; Inflicts psychic damage; can impose charmed, frightened."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 17,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Mage Hand",
+      "Minor Illusion",
+      "Prestidigitation"
+     ],
+     "perDay": {
+      "1": [
+       "Major Image",
+       "Project Image"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Cha with save DC 17, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Warding Charm",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 17
+     }
+    ],
+    "conditions": [
+     "Charmed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Wis save; can impose charmed."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Bejeweled Baton and Majestic Song. Its challenge rating is 10.",
+  "page": 237
+ },
+ {
+  "name": "Performer Maestro",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 7,
+   "score": 17
+  },
+  "hp": {
+   "avg": 110,
+   "dice": "17d8 + 34"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Acrobatics": 10,
+   "Athletics": 4,
+   "Perception": 5,
+   "Performance": 10,
+   "Stealth": 7
+  },
+  "senses": {
+   "passivePerception": 15
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rapier"
+    ],
+    "summary": "Strings together 3 strikes using Rapier."
+   },
+   {
+    "name": "Rapier",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "1d8 + 4"
+     },
+     {
+      "avg": 7,
+      "type": "Psychic",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus psychic damage."
+   },
+   {
+    "name": "Beguiling Song",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 20,
+      "dice": "3d10 + 4",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Charmed"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 15 Wis save; Inflicts psychic damage; can impose charmed."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Minor Illusion",
+      "Prestidigitation"
+     ],
+     "perDay": {
+      "1": [
+       "Tasha’s Hideous Laughter (level 3 version)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Cha with save DC 15, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Rapier and Beguiling Song. Its challenge rating is 6.",
+  "page": 237
+ },
+ {
+  "name": "Peryton",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 33,
+   "dice": "6d8 + 6"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 3
+  },
+  "senses": {
+   "passivePerception": 15
+  },
+  "languages": [
+   "Understands Common",
+   "Elvish"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Gore",
+     "Talons"
+    ],
+    "summary": "Strings together 1 strikes using Gore, Talons."
+   },
+   {
+    "name": "Gore",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 9,
+      "type": "Piercing",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   },
+   {
+    "name": "Talons",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "2d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of chaotic evil alignment, encountered in Hill and Mountain. It can fly and fights with Gore and Talons. Its challenge rating is 2.",
+  "page": 238
+ },
+ {
+  "name": "Phase Spider",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Ethereal)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "7d10 + 7"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Ethereal Sight",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Web Walker",
+    "summary": "Ignores movement restrictions caused by webs."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Bite."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "1d10 + 3"
+     },
+     {
+      "avg": 9,
+      "type": "Poison",
+      "dice": "2d8"
+     }
+    ],
+    "conditions": [
+     "Paralyzed",
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage; can impose paralyzed, poisoned."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Ethereal Jaunt",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Desert, Forest, and Grassland. It can climb and fights with Bite. Its challenge rating is 3.",
+  "page": 239
  }
 ]
