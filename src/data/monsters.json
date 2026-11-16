@@ -27367,5 +27367,2202 @@
   "lairActions": [],
   "description": "A large celestial of neutral alignment, encountered in Coastal, Grassland, and Hill. It can fly and fights with Rend. Its challenge rating is 1.",
   "page": 356
+ },
+ {
+  "name": "Giant Elk",
+  "size": "Huge",
+  "type": "Celestial",
+  "alignment": "Neutral Good",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 42,
+   "dice": "5d12 + 10"
+  },
+  "speed": {
+   "walk": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 6
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 4
+  },
+  "resistances": [
+   "Necrotic",
+   "Radiant"
+  ],
+  "senses": {
+   "darkvision": 90,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Celestial",
+   "Understands Common",
+   "Primordial (Auran)"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 5,
+      "type": "Radiant",
+      "dice": "2d4"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "2d4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning plus radiant damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge celestial of neutral good alignment, encountered in Forest, Grassland, and Hill. It fights with Ram. Its challenge rating is 2.",
+  "page": 356
+ },
+ {
+  "name": "Giant Fire Beetle",
+  "size": "Small",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 4,
+   "dice": "1d6 + 1"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 8
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 1,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Fire"
+     }
+    ],
+    "summary": "Melee attack at +1 dealing fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small beast, encountered in Underdark. It can climb and fights with Bite. Its challenge rating is 0.",
+  "page": 357
+ },
+ {
+  "name": "Giant Frog",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Swamp"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 18,
+   "dice": "4d8"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 30,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Standing Leap",
+    "summary": "Jumps long distances from a standing start."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +3 dealing piercing damage; can impose grappled."
+   },
+   {
+    "name": "Swallow",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "2d4",
+      "type": "Acid"
+     }
+    ],
+    "summary": "Inflicts acid damage; can impose blinded, grappled, prone, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Forest and Swamp. It can swim and fights with Bite. Its challenge rating is 1/4.",
+  "page": 357
+ },
+ {
+  "name": "Giant Goat",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 3
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "2d4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Grassland, Hill, and Mountain. It can climb and fights with Ram. Its challenge rating is 1/2.",
+  "page": 357
+ },
+ {
+  "name": "Giant Hyena",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 3
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Rampage",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Whenever it damages a creature that was already Bloodied, it can move up to half its Speed and make one more bite attack."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Desert, Forest, and Grassland. It fights with Bite. Its challenge rating is 1.",
+  "page": 357
+ },
+ {
+  "name": "Giant Lizard",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Coastal, Desert, and Forest. It can climb and fights with Bite. Its challenge rating is 1/4.",
+  "page": 358
+ },
+ {
+  "name": "Giant Octopus",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "7d10 + 7"
+  },
+  "speed": {
+   "walk": 10,
+   "swim": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Tentacles",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage; can impose grappled, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Ink Cloud",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day; affects a 10-foot cube."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Underwater. It can swim and fights with Tentacles. Its challenge rating is 1.",
+  "page": 358
+ },
+ {
+  "name": "Giant Owl",
+  "size": "Large",
+  "type": "Celestial",
+  "alignment": "Neutral",
+  "habitat": [
+   "Arctic",
+   "Forest",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Stealth": 6
+  },
+  "resistances": [
+   "Necrotic",
+   "Radiant"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Celestial",
+   "Understands Common",
+   "Primordial (Auran)"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Talons",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "1d10 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Detect Evil and Good",
+      "Detect Magic"
+     ],
+     "perDay": {
+      "1": [
+       "Clairvoyance"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Wis, no spell needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large celestial of neutral alignment, encountered in Arctic, Forest, and Hill. It can fly and fights with Talons. Its challenge rating is 1/4.",
+  "page": 358
+ },
+ {
+  "name": "Giant Rat",
+  "size": "Small",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 7,
+   "dice": "2d6"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small beast, encountered in Forest, Swamp, and Underdark. It can climb and fights with Bite. Its challenge rating is 1/8.",
+  "page": 358
+ },
+ {
+  "name": "Giant Scorpion",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "7d10 + 14"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 9
+  },
+  "languages": [],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw",
+     "Sting"
+    ],
+    "summary": "Strings together 2 strikes using Claw, Sting."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage; can impose grappled."
+   },
+   {
+    "name": "Sting",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     },
+     {
+      "avg": 11,
+      "type": "Poison",
+      "dice": "2d10"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Desert. It fights with Claw and Sting. Its challenge rating is 3.",
+  "page": 359
+ },
+ {
+  "name": "Giant Seahorse",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 16,
+   "dice": "3d10"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the seahorse moved 20+ feet straight toward the target immediately before the hit",
+     "avg": 11,
+     "type": "Bludgeoning",
+     "dice": "2d8 + 2"
+    },
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Bubble Dash",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Underwater. It can swim and fights with Ram. Its challenge rating is 1/2.",
+  "page": 359
+ },
+ {
+  "name": "Giant Shark",
+  "size": "Huge",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 92,
+   "dice": "8d12 + 40"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 3
+  },
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Bite."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9
+    },
+    "damage": [
+     {
+      "avg": 22,
+      "type": "Piercing",
+      "dice": "3d10 + 6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Underwater. It can swim and fights with Bite. Its challenge rating is 5.",
+  "page": 359
+ },
+ {
+  "name": "Giant Spider",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 26,
+   "dice": "4d10 + 4"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Web Walker",
+    "summary": "Ignores movement restrictions caused by webs."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Web",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 13
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 13 Dex save; can impose restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Desert, Forest, and Swamp. It can climb and fights with Bite and Web. Its challenge rating is 1.",
+  "page": 359
+ },
+ {
+  "name": "Giant Squid",
+  "size": "Huge",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 120,
+   "dice": "16d12 + 16"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 9
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 6
+  },
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 16
+  },
+  "languages": [],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Tentacle"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Tentacle."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 28,
+      "type": "Piercing",
+      "dice": "4d10 + 6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing piercing damage."
+   },
+   {
+    "name": "Tentacle",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Bludgeoning",
+      "dice": "3d8 + 6"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning damage; can impose grappled."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Ink Cloud",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day; affects a 15-foot cube."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Underwater. It can swim and fights with Bite and Tentacle. Its challenge rating is 6.",
+  "page": 360
+ },
+ {
+  "name": "Giant Toad",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Forest",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 39,
+   "dice": "6d10 + 6"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Standing Leap",
+    "summary": "Jumps long distances from a standing start."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 5,
+      "type": "Poison",
+      "dice": "2d4"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage; can impose grappled."
+   },
+   {
+    "name": "Swallow",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Acid"
+     }
+    ],
+    "summary": "Inflicts acid damage; can impose blinded, grappled, prone, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Coastal, Forest, and Swamp. It can swim and fights with Bite. Its challenge rating is 1.",
+  "page": 360
+ },
+ {
+  "name": "Giant Venomous Snake",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Swamp"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 40,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Acrobatics": 8,
+   "Perception": 2
+  },
+  "senses": {
+   "blindsight": 10,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d4 + 4"
+     },
+     {
+      "avg": 4,
+      "type": "Poison",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Coastal, Desert, and Forest. It can swim and fights with Bite. Its challenge rating is 1/4.",
+  "page": 361
+ },
+ {
+  "name": "Giant Vulture",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 25,
+   "dice": "3d10 + 9"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 3
+  },
+  "resistances": [
+   "Necrotic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Understands Common"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Gouge",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Piercing",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +4 dealing piercing damage; can impose poisoned."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of neutral evil alignment, encountered in Desert, Grassland, and Hill. It can fly and fights with Gouge. Its challenge rating is 1.",
+  "page": 361
+ },
+ {
+  "name": "Giant Wasp",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "5d8"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Sting",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 5,
+      "type": "Poison",
+      "dice": "2d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Forest, Grassland, and Urban. It can fly and fights with Sting. Its challenge rating is 1/2.",
+  "page": 361
+ },
+ {
+  "name": "Giant Weasel",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 9,
+   "dice": "2d8"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Acrobatics": 5,
+   "Perception": 3,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Grassland and Hill. It can climb and fights with Bite. Its challenge rating is 1/8.",
+  "page": 361
+ },
+ {
+  "name": "Giant Wolf Spider",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 7
+  },
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 10,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     },
+     {
+      "avg": 5,
+      "type": "Poison",
+      "dice": "2d4"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Coastal, Desert, and Forest. It can climb and fights with Bite. Its challenge rating is 1/4.",
+  "page": 362
  }
 ]
