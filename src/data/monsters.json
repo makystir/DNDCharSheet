@@ -62563,5 +62563,2891 @@
   "lairActions": [],
   "description": "A huge plant of neutral evil alignment, encountered in Forest. It fights with Branch and Grasping Root. Its challenge rating is 7.",
   "page": 44
+ },
+ {
+  "name": "Triceratops",
+  "size": "Huge",
+  "type": "Beast",
+  "tags": [
+   "Dinosaur"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 114,
+   "dice": "12d12 + 36"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Gore"
+    ],
+    "summary": "Strings together 2 strikes using Gore."
+   },
+   {
+    "name": "Gore",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Piercing",
+      "dice": "2d12 + 6"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 9,
+      "type": "Piercing",
+      "dice": "2d8"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +9 dealing piercing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Grassland. It fights with Gore. Its challenge rating is 5.",
+  "page": 372
+ },
+ {
+  "name": "Troglodyte",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 11,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 13,
+   "dice": "2d8 + 4"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 4
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Troglodyte"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Stench",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Emits a foul smell that sickens nearby creatures that fail a saving throw."
+   },
+   {
+    "name": "Sunlight Sensitivity",
+    "summary": "Suffers disadvantage on attacks and sight-based Perception checks while in direct sunlight."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of chaotic evil alignment, encountered in Underdark. It can climb and fights with Rend. Its challenge rating is 1/4.",
+  "page": 309
+ },
+ {
+  "name": "Troll",
+  "size": "Large",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic",
+   "Forest",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 94,
+   "dice": "9d10 + 45"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Giant"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Loathsome Limbs",
+    "uses": "4/Day",
+    "summary": "Usable 4 per day; can impose exhaustion; restores hit points."
+   },
+   {
+    "name": "Regeneration",
+    "summary": "Recovers hit points at the start of each of its turns unless it took certain damage types since its last turn."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Slashing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Charge",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large giant of chaotic evil alignment, encountered in Arctic, Forest, and Hill. It fights with Rend. Its challenge rating is 5.",
+  "page": 310
+ },
+ {
+  "name": "Troll Limb",
+  "size": "Small",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic",
+   "Forest",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 14,
+   "dice": "4d6"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Regeneration",
+    "summary": "Recovers hit points at the start of each of its turns unless it took certain damage types since its last turn."
+   },
+   {
+    "name": "Troll Spawn",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "2d4 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small giant of chaotic evil alignment, encountered in Arctic, Forest, and Hill. It fights with Rend. Its challenge rating is 1/2.",
+  "page": 310
+ },
+ {
+  "name": "Twig Blight",
+  "size": "Small",
+  "type": "Plant",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 7,
+   "dice": "2d6"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Stealth": 4
+  },
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Deafened"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Understands Common"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Slashing",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small plant of neutral evil alignment, encountered in Forest. It fights with Claw. Its challenge rating is 1/8.",
+  "page": 43
+ },
+ {
+  "name": "Tyrannosaurus Rex",
+  "size": "Huge",
+  "type": "Beast",
+  "tags": [
+   "Dinosaur"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 136,
+   "dice": "13d12 + 52"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 24,
+    "mod": 7,
+    "save": 10
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Survival": 4
+  },
+  "senses": {
+   "passivePerception": 14
+  },
+  "languages": [],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Tail"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Tail."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 33,
+      "type": "Piercing",
+      "dice": "4d12 + 7"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +10 dealing piercing damage; can impose grappled, restrained."
+   },
+   {
+    "name": "Tail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 25,
+      "type": "Bludgeoning",
+      "dice": "4d8 + 7"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +10 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Grassland. It fights with Bite and Tail. Its challenge rating is 8.",
+  "page": 372
+ },
+ {
+  "name": "Ultroloth",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Yugoloth"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 8,
+   "score": 18
+  },
+  "hp": {
+   "avg": 221,
+   "dice": "26d8 + 104"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   }
+  },
+  "skills": {
+   "Deception": 9,
+   "Perception": 7,
+   "Stealth": 8
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Acid",
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Abyssal",
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "13",
+  "xp": 10000,
+  "pb": 5,
+  "traits": [
+   {
+    "name": "Fiendish Restoration",
+    "summary": "If it dies away from its home plane, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Mercurial Whip",
+     "Hypnotic Gaze"
+    ],
+    "summary": "Strings together 2 strikes using Mercurial Whip, Hypnotic Gaze."
+   },
+   {
+    "name": "Mercurial Whip",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 25,
+      "type": "Force",
+      "dice": "6d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing force damage; involves teleportation."
+   },
+   {
+    "name": "Hypnotic Gaze",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Wis save; Inflicts psychic damage; can impose stunned; affects a 30-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 17,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Alter Self",
+      "Clairvoyance",
+      "Detect Magic"
+     ],
+     "perDay": {
+      "1": [
+       "Dimension Door",
+       "Fireball (level 5 version)",
+       "Wall of Fire"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Int with save DC 17, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Fiendish Guile",
+    "recharge": "4-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 4-6."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of neutral evil alignment, encountered in Planar (Lower Planes). It can fly and fights with Mercurial Whip and Hypnotic Gaze. Its challenge rating is 13.",
+  "page": 311
+ },
+ {
+  "name": "Umber Hulk",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 18,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 93,
+   "dice": "11d10 + 33"
+  },
+  "speed": {
+   "walk": 30,
+   "burrow": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 120,
+   "tremorsense": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Umber Hulk"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Tunneler",
+    "summary": "Burrows through solid rock, leaving a tunnel behind."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 8,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Slashing",
+      "dice": "2d6 + 5"
+     }
+    ],
+    "summary": "Melee attack at +8 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Confusing Gaze",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 14
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Wis save; affects a 30-foot cone."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of chaotic evil alignment, encountered in Underdark. It can burrow and fights with Rend. Its challenge rating is 5.",
+  "page": 312
+ },
+ {
+  "name": "Unicorn",
+  "size": "Large",
+  "type": "Celestial",
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Forest",
+   "Planar (Feywild)"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 8,
+   "score": 18
+  },
+  "hp": {
+   "avg": 97,
+   "dice": "13d10 + 26"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Paralyzed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Celestial",
+   "Elvish",
+   "Sylvan",
+   "Telepathy"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "3/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Hooves",
+     "Radiant Horn"
+    ],
+    "summary": "Strings together 1 strikes using Hooves, Radiant Horn."
+   },
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning damage."
+   },
+   {
+    "name": "Radiant Horn",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Radiant",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing radiant damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 14,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Detect Evil and Good",
+      "Druidcraft"
+     ],
+     "perDay": {
+      "1": [
+       "Calm Emotions",
+       "Dispel Evil and Good",
+       "Entangle",
+       "Pass without Trace",
+       "Word of Recall"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (7 spells) using Cha with save DC 14, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Unicorn’s Blessing",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Usable 3 per day."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Charging Horn",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   },
+   {
+    "name": "Shimmering Shield",
+    "type": "utility",
+    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3
+  },
+  "lairActions": [
+   {
+    "name": "Obscuring Foliage",
+    "type": "utility",
+    "summary": "Involves advantage on certain rolls."
+   },
+   {
+    "name": "Positive Energy",
+    "type": "utility",
+    "summary": "Restores hit points."
+   }
+  ],
+  "description": "A large celestial of lawful good alignment, encountered in Forest and Planar (Feywild). It fights with Hooves and Radiant Horn, can take legendary actions, and can shape the area around its lair. Its challenge rating is 5.",
+  "page": 313
+ },
+ {
+  "name": "Vampire",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 195,
+   "dice": "23d8 + 92"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 7
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   }
+  },
+  "skills": {
+   "Perception": 7,
+   "Stealth": 9
+  },
+  "resistances": [
+   "Necrotic"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "13",
+  "xp": 10000,
+  "pb": 5,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "3/Day, or 4/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Misty Escape",
+    "summary": "Can impose paralyzed; restores hit points."
+   },
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Vampire Weakness",
+    "summary": "Has specific vulnerabilities, such as running water, sunlight, and wooden stakes."
+   },
+   {
+    "name": "Running Water",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Acid"
+     }
+    ],
+    "summary": "Takes damage when it ends its turn in running water."
+   },
+   {
+    "name": "Stake to the Heart",
+    "summary": "Is paralyzed if a piercing wooden stake is driven into its heart while it is incapacitated."
+   },
+   {
+    "name": "Sunlight",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Radiant"
+     }
+    ],
+    "summary": "Takes damage while in sunlight and has disadvantage on attacks and checks there."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "cost": "Vampire Form Only",
+    "type": "multiattack",
+    "attacks": [
+     "Grave Strike",
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Grave Strike, Bite."
+   },
+   {
+    "name": "Grave Strike",
+    "cost": "Vampire Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Bludgeoning",
+      "dice": "1d8 + 4"
+     },
+     {
+      "avg": 7,
+      "type": "Necrotic",
+      "dice": "2d6"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning plus necrotic damage; can impose grappled."
+   },
+   {
+    "name": "Bite",
+    "cost": "Bat or Vampire Form Only",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 6,
+      "dice": "1d4 + 4",
+      "type": "Piercing"
+     },
+     {
+      "avg": 13,
+      "dice": "3d8",
+      "type": "Necrotic"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Incapacitated",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Con save; Inflicts necrotic/piercing damage; can impose grappled, incapacitated, restrained; restores hit points."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Charm",
+    "recharge": "5-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 5-6; can impose charmed."
+   },
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Beguile",
+    "type": "utility",
+    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Deathless Strike",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Children of the Night",
+    "type": "utility",
+    "summary": "Can impose charmed."
+   },
+   {
+    "name": "Looming Shadows",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Wis save."
+   },
+   {
+    "name": "Mists",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A medium or small undead of lawful evil alignment, encountered in Underdark and Urban. It can climb, fights with Grave Strike and Bite, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
+  "page": 317
+ },
+ {
+  "name": "Vampire Familiar",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 65,
+   "dice": "10d8 + 20"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Persuasion": 4,
+   "Stealth": 7
+  },
+  "resistances": [
+   "Necrotic"
+  ],
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Vampiric Connection",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Umbral Dagger"
+    ],
+    "summary": "Strings together 2 strikes using Umbral Dagger."
+   },
+   {
+    "name": "Umbral Dagger",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "20/60"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Necrotic",
+      "dice": "3d4"
+     }
+    ],
+    "conditions": [
+     "Paralyzed",
+     "Poisoned"
+    ],
+    "summary": "Melee or ranged attack at +5 dealing piercing plus necrotic damage; can impose paralyzed, poisoned."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Deathless Agility",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral evil alignment, encountered in Underdark and Urban. It can climb and fights with Umbral Dagger. Its challenge rating is 3.",
+  "page": 314
+ },
+ {
+  "name": "Vampire Nightbringer",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 142,
+   "dice": "19d8 + 57"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 7
+  },
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Cold"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Sunlight Hypersensitivity",
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Radiant"
+     }
+    ],
+    "summary": "Inflicts radiant damage."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Shadow Strike"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Shadow Strike."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d6 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Necrotic",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus necrotic damage; restores hit points."
+   },
+   {
+    "name": "Shadow Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "1d6 + 4"
+     },
+     {
+      "avg": 14,
+      "type": "Cold",
+      "dice": "4d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus cold damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shadow Stealth",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small undead of neutral evil alignment, encountered in Underdark and Urban. It can fly and fights with Bite and Shadow Strike. Its challenge rating is 8.",
+  "page": 316
+ },
+ {
+  "name": "Vampire Spawn",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 90,
+   "dice": "12d8 + 36"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 6
+  },
+  "resistances": [
+   "Necrotic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Vampire Weakness",
+    "summary": "Has specific vulnerabilities, such as running water, sunlight, and wooden stakes."
+   },
+   {
+    "name": "Running Water",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Acid"
+     }
+    ],
+    "summary": "Takes damage when it ends its turn in running water."
+   },
+   {
+    "name": "Stake to the Heart",
+    "summary": "Is paralyzed if a piercing wooden stake is driven into its heart while it is incapacitated."
+   },
+   {
+    "name": "Sunlight",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Radiant"
+     }
+    ],
+    "summary": "Takes damage while in sunlight and has disadvantage on attacks and checks there."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw",
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Claw, Bite."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "2d4 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage; can impose grappled."
+   },
+   {
+    "name": "Bite",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d4 + 3",
+      "type": "Piercing"
+     },
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Necrotic"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Incapacitated",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 14 Con save; Inflicts necrotic/piercing damage; can impose grappled, incapacitated, restrained; restores hit points."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Deathless Agility",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small undead of neutral evil alignment, encountered in Underdark and Urban. It fights with Claw and Bite. Its challenge rating is 5.",
+  "page": 315
+ },
+ {
+  "name": "Vampire Umbral Lord",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 187,
+   "dice": "22d8 + 88"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40,
+   "fly": 40,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 10
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 8
+   },
+   "cha": {
+    "score": 20,
+    "mod": 5,
+    "save": 10
+   }
+  },
+  "skills": {
+   "Arcana": 9,
+   "Perception": 13,
+   "Stealth": 9
+  },
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion"
+  ],
+  "damageImmunities": [
+   "Cold",
+   "Necrotic"
+  ],
+  "senses": {
+   "blindsight": 120,
+   "passivePerception": 23
+  },
+  "languages": [
+   "Common plus three other languages"
+  ],
+  "cr": "15",
+  "xp": 13000,
+  "pb": 5,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "3/Day, or 4/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Shadow Escape",
+    "summary": "Can impose paralyzed; restores hit points; involves teleportation."
+   },
+   {
+    "name": "Vampire Weakness",
+    "summary": "Has specific vulnerabilities, such as running water, sunlight, and wooden stakes."
+   },
+   {
+    "name": "Running Water",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Acid"
+     }
+    ],
+    "summary": "Takes damage when it ends its turn in running water."
+   },
+   {
+    "name": "Stake to the Heart",
+    "summary": "Is paralyzed if a piercing wooden stake is driven into its heart while it is incapacitated."
+   },
+   {
+    "name": "Sunlight",
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Radiant"
+     }
+    ],
+    "summary": "Takes damage while in sunlight and has disadvantage on attacks and checks there."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Grave Strike",
+     "Sickening Ray"
+    ],
+    "summary": "Strings together 2 strikes using Grave Strike, Sickening Ray."
+   },
+   {
+    "name": "Grave Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "1d8 + 5"
+     },
+     {
+      "avg": 13,
+      "type": "Necrotic",
+      "dice": "3d8"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing slashing plus necrotic damage."
+   },
+   {
+    "name": "Sickening Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 10,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Necrotic",
+      "dice": "2d10 + 5"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Ranged attack at +10 dealing necrotic damage; can impose poisoned."
+   },
+   {
+    "name": "Hunger of Hadar",
+    "recharge": "5-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 5-6."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Sanguine Drain",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 18
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Necrotic"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 18 Con save; Inflicts necrotic damage; restores hit points."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Beguile",
+    "type": "utility",
+    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Umbral Strike",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Children of the Night",
+    "type": "utility",
+    "summary": "Can impose charmed."
+   },
+   {
+    "name": "Looming Shadows",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Wis save."
+   },
+   {
+    "name": "Mists",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A medium or small undead of lawful evil alignment, encountered in Underdark and Urban. It can climb and fly, fights with Grave Strike and Sickening Ray, can take legendary actions, and can shape the area around its lair. Its challenge rating is 15.",
+  "page": 318
+ },
+ {
+  "name": "Venomous Snake",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Swamp"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 5,
+   "dice": "2d4"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "senses": {
+   "blindsight": 10,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Piercing",
+      "dice": "1d4 + 2"
+     },
+     {
+      "avg": 3,
+      "type": "Poison",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Coastal, Desert, and Forest. It can swim and fights with Bite. Its challenge rating is 1/8.",
+  "page": 372
+ },
+ {
+  "name": "Vine Blight",
+  "size": "Medium",
+  "type": "Plant",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d8 + 6"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Stealth": 1
+  },
+  "conditionImmunities": [
+   "Deafened"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Constricting Vine",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 4,
+      "type": "Bludgeoning",
+      "dice": "1d8"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage; can impose grappled."
+   },
+   {
+    "name": "Entangling Plants",
+    "recharge": "5-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 5-6."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium plant of neutral evil alignment, encountered in Forest. It fights with Constricting Vine. Its challenge rating is 1/2.",
+  "page": 44
+ },
+ {
+  "name": "Violet Fungus",
+  "size": "Medium",
+  "type": "Plant",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 5,
+  "initiative": {
+   "mod": -5,
+   "score": 5
+  },
+  "hp": {
+   "avg": 18,
+   "dice": "4d8"
+  },
+  "speed": {
+   "walk": 5
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Blinded",
+   "Charmed",
+   "Deafened",
+   "Frightened"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 6
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rotting Touch"
+    ],
+    "summary": "Strings together 2 strikes using Rotting Touch."
+   },
+   {
+    "name": "Rotting Touch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Necrotic",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Melee attack at +2 dealing necrotic damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium plant, encountered in Underdark. It fights with Rotting Touch. Its challenge rating is 1/4.",
+  "page": 126
+ },
+ {
+  "name": "Violet Fungus Necrohulk",
+  "size": "Large",
+  "type": "Plant",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 17,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 123,
+   "dice": "13d10 + 52"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Blinded",
+   "Charmed",
+   "Deafened",
+   "Frightened",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rotting Slam"
+    ],
+    "summary": "Strings together 2 strikes using Rotting Slam."
+   },
+   {
+    "name": "Rotting Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 4"
+     },
+     {
+      "avg": 7,
+      "type": "Necrotic",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning plus necrotic damage."
+   },
+   {
+    "name": "Spore Bomb",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "8d6",
+      "type": "Necrotic"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Con save; Inflicts necrotic damage; can impose poisoned; restores hit points."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Absorb Body",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Str save; can impose restrained; restores hit points."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large plant of neutral evil alignment, encountered in Underdark. It fights with Rotting Slam and Spore Bomb. Its challenge rating is 7.",
+  "page": 126
+ },
+ {
+  "name": "Vrock",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 152,
+   "dice": "16d10 + 64"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Shred"
+    ],
+    "summary": "Strings together 2 strikes using Shred."
+   },
+   {
+    "name": "Shred",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "2d6 + 3"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Spores",
+    "recharge": "6-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Poison"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 6-6; Targets make a DC 15 Con save; Inflicts poison damage; can impose poisoned; affects a 20-foot emanation."
+   },
+   {
+    "name": "Stunning Screech",
+    "uses": "1/Day",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Thunder"
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Usable 1 per day; Targets make a DC 15 Con save; Inflicts thunder damage; can impose stunned; affects a 20-foot emanation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It can fly and fights with Shred, Spores, and Stunning Screech. Its challenge rating is 6.",
+  "page": 319
+ },
+ {
+  "name": "Vulture",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 5,
+   "dice": "1d8 + 1"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Beak",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 2,
+      "type": "Piercing",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +2 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Desert, Grassland, and Hill. It can fly and fights with Beak. Its challenge rating is 0.",
+  "page": 372
  }
 ]
