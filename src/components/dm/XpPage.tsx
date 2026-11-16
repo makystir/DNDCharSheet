@@ -87,9 +87,12 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const [createError, setCreateError] = useState<string | null>(null);
   const codeRef = useRef<HTMLTextAreaElement>(null);
   const creating = useRef(false);
+  const showToken = useRef(0);
 
   const encounters = campaign?.encounters ?? [];
-  const encounter = encounters.find((e) => e.id === encounterId) ?? encounters[0];
+  // An explicit pick wins, then the encounter the DM has open, then the newest saved one.
+  const encounter =
+    encounters.find((e) => e.id === encounterId) ?? encounters.find((e) => e.id === campaign?.activeEncounterId) ?? encounters[encounters.length - 1];
   const partySize = Math.max(1, party.length);
   // Blank means the whole party. Anything else must be a whole number of at least 1 (no silent coercion).
   const sharersText = sharers.trim();
@@ -173,6 +176,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
       source: amount.source,
       createdAt: clockNow(),
     };
+    showToken.current++;
     const encoded = await encodeAward({ kind: award.kind, amount: award.amount, id: award.id, label: award.label });
     if (!encoded.ok) {
       setCreateError(encoded.error);
@@ -185,7 +189,11 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   };
 
   const showCode = async (award: DmAward) => {
+    // Hide the current code at once so a slow or failed request never leaves another award's code to copy.
+    const token = ++showToken.current;
+    setShown(null);
     const encoded = await encodeAward({ kind: award.kind, amount: award.amount, id: award.id, label: award.label });
+    if (token !== showToken.current) return; // a newer request replaced this one
     if (!encoded.ok) {
       setCreateError(encoded.error);
       return;
@@ -236,6 +244,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
               className={tab === t.id ? styles.tabActive : styles.tab}
               onClick={() => {
                 setTab(t.id);
+                showToken.current++;
                 setShown(null);
                 setCreateError(null);
               }}

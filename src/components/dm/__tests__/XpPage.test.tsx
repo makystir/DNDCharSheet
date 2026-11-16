@@ -4,6 +4,7 @@ import { XpPage } from '../XpPage';
 import { useDmData } from '../../../hooks/useDmData';
 import { DM_DATA_KEY, loadDmData, saveDmData } from '../../../storage/dm-store';
 import { addImportedMember, addManualMember, createCampaign, DEFAULT_MANUAL_STATS, emptyDmData } from '../../../logic/dm-campaign';
+import * as gz from '../../../logic/gzip';
 import { decodeAward } from '../../../logic/dm-awards';
 import { customCombatant } from '../../../logic/dm-encounter';
 import { generateRandomCharacter } from '../../../logic/personal-details-generation';
@@ -161,7 +162,7 @@ describe('Party XP page', () => {
     render(<Page newId={() => `0000000000${++i}-aaaa-bbbb-cccc-dddddddddddd`} />);
     fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
     await screen.findByLabelText('Award code');
-    fireEvent.change(screen.getByLabelText('Encounter'), { target: { value: 'e2' } });
+    fireEvent.change(screen.getByLabelText('Encounter'), { target: { value: 'e1' } });
     expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
     await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(2));
@@ -169,6 +170,40 @@ describe('Party XP page', () => {
     expect(a.id).not.toBe(b.id);
   });
 
+  it('defaults the fight form to the active encounter, then the newest one', async () => {
+    const mon = (id: string, xp: number) => ({ ...customCombatant(id, { name: id, ac: 10, hpMax: 10, initiativeMod: 0 }), xp, kind: 'monster' as const, xpCounts: true });
+    const enc = (id: string, xp: number) => ({ id, name: id, status: 'ended' as const, round: 0, activeId: null, combatants: [mon(`${id}-orc`, xp)], log: [], createdAt: 1, updatedAt: 1 });
+    const build = (activeEncounterId: string | null) => {
+      let d = createCampaign(emptyDmData(), { id: 'c', name: 'Test', now: 1 });
+      d = addImportedMember(d, 'c', { id: 'Ann', character: { ...sheet(3, 'xp', 0), name: 'Ann' }, now: 1 }).data;
+      d = { ...d, campaigns: d.campaigns.map((c) => ({ ...c, activeEncounterId, encounters: [enc('e1', 100), enc('e2', 200), enc('e3', 300)] })) };
+      saveDmData(d);
+    };
+    build('e2');
+    const first = render(<Page />);
+    expect(screen.getByLabelText('Encounter')).toHaveValue('e2');
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    const code = await screen.findByLabelText('Award code');
+    expect(await decodeAward((code as HTMLTextAreaElement).value)).toMatchObject({ ok: true, award: { kind: 'xp', amount: 200 } });
+    first.unmount();
+    localStorage.clear();
+    build(null);
+    render(<Page />);
+    expect(screen.getByLabelText('Encounter')).toHaveValue('e3');
+  });
+
+  it('hides the previous code while a history code is requested, and when that request fails', async () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    render(<Page />);
+    typeAmount('50');
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    await screen.findByLabelText('Award code');
+    await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(1));
+    vi.spyOn(gz, 'isGzipSupported').mockReturnValue(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Show code' }));
+    await waitFor(() => expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument());
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
   it('rejects an invalid sharer count instead of coercing it', () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
     render(<Page />);
