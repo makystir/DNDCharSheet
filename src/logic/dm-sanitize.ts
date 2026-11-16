@@ -12,12 +12,14 @@ import type {
   DmEncounter,
   DmManualStats,
   DmMonsterEntry,
+  DmNote,
   DmPartyMember,
 } from '../types/dm';
 import { CONDITIONS } from '../data/conditions';
 import { MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
 import { clampManualStats, DEFAULT_MANUAL_STATS, emptyDmData } from './dm-campaign';
 import { ABILITY_KEYS, blankCustomMonster } from './dm-library';
+import { MAX_BODY, MAX_NOTES, MAX_TITLE, NOTE_KINDS, QUEST_STATUSES } from './dm-journal';
 import { validateSharedPayload } from './share-validate';
 
 function str(v: unknown, fallback = ''): string {
@@ -217,6 +219,23 @@ function sanitizeMonster(raw: unknown): DmCustomMonster | undefined {
     updatedAt: num(raw.updatedAt, 0),
   };
 }
+function sanitizeNote(raw: unknown): DmNote | undefined {
+  if (!isRecord(raw)) return undefined;
+  const id = str(raw.id);
+  if (id === '') return undefined;
+  const kind = NOTE_KINDS.find((k) => k === raw.kind) ?? 'note';
+  const status = QUEST_STATUSES.find((s) => s === raw.status) ?? 'open';
+  return {
+    id,
+    kind,
+    title: str(raw.title).replace(/[[\]\n]/g, ' ').trim().slice(0, MAX_TITLE) || 'Untitled',
+    body: str(raw.body).slice(0, MAX_BODY),
+    status,
+    sessionNumber: kind === 'session' ? int(raw.sessionNumber, 1, 1, 9999) : null,
+    createdAt: num(raw.createdAt, 0),
+    updatedAt: num(raw.updatedAt, 0),
+  };
+}
 function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   if (!isRecord(raw)) return undefined;
   const id = str(raw.id);
@@ -227,6 +246,10 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   const encounters = (Array.isArray(raw.encounters) ? raw.encounters : [])
     .map(sanitizeEncounter)
     .filter((e): e is DmEncounter => e !== undefined);
+  const journal = (Array.isArray(raw.journal) ? raw.journal : [])
+    .map(sanitizeNote)
+    .filter((n): n is DmNote => n !== undefined)
+    .slice(0, MAX_NOTES);
   const wantedEncounter = str(raw.activeEncounterId);
   return {
     id,
@@ -234,6 +257,7 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
     notes: str(raw.notes).slice(0, 20000),
     party,
     encounters,
+    journal,
     activeEncounterId: encounters.some((e) => e.id === wantedEncounter) ? wantedEncounter : null,
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),

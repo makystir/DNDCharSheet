@@ -28,7 +28,7 @@ export function clockNow(): number {
   return Date.now();
 }
 
-export const DM_PAGES = ['campaign', 'party', 'encounter', 'library', 'settings'] as const;
+export const DM_PAGES = ['campaign', 'party', 'encounter', 'library', 'journal', 'settings'] as const;
 export type DmPage = (typeof DM_PAGES)[number];
 export const DEFAULT_DM_PAGE: DmPage = 'party';
 

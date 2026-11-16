@@ -51,6 +51,8 @@ export interface DmCampaign {
   encounters: DmEncounter[];
   /** The encounter open on the Encounter page, if any. */
   activeEncounterId: string | null;
+  /** Journal entries: sessions, NPCs, places, quests and plain notes. */
+  journal: DmNote[];
   createdAt: number;
   updatedAt: number;
 }
@@ -178,6 +180,29 @@ export interface DmCustomMonster {
   legendaryUses: number;
   /** Where the numbers came from, e.g. "Copy of Guard (Monster Manual 2024, p.250)". */
   basedOn: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+// ------------------------------------------------------------------ journal
+
+export type DmNoteKind = 'session' | 'npc' | 'location' | 'quest' | 'note';
+
+export type DmQuestStatus = 'open' | 'done' | 'dropped';
+
+/**
+ * One journal entry. The body is plain text; `[[Title]]` in it links to another
+ * entry of the same campaign by title.
+ */
+export interface DmNote {
+  id: string;
+  kind: DmNoteKind;
+  title: string;
+  body: string;
+  /** Quests only. */
+  status: DmQuestStatus;
+  /** Sessions only: 1, 2, 3... */
+  sessionNumber: number | null;
   createdAt: number;
   updatedAt: number;
 }

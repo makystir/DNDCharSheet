@@ -67,6 +67,7 @@ export function createCampaign(data: DmData, input: { id: string; name: string; 
     party: [],
     encounters: [],
     activeEncounterId: null,
+    journal: [],
     createdAt: input.now,
     updatedAt: input.now,
   };

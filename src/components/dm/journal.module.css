@@ -1,0 +1,146 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.newRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.item,
+.itemActive {
+  font: inherit;
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--bg-tertiary);
+}
+
+.itemActive {
+  background: var(--bg-tertiary);
+  box-shadow: inset 3px 0 0 var(--accent-gold);
+}
+
+.item:focus-visible,
+.itemActive:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
+}
+
+.itemMeta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.snippet {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.noteHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.noteTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--accent-gold);
+}
+
+.body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.sectionTitle {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.link,
+.linkMissing {
+  font: inherit;
+  display: inline;
+  /* Inline in a line of text: the vertical padding widens the tap area without moving the lines. */
+  padding: 10px 2px;
+  margin: -10px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
+  cursor: pointer;
+}
+
+.linkMissing {
+  border-bottom-style: dashed;
+  color: var(--text-secondary);
+}
+
+.link:focus-visible,
+.linkMissing:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .list {
+    max-height: 40vh;
+  }
+}
