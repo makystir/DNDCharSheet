@@ -29564,5 +29564,2806 @@
   "lairActions": [],
   "description": "A medium beast, encountered in Coastal, Desert, and Forest. It can climb and fights with Bite. Its challenge rating is 1/4.",
   "page": 362
+ },
+ {
+  "name": "Gibbering Mouther",
+  "size": "Medium",
+  "type": "Aberration",
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [],
+  "ac": 9,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "7d8 + 21"
+  },
+  "speed": {
+   "walk": 20,
+   "swim": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Prone"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Aberrant Ground",
+    "summary": "Affects a 10-foot emanation."
+   },
+   {
+    "name": "Gibbering",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 10
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 10 Wis save; can impose incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "2d6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +2 dealing piercing damage; can impose prone."
+   },
+   {
+    "name": "Blinding Spittle",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 10
+     }
+    ],
+    "damage": [
+     {
+      "avg": 7,
+      "dice": "2d6",
+      "type": "Radiant"
+     }
+    ],
+    "conditions": [
+     "Blinded"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 10 Dex save; Inflicts radiant damage; can impose blinded."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of chaotic neutral alignment, encountered in Underdark. It can swim and fights with Bite and Blinding Spittle. Its challenge rating is 2.",
+  "page": 133
+ },
+ {
+  "name": "Githyanki Dracomancer",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Astral Plane)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 8,
+   "score": 18
+  },
+  "hp": {
+   "avg": 255,
+   "dice": "30d8 + 120"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 8
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 10
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 8
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   }
+  },
+  "skills": {
+   "Arcana": 10,
+   "Perception": 8
+  },
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Common",
+   "Draconic",
+   "Gith"
+  ],
+  "cr": "16",
+  "xp": 15000,
+  "pb": 5,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Draconic Strike"
+    ],
+    "summary": "Strings together 3 strikes using Draconic Strike."
+   },
+   {
+    "name": "Draconic Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 10,
+     "reach": 10,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Slashing",
+      "dice": "2d6 + 5"
+     },
+     {
+      "avg": 17,
+      "type": "Fire",
+      "dice": "5d6"
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "summary": "Melee or ranged attack at +10 dealing slashing plus fire damage; can impose frightened."
+   },
+   {
+    "name": "Conjured Dragon’s Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 18
+     }
+    ],
+    "damage": [
+     {
+      "avg": 27,
+      "dice": "6d8",
+      "type": "Fire"
+     },
+     {
+      "avg": 27,
+      "dice": "6d8",
+      "type": "Force"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 18 Dex save; Inflicts fire/force damage; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 18,
+    "attackBonus": 10,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "2": [
+       "Nondetection (self only)",
+       "Plane Shift",
+       "Tongues"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Int with save DC 18, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Misty Step",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Teleports a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful evil alignment, encountered in Planar (Astral Plane). It can fly and fights with Draconic Strike and Conjured Dragon’s Breath. Its challenge rating is 16.",
+  "page": 135
+ },
+ {
+  "name": "Githyanki Knight",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Astral Plane)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 117,
+   "dice": "18d8 + 36"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common",
+   "Gith"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Silver Sword",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Silver Sword, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Silver Sword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     },
+     {
+      "avg": 14,
+      "type": "Psychic",
+      "dice": "4d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing plus psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 13,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "2": [
+       "Nondetection (self only)",
+       "Tongues"
+      ],
+      "1": [
+       "Plane Shift",
+       "Telekinesis"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Int with save DC 13, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Misty Step",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Teleports a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful evil alignment, encountered in Planar (Astral Plane). It fights with Silver Sword. Its challenge rating is 8.",
+  "page": 135
+ },
+ {
+  "name": "Githyanki Warrior",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Astral Plane)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 49,
+   "dice": "9d8 + 9"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [
+   "Common",
+   "Gith"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Psi Blade"
+    ],
+    "summary": "Strings together 2 strikes using Psi Blade."
+   },
+   {
+    "name": "Psi Blade",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "2d6 + 2"
+     },
+     {
+      "avg": 7,
+      "type": "Psychic",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing plus psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "2": [
+       "Nondetection (self only)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Int, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Misty Step",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Teleports a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful evil alignment, encountered in Planar (Astral Plane). It fights with Psi Blade. Its challenge rating is 3.",
+  "page": 134
+ },
+ {
+  "name": "Githzerai Monk",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Limbo)"
+  ],
+  "treasure": [
+   "Arcana",
+   "Individual"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 38,
+   "dice": "7d8 + 7"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Insight": 4,
+   "Perception": 4
+  },
+  "senses": {
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common",
+   "Gith"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Psi Strike"
+    ],
+    "summary": "Strings together 2 strikes using Psi Strike."
+   },
+   {
+    "name": "Psi Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d8 + 2"
+     },
+     {
+      "avg": 9,
+      "type": "Psychic",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning plus psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "1": [
+       "See Invisibility"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Psi-Powered Leap",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Usable 2 per day."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Psionic Defense",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Usable 2 per day."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful neutral alignment, encountered in Planar (Limbo). It fights with Psi Strike. Its challenge rating is 2.",
+  "page": 136
+ },
+ {
+  "name": "Githzerai Psion",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Limbo)"
+  ],
+  "treasure": [
+   "Arcana",
+   "Individual"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 8,
+   "score": 18
+  },
+  "hp": {
+   "avg": 169,
+   "dice": "26d8 + 52"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 40,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Arcana": 8,
+   "Insight": 8,
+   "Perception": 8
+  },
+  "senses": {
+   "passivePerception": 18
+  },
+  "languages": [
+   "Common",
+   "Gith"
+  ],
+  "cr": "12",
+  "xp": 8400,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Psychic Warp"
+    ],
+    "summary": "Strings together 3 strikes using Psychic Warp."
+   },
+   {
+    "name": "Psychic Warp",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 8,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 26,
+      "type": "Psychic",
+      "dice": "4d10 + 4"
+     }
+    ],
+    "conditions": [
+     "Charmed",
+     "Prone"
+    ],
+    "summary": "Melee or ranged attack at +8 dealing psychic damage; can impose charmed, prone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 16,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "1": [
+       "Plane Shift",
+       "See Invisibility"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Int with save DC 16, no spell needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Psionic Defense",
+    "type": "utility",
+    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful neutral alignment, encountered in Planar (Limbo). It can fly and fights with Psychic Warp. Its challenge rating is 12.",
+  "page": 137
+ },
+ {
+  "name": "Githzerai Zerth",
+  "size": "Medium",
+  "type": "Aberration",
+  "tags": [
+   "Gith"
+  ],
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Limbo)"
+  ],
+  "treasure": [
+   "Arcana",
+   "Individual"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 7,
+   "score": 17
+  },
+  "hp": {
+   "avg": 84,
+   "dice": "13d8 + 26"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Arcana": 6,
+   "Insight": 6,
+   "Perception": 6
+  },
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common",
+   "Gith"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Psi Strike"
+    ],
+    "summary": "Strings together 2 strikes using Psi Strike."
+   },
+   {
+    "name": "Psi Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 13,
+      "type": "Psychic",
+      "dice": "3d8"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning plus psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 14,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "1": [
+       "Phantasmal Killer (level 6 version)",
+       "Plane Shift",
+       "See Invisibility"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Wis with save DC 14, no spell needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Psi-Powered Leap",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Usable 2 per day."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Psionic Defense",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Usable 2 per day."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful neutral alignment, encountered in Planar (Limbo). It fights with Psi Strike. Its challenge rating is 6.",
+  "page": 137
+ },
+ {
+  "name": "Glabrezu",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 189,
+   "dice": "18d10 + 90"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Deception": 7,
+   "Perception": 7
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Pincer",
+     "Pummel",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Pincer, Pummel, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Pincer",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Slashing",
+      "dice": "2d10 + 5"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +9 dealing slashing damage; can impose grappled."
+   },
+   {
+    "name": "Pummel",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 15,
+      "dice": "3d6 + 5",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 17 Dex save; Inflicts bludgeoning damage; can impose grappled."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 16,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Darkness",
+      "Detect Magic",
+      "Dispel Magic"
+     ],
+     "perDay": {
+      "1": [
+       "Confusion",
+       "Fly",
+       "Power Word Stun"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Int with save DC 16, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It fights with Pincer and Pummel. Its challenge rating is 9.",
+  "page": 138
+ },
+ {
+  "name": "Gladiator",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 112,
+   "dice": "15d8 + 45"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Athletics": 10,
+   "Performance": 5
+  },
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Spear",
+     "Shield Bash"
+    ],
+    "summary": "Strings together 3 strikes using Spear, Shield Bash."
+   },
+   {
+    "name": "Spear",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 7,
+     "reach": 5,
+     "range": "20/60"
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +7 dealing piercing damage."
+   },
+   {
+    "name": "Shield Bash",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 9,
+      "dice": "2d4 + 4",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Str save; Inflicts bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Parry",
+    "type": "utility",
+    "summary": "Reaction that adds to its AC against a single melee attack."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Spear and Shield Bash. Its challenge rating is 5.",
+  "page": 139
+ },
+ {
+  "name": "Gnoll Demoniac",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 135,
+   "dice": "18d8 + 54"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Gnoll"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Abyssal Strike"
+    ],
+    "summary": "Strings together 2 strikes using Abyssal Strike."
+   },
+   {
+    "name": "Abyssal Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 6,
+     "reach": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Poison",
+      "dice": "5d6 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +6 dealing poison damage."
+   },
+   {
+    "name": "Hunger of Yeenoghu",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "8d6",
+      "type": "Necrotic"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Dex save; Inflicts necrotic damage; affects a 30-foot cube."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Rampage",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Whenever it damages a creature that was already Bloodied, it can move up to half its Speed and make one more bite attack."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of chaotic evil alignment, encountered in Desert, Forest, and Grassland. It fights with Abyssal Strike and Hunger of Yeenoghu. Its challenge rating is 8.",
+  "page": 141
+ },
+ {
+  "name": "Gnoll Fang of Yeenoghu",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 71,
+   "dice": "13d8 + 13"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 4
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Abyssal",
+   "Gnoll"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Bone Flail"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Bone Flail."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d6 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage; can impose poisoned."
+   },
+   {
+    "name": "Bone Flail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Rampage",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Whenever it damages a creature that was already Bloodied, it can move up to half its Speed and make one more bite attack."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of chaotic evil alignment, encountered in Desert, Forest, and Grassland. It fights with Bite and Bone Flail. Its challenge rating is 4.",
+  "page": 141
+ },
+ {
+  "name": "Gnoll Pack Lord",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 49,
+   "dice": "9d8 + 9"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Gnoll"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bone Whip",
+     "Bone Javelin",
+     "Incite Rampage"
+    ],
+    "summary": "Strings together 2 strikes using Bone Whip, Bone Javelin, Incite Rampage."
+   },
+   {
+    "name": "Bone Whip",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "2d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Bone Javelin",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "summary": "Ranged attack at +5 dealing piercing damage."
+   },
+   {
+    "name": "Incite Rampage",
+    "recharge": "5-6",
+    "type": "utility",
+    "summary": "Recharges on a roll of 5-6."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Rampage",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Whenever it damages a creature that was already Bloodied, it can move up to half its Speed and make one more bite attack."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of chaotic evil alignment, encountered in Desert, Forest, and Grassland. It fights with Bone Whip and Bone Javelin. Its challenge rating is 2.",
+  "page": 140
+ },
+ {
+  "name": "Gnoll Warrior",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Desert",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 27,
+   "dice": "6d8"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Gnoll"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing damage."
+   },
+   {
+    "name": "Bone Bow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 3,
+     "range": "150/600"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d10 + 1"
+     }
+    ],
+    "summary": "Ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Rampage",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Whenever it damages a creature that was already Bloodied, it can move up to half its Speed and make one more bite attack."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of chaotic evil alignment, encountered in Desert, Grassland, and Hill. It fights with Rend and Bone Bow. Its challenge rating is 1/2.",
+  "page": 140
+ },
+ {
+  "name": "Goat",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill",
+   "Mountain",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 4,
+   "dice": "1d8"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Bludgeoning"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the goat moved 20+ feet straight toward the target immediately before the hit",
+     "avg": 2,
+     "type": "Bludgeoning",
+     "dice": "1d4"
+    },
+    "summary": "Melee attack at +2 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Grassland, Hill, and Mountain. It can climb and fights with Ram. Its challenge rating is 0.",
+  "page": 362
+ },
+ {
+  "name": "Goblin Boss",
+  "size": "Small",
+  "type": "Fey",
+  "tags": [
+   "Goblinoid"
+  ],
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Acheron, Feywild)",
+   "Underdark"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 21,
+   "dice": "6d6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Common",
+   "Goblin"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Scimitar",
+     "Shortbow"
+    ],
+    "summary": "Strings together 2 strikes using Scimitar, Shortbow."
+   },
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Slashing",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing plus slashing damage."
+   },
+   {
+    "name": "Shortbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "80/320"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Piercing",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing plus piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Nimble Escape",
+    "type": "utility",
+    "summary": "Disengages or hides as a bonus action."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Redirect Attack",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small fey of chaotic neutral alignment, encountered in Forest, Grassland, and Hill. It fights with Scimitar and Shortbow. Its challenge rating is 1.",
+  "page": 143
+ },
+ {
+  "name": "Goblin Hexer",
+  "size": "Small",
+  "type": "Fey",
+  "tags": [
+   "Goblinoid"
+  ],
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Acheron, Feywild)",
+   "Underdark"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "10d6 + 10"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Sleight of Hand": 5,
+   "Stealth": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common",
+   "Goblin"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Hex Stick",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Hex Stick, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Hex Stick",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Psychic",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +5 dealing psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 13,
+    "spells": {
+     "atWill": [
+      "Minor Illusion"
+     ],
+     "perDay": {
+      "1": [
+       "Blindness/Deafness",
+       "Faerie Fire",
+       "Grease"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Int with save DC 13."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Jinx",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 13
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Wis save."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small fey of chaotic neutral alignment, encountered in Forest, Grassland, and Hill. It fights with Hex Stick. Its challenge rating is 3.",
+  "page": 143
+ },
+ {
+  "name": "Goblin Minion",
+  "size": "Small",
+  "type": "Fey",
+  "tags": [
+   "Goblinoid"
+  ],
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Acheron, Feywild)",
+   "Underdark"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 7,
+   "dice": "2d6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Common",
+   "Goblin"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Dagger",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 4,
+     "reach": 5,
+     "range": "20/60"
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Piercing",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee or ranged attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Nimble Escape",
+    "type": "utility",
+    "summary": "Disengages or hides as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small fey of chaotic neutral alignment, encountered in Forest, Grassland, and Hill. It fights with Dagger. Its challenge rating is 1/8.",
+  "page": 142
+ },
+ {
+  "name": "Goblin Warrior",
+  "size": "Small",
+  "type": "Fey",
+  "tags": [
+   "Goblinoid"
+  ],
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Planar (Acheron, Feywild)",
+   "Underdark"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 10,
+   "dice": "3d6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Common",
+   "Goblin"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Slashing",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing plus slashing damage."
+   },
+   {
+    "name": "Shortbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "80/320"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Piercing",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing plus piercing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Nimble Escape",
+    "type": "utility",
+    "summary": "Disengages or hides as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small fey of chaotic neutral alignment, encountered in Forest, Grassland, and Hill. It fights with Scimitar and Shortbow. Its challenge rating is 1/4.",
+  "page": 142
+ },
+ {
+  "name": "Gold Dragon Wyrmling",
+  "size": "Medium",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 60,
+   "dice": "8d8 + 24"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 4
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 10,
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Draconic"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 2 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Slashing",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 22,
+      "dice": "4d10",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 13 Dex save; Inflicts fire damage; affects a 15-foot cone."
+   },
+   {
+    "name": "Weakening Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 13
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Str save; affects a 15-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium dragon of lawful good alignment, encountered in Grassland. It can fly and swim and fights with Rend, Fire Breath, and Weakening Breath. Its challenge rating is 3.",
+  "page": 144
+ },
+ {
+  "name": "Gorgon",
+  "size": "Large",
+  "type": "Construct",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 114,
+   "dice": "12d10 + 48"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 7
+  },
+  "conditionImmunities": [
+   "Exhaustion",
+   "Petrified"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 17
+  },
+  "languages": [],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Gore",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 8,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Piercing",
+      "dice": "2d12 + 5"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +8 dealing piercing damage; can impose prone."
+   },
+   {
+    "name": "Petrifying Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Petrified",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Con save; can impose petrified, restrained; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Trample",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 16,
+      "dice": "2d10 + 5",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 16 Dex save; Inflicts bludgeoning damage; can impose prone."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large construct, encountered in Forest, Grassland, and Hill. It fights with Gore and Petrifying Breath. Its challenge rating is 5.",
+  "page": 148
  }
 ]
