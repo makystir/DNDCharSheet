@@ -11,7 +11,8 @@ import { parseDmData } from '../dm-sanitize';
 import { importCharacterFromText } from '../dm-import';
 import { encodeSharePayload } from '../share-codec';
 import * as gzipModule from '../gzip';
-import { hitPointMaxOf } from '../hit-points-state';
+import { hitPointMaxOf, lifeStatus } from '../hit-points-state';
+import { undoLastLevel } from '../level-undo';
 import { pendingChoices } from '../pending-choices';
 import {
   applyAward,
@@ -454,6 +455,42 @@ describe('applyAward', () => {
     expect(r.character.currentHp).toBe(0);
     expect(r.character.dead).toBe(true);
   });
+
+  it('level award keeps a dead character dead even with positive stored HP', () => {
+    const dead = { ...withMode(sheet(3), 'milestone'), currentHp: 3, dead: true };
+    const r = applyAward(dead, levelAwardOf(5), NOW);
+    expect(r.outcome).toBe('applied');
+    expect(r.character.level).toBe(5);
+    expect(r.character.currentHp).toBe(3);
+    expect(r.character.dead).toBe(true);
+    expect(lifeStatus(r.character)).toBe('dead');
+  });
+
+  it('undoing an awarded level frees the award ID so the same code applies again', () => {
+    const c = withMode(sheet(3), 'milestone');
+    const award = levelAwardOf(4, 'abcdef123456', 'Boss');
+    const first = applyAward(c, award, NOW);
+    expect(first.outcome).toBe('applied');
+    expect(applyAward(first.character, award, NOW).outcome).toBe('already-applied');
+    const undone = undoLastLevel(first.character, NOW + 1);
+    if (!undone.ok) throw new Error(undone.reason);
+    expect(undone.character.level).toBe(3);
+    expect(undone.character.advancement?.appliedAwards).toEqual([]);
+    const second = applyAward(undone.character, award, NOW + 2);
+    expect(second.outcome).toBe('applied');
+    expect(second.character.level).toBe(4);
+    expect(second.character.advancement?.appliedAwards).toEqual(['abcdef123456']);
+  });
+
+  it('undoing a normal level leaves other applied award IDs alone', () => {
+    const c = withMode(sheet(3), 'xp', 0);
+    const xpApplied = applyAward(c, xpAwardOf(1, 'xpaward00001'), NOW).character;
+    const leveled = applyAward({ ...xpApplied, advancement: { ...xpApplied.advancement, leveling: { mode: 'milestone' } } }, levelAwardOf(4, 'lvlaward0001'), NOW).character;
+    const undone = undoLastLevel(leveled, NOW + 1);
+    if (!undone.ok) throw new Error(undone.reason);
+    expect(undone.character.advancement?.appliedAwards).toEqual(['xpaward00001']);
+  });
+
   it('refuses a level award on a multiclass sheet but allows XP', () => {
     const c = withMode(twoClasses(sheet(5), 5), 'xp', 0);
     const r = applyAward(c, levelAwardOf(8), NOW);

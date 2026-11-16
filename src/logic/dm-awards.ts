@@ -25,7 +25,7 @@ import type { DmCombatant, DmPartyMember } from '../types/dm';
 import type { Breakdown } from './breakdown';
 import type { EncounterDifficulty } from '../data/xp-tables';
 import { clampLevel } from './abilities';
-import { applyHealingToCharacter, hitPointMaxOf } from './hit-points-state';
+import { applyHealingToCharacter, hitPointMaxOf, lifeStatus } from './hit-points-state';
 import { appendLogEntry, applyLevelUp, awardXp, levelingMode, xpForLevel, xpToLevel } from './advancement';
 import { resolveClass } from './classes';
 import { xpAward, xpBudget, type BudgetMember, type XpAward } from './dm-balance';
@@ -370,7 +370,9 @@ export function applyAward(
     // Stable like any other healing. A dead character (explicit flag) gets no HP change: the
     // rulebooks do not say a level award revives, so the level rises and the life state stays.
     const maxAfter = hitPointMaxOf(next);
-    if (maxBefore !== undefined && maxAfter !== undefined && maxAfter > maxBefore && next.currentHp !== undefined && Number.isFinite(next.currentHp)) {
+    // Explicit guard (not reliant on applyHealingToCharacter refusing): a dead character is left as is.
+    const isDead = lifeStatus(character) === 'dead';
+    if (!isDead && maxBefore !== undefined && maxAfter !== undefined && maxAfter > maxBefore && next.currentHp !== undefined && Number.isFinite(next.currentHp)) {
       const healed = applyHealingToCharacter(next, maxAfter - maxBefore);
       if (healed) next = healed.character;
     }
@@ -379,6 +381,8 @@ export function applyAward(
       kind: 'level-up',
       level: award.amount,
       detail: `Level ${award.amount}: ${awardReason(award)}`,
+      // Lets undoing this level free the award ID (see undoLastLevel).
+      awardId: award.id,
     });
   }
 

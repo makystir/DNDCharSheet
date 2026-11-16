@@ -763,6 +763,7 @@ export interface AdvancementLogEntry {
   detail: string;
   /** The XP awarded (xp-award entries only). */
   xpAmount?: number;
+  awardId?: string;
 }
 
 /**

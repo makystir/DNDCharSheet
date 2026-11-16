@@ -289,6 +289,8 @@ export interface AdvancementLogEntry {
   detail: string;
   /** The XP awarded (xp-award entries only). */
   xpAmount?: number;
+  /** The DM award ID that granted this level (level-up entries from a DM level award only). */
+  awardId?: string;
 }
 
 /** The character's advancement log, oldest-first (absent = empty). */

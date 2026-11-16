@@ -159,6 +159,13 @@ export function undoLastLevel(character: Character, timestamp: number, classId?:
   if (record?.hp) {
     removals.push(`Hit points gained at level ${fromLevel} (${record.hp.mode === 'rolled' ? `rolled ${record.hp.value}` : 'fixed value'})`);
   }
+  const isUndoneEntry = (e: { kind: string; level?: number }) =>
+    (e.kind === 'level-up' || e.kind === 'hp') && e.level === fromLevel;
+  // A level granted by a DM award carries the award ID on its log entry. Undoing that level frees the
+  // ID so the same code can be applied again (otherwise it would read as already applied).
+  const freedAwardIds = new Set(
+    (character.advancement?.log ?? []).filter((e) => isUndoneEntry(e) && e.awardId !== undefined).map((e) => e.awardId),
+  );
   let next: Character = {
     ...character,
     classes: nextClasses,
@@ -166,11 +173,19 @@ export function undoLastLevel(character: Character, timestamp: number, classId?:
     advancement: {
       ...character.advancement,
       levels: levels.filter((l) => l.level !== fromLevel),
-      log: (character.advancement?.log ?? []).filter(
-        (e) => !((e.kind === 'level-up' || e.kind === 'hp') && e.level === fromLevel),
-      ),
+      log: (character.advancement?.log ?? []).filter((e) => !isUndoneEntry(e)),
     },
   };
+  if (freedAwardIds.size > 0 && Array.isArray(character.advancement?.appliedAwards)) {
+    next = {
+      ...next,
+      advancement: {
+        ...next.advancement,
+        appliedAwards: character.advancement!.appliedAwards!.filter((id) => !freedAwardIds.has(id)),
+      },
+    };
+    removals.push('The DM award code that granted this level can be applied again');
+  }
 
   // 4. Feats whose slot (or Fighting Style feature) is gone.
   const placedBefore = placedFeats(character);
