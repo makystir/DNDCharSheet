@@ -60,6 +60,20 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const notify = useCallback((text: string) => setToast((prev) => ({ id: (prev?.id ?? 0) + 1, text })), []);
 
+  // Encounter id handed to the Party XP page by the Encounter page's button; any other way of reaching it clears it.
+  const [xpEncounterId, setXpEncounterId] = useState<string | undefined>(undefined);
+  const go = useCallback(
+    (target: DmPage) => {
+      setXpEncounterId(undefined);
+      onNavigate(target);
+    },
+    [onNavigate],
+  );
+  const openPartyXp = (encounterId: string) => {
+    setXpEncounterId(encounterId);
+    onNavigate('xp');
+  };
+
   // Number-key shortcuts, ignored while typing in a form field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -67,11 +81,11 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       const item = DM_NAV.find((n) => n.shortcut === e.key);
-      if (item) onNavigate(item.id);
+      if (item) go(item.id);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onNavigate]);
+  }, [go]);
 
   const activeLabel = DM_NAV.find((n) => n.id === page)?.label ?? '';
 
@@ -83,7 +97,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         key={item.id}
         type="button"
         className={active ? navStyles.navItemActive : navStyles.navItem}
-        onClick={() => onNavigate(item.id)}
+        onClick={() => go(item.id)}
         aria-current={active ? 'page' : undefined}
         aria-keyshortcuts={item.shortcut}
         title={`${item.label} (press ${item.shortcut})`}
@@ -140,14 +154,14 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'party' && (
           <PartyPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />
         )}
-        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
+        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenPartyXp={openPartyXp} />}
         {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
         {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
         {page === 'generators' && (
           <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
         )}
         {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} />}
-        {page === 'xp' && <XpPage dm={dm} onNotify={notify} />}
+        {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
         )}

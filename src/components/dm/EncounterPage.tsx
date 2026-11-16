@@ -39,12 +39,14 @@ interface EncounterPageProps {
   dm: DmApi;
   onNotify: (text: string) => void;
   onOpenCampaign: () => void;
+  /** Open the Party XP page's Fight tab with this encounter already chosen. */
+  onOpenPartyXp: (encounterId: string) => void;
 }
 
 const STATUS_LABEL = { setup: 'Setting up', running: 'In progress', ended: 'Finished' } as const;
 
 /** Run an encounter: build the order, roll Initiative, step through turns, track Hit Points. */
-export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPageProps) {
+export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: EncounterPageProps) {
   const campaign = activeCampaign(dm.data);
   const [adding, setAdding] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
@@ -383,7 +385,15 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign }: EncounterPagePro
 
       {!ended && <EncounterBalance members={budgetMembers} combatants={open.combatants} />}
 
-      {ended && <XpAwardCard encounter={open} defaultSharers={budgetMembers.length} onCommit={commit} />}
+      {ended && (
+        <XpAwardCard
+          encounter={open}
+          // The Party XP page awards every party member and rejects a smaller count, so start from the same number.
+          defaultSharers={Math.max(1, campaign.party.length)}
+          onCommit={commit}
+          onOpenPartyXp={() => onOpenPartyXp(open.id)}
+        />
+      )}
 
       {open.combatants.length === 0 ? (
         <Card>

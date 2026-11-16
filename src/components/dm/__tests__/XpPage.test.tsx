@@ -32,9 +32,9 @@ function seed(members: Array<{ id: string; character: Character }> = [], manualL
   saveDmData(d);
 }
 
-function Page({ onNotify = () => {}, newId = () => UUID }: { onNotify?: (t: string) => void; newId?: () => string }) {
+function Page({ onNotify = () => {}, newId = () => UUID, initialEncounterId }: { onNotify?: (t: string) => void; newId?: () => string; initialEncounterId?: string }) {
   const dm = useDmData();
-  return <XpPage dm={dm} onNotify={onNotify} newId={newId} />;
+  return <XpPage dm={dm} onNotify={onNotify} newId={newId} initialEncounterId={initialEncounterId} />;
 }
 
 function typeAmount(value: string) {
@@ -192,6 +192,20 @@ describe('Party XP page', () => {
     expect(screen.getByLabelText('Encounter')).toHaveValue('e3');
   });
 
+  it('opens the Fight tab on the encounter handed over from the Encounter page, ahead of the active and newest ones', async () => {
+    const mon = (id: string, xp: number) => ({ ...customCombatant(id, { name: id, ac: 10, hpMax: 10, initiativeMod: 0 }), xp, kind: 'monster' as const, xpCounts: true });
+    const enc = (id: string, xp: number) => ({ id, name: id, status: 'ended' as const, round: 0, activeId: null, combatants: [mon(id + '-orc', xp)], log: [], createdAt: 1, updatedAt: 1 });
+    let d = createCampaign(emptyDmData(), { id: 'c', name: 'Test', now: 1 });
+    d = addImportedMember(d, 'c', { id: 'Ann', character: { ...sheet(3, 'xp', 0), name: 'Ann' }, now: 1 }).data;
+    d = { ...d, campaigns: d.campaigns.map((c) => ({ ...c, activeEncounterId: 'e2', encounters: [enc('e1', 100), enc('e2', 200), enc('e3', 300)] })) };
+    saveDmData(d);
+    render(<Page initialEncounterId="e1" />);
+    expect(screen.getByRole('tab', { name: 'Fight' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByLabelText('Encounter')).toHaveValue('e1');
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    const code = await screen.findByLabelText('Award code');
+    expect(await decodeAward((code as HTMLTextAreaElement).value)).toMatchObject({ ok: true, award: { kind: 'xp', amount: 100 } });
+  });
   it('hides the previous code while a history code is requested, and when that request fails', async () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
     render(<Page />);

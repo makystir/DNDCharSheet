@@ -33,6 +33,8 @@ interface XpPageProps {
   onNotify: (text: string) => void;
   /** Source of a UUID for new award IDs. Tests inject a fixed one. */
   newId?: () => string;
+  /** Encounter to choose on the Fight tab when the page opens (handed over from the Encounter page). */
+  initialEncounterId?: string;
 }
 
 type Tab = 'fight' | 'milestone' | 'noncombat' | 'level';
@@ -66,7 +68,7 @@ const BLOCKED_TEXT: Record<BlockedOutcome, string> = {
 };
 
 /** Build one award (DMG 2024 "Awarding XP", "Noncombat Challenges", "Milestones") and copy its code. */
-export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
+export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId }: XpPageProps) {
   const campaign = activeCampaign(dm.data);
   const party = campaign?.party ?? [];
   const budgetMembers = party.flatMap((m) => {
@@ -76,7 +78,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
 
   const [tab, setTab] = useState<Tab>('fight');
   const [label, setLabel] = useState('');
-  const [encounterId, setEncounterId] = useState('');
+  const [encounterId, setEncounterId] = useState(initialEncounterId ?? '');
   const [sharers, setSharers] = useState('');
   const [milestone, setMilestone] = useState<'major' | 'minor'>('major');
   const [noncombat, setNoncombat] = useState<EncounterDifficulty | 'typed'>('moderate');

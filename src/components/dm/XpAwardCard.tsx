@@ -14,10 +14,12 @@ interface XpAwardCardProps {
   /** Characters who share the XP unless the DM changes it. */
   defaultSharers: number;
   onCommit: (next: DmEncounter) => void;
+  /** Open the Party XP page's Fight tab for this encounter, where the award code is made. */
+  onOpenPartyXp: () => void;
 }
 
 /** Who counts as overcome, and what each character earns (DMG 2024 "Awarding XP"). */
-export function XpAwardCard({ encounter, defaultSharers, onCommit }: XpAwardCardProps) {
+export function XpAwardCard({ encounter, defaultSharers, onCommit, onOpenPartyXp }: XpAwardCardProps) {
   const [sharers, setSharers] = useState(String(Math.max(1, defaultSharers)));
   const monsters = encounter.combatants.filter((c) => c.kind === 'monster');
   const counts = countsForXp;
@@ -74,6 +76,12 @@ export function XpAwardCard({ encounter, defaultSharers, onCommit }: XpAwardCard
               </CalculatedValue>
             </span>
           </div>
+        </div>
+        <div className={styles.row}>
+          <button type="button" className={styles.btnPrimary} onClick={onOpenPartyXp}>
+            Open Party XP for this fight
+          </button>
+          <span className={styles.muted}>Make the award code there. The ticked creatures carry over.</span>
         </div>
       </div>
     </Card>

@@ -242,6 +242,27 @@ describe('Encounter page', () => {
     fireEvent.click(screen.getByLabelText('Count Orc for XP'));
     expect(screen.getByTestId('xp-share')).toHaveTextContent('0');
   });
+  it('opens Party XP for the finished fight with the encounter already chosen', () => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Orc' } });
+    fireEvent.change(screen.getByLabelText(/^XP value/), { target: { value: '100' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add to encounter' }));
+    fireEvent.change(screen.getByLabelText('Initiative for Orc'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    fireEvent.click(screen.getByRole('button', { name: 'End combat' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'End combat' })).getByRole('button', { name: 'End combat' }));
+
+    // The sharers box starts at the party size, the same number the Party XP page uses.
+    expect(screen.getByLabelText('Characters sharing the XP')).toHaveValue(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Open Party XP for this fight' }));
+    expect(screen.getByRole('tab', { name: 'Fight' })).toHaveAttribute('aria-selected', 'true');
+    const id = JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].encounters[0].id;
+    expect(screen.getByLabelText('Encounter')).toHaveValue(id);
+  });
 });
 
 describe('Encounter page: DM quality of life', () => {
