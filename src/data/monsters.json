@@ -1,1 +1,266 @@
-﻿[]
+[
+ {
+  "name": "Aarakocra Aeromancer",
+  "size": "Medium",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Mountain",
+   "Planar (Elemental Plane of Air)"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 66,
+   "dice": "12d8 + 12"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 13,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 17,
+    "mod": 3,
+    "save": 5
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Arcana": 3,
+   "Nature": 5,
+   "Perception": 7
+  },
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Aarakocra",
+   "Primordial (Auran)"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "summary": "Makes two Wind Staff attacks and can cast Gust of Wind via Spellcasting."
+   },
+   {
+    "name": "Wind Staff",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "dice": "1d8 + 3",
+      "type": "Bludgeoning"
+     },
+     {
+      "avg": 11,
+      "dice": "2d10",
+      "type": "Lightning"
+     }
+    ],
+    "summary": "Staff strike usable in melee or at range, dealing bludgeoning plus lightning damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Elementalism",
+      "Gust of Wind",
+      "Mage Hand",
+      "Message"
+     ],
+     "perDay": {
+      "1": [
+       "Lightning Bolt"
+      ]
+     }
+    },
+    "summary": "Casts one listed spell per use without Material components."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Feather Fall",
+    "uses": "1/Day",
+    "summary": "Casts Feather Fall in response to its trigger, using its Spellcasting ability."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "page": 10
+ },
+ {
+  "name": "Aarakocra Skirmisher",
+  "size": "Medium",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Mountain",
+   "Planar (Elemental Plane of Air)"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 11,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 11,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "senses": {
+   "passivePerception": 15
+  },
+  "languages": [
+   "Aarakocra",
+   "Primordial (Auran)"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Talons",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "dice": "1d4 + 2",
+      "type": "Slashing"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "Moved 30+ ft straight toward the target immediately before the hit",
+     "avg": 9,
+     "dice": "3d4 + 2",
+     "type": "Slashing"
+    },
+    "summary": "Claw attack that hits harder after a straight diving approach of 30+ feet."
+   },
+   {
+    "name": "Wind Javelin",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 4,
+     "reach": 5,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d6 + 2",
+      "type": "Piercing"
+     },
+     {
+      "avg": 2,
+      "dice": "1d4",
+      "type": "Thunder"
+     }
+    ],
+    "onHitOrMiss": "Javelin magically returns to hand after a ranged attack.",
+    "summary": "Thrown or stabbing javelin that adds thunder damage and returns after ranged use."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "page": 10
+ }
+]

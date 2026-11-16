@@ -1,3018 +1,3018 @@
-﻿{
-    "complete":  false,
-    "note":  "Built from rendered Index of Stat Blocks (PDF idx 5-6). Page = printed page; PDF 0-based idx = page+2.",
-    "items":  [
-                  {
-                      "name":  "Aarakocra Aeromancer",
-                      "page":  10,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Aarakocra Skirmisher",
-                      "page":  10,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Aberrant Cultist",
-                      "page":  86,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Aboleth",
-                      "page":  12,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Abominable Yeti",
-                      "page":  340,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Black Dragon",
-                      "page":  39,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Blue Dragon",
-                      "page":  49,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Brass Dragon",
-                      "page":  55,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Bronze Dragon",
-                      "page":  59,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Copper Dragon",
-                      "page":  79,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Gold Dragon",
-                      "page":  145,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Green Dragon",
-                      "page":  153,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Red Dragon",
-                      "page":  255,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult Silver Dragon",
-                      "page":  279,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Adult White Dragon",
-                      "page":  329,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Air Elemental",
-                      "page":  13,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Allosaurus",
-                      "page":  348,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Black Dragon",
-                      "page":  40,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Blue Dragon",
-                      "page":  50,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Brass Dragon",
-                      "page":  56,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Bronze Dragon",
-                      "page":  60,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Copper Dragon",
-                      "page":  80,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Gold Dragon",
-                      "page":  146,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Green Dragon",
-                      "page":  154,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Red Dragon",
-                      "page":  256,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient Silver Dragon",
-                      "page":  280,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ancient White Dragon",
-                      "page":  330,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Animal Lord",
-                      "page":  15,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Animated Armor",
-                      "page":  16,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Animated Broom",
-                      "page":  16,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Animated Flying Sword",
-                      "page":  17,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Animated Rug of Smothering",
-                      "page":  17,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ankheg",
-                      "page":  18,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ankylosaurus",
-                      "page":  348,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ape",
-                      "page":  348,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Arcanaloth",
-                      "page":  19,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Archelon",
-                      "page":  349,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Arch-hag",
-                      "page":  21,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Archmage",
-                      "page":  199,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Archpriest",
-                      "page":  248,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Assassin",
-                      "page":  22,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Awakened Shrub",
-                      "page":  23,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Awakened Tree",
-                      "page":  23,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Axe Beak",
-                      "page":  24,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Azer Pyromancer",
-                      "page":  25,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Azer Sentinel",
-                      "page":  25,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Baboon",
-                      "page":  349,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Badger",
-                      "page":  349,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Balor",
-                      "page":  26,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bandit",
-                      "page":  27,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bandit Captain",
-                      "page":  27,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bandit Crime Lord",
-                      "page":  28,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bandit Deceiver",
-                      "page":  28,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Banshee",
-                      "page":  29,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Barbed Devil",
-                      "page":  30,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Barlgura",
-                      "page":  31,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Basilisk",
-                      "page":  32,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bat",
-                      "page":  349,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bearded Devil",
-                      "page":  33,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Behir",
-                      "page":  34,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Beholder",
-                      "page":  36,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Beholder Zombie",
-                      "page":  347,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Berserker",
-                      "page":  37,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Berserker Commander",
-                      "page":  37,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Black Bear",
-                      "page":  349,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Black Dragon Wyrmling",
-                      "page":  38,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Black Pudding",
-                      "page":  42,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Blink Dog",
-                      "page":  46,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Blob of Annihilation",
-                      "page":  47,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Blood Hawk",
-                      "page":  350,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Blue Dragon Wyrmling",
-                      "page":  48,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Blue Slaad",
-                      "page":  285,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Boar",
-                      "page":  350,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bone Devil",
-                      "page":  52,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bone Naga",
-                      "page":  53,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Brass Dragon Wyrmling",
-                      "page":  54,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Brazen Gorgon",
-                      "page":  149,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bronze Dragon Wyrmling",
-                      "page":  58,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Brown Bear",
-                      "page":  350,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bugbear Stalker",
-                      "page":  62,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bugbear Warrior",
-                      "page":  62,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bulette",
-                      "page":  63,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bulette Pup",
-                      "page":  63,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bullywug Bog Sage",
-                      "page":  64,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Bullywug Warrior",
-                      "page":  64,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cambion",
-                      "page":  65,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Camel",
-                      "page":  351,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Carrion Crawler",
-                      "page":  66,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cat",
-                      "page":  351,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Centaur Trooper",
-                      "page":  67,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Centaur Warden",
-                      "page":  67,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Chain Devil",
-                      "page":  68,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Chasme",
-                      "page":  69,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Chimera",
-                      "page":  70,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Chuul",
-                      "page":  71,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Clay Golem",
-                      "page":  72,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cloaker",
-                      "page":  73,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cloud Giant",
-                      "page":  74,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cockatrice",
-                      "page":  75,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cockatrice Regent",
-                      "page":  75,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Colossus",
-                      "page":  76,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Commoner",
-                      "page":  77,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Constrictor Snake",
-                      "page":  351,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Copper Dragon Wyrmling",
-                      "page":  78,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Couatl",
-                      "page":  82,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Crab",
-                      "page":  351,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Crawling Claw",
-                      "page":  83,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Crocodile",
-                      "page":  352,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cultist",
-                      "page":  84,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cultist Fanatic",
-                      "page":  85,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cultist Hierophant",
-                      "page":  85,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cyclops Oracle",
-                      "page":  88,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Cyclops Sentry",
-                      "page":  88,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dao",
-                      "page":  89,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Darkmantle",
-                      "page":  90,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Cultist",
-                      "page":  86,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Dog",
-                      "page":  91,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Knight",
-                      "page":  92,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Knight Aspirant",
-                      "page":  93,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Slaad",
-                      "page":  287,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Death Tyrant",
-                      "page":  95,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Deer",
-                      "page":  352,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Demilich",
-                      "page":  96,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Deva",
-                      "page":  97,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dire Wolf",
-                      "page":  352,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dire Worg",
-                      "page":  335,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Displacer Beast",
-                      "page":  98,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Djinni",
-                      "page":  99,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Doppelganger",
-                      "page":  100,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dracolich",
-                      "page":  102,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Draft Horse",
-                      "page":  352,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dragon Turtle",
-                      "page":  103,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dretch",
-                      "page":  104,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Drider",
-                      "page":  105,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Druid",
-                      "page":  106,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dryad",
-                      "page":  107,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Dust Mephit",
-                      "page":  206,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Eagle",
-                      "page":  353,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Earth Elemental",
-                      "page":  108,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Efreeti",
-                      "page":  109,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Elemental Cataclysm",
-                      "page":  111,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Elemental Cultist",
-                      "page":  87,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Elephant",
-                      "page":  353,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Elk",
-                      "page":  353,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Empyrean",
-                      "page":  113,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Empyrean Iota",
-                      "page":  112,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Erinyes",
-                      "page":  114,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ettercap",
-                      "page":  115,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ettin",
-                      "page":  116,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Faerie Dragon Adult",
-                      "page":  117,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Faerie Dragon Youth",
-                      "page":  117,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Fiend Cultist",
-                      "page":  87,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Fire Elemental",
-                      "page":  118,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Fire Giant",
-                      "page":  119,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Flameskull",
-                      "page":  120,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Flaming Skeleton",
-                      "page":  283,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Flesh Golem",
-                      "page":  121,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Flumph",
-                      "page":  122,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Flying Snake",
-                      "page":  353,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Fomorian",
-                      "page":  123,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Frog",
-                      "page":  354,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Frost Giant",
-                      "page":  124,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Galeb Duhr",
-                      "page":  127,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gargoyle",
-                      "page":  128,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gas Spore Fungus",
-                      "page":  125,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gelatinous Cube",
-                      "page":  129,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ghast",
-                      "page":  130,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ghast Gravecaller",
-                      "page":  130,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ghost",
-                      "page":  131,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ghoul",
-                      "page":  132,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Ape",
-                      "page":  354,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Axe Beak",
-                      "page":  24,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Badger",
-                      "page":  354,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Bat",
-                      "page":  355,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Boar",
-                      "page":  355,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Centipede",
-                      "page":  355,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Constrictor Snake",
-                      "page":  355,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Crab",
-                      "page":  356,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Crocodile",
-                      "page":  356,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Eagle",
-                      "page":  356,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Elk",
-                      "page":  356,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Fire Beetle",
-                      "page":  357,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Frog",
-                      "page":  357,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Goat",
-                      "page":  357,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Hyena",
-                      "page":  357,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Lizard",
-                      "page":  358,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Octopus",
-                      "page":  358,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Owl",
-                      "page":  358,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Rat",
-                      "page":  358,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Scorpion",
-                      "page":  359,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Seahorse",
-                      "page":  359,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Shark",
-                      "page":  359,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Spider",
-                      "page":  359,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Squid",
-                      "page":  360,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Toad",
-                      "page":  360,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Venomous Snake",
-                      "page":  361,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Vulture",
-                      "page":  361,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Wasp",
-                      "page":  361,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Weasel",
-                      "page":  361,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Giant Wolf Spider",
-                      "page":  362,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gibbering Mouther",
-                      "page":  133,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githyanki Dracomancer",
-                      "page":  135,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githyanki Knight",
-                      "page":  135,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githyanki Warrior",
-                      "page":  134,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githzerai Monk",
-                      "page":  136,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githzerai Psion",
-                      "page":  137,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Githzerai Zerth",
-                      "page":  137,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Glabrezu",
-                      "page":  138,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gladiator",
-                      "page":  139,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gnoll Demoniac",
-                      "page":  141,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gnoll Fang of Yeenoghu",
-                      "page":  141,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gnoll Pack Lord",
-                      "page":  140,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gnoll Warrior",
-                      "page":  140,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goat",
-                      "page":  362,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goblin Boss",
-                      "page":  143,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goblin Hexer",
-                      "page":  143,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goblin Minion",
-                      "page":  142,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goblin Warrior",
-                      "page":  142,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gold Dragon Wyrmling",
-                      "page":  144,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gorgon",
-                      "page":  148,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Goristro",
-                      "page":  150,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gray Ooze",
-                      "page":  151,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gray Slaad",
-                      "page":  286,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Green Dragon Wyrmling",
-                      "page":  152,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Green Hag",
-                      "page":  156,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Green Slaad",
-                      "page":  286,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Grell",
-                      "page":  157,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Grick",
-                      "page":  158,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Grick Ancient",
-                      "page":  158,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Griffon",
-                      "page":  159,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Grimlock",
-                      "page":  160,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Guard",
-                      "page":  162,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Guard Captain",
-                      "page":  162,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Guardian Naga",
-                      "page":  161,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Gulthias Blight",
-                      "page":  45,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Half-Dragon",
-                      "page":  163,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Harpy",
-                      "page":  164,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Haunting Revenant",
-                      "page":  260,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hawk",
-                      "page":  362,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hell Hound",
-                      "page":  165,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Helmed Horror",
-                      "page":  166,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hezrou",
-                      "page":  167,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hill Giant",
-                      "page":  168,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hippogriff",
-                      "page":  169,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hippopotamus",
-                      "page":  362,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hobgoblin Captain",
-                      "page":  171,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hobgoblin Warlord",
-                      "page":  171,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hobgoblin Warrior",
-                      "page":  170,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Homunculus",
-                      "page":  172,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hook Horror",
-                      "page":  173,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Horned Devil",
-                      "page":  174,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hunter Shark",
-                      "page":  363,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hydra",
-                      "page":  175,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Hyena",
-                      "page":  363,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ice Devil",
-                      "page":  176,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ice Mephit",
-                      "page":  206,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Imp",
-                      "page":  177,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Incubus",
-                      "page":  178,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Intellect Devourer",
-                      "page":  179,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Invisible Stalker",
-                      "page":  180,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Iron Golem",
-                      "page":  181,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Jackal",
-                      "page":  364,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Jackalwere",
-                      "page":  182,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Juvenile Shadow Dragon",
-                      "page":  275,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kenku",
-                      "page":  183,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Killer Whale",
-                      "page":  364,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Knight",
-                      "page":  184,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kobold Warrior",
-                      "page":  185,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kraken",
-                      "page":  187,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kuo-toa",
-                      "page":  189,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kuo-toa Archpriest",
-                      "page":  191,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kuo-toa Monitor",
-                      "page":  190,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Kuo-toa Whip",
-                      "page":  190,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lacedon Ghoul",
-                      "page":  132,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lamia",
-                      "page":  192,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Larva",
-                      "page":  193,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lemure",
-                      "page":  194,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lich",
-                      "page":  196,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lion",
-                      "page":  364,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lizard",
-                      "page":  364,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lizardfolk Geomancer",
-                      "page":  197,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Lizardfolk Sovereign",
-                      "page":  197,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mage",
-                      "page":  199,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mage Apprentice",
-                      "page":  198,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Magma Mephit",
-                      "page":  207,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Magmin",
-                      "page":  200,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mammoth",
-                      "page":  365,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Manes",
-                      "page":  201,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Manes Vaporspawn",
-                      "page":  201,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Manticore",
-                      "page":  202,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Marid",
-                      "page":  203,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Marilith",
-                      "page":  204,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mastiff",
-                      "page":  365,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Medusa",
-                      "page":  205,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Merfolk Skirmisher",
-                      "page":  209,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Merfolk Wavebender",
-                      "page":  209,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Merrow",
-                      "page":  210,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mezzoloth",
-                      "page":  211,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mimic",
-                      "page":  212,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mind Flayer",
-                      "page":  214,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mind Flayer Arcanist",
-                      "page":  214,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Minotaur of Baphomet",
-                      "page":  215,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Minotaur Skeleton",
-                      "page":  283,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Modron Duodrone",
-                      "page":  217,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Modron Monodrone",
-                      "page":  216,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Modron Pentadrone",
-                      "page":  218,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Modron Quadrone",
-                      "page":  218,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Modron Tridrone",
-                      "page":  217,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mud Mephit",
-                      "page":  207,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mule",
-                      "page":  365,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mummy",
-                      "page":  219,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Mummy Lord",
-                      "page":  221,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Myconid Adult",
-                      "page":  223,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Myconid Sovereign",
-                      "page":  223,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Myconid Spore Servant",
-                      "page":  223,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Myconid Sprout",
-                      "page":  222,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Nalfeshnee",
-                      "page":  224,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Needle Blight",
-                      "page":  43,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Night Hag",
-                      "page":  225,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Nightmare",
-                      "page":  226,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Noble",
-                      "page":  227,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Noble Prodigy",
-                      "page":  227,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Nothic",
-                      "page":  228,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Nycaloth",
-                      "page":  229,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ochre Jelly",
-                      "page":  230,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Octopus",
-                      "page":  365,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ogre",
-                      "page":  231,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ogre Zombie",
-                      "page":  346,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ogrillon Ogre",
-                      "page":  231,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Oni",
-                      "page":  232,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Otyugh",
-                      "page":  233,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Owl",
-                      "page":  366,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Owlbear",
-                      "page":  234,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Panther",
-                      "page":  366,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pegasus",
-                      "page":  235,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Performer",
-                      "page":  236,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Performer Legend",
-                      "page":  237,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Performer Maestro",
-                      "page":  237,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Peryton",
-                      "page":  238,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Phase Spider",
-                      "page":  239,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Piercer",
-                      "page":  240,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Piranha",
-                      "page":  366,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pirate",
-                      "page":  241,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pirate Admiral",
-                      "page":  242,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pirate Captain",
-                      "page":  242,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pit Fiend",
-                      "page":  243,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pixie",
-                      "page":  244,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pixie Wonderbringer",
-                      "page":  244,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Planetar",
-                      "page":  245,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Plesiosaurus",
-                      "page":  366,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Polar Bear",
-                      "page":  367,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Poltergeist",
-                      "page":  246,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pony",
-                      "page":  367,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Priest",
-                      "page":  248,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Priest Acolyte",
-                      "page":  247,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Primeval Owlbear",
-                      "page":  234,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pseudodragon",
-                      "page":  249,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Psychic Gray Ooze",
-                      "page":  151,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Pteranodon",
-                      "page":  367,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Purple Worm",
-                      "page":  250,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Quaggoth",
-                      "page":  251,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Quaggoth Thonot",
-                      "page":  251,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Quasit",
-                      "page":  252,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Questing Knight",
-                      "page":  184,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Rakshasa",
-                      "page":  253,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Rat",
-                      "page":  367,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Raven",
-                      "page":  368,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Red Dragon Wyrmling",
-                      "page":  254,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Red Slaad",
-                      "page":  285,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Reef Shark",
-                      "page":  368,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Remorhaz",
-                      "page":  258,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Revenant",
-                      "page":  259,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Rhinoceros",
-                      "page":  368,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Riding Horse",
-                      "page":  368,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Roc",
-                      "page":  261,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Roper",
-                      "page":  262,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Rust Monster",
-                      "page":  263,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Saber-Toothed Tiger",
-                      "page":  369,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sahuagin Baron",
-                      "page":  265,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sahuagin Priest",
-                      "page":  265,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sahuagin Warrior",
-                      "page":  264,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Salamander",
-                      "page":  267,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Salamander Fire Snake",
-                      "page":  266,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Salamander Inferno Master",
-                      "page":  267,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Satyr",
-                      "page":  268,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Satyr Revelmaster",
-                      "page":  268,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Scarecrow",
-                      "page":  269,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Scorpion",
-                      "page":  369,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Scout",
-                      "page":  270,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Scout Captain",
-                      "page":  270,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sea Hag",
-                      "page":  271,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Seahorse",
-                      "page":  369,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shadow",
-                      "page":  272,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shadow Demon",
-                      "page":  273,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shadow Dragon",
-                      "page":  275,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shambling Mound",
-                      "page":  276,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shield Guardian",
-                      "page":  277,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Shrieker Fungus",
-                      "page":  125,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Silver Dragon Wyrmling",
-                      "page":  278,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Skeleton",
-                      "page":  282,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Slaad Tadpole",
-                      "page":  284,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Smoke Mephit",
-                      "page":  208,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Solar",
-                      "page":  288,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spectator",
-                      "page":  289,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Specter",
-                      "page":  290,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sphinx of Lore",
-                      "page":  293,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sphinx of Secrets",
-                      "page":  292,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sphinx of Valor",
-                      "page":  294,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sphinx of Wonder",
-                      "page":  291,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spider",
-                      "page":  369,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spined Devil",
-                      "page":  296,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spirit Naga",
-                      "page":  297,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Sprite",
-                      "page":  298,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spy",
-                      "page":  295,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Spy Master",
-                      "page":  295,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Steam Mephit",
-                      "page":  208,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Stirge",
-                      "page":  299,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Stone Giant",
-                      "page":  300,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Stone Golem",
-                      "page":  301,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Storm Giant",
-                      "page":  302,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Succubus",
-                      "page":  303,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Bats",
-                      "page":  370,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Crawling Claws",
-                      "page":  83,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Dretches",
-                      "page":  104,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Insects",
-                      "page":  370,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Larvae",
-                      "page":  193,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Lemures",
-                      "page":  194,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Piranhas",
-                      "page":  370,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Rats",
-                      "page":  370,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Ravens",
-                      "page":  371,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Stirges",
-                      "page":  299,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Swarm of Venomous Snakes",
-                      "page":  371,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tarrasque",
-                      "page":  305,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Thri-kreen Marauder",
-                      "page":  306,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Thri-kreen Psion",
-                      "page":  306,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tiger",
-                      "page":  371,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tough",
-                      "page":  307,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tough Boss",
-                      "page":  307,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Treant",
-                      "page":  308,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tree Blight",
-                      "page":  44,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Triceratops",
-                      "page":  372,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Troglodyte",
-                      "page":  309,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Troll",
-                      "page":  310,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Troll Limb",
-                      "page":  310,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Twig Blight",
-                      "page":  43,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Tyrannosaurus Rex",
-                      "page":  372,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Ultroloth",
-                      "page":  311,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Umber Hulk",
-                      "page":  312,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Unicorn",
-                      "page":  313,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vampire",
-                      "page":  317,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vampire Familiar",
-                      "page":  314,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vampire Nightbringer",
-                      "page":  316,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vampire Spawn",
-                      "page":  315,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vampire Umbral Lord",
-                      "page":  318,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Venomous Snake",
-                      "page":  372,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vine Blight",
-                      "page":  44,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Violet Fungus",
-                      "page":  126,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Violet Fungus Necrohulk",
-                      "page":  126,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vrock",
-                      "page":  319,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Vulture",
-                      "page":  372,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Warhorse",
-                      "page":  373,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Warhorse Skeleton",
-                      "page":  282,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Warrior Commander",
-                      "page":  321,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Warrior Infantry",
-                      "page":  320,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Warrior Veteran",
-                      "page":  320,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Water Elemental",
-                      "page":  322,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Water Weird",
-                      "page":  323,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Weasel",
-                      "page":  373,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Werebear",
-                      "page":  324,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wereboar",
-                      "page":  325,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wererat",
-                      "page":  325,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Weretiger",
-                      "page":  326,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Werewolf",
-                      "page":  327,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "White Dragon Wyrmling",
-                      "page":  328,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wight",
-                      "page":  332,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Will-o\u0027-Wisp",
-                      "page":  333,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Winged Kobold",
-                      "page":  185,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Winter Wolf",
-                      "page":  334,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wolf",
-                      "page":  373,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Worg",
-                      "page":  335,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wraith",
-                      "page":  336,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Wyvern",
-                      "page":  337,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Xorn",
-                      "page":  338,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yeti",
-                      "page":  339,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yochlol",
-                      "page":  341,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Black Dragon",
-                      "page":  38,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Blue Dragon",
-                      "page":  48,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Brass Dragon",
-                      "page":  54,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Bronze Dragon",
-                      "page":  58,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Copper Dragon",
-                      "page":  78,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Gold Dragon",
-                      "page":  144,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Green Dragon",
-                      "page":  152,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Red Dragon",
-                      "page":  254,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Remorhaz",
-                      "page":  258,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young Silver Dragon",
-                      "page":  278,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Young White Dragon",
-                      "page":  328,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yuan-ti Abomination",
-                      "page":  345,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yuan-ti Infiltrator",
-                      "page":  342,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yuan-ti Malison (Type 1)",
-                      "page":  343,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yuan-ti Malison (Type 2)",
-                      "page":  343,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Yuan-ti Malison (Type 3)",
-                      "page":  344,
-                      "status":  "pending",
-                      "done":  false
-                  },
-                  {
-                      "name":  "Zombie",
-                      "page":  346,
-                      "status":  "pending",
-                      "done":  false
-                  }
-              ]
+{
+ "complete": false,
+ "note": "Built from rendered Index of Stat Blocks (PDF idx 5-6). Page = printed page; PDF 0-based idx = page+2.",
+ "items": [
+  {
+   "name": "Aarakocra Aeromancer",
+   "page": 10,
+   "status": "done",
+   "done": true
+  },
+  {
+   "name": "Aarakocra Skirmisher",
+   "page": 10,
+   "status": "done",
+   "done": true
+  },
+  {
+   "name": "Aberrant Cultist",
+   "page": 86,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Aboleth",
+   "page": 12,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Abominable Yeti",
+   "page": 340,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Black Dragon",
+   "page": 39,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Blue Dragon",
+   "page": 49,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Brass Dragon",
+   "page": 55,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Bronze Dragon",
+   "page": 59,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Copper Dragon",
+   "page": 79,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Gold Dragon",
+   "page": 145,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Green Dragon",
+   "page": 153,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Red Dragon",
+   "page": 255,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult Silver Dragon",
+   "page": 279,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Adult White Dragon",
+   "page": 329,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Air Elemental",
+   "page": 13,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Allosaurus",
+   "page": 348,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Black Dragon",
+   "page": 40,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Blue Dragon",
+   "page": 50,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Brass Dragon",
+   "page": 56,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Bronze Dragon",
+   "page": 60,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Copper Dragon",
+   "page": 80,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Gold Dragon",
+   "page": 146,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Green Dragon",
+   "page": 154,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Red Dragon",
+   "page": 256,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient Silver Dragon",
+   "page": 280,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ancient White Dragon",
+   "page": 330,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Animal Lord",
+   "page": 15,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Animated Armor",
+   "page": 16,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Animated Broom",
+   "page": 16,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Animated Flying Sword",
+   "page": 17,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Animated Rug of Smothering",
+   "page": 17,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ankheg",
+   "page": 18,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ankylosaurus",
+   "page": 348,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ape",
+   "page": 348,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Arcanaloth",
+   "page": 19,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Archelon",
+   "page": 349,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Arch-hag",
+   "page": 21,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Archmage",
+   "page": 199,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Archpriest",
+   "page": 248,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Assassin",
+   "page": 22,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Awakened Shrub",
+   "page": 23,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Awakened Tree",
+   "page": 23,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Axe Beak",
+   "page": 24,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Azer Pyromancer",
+   "page": 25,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Azer Sentinel",
+   "page": 25,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Baboon",
+   "page": 349,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Badger",
+   "page": 349,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Balor",
+   "page": 26,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bandit",
+   "page": 27,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bandit Captain",
+   "page": 27,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bandit Crime Lord",
+   "page": 28,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bandit Deceiver",
+   "page": 28,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Banshee",
+   "page": 29,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Barbed Devil",
+   "page": 30,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Barlgura",
+   "page": 31,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Basilisk",
+   "page": 32,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bat",
+   "page": 349,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bearded Devil",
+   "page": 33,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Behir",
+   "page": 34,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Beholder",
+   "page": 36,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Beholder Zombie",
+   "page": 347,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Berserker",
+   "page": 37,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Berserker Commander",
+   "page": 37,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Black Bear",
+   "page": 349,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Black Dragon Wyrmling",
+   "page": 38,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Black Pudding",
+   "page": 42,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Blink Dog",
+   "page": 46,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Blob of Annihilation",
+   "page": 47,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Blood Hawk",
+   "page": 350,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Blue Dragon Wyrmling",
+   "page": 48,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Blue Slaad",
+   "page": 285,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Boar",
+   "page": 350,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bone Devil",
+   "page": 52,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bone Naga",
+   "page": 53,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Brass Dragon Wyrmling",
+   "page": 54,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Brazen Gorgon",
+   "page": 149,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bronze Dragon Wyrmling",
+   "page": 58,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Brown Bear",
+   "page": 350,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bugbear Stalker",
+   "page": 62,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bugbear Warrior",
+   "page": 62,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bulette",
+   "page": 63,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bulette Pup",
+   "page": 63,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bullywug Bog Sage",
+   "page": 64,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Bullywug Warrior",
+   "page": 64,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cambion",
+   "page": 65,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Camel",
+   "page": 351,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Carrion Crawler",
+   "page": 66,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cat",
+   "page": 351,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Centaur Trooper",
+   "page": 67,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Centaur Warden",
+   "page": 67,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Chain Devil",
+   "page": 68,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Chasme",
+   "page": 69,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Chimera",
+   "page": 70,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Chuul",
+   "page": 71,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Clay Golem",
+   "page": 72,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cloaker",
+   "page": 73,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cloud Giant",
+   "page": 74,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cockatrice",
+   "page": 75,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cockatrice Regent",
+   "page": 75,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Colossus",
+   "page": 76,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Commoner",
+   "page": 77,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Constrictor Snake",
+   "page": 351,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Copper Dragon Wyrmling",
+   "page": 78,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Couatl",
+   "page": 82,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Crab",
+   "page": 351,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Crawling Claw",
+   "page": 83,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Crocodile",
+   "page": 352,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cultist",
+   "page": 84,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cultist Fanatic",
+   "page": 85,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cultist Hierophant",
+   "page": 85,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cyclops Oracle",
+   "page": 88,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Cyclops Sentry",
+   "page": 88,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dao",
+   "page": 89,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Darkmantle",
+   "page": 90,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Cultist",
+   "page": 86,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Dog",
+   "page": 91,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Knight",
+   "page": 92,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Knight Aspirant",
+   "page": 93,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Slaad",
+   "page": 287,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Death Tyrant",
+   "page": 95,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Deer",
+   "page": 352,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Demilich",
+   "page": 96,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Deva",
+   "page": 97,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dire Wolf",
+   "page": 352,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dire Worg",
+   "page": 335,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Displacer Beast",
+   "page": 98,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Djinni",
+   "page": 99,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Doppelganger",
+   "page": 100,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dracolich",
+   "page": 102,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Draft Horse",
+   "page": 352,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dragon Turtle",
+   "page": 103,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dretch",
+   "page": 104,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Drider",
+   "page": 105,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Druid",
+   "page": 106,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dryad",
+   "page": 107,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Dust Mephit",
+   "page": 206,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Eagle",
+   "page": 353,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Earth Elemental",
+   "page": 108,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Efreeti",
+   "page": 109,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Elemental Cataclysm",
+   "page": 111,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Elemental Cultist",
+   "page": 87,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Elephant",
+   "page": 353,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Elk",
+   "page": 353,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Empyrean",
+   "page": 113,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Empyrean Iota",
+   "page": 112,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Erinyes",
+   "page": 114,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ettercap",
+   "page": 115,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ettin",
+   "page": 116,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Faerie Dragon Adult",
+   "page": 117,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Faerie Dragon Youth",
+   "page": 117,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Fiend Cultist",
+   "page": 87,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Fire Elemental",
+   "page": 118,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Fire Giant",
+   "page": 119,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Flameskull",
+   "page": 120,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Flaming Skeleton",
+   "page": 283,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Flesh Golem",
+   "page": 121,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Flumph",
+   "page": 122,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Flying Snake",
+   "page": 353,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Fomorian",
+   "page": 123,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Frog",
+   "page": 354,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Frost Giant",
+   "page": 124,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Galeb Duhr",
+   "page": 127,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gargoyle",
+   "page": 128,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gas Spore Fungus",
+   "page": 125,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gelatinous Cube",
+   "page": 129,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ghast",
+   "page": 130,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ghast Gravecaller",
+   "page": 130,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ghost",
+   "page": 131,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ghoul",
+   "page": 132,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Ape",
+   "page": 354,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Axe Beak",
+   "page": 24,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Badger",
+   "page": 354,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Bat",
+   "page": 355,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Boar",
+   "page": 355,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Centipede",
+   "page": 355,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Constrictor Snake",
+   "page": 355,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Crab",
+   "page": 356,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Crocodile",
+   "page": 356,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Eagle",
+   "page": 356,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Elk",
+   "page": 356,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Fire Beetle",
+   "page": 357,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Frog",
+   "page": 357,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Goat",
+   "page": 357,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Hyena",
+   "page": 357,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Lizard",
+   "page": 358,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Octopus",
+   "page": 358,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Owl",
+   "page": 358,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Rat",
+   "page": 358,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Scorpion",
+   "page": 359,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Seahorse",
+   "page": 359,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Shark",
+   "page": 359,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Spider",
+   "page": 359,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Squid",
+   "page": 360,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Toad",
+   "page": 360,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Venomous Snake",
+   "page": 361,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Vulture",
+   "page": 361,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Wasp",
+   "page": 361,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Weasel",
+   "page": 361,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Giant Wolf Spider",
+   "page": 362,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gibbering Mouther",
+   "page": 133,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githyanki Dracomancer",
+   "page": 135,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githyanki Knight",
+   "page": 135,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githyanki Warrior",
+   "page": 134,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githzerai Monk",
+   "page": 136,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githzerai Psion",
+   "page": 137,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Githzerai Zerth",
+   "page": 137,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Glabrezu",
+   "page": 138,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gladiator",
+   "page": 139,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gnoll Demoniac",
+   "page": 141,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gnoll Fang of Yeenoghu",
+   "page": 141,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gnoll Pack Lord",
+   "page": 140,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gnoll Warrior",
+   "page": 140,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goat",
+   "page": 362,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goblin Boss",
+   "page": 143,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goblin Hexer",
+   "page": 143,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goblin Minion",
+   "page": 142,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goblin Warrior",
+   "page": 142,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gold Dragon Wyrmling",
+   "page": 144,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gorgon",
+   "page": 148,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Goristro",
+   "page": 150,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gray Ooze",
+   "page": 151,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gray Slaad",
+   "page": 286,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Green Dragon Wyrmling",
+   "page": 152,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Green Hag",
+   "page": 156,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Green Slaad",
+   "page": 286,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Grell",
+   "page": 157,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Grick",
+   "page": 158,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Grick Ancient",
+   "page": 158,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Griffon",
+   "page": 159,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Grimlock",
+   "page": 160,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Guard",
+   "page": 162,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Guard Captain",
+   "page": 162,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Guardian Naga",
+   "page": 161,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Gulthias Blight",
+   "page": 45,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Half-Dragon",
+   "page": 163,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Harpy",
+   "page": 164,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Haunting Revenant",
+   "page": 260,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hawk",
+   "page": 362,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hell Hound",
+   "page": 165,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Helmed Horror",
+   "page": 166,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hezrou",
+   "page": 167,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hill Giant",
+   "page": 168,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hippogriff",
+   "page": 169,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hippopotamus",
+   "page": 362,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hobgoblin Captain",
+   "page": 171,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hobgoblin Warlord",
+   "page": 171,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hobgoblin Warrior",
+   "page": 170,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Homunculus",
+   "page": 172,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hook Horror",
+   "page": 173,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Horned Devil",
+   "page": 174,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hunter Shark",
+   "page": 363,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hydra",
+   "page": 175,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Hyena",
+   "page": 363,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ice Devil",
+   "page": 176,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ice Mephit",
+   "page": 206,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Imp",
+   "page": 177,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Incubus",
+   "page": 178,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Intellect Devourer",
+   "page": 179,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Invisible Stalker",
+   "page": 180,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Iron Golem",
+   "page": 181,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Jackal",
+   "page": 364,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Jackalwere",
+   "page": 182,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Juvenile Shadow Dragon",
+   "page": 275,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kenku",
+   "page": 183,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Killer Whale",
+   "page": 364,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Knight",
+   "page": 184,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kobold Warrior",
+   "page": 185,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kraken",
+   "page": 187,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kuo-toa",
+   "page": 189,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kuo-toa Archpriest",
+   "page": 191,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kuo-toa Monitor",
+   "page": 190,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Kuo-toa Whip",
+   "page": 190,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lacedon Ghoul",
+   "page": 132,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lamia",
+   "page": 192,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Larva",
+   "page": 193,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lemure",
+   "page": 194,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lich",
+   "page": 196,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lion",
+   "page": 364,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lizard",
+   "page": 364,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lizardfolk Geomancer",
+   "page": 197,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Lizardfolk Sovereign",
+   "page": 197,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mage",
+   "page": 199,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mage Apprentice",
+   "page": 198,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Magma Mephit",
+   "page": 207,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Magmin",
+   "page": 200,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mammoth",
+   "page": 365,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Manes",
+   "page": 201,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Manes Vaporspawn",
+   "page": 201,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Manticore",
+   "page": 202,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Marid",
+   "page": 203,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Marilith",
+   "page": 204,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mastiff",
+   "page": 365,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Medusa",
+   "page": 205,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Merfolk Skirmisher",
+   "page": 209,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Merfolk Wavebender",
+   "page": 209,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Merrow",
+   "page": 210,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mezzoloth",
+   "page": 211,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mimic",
+   "page": 212,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mind Flayer",
+   "page": 214,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mind Flayer Arcanist",
+   "page": 214,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Minotaur of Baphomet",
+   "page": 215,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Minotaur Skeleton",
+   "page": 283,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Modron Duodrone",
+   "page": 217,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Modron Monodrone",
+   "page": 216,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Modron Pentadrone",
+   "page": 218,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Modron Quadrone",
+   "page": 218,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Modron Tridrone",
+   "page": 217,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mud Mephit",
+   "page": 207,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mule",
+   "page": 365,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mummy",
+   "page": 219,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Mummy Lord",
+   "page": 221,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Myconid Adult",
+   "page": 223,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Myconid Sovereign",
+   "page": 223,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Myconid Spore Servant",
+   "page": 223,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Myconid Sprout",
+   "page": 222,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Nalfeshnee",
+   "page": 224,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Needle Blight",
+   "page": 43,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Night Hag",
+   "page": 225,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Nightmare",
+   "page": 226,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Noble",
+   "page": 227,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Noble Prodigy",
+   "page": 227,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Nothic",
+   "page": 228,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Nycaloth",
+   "page": 229,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ochre Jelly",
+   "page": 230,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Octopus",
+   "page": 365,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ogre",
+   "page": 231,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ogre Zombie",
+   "page": 346,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ogrillon Ogre",
+   "page": 231,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Oni",
+   "page": 232,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Otyugh",
+   "page": 233,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Owl",
+   "page": 366,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Owlbear",
+   "page": 234,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Panther",
+   "page": 366,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pegasus",
+   "page": 235,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Performer",
+   "page": 236,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Performer Legend",
+   "page": 237,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Performer Maestro",
+   "page": 237,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Peryton",
+   "page": 238,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Phase Spider",
+   "page": 239,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Piercer",
+   "page": 240,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Piranha",
+   "page": 366,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pirate",
+   "page": 241,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pirate Admiral",
+   "page": 242,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pirate Captain",
+   "page": 242,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pit Fiend",
+   "page": 243,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pixie",
+   "page": 244,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pixie Wonderbringer",
+   "page": 244,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Planetar",
+   "page": 245,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Plesiosaurus",
+   "page": 366,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Polar Bear",
+   "page": 367,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Poltergeist",
+   "page": 246,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pony",
+   "page": 367,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Priest",
+   "page": 248,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Priest Acolyte",
+   "page": 247,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Primeval Owlbear",
+   "page": 234,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pseudodragon",
+   "page": 249,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Psychic Gray Ooze",
+   "page": 151,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Pteranodon",
+   "page": 367,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Purple Worm",
+   "page": 250,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Quaggoth",
+   "page": 251,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Quaggoth Thonot",
+   "page": 251,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Quasit",
+   "page": 252,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Questing Knight",
+   "page": 184,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Rakshasa",
+   "page": 253,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Rat",
+   "page": 367,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Raven",
+   "page": 368,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Red Dragon Wyrmling",
+   "page": 254,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Red Slaad",
+   "page": 285,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Reef Shark",
+   "page": 368,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Remorhaz",
+   "page": 258,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Revenant",
+   "page": 259,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Rhinoceros",
+   "page": 368,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Riding Horse",
+   "page": 368,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Roc",
+   "page": 261,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Roper",
+   "page": 262,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Rust Monster",
+   "page": 263,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Saber-Toothed Tiger",
+   "page": 369,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sahuagin Baron",
+   "page": 265,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sahuagin Priest",
+   "page": 265,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sahuagin Warrior",
+   "page": 264,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Salamander",
+   "page": 267,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Salamander Fire Snake",
+   "page": 266,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Salamander Inferno Master",
+   "page": 267,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Satyr",
+   "page": 268,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Satyr Revelmaster",
+   "page": 268,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Scarecrow",
+   "page": 269,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Scorpion",
+   "page": 369,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Scout",
+   "page": 270,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Scout Captain",
+   "page": 270,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sea Hag",
+   "page": 271,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Seahorse",
+   "page": 369,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shadow",
+   "page": 272,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shadow Demon",
+   "page": 273,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shadow Dragon",
+   "page": 275,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shambling Mound",
+   "page": 276,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shield Guardian",
+   "page": 277,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Shrieker Fungus",
+   "page": 125,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Silver Dragon Wyrmling",
+   "page": 278,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Skeleton",
+   "page": 282,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Slaad Tadpole",
+   "page": 284,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Smoke Mephit",
+   "page": 208,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Solar",
+   "page": 288,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spectator",
+   "page": 289,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Specter",
+   "page": 290,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sphinx of Lore",
+   "page": 293,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sphinx of Secrets",
+   "page": 292,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sphinx of Valor",
+   "page": 294,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sphinx of Wonder",
+   "page": 291,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spider",
+   "page": 369,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spined Devil",
+   "page": 296,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spirit Naga",
+   "page": 297,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Sprite",
+   "page": 298,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spy",
+   "page": 295,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Spy Master",
+   "page": 295,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Steam Mephit",
+   "page": 208,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Stirge",
+   "page": 299,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Stone Giant",
+   "page": 300,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Stone Golem",
+   "page": 301,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Storm Giant",
+   "page": 302,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Succubus",
+   "page": 303,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Bats",
+   "page": 370,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Crawling Claws",
+   "page": 83,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Dretches",
+   "page": 104,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Insects",
+   "page": 370,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Larvae",
+   "page": 193,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Lemures",
+   "page": 194,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Piranhas",
+   "page": 370,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Rats",
+   "page": 370,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Ravens",
+   "page": 371,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Stirges",
+   "page": 299,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Swarm of Venomous Snakes",
+   "page": 371,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tarrasque",
+   "page": 305,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Thri-kreen Marauder",
+   "page": 306,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Thri-kreen Psion",
+   "page": 306,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tiger",
+   "page": 371,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tough",
+   "page": 307,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tough Boss",
+   "page": 307,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Treant",
+   "page": 308,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tree Blight",
+   "page": 44,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Triceratops",
+   "page": 372,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Troglodyte",
+   "page": 309,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Troll",
+   "page": 310,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Troll Limb",
+   "page": 310,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Twig Blight",
+   "page": 43,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Tyrannosaurus Rex",
+   "page": 372,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Ultroloth",
+   "page": 311,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Umber Hulk",
+   "page": 312,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Unicorn",
+   "page": 313,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vampire",
+   "page": 317,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vampire Familiar",
+   "page": 314,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vampire Nightbringer",
+   "page": 316,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vampire Spawn",
+   "page": 315,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vampire Umbral Lord",
+   "page": 318,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Venomous Snake",
+   "page": 372,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vine Blight",
+   "page": 44,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Violet Fungus",
+   "page": 126,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Violet Fungus Necrohulk",
+   "page": 126,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vrock",
+   "page": 319,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Vulture",
+   "page": 372,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Warhorse",
+   "page": 373,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Warhorse Skeleton",
+   "page": 282,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Warrior Commander",
+   "page": 321,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Warrior Infantry",
+   "page": 320,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Warrior Veteran",
+   "page": 320,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Water Elemental",
+   "page": 322,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Water Weird",
+   "page": 323,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Weasel",
+   "page": 373,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Werebear",
+   "page": 324,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wereboar",
+   "page": 325,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wererat",
+   "page": 325,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Weretiger",
+   "page": 326,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Werewolf",
+   "page": 327,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "White Dragon Wyrmling",
+   "page": 328,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wight",
+   "page": 332,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Will-o'-Wisp",
+   "page": 333,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Winged Kobold",
+   "page": 185,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Winter Wolf",
+   "page": 334,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wolf",
+   "page": 373,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Worg",
+   "page": 335,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wraith",
+   "page": 336,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Wyvern",
+   "page": 337,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Xorn",
+   "page": 338,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yeti",
+   "page": 339,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yochlol",
+   "page": 341,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Black Dragon",
+   "page": 38,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Blue Dragon",
+   "page": 48,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Brass Dragon",
+   "page": 54,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Bronze Dragon",
+   "page": 58,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Copper Dragon",
+   "page": 78,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Gold Dragon",
+   "page": 144,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Green Dragon",
+   "page": 152,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Red Dragon",
+   "page": 254,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Remorhaz",
+   "page": 258,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young Silver Dragon",
+   "page": 278,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Young White Dragon",
+   "page": 328,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yuan-ti Abomination",
+   "page": 345,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yuan-ti Infiltrator",
+   "page": 342,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yuan-ti Malison (Type 1)",
+   "page": 343,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yuan-ti Malison (Type 2)",
+   "page": 343,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Yuan-ti Malison (Type 3)",
+   "page": 344,
+   "status": "pending",
+   "done": false
+  },
+  {
+   "name": "Zombie",
+   "page": 346,
+   "status": "pending",
+   "done": false
+  }
+ ]
 }
