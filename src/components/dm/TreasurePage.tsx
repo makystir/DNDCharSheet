@@ -37,6 +37,7 @@ import tr from './treasure.module.css';
 interface TreasurePageProps {
   dm: DmApi;
   onNotify: (text: string) => void;
+  onOpenJournal: () => void;
 }
 
 type Tab = 'individual' | 'hoard' | 'quest' | 'items' | 'reference';
@@ -94,7 +95,7 @@ function outcomeText(o: Outcome): string {
 }
 
 /** Roll treasure from the DMG tables, take it as coins, gems, art or bars, and save it to the journal. */
-export function TreasurePage({ dm, onNotify }: TreasurePageProps) {
+export function TreasurePage({ dm, onNotify, onOpenJournal }: TreasurePageProps) {
   const campaign = activeCampaign(dm.data);
   const partyLevels = (campaign?.party ?? []).flatMap((m) => {
     const s = memberStats(m);
@@ -116,6 +117,9 @@ export function TreasurePage({ dm, onNotify }: TreasurePageProps) {
   const [itemValue, setItemValue] = useState('100');
   const [itemCount, setItemCount] = useState('3');
   const [items, setItems] = useState<FormedMoney | null>(null);
+
+  /** The text last saved to the journal, so the Open journal action shows only beside what was saved. */
+  const [savedBody, setSavedBody] = useState<string | null>(null);
 
   const levelNum = Math.min(20, Math.max(1, Math.trunc(Number(level)) || 1));
 
@@ -184,6 +188,7 @@ export function TreasurePage({ dm, onNotify }: TreasurePageProps) {
     const now = clockNow();
     const base = newNote(campaign.journal, { id: crypto.randomUUID(), kind: 'note', now, title: `Treasure: ${title}` });
     dm.update((d) => saveNote(d, campaign.id, { ...base, body }, now));
+    setSavedBody(body);
     onNotify(`Saved to the journal as "${base.title}".`);
   };
 
@@ -368,6 +373,11 @@ export function TreasurePage({ dm, onNotify }: TreasurePageProps) {
                     >
                       Save to journal
                     </button>
+                    {savedBody !== null && savedBody === moneyText({ ...items, leftoverGp: 0 }).filter((l) => !l.startsWith('0 GP')).join('\n') && (
+                      <button type="button" className={styles.btn} onClick={onOpenJournal}>
+                        Open journal
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -500,6 +510,11 @@ export function TreasurePage({ dm, onNotify }: TreasurePageProps) {
               <button type="button" className={styles.btn} disabled={!campaign} onClick={() => saveToJournal(outcome.title, outcomeText(outcome))}>
                 Save to journal
               </button>
+              {savedBody !== null && savedBody === outcomeText(outcome) && (
+                <button type="button" className={styles.btn} onClick={onOpenJournal}>
+                  Open journal
+                </button>
+              )}
               {!campaign && <span className={styles.muted}>Create a campaign to save to its journal.</span>}
             </div>
           </div>

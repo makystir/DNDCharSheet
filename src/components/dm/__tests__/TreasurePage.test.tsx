@@ -144,4 +144,15 @@ describe('Treasure page', () => {
     expect(journal()[0].title).toMatch(/^Treasure: Individual treasure/);
     expect(journal()[0].body).toContain('Monetary treasure:');
   });
+
+  it('offers Open journal only after saving, and opens the journal', () => {
+    seed();
+    render(<Routed initial="treasure" />);
+    fireEvent.click(screen.getByLabelText('Use the average instead of rolling'));
+    fireEvent.click(screen.getByRole('button', { name: 'Use the average' }));
+    expect(screen.queryByRole('button', { name: 'Open journal' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open journal' }));
+    expect(screen.queryByRole('heading', { name: 'Treasure' })).not.toBeInTheDocument();
+  });
 });

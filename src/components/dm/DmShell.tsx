@@ -146,7 +146,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'generators' && (
           <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
         )}
-        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} />}
+        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} />}
         {page === 'xp' && <XpPage dm={dm} onNotify={notify} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
