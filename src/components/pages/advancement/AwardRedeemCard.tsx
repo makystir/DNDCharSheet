@@ -40,7 +40,7 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
     if (levelingMode(character) === 'xp') {
       notes.push('Your XP is unchanged; later level-ups still need the XP threshold.');
     }
-    notes.push('HP for the new levels uses the fixed value until you choose on the Advancement page.');
+    notes.push('New levels use the fixed HP value, and your current HP rises with your maximum. Only your current level\'s HP can be re-recorded on this page.');
   }
   return notes;
 }

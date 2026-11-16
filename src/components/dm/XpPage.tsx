@@ -439,9 +439,11 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                 <button type="button" className={styles.btn} onClick={() => void copy()}>
                   Copy
                 </button>
-                <button type="button" className={styles.btn} onClick={() => void create(true)}>
-                  Create another award with these values
-                </button>
+                {shown.key !== null && (
+                  <button type="button" className={styles.btn} onClick={() => void create(true)}>
+                    Create another award with these values
+                  </button>
+                )}
                 <span className={styles.muted}>Send this to each player. They paste it on their Advancement page.</span>
               </div>
             </>

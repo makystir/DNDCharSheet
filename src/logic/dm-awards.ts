@@ -25,6 +25,7 @@ import type { DmCombatant, DmPartyMember } from '../types/dm';
 import type { Breakdown } from './breakdown';
 import type { EncounterDifficulty } from '../data/xp-tables';
 import { clampLevel } from './abilities';
+import { hitPointMaxOf } from './hit-points-state';
 import { appendLogEntry, awardXp, characterXp, levelingMode, setLevel, xpForLevel, xpToLevel } from './advancement';
 import { xpAward, xpBudget, type BudgetMember, type XpAward } from './dm-balance';
 import { isGzipSupported } from './gzip';
@@ -316,13 +317,28 @@ export function applyAward(
       };
     }
   } else {
-    next = appendLogEntry(setLevel(character, award.amount), {
+    const maxBefore = hitPointMaxOf(character);
+    next = setLevel(character, award.amount);
+    // DMG 2024 "Leveling Up": current and maximum HP rise together outside a Long Rest, so
+    // a stored current HP gains the same amount as the maximum (never above the new maximum).
+    const maxAfter = hitPointMaxOf(next);
+    if (
+      maxBefore !== undefined &&
+      maxAfter !== undefined &&
+      maxAfter > maxBefore &&
+      next.currentHp !== undefined &&
+      Number.isFinite(next.currentHp)
+    ) {
+      next = { ...next, currentHp: Math.min(maxAfter, Math.max(0, next.currentHp) + (maxAfter - maxBefore)) };
+    }
+    next = appendLogEntry(next, {
       timestamp: now,
       kind: 'level-up',
       level: award.amount,
       detail: `Level ${award.amount}: ${awardReason(award)}`,
     });
   }
+
   return { character: recordId(next, award.id), outcome: 'applied' };
 }
 
@@ -413,7 +429,9 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
       ],
       note:
         award.kind === 'xp'
-          ? `${newXp.toLocaleString()} XP reaches level ${xpToLevel(newXp)} (PHB 2024 "Character Advancement").`
+          ? `${newXp.toLocaleString()} XP reaches level ${xpToLevel(newXp)}: the level ${xpToLevel(newXp)} threshold is ${xpForLevel(xpToLevel(newXp)).toLocaleString()} XP` +
+            (xpToLevel(newXp) < 20 ? ` and the level ${xpToLevel(newXp) + 1} threshold is ${xpForLevel(xpToLevel(newXp) + 1).toLocaleString()} XP` : '') +
+            ' (PHB 2024 "Character Advancement").'
           : `Target level ${award.amount}.`,
     },
     levelsGained: gained,

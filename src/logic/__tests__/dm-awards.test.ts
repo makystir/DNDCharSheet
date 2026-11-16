@@ -11,6 +11,7 @@ import { parseDmData } from '../dm-sanitize';
 import { importCharacterFromText } from '../dm-import';
 import { encodeSharePayload } from '../share-codec';
 import * as gzipModule from '../gzip';
+import { hitPointMaxOf } from '../hit-points-state';
 import {
   applyAward,
   awardBlocker,
@@ -259,6 +260,12 @@ describe('previewAward', () => {
   function xpAward_(n: number) {
     return xpAwardOf(n);
   }
+  it('explains the thresholds for a non-exact total', () => {
+    const p = previewAward(member(xpSheet(3, 2900)), xpAwardOf(100));
+    expect(p.reachableLevel?.total).toBe(4);
+    expect(p.reachableLevel?.note).toContain('level 4 threshold is 2,700 XP');
+    expect(p.reachableLevel?.note).toContain('level 5 threshold is 6,500 XP');
+  });
   it('caps at level 20', () => {
     const p = previewAward(member(xpSheet(19, 305000)), xpAwardOf(MAX_AWARD_XP));
     expect(p.reachableLevel?.total).toBe(20);
@@ -355,6 +362,19 @@ describe('applyAward', () => {
     const last = r.character.advancement?.log?.at(-1);
     expect(last?.kind).toBe('level-up');
     expect(last?.detail).toContain('Level 5: DM award: Boss');
+  });
+
+  it('raises stored current HP by the maximum gain for a level award', () => {
+    const base = withMode(sheet(3), 'milestone');
+    const maxBefore = hitPointMaxOf(base)!;
+    for (const hp of [0, 4]) {
+      const r = applyAward({ ...base, currentHp: hp }, levelAwardOf(5), NOW);
+      const gain = hitPointMaxOf(r.character)! - maxBefore;
+      expect(gain).toBeGreaterThan(0);
+      expect(r.character.currentHp).toBe(hp + gain);
+    }
+    // A character at full HP (no stored value) stays following the maximum.
+    expect(applyAward(base, levelAwardOf(5), NOW).character.currentHp).toBeUndefined();
   });
 
   it('records the ID for no-change and leaves the log alone', () => {
