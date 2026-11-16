@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen } from 'lucide-react';
+import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen, Dices } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { DmPage } from '../../logic/dm-mode';
 import { useDmData } from '../../hooks/useDmData';
@@ -13,6 +13,7 @@ import { PartyPage } from './PartyPage';
 import { EncounterPage } from './EncounterPage';
 import { LibraryPage } from './LibraryPage';
 import { JournalPage } from './JournalPage';
+import { GeneratorsPage } from './GeneratorsPage';
 import { DmSettingsPage } from './DmSettingsPage';
 import navStyles from '../layout/Navigation.module.css';
 import appStyles from '../../App.module.css';
@@ -41,7 +42,8 @@ const DM_NAV: DmNavItem[] = [
   { id: 'encounter', label: 'Encounter', icon: Swords, shortcut: '3' },
   { id: 'library', label: 'Library', icon: BookOpen, shortcut: '4' },
   { id: 'journal', label: 'Journal', icon: NotebookPen, shortcut: '5' },
-  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '6' },
+  { id: 'generators', label: 'Generators', icon: Dices, shortcut: '6' },
+  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '7' },
 ];
 
 /**
@@ -135,6 +137,9 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
         {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
         {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
+        {page === 'generators' && (
+          <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
+        )}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
         )}
