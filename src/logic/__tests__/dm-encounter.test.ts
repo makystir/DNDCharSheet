@@ -17,7 +17,9 @@ import {
   giveTempHp,
   healCombatant,
   isDown,
+  MAX_COMBATANTS,
   makeCopies,
+  parseCopyCount,
   nextTurn,
   parseDamageTypes,
   previousTurn,
@@ -107,6 +109,14 @@ describe('building combatants', () => {
     }
   });
 
+  it('turns the how-many text into a count between 1 and the cap', () => {
+    expect(parseCopyCount('3')).toBe(3);
+    expect(parseCopyCount('')).toBe(1);
+    expect(parseCopyCount('0')).toBe(1);
+    expect(parseCopyCount('abc')).toBe(1);
+    expect(parseCopyCount('2.9')).toBe(2);
+    expect(parseCopyCount('9999')).toBe(MAX_COMBATANTS);
+  });
   it('numbers copies and groups them for one Initiative roll', () => {
     let k = 0;
     const copies = makeCopies(mon('Goblin'), 3, () => `g${++k}`, true);

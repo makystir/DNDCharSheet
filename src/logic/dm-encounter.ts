@@ -290,6 +290,11 @@ export function customCombatant(id: string, input: CustomCombatantInput): DmComb
   return c;
 }
 
+/** Turn the how-many box text into a copy count between 1 and the encounter cap. */
+export function parseCopyCount(raw: string | number): number {
+  return Math.min(MAX_COMBATANTS, Math.max(1, Math.trunc(Number(raw)) || 1));
+}
+
 /**
  * Make `count` copies of a combatant: numbered names ("Goblin 1", "Goblin 2")
  * and, for more than one, a shared group so they roll Initiative once (PHB

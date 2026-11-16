@@ -17,7 +17,7 @@ import { NPC_TEMPLATE_LIST, type NpcTemplate } from '../data/npc-templates';
 import { MONSTER_MANUAL_2024_LIST, type MmFeature, type MonsterManual2024Entry } from '../data/monster-manual-2024';
 import { abilityModifier } from './abilities';
 import { xpForCr } from './dm-balance';
-import { combatantFromCreature, combatantFromMonsterManual, combatantFromTemplate, customCombatant } from './dm-encounter';
+import { combatantFromCreature, combatantFromMonsterManual, combatantFromTemplate, customCombatant, makeCopies } from './dm-encounter';
 
 export const ABILITY_KEYS: readonly Ability[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 export const ABILITY_LABELS: Record<Ability, string> = {
@@ -595,4 +595,20 @@ export function combatantFromLibrary(m: LibraryMonster, id: string): DmCombatant
   base.sourceLabel = `${m.name} (custom)`;
   if (m.legendaryUses > 0) base.legendary = { max: m.legendaryUses, used: 0 };
   return base;
+}
+
+
+/** The message shown when a library creature has no fixed Armor Class or Hit Points to put in an encounter. */
+export function notAddableMessage(name: string): string {
+  return `${name} has no fixed Armor Class or Hit Points, so it cannot be added to an encounter.`;
+}
+
+/**
+ * Ready-to-add combatants for a library creature: one fresh combatant, copied `count` times (clamped to 1 and the
+ * encounter cap, numbered, with one shared Initiative roll when `group` is set). Undefined when the creature has no
+ * fixed Armor Class or Hit Points (use `notAddableMessage`).
+ */
+export function libraryCombatants(m: LibraryMonster, count: number, group: boolean, newId: () => string): DmCombatant[] | undefined {
+  const base = combatantFromLibrary(m, newId());
+  return base ? makeCopies(base, count, newId, group) : undefined;
 }

@@ -5,25 +5,24 @@ import type { DmApi } from './dmApi';
 import { activeCampaign } from '../../logic/dm-campaign';
 import {
   blankCustomMonster,
-  combatantFromLibrary,
-  crOptions,
   customFromLibrary,
   deleteCustomMonster,
-  filterMonsters,
+  libraryCombatants,
   libraryMonsters,
+  notAddableMessage,
   saveCustomMonster,
   typeOf,
-  typeOptions,
   type LibraryMonster,
   type LibraryOrigin,
 } from '../../logic/dm-library';
-import { addCombatants, createEncounter, makeCopies, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { addCombatants, createEncounter, parseCopyCount, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { MonsterStatBlock } from './MonsterStatBlock';
 import { MonsterEditorDialog } from './MonsterEditorDialog';
+import { MonsterFilterBar, useMonsterFilter } from './MonsterFilterBar';
 import styles from './dm.module.css';
 import lib from './library.module.css';
 
@@ -43,9 +42,6 @@ const ORIGIN_LABEL: Record<LibraryOrigin, string> = {
 /** Search the creatures, read a stat block, copy one into your own monsters, or send it into an encounter. */
 export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps) {
   const campaign = activeCampaign(dm.data);
-  const [query, setQuery] = useState('');
-  const [cr, setCr] = useState('');
-  const [type, setType] = useState('');
   const [origin, setOrigin] = useState<LibraryOrigin | ''>('');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ monster: DmCustomMonster; isNew: boolean } | null>(null);
@@ -55,12 +51,8 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
   const [group, setGroup] = useState(true);
 
   const all = useMemo(() => libraryMonsters(dm.data), [dm.data]);
-  const shown = useMemo(
-    () => filterMonsters(all, { query, cr, type, origin: origin || undefined }),
-    [all, query, cr, type, origin],
-  );
-  const crs = useMemo(() => crOptions(all), [all]);
-  const types = useMemo(() => typeOptions(all), [all]);
+  const filter = useMonsterFilter(all, origin || undefined);
+  const shown = filter.matches;
   const selected = all.find((m) => m.key === selectedKey) ?? null;
 
   const openEncounters = (campaign?.encounters ?? []).filter((e) => e.status !== 'ended');
@@ -68,7 +60,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
     openEncounters.find((e) => e.id === encounterId) ??
     openEncounters.find((e) => e.id === campaign?.activeEncounterId) ??
     openEncounters[0];
-  const count = Math.min(MAX_COMBATANTS, Math.max(1, Math.trunc(Number(qty)) || 1));
+  const count = parseCopyCount(qty);
 
   const edit = (m: LibraryMonster) => {
     const found = dm.data.customMonsters.find((c) => c.id === m.customId);
@@ -82,12 +74,11 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
 
   const addToEncounter = (m: LibraryMonster) => {
     if (!campaign || !chosenEncounter) return;
-    const base = combatantFromLibrary(m, crypto.randomUUID());
-    if (!base) {
-      onNotify(`${m.name} has no fixed Armor Class or Hit Points, so it cannot be added to an encounter.`);
+    const list = libraryCombatants(m, count, group, () => crypto.randomUUID());
+    if (!list) {
+      onNotify(notAddableMessage(m.name));
       return;
     }
-    const list = makeCopies(base, count, () => crypto.randomUUID(), group);
     const next = addCombatants(chosenEncounter, list);
     const now = clockNow();
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
@@ -97,14 +88,14 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
   /** No open encounter: make one (named for the creature) and put the creature straight into it. */
   const createAndAdd = (m: LibraryMonster) => {
     if (!campaign) return;
-    const base = combatantFromLibrary(m, crypto.randomUUID());
-    if (!base) {
-      onNotify(`${m.name} has no fixed Armor Class or Hit Points, so it cannot be added to an encounter.`);
+    const list = libraryCombatants(m, count, group, () => crypto.randomUUID());
+    if (!list) {
+      onNotify(notAddableMessage(m.name));
       return;
     }
     const now = clockNow();
     const created = createEncounter(crypto.randomUUID(), `${m.name} encounter`, now);
-    const next = addCombatants(created, makeCopies(base, count, () => crypto.randomUUID(), group));
+    const next = addCombatants(created, list);
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
     onNotify(`${count > 1 ? `${count} × ` : ''}${m.name} added to the new encounter "${next.name}".`);
   };
@@ -129,43 +120,19 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
 
       <Card>
         <div className={lib.filters}>
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>Search by name</span>
-            <input className={styles.input} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="For example: guard" />
-          </label>
-          <label className={styles.field} style={{ flex: '0 1 140px' }}>
-            <span className={styles.fieldLabel}>Challenge Rating</span>
-            <select className={styles.input} value={cr} onChange={(e) => setCr(e.target.value)}>
-              <option value="">Any</option>
-              {crs.map((c) => (
-                <option key={c} value={c}>
-                  CR {c}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={styles.field} style={{ flex: '0 1 170px' }}>
-            <span className={styles.fieldLabel}>Creature type</span>
-            <select className={styles.input} value={type} onChange={(e) => setType(e.target.value)}>
-              <option value="">Any</option>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={styles.field} style={{ flex: '0 1 190px' }}>
-            <span className={styles.fieldLabel}>Source</span>
-            <select className={styles.input} value={origin} onChange={(e) => setOrigin(e.target.value as LibraryOrigin | '')}>
-              <option value="">All</option>
-              {(Object.keys(ORIGIN_LABEL) as LibraryOrigin[]).map((o) => (
-                <option key={o} value={o}>
-                  {ORIGIN_LABEL[o]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <MonsterFilterBar filter={filter} searchLabel="Search by name">
+            <label className={styles.field} style={{ flex: '0 1 190px' }}>
+              <span className={styles.fieldLabel}>Source</span>
+              <select className={styles.input} value={origin} onChange={(e) => setOrigin(e.target.value as LibraryOrigin | '')}>
+                <option value="">All</option>
+                {(Object.keys(ORIGIN_LABEL) as LibraryOrigin[]).map((o) => (
+                  <option key={o} value={o}>
+                    {ORIGIN_LABEL[o]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </MonsterFilterBar>
         </div>
       </Card>
 

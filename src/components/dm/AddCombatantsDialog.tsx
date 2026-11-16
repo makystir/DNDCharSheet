@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DmCombatant, DmCustomMonster, DmPartyMember } from '../../types/dm';
-import { combatantFromMember, customCombatant, makeCopies, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { combatantFromMember, customCombatant, makeCopies, parseCopyCount, MAX_COMBATANTS } from '../../logic/dm-encounter';
 import { xpForCr } from '../../logic/dm-balance';
-import {
-  combatantFromLibrary,
-  crOptions,
-  filterMonsters,
-  libraryMonsters,
-  typeOptions,
-  type LibraryMonster,
-} from '../../logic/dm-library';
+import { libraryCombatants, libraryMonsters, notAddableMessage, type LibraryMonster } from '../../logic/dm-library';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { MonsterFilterBar, useMonsterFilter } from './MonsterFilterBar';
 import styles from './dm.module.css';
 import enc from './encounter.module.css';
 
@@ -58,9 +52,6 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   useBodyScrollLock(true);
   const [tab, setTab] = useState<Tab>('party');
   const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [query, setQuery] = useState('');
-  const [cr, setCr] = useState('');
-  const [type, setType] = useState('');
   const [chosen, setChosen] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
   const [qty, setQty] = useState('1');
@@ -88,15 +79,14 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   }, [onClose]);
 
   const entries = useMemo(() => libraryEntries(customMonsters), [customMonsters]);
-  const crs = useMemo(() => crOptions(entries.map((e) => e.monster)), [entries]);
-  const types = useMemo(() => typeOptions(entries.map((e) => e.monster)), [entries]);
+  const filter = useMonsterFilter(useMemo(() => entries.map((e) => e.monster), [entries]));
   const matches = useMemo(() => {
-    const keys = new Set(filterMonsters(entries.map((e) => e.monster), { query, cr, type }).map((m) => m.key));
+    const keys = new Set(filter.matches.map((m) => m.key));
     return entries.filter((e) => keys.has(e.key));
-  }, [entries, query, cr, type]);
+  }, [entries, filter.matches]);
   const shown = matches.slice(0, MAX_SHOWN);
 
-  const count = Math.min(MAX_COMBATANTS, Math.max(1, Math.trunc(Number(qty)) || 1));
+  const count = parseCopyCount(qty);
 
   const submit = (keepOpen = false) => {
     setError(null);
@@ -114,9 +104,9 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
     if (tab === 'library') {
       const entry = entries.find((e) => e.key === chosen);
       if (!entry) return setError('Pick a creature from the list.');
-      const base = combatantFromLibrary(entry.monster, newId());
-      if (!base) return setError('That creature has no fixed Armor Class or Hit Points to track.');
-      onAdd(makeCopies(base, count, newId, group), keepOpen);
+      const made = libraryCombatants(entry.monster, count, group, newId);
+      if (!made) return setError(notAddableMessage(entry.name));
+      onAdd(made, keepOpen);
       if (keepOpen) setAdded(`Added ${count > 1 ? `${count} x ` : ''}${entry.name}.`);
       return;
     }
@@ -228,33 +218,8 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
 
         {tab === 'library' && (
           <div className={styles.stack}>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>Search creatures</span>
-              <input className={styles.input} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="For example: guard" />
-            </label>
             <div className={styles.row}>
-              <label className={styles.field} style={{ flex: '0 1 140px' }}>
-                <span className={styles.fieldLabel}>Challenge Rating</span>
-                <select className={styles.input} value={cr} onChange={(e) => setCr(e.target.value)}>
-                  <option value="">Any</option>
-                  {crs.map((c) => (
-                    <option key={c} value={c}>
-                      CR {c}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className={styles.field} style={{ flex: '0 1 170px' }}>
-                <span className={styles.fieldLabel}>Creature type</span>
-                <select className={styles.input} value={type} onChange={(e) => setType(e.target.value)}>
-                  <option value="">Any</option>
-                  {types.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <MonsterFilterBar filter={filter} searchLabel="Search creatures" />
             </div>
             <ul className={enc.pickList} aria-label="Creatures">
               {shown.length === 0 && <li className={styles.muted}>No creature matches those filters.</li>}

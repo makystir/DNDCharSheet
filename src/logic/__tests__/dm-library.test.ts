@@ -13,7 +13,9 @@ import {
   deleteCustomMonster,
   filterMonsters,
   fromMonsterManual2024Entry,
+  libraryCombatants,
   libraryMonsters,
+  notAddableMessage,
   saveCustomMonster,
   typeOf,
   typeOptions,
@@ -100,6 +102,19 @@ describe('built-in library', () => {
     expect(c.hp.max).toBe(goblin.hpAverage);
     const bad = all.find((m) => !m.addable);
     if (bad) expect(combatantFromLibrary(bad, 'y')).toBeUndefined();
+  });
+
+  it('builds numbered, grouped copies for the add flows and refuses a creature without fixed numbers', () => {
+    const goblin = all.find((m) => m.addable && m.origin === 'npc')!;
+    let k = 0;
+    const copies = libraryCombatants(goblin, 3, true, () => `id${++k}`)!;
+    expect(copies).toHaveLength(3);
+    expect(copies.map((c) => c.name)).toEqual([1, 2, 3].map((i) => `${goblin.name} ${i}`));
+    expect(new Set(copies.map((c) => c.groupId)).size).toBe(1);
+    expect(libraryCombatants(goblin, 1, true, () => 'solo')![0].id).toBe('solo');
+    const bad = all.find((m) => !m.addable);
+    if (bad) expect(libraryCombatants(bad, 2, true, () => 'z')).toBeUndefined();
+    expect(notAddableMessage('Ooze')).toBe('Ooze has no fixed Armor Class or Hit Points, so it cannot be added to an encounter.');
   });
 });
 
