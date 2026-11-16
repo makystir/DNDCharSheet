@@ -609,7 +609,7 @@
    {
     "name": "Psychic Drain",
     "type": "utility",
-    "summary": "Can impose charmed, grappled; restores hit points."
+    "summary": "If it has at least one Charmed or Grappled creature, it uses Consume Memories and regains 5 (1d10) hit points."
    }
   ],
   "legendaryActionUses": {
@@ -635,7 +635,7 @@
    {
     "name": "Psionic Projection",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Within its lair, the creature can cast Project Image from up to a mile away and use its telepathy through the illusion, and this ends if it dies or leaves the lair."
    }
   ],
   "description": "A large aberration of lawful evil alignment, encountered in Underdark and Underwater. It can swim, fights with Tentacle, Consume Memories, and Dominate Mind, can take legendary actions, and can shape the area around its lair. Its challenge rating is 10.",
@@ -1031,7 +1031,7 @@
    {
     "name": "Acrid Haze",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "A stinging fog lightly obscures everything within a mile of the lair and doubles travel time for anyone except the dragon and its allies, and the effect ends if the dragon dies or leaves."
    },
    {
     "name": "Foul Water",
@@ -1220,12 +1220,12 @@
    {
     "name": "Cloaked Flight",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Invisibility on itself through Spellcasting and flies up to half its Fly Speed, and can't repeat this until its next turn begins."
    },
    {
     "name": "Sonic Boom",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Shatter through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Tail Swipe",
@@ -1248,12 +1248,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Dex save."
+    "summary": "Each time a creature other than the dragon or its allies long-rests within a mile of the lair, a 1 on a d20 opens a sinkhole under it that drops it 2d4 x 10 feet unless it passes a DC 15 Dexterity save."
    },
    {
     "name": "Spiteful Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Dust devils and thunderstorms churn across the mile around the lair and leave it lightly obscured until the dragon dies or abandons the lair."
    }
   ],
   "description": "A huge dragon of lawful evil alignment, encountered in Coastal and Desert. It can burrow and fly, fights with Rend and Lightning Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 16.",
@@ -1446,7 +1446,7 @@
    {
     "name": "Blazing Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Scorching Ray through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -1481,12 +1481,12 @@
    {
     "name": "Mirages",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Major Image without material components, with a one-mile range and no need to see where the illusion appears."
    },
    {
     "name": "Refreshing Water",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Water within a mile of the lair restores 2d4 temporary hit points to whoever drinks it and alerts the dragon to the drinker, until the dragon dies or leaves."
    }
   ],
   "description": "A huge dragon of chaotic good alignment, encountered in Desert. It can burrow and fly, fights with Rend, Fire Breath, and Sleep Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
@@ -1682,7 +1682,7 @@
    {
     "name": "Guiding Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Guiding Bolt at level 2 through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -1720,12 +1720,12 @@
    {
     "name": "Buoying Currents",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Creatures within a mile of the lair that have no swim speed pay no extra movement cost for swimming."
    },
    {
     "name": "Sun and Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Control Weather without material components and can use it on the weather around the lair."
    }
   ],
   "description": "A huge dragon of lawful good alignment, encountered in Coastal. It can fly and swim, fights with Rend, Lightning Breath, and Repulsion Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 15.",
@@ -1881,7 +1881,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 18 Con save; affects a 60-foot cone."
+    "summary": "Creatures in a cone make a Constitution save or lose Reactions, have half Speed, and can take only an action or a Bonus Action (not both) until the end of their next turn."
    },
    {
     "name": "Spellcasting",
@@ -1931,7 +1931,7 @@
    {
     "name": "Mind Jolt",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Mind Spike through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Pounce",
@@ -1947,7 +1947,7 @@
    {
     "name": "Chatty Critters",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Tiny beasts within six miles of the lair gain the ability to speak and understand Draconic."
    },
    {
     "name": "Giggle Fits",
@@ -2146,7 +2146,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 21 Str save; affects a 60-foot cone."
+    "summary": "Creatures in a cone that aren't already affected make a Strength save or have Disadvantage on Strength-based D20 Tests and reduced damage rolls until they pass a repeat save."
    }
   ],
   "bonusActions": [],
@@ -2177,7 +2177,7 @@
    {
     "name": "Guiding Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Guiding Bolt at level 2 through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -2193,12 +2193,12 @@
    {
     "name": "Dream Messenger",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Dream without material components and target any creature within six miles."
    },
    {
     "name": "Foretelling Fog",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Shimmering fog lightly obscures the mile around the lair and warns everyone inside it, so no creature there can be surprised."
    }
   ],
   "description": "A huge dragon of lawful good alignment, encountered in Forest and Grassland. It can fly and swim, fights with Rend, Fire Breath, and Weakening Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 17.",
@@ -2377,7 +2377,7 @@
    {
     "name": "Mind Invasion",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Mind Spike at level 3 through Spellcasting."
    },
    {
     "name": "Noxious Miasma",
@@ -2412,7 +2412,7 @@
    {
     "name": "Beast Spies",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Tiny beasts within a mile of the lair understand Draconic and can speak telepathically with the dragon."
    },
    {
     "name": "Poisonous Thicket",
@@ -2600,12 +2600,12 @@
    {
     "name": "Commanding Presence",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Command at level 2 through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Fiery Rays",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Scorching Ray through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Pounce",
@@ -2627,7 +2627,7 @@
       "type": "Fire"
      }
     ],
-    "summary": "Inflicts fire damage."
+    "summary": "The mile around the lair becomes extremely hot, and burning creatures or objects take an extra 1d4 Fire damage at the start of each of their turns."
    },
    {
     "name": "Smoldering Haze",
@@ -2834,7 +2834,7 @@
    {
     "name": "Chill",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Hold Monster through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Cold Gale",
@@ -2869,12 +2869,12 @@
    {
     "name": "Gentle Gusts",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Winds within a mile of the lair slow falling creatures to 60 feet per round and spare them fall damage."
    },
    {
     "name": "Sun and Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Control Weather without material components and can use it on the weather around the lair."
    }
   ],
   "description": "A huge dragon of lawful good alignment, encountered in Mountain and Urban. It can fly, fights with Rend, Cold Breath, and Paralyzing Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 16.",
@@ -3064,7 +3064,7 @@
    {
     "name": "Frigid Cold",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "The mile around the lair becomes extremely cold with frigid water, following the Dungeon Master's Guide hazard rules for such conditions."
    },
    {
     "name": "Glacial Gloom",
@@ -3076,7 +3076,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Con save."
+    "summary": "Chilly fog lightly obscures the mile around the lair, and a creature that long-rests there must pass a DC 15 Constitution save or have its Speed cut by 10 feet for an hour."
    }
   ],
   "description": "A huge dragon of chaotic evil alignment, encountered in Arctic. It can burrow, fly, and swim, fights with Rend and Cold Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
@@ -3173,7 +3173,7 @@
   "traits": [
    {
     "name": "Air Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can enter another creature's space and stop there, and can squeeze through gaps only an inch wide without paying extra movement."
    }
   ],
   "actions": [
@@ -3553,7 +3553,7 @@
    {
     "name": "Acrid Haze",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "A stinging fog lightly obscures everything within a mile of the lair and doubles travel time for anyone except the dragon and its allies, and the effect ends if the dragon dies or leaves."
    },
    {
     "name": "Foul Water",
@@ -3742,12 +3742,12 @@
    {
     "name": "Cloaked Flight",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Invisibility on itself through Spellcasting and flies up to half its Fly Speed, and can't repeat this until its next turn begins."
    },
    {
     "name": "Sonic Boom",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Shatter through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Tail Swipe",
@@ -3770,12 +3770,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Dex save."
+    "summary": "Each time a creature other than the dragon or its allies long-rests within a mile of the lair, a 1 on a d20 opens a sinkhole under it that drops it 2d4 x 10 feet unless it passes a DC 15 Dexterity save."
    },
    {
     "name": "Spiteful Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Dust devils and thunderstorms churn across the mile around the lair and leave it lightly obscured until the dragon dies or abandons the lair."
    }
   ],
   "description": "A gargantuan dragon of lawful evil alignment, encountered in Coastal and Desert. It can burrow and fly, fights with Rend and Lightning Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 23.",
@@ -3968,7 +3968,7 @@
    {
     "name": "Blazing Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Scorching Ray through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -4003,12 +4003,12 @@
    {
     "name": "Mirages",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Major Image without material components, with a one-mile range and no need to see where the illusion appears."
    },
    {
     "name": "Refreshing Water",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Water within a mile of the lair restores 2d4 temporary hit points to whoever drinks it and alerts the dragon to the drinker, until the dragon dies or leaves."
    }
   ],
   "description": "A gargantuan dragon of chaotic good alignment, encountered in Desert. It can burrow and fly, fights with Rend, Fire Breath, and Sleep Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 20.",
@@ -4206,7 +4206,7 @@
    {
     "name": "Guiding Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Guiding Bolt at level 2 through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -4244,12 +4244,12 @@
    {
     "name": "Buoying Currents",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Creatures within a mile of the lair that have no swim speed pay no extra movement cost for swimming."
    },
    {
     "name": "Sun and Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Control Weather without material components and can use it on the weather around the lair."
    }
   ],
   "description": "A gargantuan dragon of lawful good alignment, encountered in Coastal. It can fly and swim, fights with Rend, Lightning Breath, and Repulsion Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 22.",
@@ -4405,7 +4405,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 22 Con save; affects a 90-foot cone."
+    "summary": "Creatures in a cone make a Constitution save or lose Reactions, have half Speed, and can take only an action or a Bonus Action (not both) until the end of their next turn."
    },
    {
     "name": "Spellcasting",
@@ -4456,7 +4456,7 @@
    {
     "name": "Mind Jolt",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Mind Spike through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Pounce",
@@ -4472,7 +4472,7 @@
    {
     "name": "Chatty Critters",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Tiny beasts within six miles of the lair gain the ability to speak and understand Draconic."
    },
    {
     "name": "Giggle Fits",
@@ -4671,7 +4671,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 24 Str save; affects a 90-foot cone."
+    "summary": "Creatures in a cone that aren't already affected make a Strength save or have Disadvantage on Strength-based D20 Tests and reduced damage rolls until they pass a repeat save."
    }
   ],
   "bonusActions": [],
@@ -4702,7 +4702,7 @@
    {
     "name": "Guiding Light",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Guiding Bolt at level 2 through Spellcasting."
    },
    {
     "name": "Pounce",
@@ -4718,12 +4718,12 @@
    {
     "name": "Dream Messenger",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Dream without material components and target any creature within six miles."
    },
    {
     "name": "Foretelling Fog",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Shimmering fog lightly obscures the mile around the lair and warns everyone inside it, so no creature there can be surprised."
    }
   ],
   "description": "A gargantuan dragon of lawful good alignment, encountered in Forest and Grassland. It can fly and swim, fights with Rend, Fire Breath, and Weakening Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 24.",
@@ -4903,7 +4903,7 @@
    {
     "name": "Mind Invasion",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Mind Spike at level 3 through Spellcasting."
    },
    {
     "name": "Noxious Miasma",
@@ -4937,7 +4937,7 @@
    {
     "name": "Beast Spies",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Tiny beasts within a mile of the lair understand Draconic and can speak telepathically with the dragon."
    },
    {
     "name": "Poisonous Thicket",
@@ -5126,12 +5126,12 @@
    {
     "name": "Commanding Presence",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Command at level 2 through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Fiery Rays",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Scorching Ray through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Pounce",
@@ -5153,7 +5153,7 @@
       "type": "Fire"
      }
     ],
-    "summary": "Inflicts fire damage."
+    "summary": "The mile around the lair becomes extremely hot, and burning creatures or objects take an extra 1d4 Fire damage at the start of each of their turns."
    },
    {
     "name": "Smoldering Haze",
@@ -5362,7 +5362,7 @@
    {
     "name": "Chill",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Hold Monster through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Cold Gale",
@@ -5397,12 +5397,12 @@
    {
     "name": "Gentle Gusts",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Winds within a mile of the lair slow falling creatures to 60 feet per round and spare them fall damage."
    },
    {
     "name": "Sun and Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the dragon can cast Control Weather without material components and can use it on the weather around the lair."
    }
   ],
   "description": "A gargantuan dragon of lawful good alignment, encountered in Mountain and Urban. It can fly, fights with Rend, Cold Breath, and Paralyzing Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 23.",
@@ -5592,7 +5592,7 @@
    {
     "name": "Frigid Cold",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "The mile around the lair becomes extremely cold with frigid water, following the Dungeon Master's Guide hazard rules for such conditions."
    },
    {
     "name": "Glacial Gloom",
@@ -5604,7 +5604,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Con save."
+    "summary": "Chilly fog lightly obscures the mile around the lair, and a creature that long-rests there must pass a DC 15 Constitution save or have its Speed cut by 10 feet for an hour."
    }
   ],
   "description": "A gargantuan dragon of chaotic evil alignment, encountered in Arctic. It can burrow, fly, and swim, fights with Rend and Cold Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 20.",
@@ -5699,7 +5699,7 @@
   "traits": [
    {
     "name": "Animal Lordship",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "The animal lord takes the Forager, Hunter, or Sage role at the DM's choice, which decides which role-specific traits and effects apply."
    },
    {
     "name": "Legendary Resistance",
@@ -5725,7 +5725,7 @@
    {
     "name": "Fearful",
     "cost": "Hunter Only",
-    "summary": "Can impose frightened."
+    "summary": "Hunter variant: a target that fails the save is Frightened until the end of its next turn."
    },
    {
     "name": "Mired",
@@ -5737,7 +5737,7 @@
       "type": "Psychic"
      }
     ],
-    "summary": "Inflicts psychic damage."
+    "summary": "Sage variant: a target that fails the save takes 10 (3d6) Psychic damage and, until the end of its next turn, subtracts 1d4 from its saving throws."
    },
    {
     "name": "Magic Resistance",
@@ -5817,7 +5817,7 @@
     "name": "Pesky Swarm",
     "cost": "Sage Only",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "The target has Disadvantage on attack rolls and ability checks until the end of its next turn."
    },
    {
     "name": "Spellcasting",
@@ -6763,7 +6763,7 @@
    },
    {
     "name": "Soul Tome",
-    "summary": "Restores hit points."
+    "summary": "Carries a magic tome that powers its Banishing Claw action, and the tome heals fully each turn but crumbles if reduced to 0 hit points or if the arcanaloth dies, and can be replaced after a rest."
    }
   ],
   "actions": [
@@ -6856,7 +6856,7 @@
    {
     "name": "Teleport",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports up to 30 feet to an unoccupied space it can see."
    }
   ],
   "reactions": [
@@ -7077,7 +7077,7 @@
    },
    {
     "name": "Spiteful Escape",
-    "summary": "Involves teleportation."
+    "summary": "When reduced to 0 hit points the hag dies only if near its anathema, and otherwise drops to 1 hit point, teleports to a demiplane for 2d6 days, and curses nearby creatures with disadvantage on checks and saves."
    }
   ],
   "actions": [
@@ -7165,14 +7165,14 @@
       "type": "Lightning"
      }
     ],
-    "summary": "Inflicts lightning damage."
+    "summary": "Each creature the hag has cursed within 60 feet takes 14 (4d6) Lightning damage."
    }
   ],
   "reactions": [
    {
     "name": "Tongue Twister",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Counterspell, and if the target fails its save it is cursed until the end of its next turn so that it can't cast spells with Verbal components and says the opposite of what it means."
    }
   ],
   "legendaryActions": [
@@ -7184,7 +7184,7 @@
    {
     "name": "Malicious Magic",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Dimension Door or Hypnotic Pattern through Spellcasting, and can't repeat this until its next turn begins."
    }
   ],
   "legendaryActionUses": {
@@ -7195,12 +7195,12 @@
    {
     "name": "Lapsus Linguae",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Creatures other than the hag and its allies subtract 1d10 from ability checks made with the Influence action within a mile of the lair."
    },
    {
     "name": "Meddlesome Magic",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "A creature that long-rests near the lair will, the next time it spends a spell slot, also cast Confusion centered on itself without needing concentration."
    }
   ],
   "description": "A large fey of neutral evil alignment, encountered in Any. It fights with Spectral Claw and Crackling Wave, can take legendary actions, and can shape the area around its lair. Its challenge rating is 21.",
@@ -7363,7 +7363,7 @@
     "name": "Protective Magic",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Three times per day, casts Counterspell or Shield in response to the spell's trigger."
    }
   ],
   "legendaryActions": [],
@@ -7524,7 +7524,7 @@
     "name": "Divine Aid",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -8626,7 +8626,7 @@
    {
     "name": "Teleport",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports to an unoccupied space it can see."
    }
   ],
   "reactions": [],
@@ -9024,7 +9024,7 @@
       "type": "Poison"
      }
     ],
-    "summary": "Inflicts poison damage; involves advantage on certain rolls."
+    "summary": "Gives itself Advantage on its next attack roll this turn, and a hit deals an extra 28 (8d6) Poison damage."
    }
   ],
   "reactions": [],
@@ -9288,7 +9288,7 @@
   "traits": [
    {
     "name": "Detect Life",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Senses the direction of living creatures within a mile, ignoring Constructs and Undead."
    },
    {
     "name": "Incorporeal Movement",
@@ -9467,7 +9467,7 @@
       "type": "Piercing"
      }
     ],
-    "summary": "Inflicts piercing damage."
+    "summary": "At the start of its turn, deals 5 (1d10) Piercing damage to any creature it is grappling or that is grappling it."
    },
    {
     "name": "Diabolical Restoration",
@@ -10466,7 +10466,7 @@
    {
     "name": "Antimagic Cone",
     "type": "utility",
-    "summary": "Affects a 150-foot cone."
+    "summary": "The central eye projects a 150-foot cone that works as Antimagic Field until the start of the beholder's next turn, and it also blocks the beholder's own Eye Rays."
    }
   ],
   "reactions": [],
@@ -10479,7 +10479,7 @@
    {
     "name": "Glare",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Uses Eye Rays."
    }
   ],
   "legendaryActionUses": {
@@ -10497,12 +10497,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 13 Wis save."
+    "summary": "Creatures that short-rest within a mile of the lair must pass a Wisdom save or gain no benefit from the rest."
    },
    {
     "name": "Warping Terrain",
     "type": "utility",
-    "summary": "Can impose prone."
+    "summary": "Any creature within a mile of the lair other than the beholder that rolls a 1 on a D20 Test falls Prone."
    }
   ],
   "description": "A large aberration of lawful evil alignment, encountered in Underdark. It can fly, fights with Bite and Eye Rays, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
@@ -10624,7 +10624,7 @@
    {
     "name": "Eye Rays",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Fires one randomly rolled magical eye ray at a visible target, rerolling any ray already used this turn, with effects such as paralysis, fear, and damage that depend on the ray."
    },
    {
     "name": "Paralyzing Ray",
@@ -10940,7 +10940,7 @@
    {
     "name": "Frenzied Rush",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Each ally within 30 feet can use a Reaction to move up to half its Speed without provoking Opportunity Attacks, and the berserker can do the same."
    }
   ],
   "reactions": [],
@@ -11285,7 +11285,7 @@
       "type": "Acid"
      }
     ],
-    "summary": "Inflicts acid damage."
+    "summary": "A creature that hits it with a melee attack roll takes 4 (1d8) Acid damage, and nonmagical ammunition and weapons are destroyed or degraded by contact."
    },
    {
     "name": "Spider Climb",
@@ -11316,7 +11316,7 @@
    {
     "name": "Split",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "When Large or Medium with at least 10 hit points and Bloodied or hit by Lightning or Slashing damage, it divides into two creatures one size smaller that share its remaining hit points evenly."
    }
   ],
   "legendaryActions": [],
@@ -11419,7 +11419,7 @@
     "name": "Teleport",
     "recharge": "4-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 4-6; involves teleportation."
+    "summary": "Teleports up to 40 feet to an unoccupied space it can see, recharging on a roll of 4-6."
    }
   ],
   "reactions": [],
@@ -11521,7 +11521,7 @@
   "traits": [
    {
     "name": "Astral Implosion",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "When reduced to 0 hit points, the blob implodes, sending everything it engulfed to the Astral Sea, coating its surroundings in slime, and re-forming on a random Material Plane world after 1d20 years."
    },
    {
     "name": "Legendary Resistance",
@@ -11619,12 +11619,12 @@
       "type": "Necrotic"
      }
     ],
-    "summary": "Inflicts necrotic damage."
+    "summary": "Deals 14 (4d6) Necrotic damage to each creature it has engulfed, and can't repeat this until its next turn begins."
    },
    {
     "name": "Grasping Glob",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Uses Restraining Glob, and can't repeat this until its next turn begins."
    },
    {
     "name": "Lashing Goop",
@@ -14239,7 +14239,7 @@
   "traits": [
    {
     "name": "Jumper",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Uses Dexterity instead of Strength to work out how far it can jump."
    }
   ],
   "actions": [
@@ -15153,7 +15153,7 @@
    },
    {
     "name": "Sense Magic",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Detects magic within 120 feet in the manner of Detect Magic, without the sense itself being magical."
    }
   ],
   "actions": [
@@ -15297,11 +15297,11 @@
   "traits": [
    {
     "name": "Acid Absorption",
-    "summary": "Restores hit points."
+    "summary": "Acid damage heals the golem for the amount dealt instead of harming it."
    },
    {
     "name": "Berserk",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Each turn it starts Bloodied, a 1d6 roll of 6 sends it into a rampage in which it attacks the nearest creature or object until destroyed or no longer Bloodied."
    },
    {
     "name": "Immutable Form",
@@ -15349,7 +15349,7 @@
     "name": "Hasten",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Takes the Dash and Disengage actions, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -15505,7 +15505,7 @@
     "name": "Phantasms",
     "cost": "Recharge after a Short or Long Rest",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Mirror Image using Wisdom with no spell components, ending early if it starts or ends its turn in Bright Light, and recharges on a Short or Long Rest."
    }
   ],
   "reactions": [],
@@ -16196,7 +16196,7 @@
   "traits": [
    {
     "name": "Training",
-    "summary": "Involves advantage on certain rolls."
+    "summary": "Has proficiency in one skill chosen by the DM and Advantage on ability checks with it."
    }
   ],
   "actions": [
@@ -16470,7 +16470,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 11 Con save; affects a 15-foot cone."
+    "summary": "Creatures in a cone make a Constitution save or lose Reactions, have half Speed, and can take only an action or a Bonus Action (not both) until the end of their next turn."
    }
   ],
   "bonusActions": [],
@@ -16563,7 +16563,7 @@
   "traits": [
    {
     "name": "Shielded Mind",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Its thoughts can't be read, and others can speak telepathically with it only if it permits."
    }
   ],
   "actions": [
@@ -16641,7 +16641,7 @@
     "name": "Divine Aid",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -17179,7 +17179,7 @@
     "name": "Spiritual Weapon",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Spiritual Weapon twice per day using its Spellcasting ability."
    }
   ],
   "reactions": [],
@@ -17484,7 +17484,7 @@
     "name": "Portent",
     "recharge": "4-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 4-6."
+    "summary": "When it or a visible ally makes a D20 Test, it rolls 1d20 and may use that result in place of the original, recharging on a roll of 4-6."
    }
   ],
   "legendaryActions": [],
@@ -17617,7 +17617,7 @@
     "name": "Limited Foresight",
     "recharge": "6-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 6-6; involves advantage on certain rolls."
+    "summary": "When a visible creature attacks it, it imposes Disadvantage on that roll and gains Advantage on its own attacks against the attacker until the end of its next turn, recharging on a roll of 6."
    }
   ],
   "legendaryActions": [],
@@ -17905,7 +17905,7 @@
     "name": "Darkness Aura",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day; affects a 15-foot emanation."
+    "summary": "Fills a 15-foot Emanation with magical Darkness that darkvision can't penetrate, lasting up to 10 minutes while it concentrates, once per day."
    }
   ],
   "bonusActions": [],
@@ -18288,7 +18288,7 @@
    },
    {
     "name": "Marshal Undead",
-    "summary": "Can impose incapacitated; involves advantage on certain rolls; affects a 60-foot emanation."
+    "summary": "Undead allies it chooses within a 60-foot Emanation have Advantage on attack rolls and saving throws, unless it is Incapacitated."
    },
    {
     "name": "Undead Restoration",
@@ -18384,7 +18384,7 @@
    {
     "name": "Dread Authority",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Command through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Fell Word",
@@ -18501,7 +18501,7 @@
    },
    {
     "name": "Marshal Undead",
-    "summary": "Can impose incapacitated; involves advantage on certain rolls; affects a 60-foot emanation."
+    "summary": "Undead allies it chooses within a 60-foot Emanation have Advantage on attack rolls and saving throws, unless it is Incapacitated."
    }
   ],
   "actions": [
@@ -18881,7 +18881,7 @@
    {
     "name": "Eye Rays",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Fires one randomly rolled magical eye ray at a visible target, rerolling any ray already used this turn, with effects such as paralysis, fear, and damage that depend on the ray."
    },
    {
     "name": "Charm Ray",
@@ -18986,12 +18986,12 @@
    {
     "name": "Telekinetic Ray",
     "type": "utility",
-    "summary": "Can impose incapacitated, restrained."
+    "summary": "A target that fails a Strength save is moved up to 30 feet and Restrained, and the tyrant can also manipulate objects with fine control."
    },
    {
     "name": "Sleep Ray",
     "type": "utility",
-    "summary": "Can impose unconscious."
+    "summary": "A target that fails a Wisdom save falls Unconscious for a minute unless it takes damage or is woken by a nearby creature, and Constructs and Undead are unaffected."
    },
    {
     "name": "Petrification Ray",
@@ -19052,7 +19052,7 @@
    {
     "name": "Negative Energy Cone",
     "type": "utility",
-    "summary": "Restores hit points; affects a 150-foot cone."
+    "summary": "A 150-foot cone of negative energy stops creatures from regaining hit points until the start of the tyrant's next turn and raises Humanoid corpses in it as Zombies under its control."
    }
   ],
   "reactions": [],
@@ -19065,7 +19065,7 @@
    {
     "name": "Glare",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Uses Eye Rays."
    }
   ],
   "legendaryActionUses": {
@@ -19076,7 +19076,7 @@
    {
     "name": "Negative Energy Suffusion",
     "type": "utility",
-    "summary": "Restores hit points."
+    "summary": "Healing from spells within a mile of the lair is reduced by 1d10 hit points."
    },
    {
     "name": "Scopophobia",
@@ -19088,7 +19088,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Wis save."
+    "summary": "Creatures that short-rest within a mile of the lair must pass a Wisdom save or gain no benefit from the rest."
    }
   ],
   "description": "A large undead of lawful evil alignment, encountered in Underdark. It can fly, fights with Bite, Charm Ray, and Paralyzing Ray, can take legendary actions, and can shape the area around its lair. Its challenge rating is 14.",
@@ -19162,7 +19162,7 @@
   "traits": [
    {
     "name": "Agile",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Moving out of an enemy's reach does not provoke Opportunity Attacks from it."
    }
   ],
   "actions": [
@@ -19352,7 +19352,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 19 Con save."
+    "summary": "A visible creature within 120 feet that fails a Constitution save has its hit point maximum reduced by 14 (4d6), and the demilich can't repeat this until its next turn begins."
    },
    {
     "name": "Grave-Dust Flight",
@@ -19390,12 +19390,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 20 Con save."
+    "summary": "A creature that long-rests within a mile of the lair must pass a Constitution save or have its hit point maximum reduced by 1d4 until it long-rests elsewhere."
    },
    {
     "name": "Travel Ward",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Creatures can't use teleportation or planar travel to enter or leave the lair."
    }
   ],
   "description": "A tiny undead of netural alignment, encountered in Any. It can fly, fights with Necrotic Burst and Howl, can take legendary actions, and can shape the area around its lair. Its challenge rating is 18.",
@@ -19551,7 +19551,7 @@
     "name": "Divine Aid",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -19799,7 +19799,7 @@
    {
     "name": "Warp Step",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports up to 30 feet to an unoccupied space it can see, bringing along one willing creature within 5 feet."
    }
   ],
   "reactions": [],
@@ -19875,11 +19875,11 @@
   "traits": [
    {
     "name": "Avoidance",
-    "summary": "Can impose incapacitated."
+    "summary": "When an effect lets it save for half damage, it takes none on a success and half on a failure, unless it is Incapacitated."
    },
    {
     "name": "Displacement",
-    "summary": "Can impose incapacitated."
+    "summary": "Attack rolls against it have Disadvantage thanks to an illusion about its position, unless it is Incapacitated."
    }
   ],
   "actions": [
@@ -20085,7 +20085,7 @@
       "type": "Thunder"
      }
     ],
-    "summary": "Inflicts thunder damage; can impose restrained."
+    "summary": "Conjures a whirlwind within 120 feet that it can move 20 feet each turn while concentrating, forcing creatures it touches to make a Strength save or take thunder damage and risk being Restrained."
    },
    {
     "name": "Spellcasting",
@@ -20226,7 +20226,7 @@
    {
     "name": "Read Thoughts",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Detect Thoughts without spell components, using Charisma (DC 12)."
    },
    {
     "name": "Unsettling Visage",
@@ -20350,7 +20350,7 @@
    },
    {
     "name": "Life Suppression",
-    "summary": "Restores hit points."
+    "summary": "Creatures within 60 feet of the dracolich can't regain hit points."
    },
    {
     "name": "Magic Resistance",
@@ -20358,7 +20358,7 @@
    },
    {
     "name": "Soul Gem",
-    "summary": "Restores hit points."
+    "summary": "If destroyed while its gem is on the same plane, it gains a new body next to the gem in 1d20 days with full hit points, and the sturdy gem heals itself each turn."
    }
   ],
   "actions": [
@@ -20446,7 +20446,7 @@
    {
     "name": "Sickening Ray",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Casts Ray of Sickness at level 2 through Spellcasting, and can't repeat this until its next turn begins."
    },
    {
     "name": "Terrifying Presence",
@@ -20494,7 +20494,7 @@
    {
     "name": "Soul Drain",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Creatures within a mile of the lair roll death saving throws with disadvantage, and the effect ends if the owner is destroyed or leaves but resumes if it gains a new body."
    }
   ],
   "description": "A huge or gargantuan undead of lawful evil alignment, encountered in Any. It can burrow and fly, fights with Rend and Necrotic Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 17.",
@@ -21004,7 +21004,7 @@
     "name": "Magic of the Spider Queen",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Darkness, Faerie Fire, or Web without material components, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -21244,7 +21244,7 @@
    },
    {
     "name": "Speak with Beasts and Plants",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can communicate with Beasts and Plants as though they shared a language."
    }
   ],
   "actions": [
@@ -21318,7 +21318,7 @@
    {
     "name": "Tree Stride",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "From within 5 feet of a Large or bigger tree, it teleports next to a second such tree within 60 feet."
    }
   ],
   "reactions": [],
@@ -21465,7 +21465,7 @@
     "name": "Sleep",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Casts Sleep once per day using Charisma, without spell components."
    }
   ],
   "bonusActions": [],
@@ -22084,7 +22084,7 @@
    {
     "name": "Control Weather",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Control Weather without spell components, using Constitution as its spellcasting ability."
    }
   ],
   "bonusActions": [],
@@ -22243,7 +22243,7 @@
     "name": "Elemental Absorption",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Once per day, when it takes Acid, Cold, Fire, Lightning, or Thunder damage, it resists that damage and gains 10 temporary hit points."
    }
   ],
   "legendaryActions": [],
@@ -22646,7 +22646,7 @@
    {
     "name": "Bolster",
     "type": "utility",
-    "summary": "Involves advantage on certain rolls."
+    "summary": "It gains 10 temporary hit points and it and its allies within 30 feet have Advantage on D20 Tests until the end of its next turn, and it can't repeat this until its next turn begins."
    },
    {
     "name": "Shockwave of Glory",
@@ -22816,7 +22816,7 @@
     "name": "Healing Word",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Casts Healing Word once per day using its Spellcasting ability."
    }
   ],
   "reactions": [],
@@ -22920,7 +22920,7 @@
    },
    {
     "name": "Magic Rope",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Carries a magic rope that powers its Entangling Rope action and that turns to dust if destroyed, kept far from the owner for an hour, or if the owner dies, though it can be restored on a rest."
    }
   ],
   "actions": [
@@ -23144,7 +23144,7 @@
    {
     "name": "Reel",
     "type": "utility",
-    "summary": "Can impose restrained."
+    "summary": "Pulls a creature within 30 feet that is Restrained by its Web Strand up to 25 feet toward itself."
    }
   ],
   "reactions": [],
@@ -23431,7 +23431,7 @@
    {
     "name": "Superior Invisibility",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Greater Invisibility on itself without spell components."
    }
   ],
   "reactions": [],
@@ -23578,7 +23578,7 @@
    {
     "name": "Superior Invisibility",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Greater Invisibility on itself without spell components."
    }
   ],
   "reactions": [],
@@ -23832,7 +23832,7 @@
       "type": "Fire"
      }
     ],
-    "summary": "Inflicts fire damage."
+    "summary": "Can squeeze through 1-inch gaps and enter creatures' spaces, dealing 5 (1d10) Fire damage to a creature the first time it enters that creature's space each turn."
    },
    {
     "name": "Illumination",
@@ -23847,7 +23847,7 @@
       "type": "Cold"
      }
     ],
-    "summary": "Inflicts cold damage."
+    "summary": "Takes 3 (1d6) Cold damage for every 5 feet it moves through water and for every gallon splashed on it."
    }
   ],
   "actions": [
@@ -24416,11 +24416,11 @@
   "traits": [
    {
     "name": "Aversion to Fire",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "If the golem takes Fire damage, it has Disadvantage on attack rolls and ability checks until the end of its next turn."
    },
    {
     "name": "Berserk",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Each turn it starts Bloodied, a 1d6 roll of 6 sends it into a rampage in which it attacks the nearest creature or object, and its creator can calm it for a turn with a DC 15 Charisma (Persuasion) check made within 60 feet."
    },
    {
     "name": "Immutable Form",
@@ -24428,7 +24428,7 @@
    },
    {
     "name": "Lightning Absorption",
-    "summary": "Restores hit points."
+    "summary": "Lightning damage heals the creature for the amount dealt."
    },
    {
     "name": "Magic Resistance",
@@ -24553,7 +24553,7 @@
   "traits": [
    {
     "name": "Advanced Telepathy",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Perceives the content of any telepathic communication within 60 feet."
    },
    {
     "name": "Prone Deficiency",
@@ -24573,7 +24573,7 @@
    },
    {
     "name": "Telepathic Shroud",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Its thoughts can't be read and magic can't detect its location or watch it from afar."
    }
   ],
   "actions": [
@@ -25082,7 +25082,7 @@
     "name": "War Cry",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6; involves advantage on certain rolls."
+    "summary": "The giant or a chosen creature that can see or hear it gains 16 (2d10 + 5) temporary hit points and Advantage on attack rolls until the start of the giant's next turn, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -25203,7 +25203,7 @@
     "name": "Animate Boulders",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Once per day, animates one or two boulders within 60 feet as Galeb Duhr with Intelligence and Charisma of 1 that obey it for up to a minute."
    }
   ],
   "bonusActions": [],
@@ -25545,11 +25545,11 @@
       "type": "Acid"
      }
     ],
-    "summary": "Inflicts acid damage."
+    "summary": "The cube fills its whole space transparently, and creatures entering it are engulfed with Disadvantage on the save, gaining Total Cover inside while able to be pulled out by others."
    },
    {
     "name": "Transparent",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Even in plain sight it is hard to spot, requiring a DC 15 Wisdom (Perception) check unless the observer has seen it move or act."
    }
   ],
   "actions": [
@@ -26022,7 +26022,7 @@
   "traits": [
    {
     "name": "Ethereal Sight",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can see 60 feet into the Ethereal Plane from the Material Plane."
    },
    {
     "name": "Incorporeal Movement",
@@ -26065,7 +26065,7 @@
    {
     "name": "Etherealness",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Etherealness without spell components using Charisma, and while on the Border Ethereal it and the Material Plane can see each other but can't affect each other."
    },
    {
     "name": "Horrific Visage",
@@ -27688,7 +27688,7 @@
       "type": "Acid"
      }
     ],
-    "summary": "Inflicts acid damage; can impose blinded, grappled, prone, restrained."
+    "summary": "Swallows a Small or smaller creature it is grappling, which becomes Blinded and Restrained with Total Cover from outside, and it can't use Bite while the target is swallowed."
    }
   ],
   "bonusActions": [],
@@ -28103,7 +28103,7 @@
     "name": "Ink Cloud",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day; affects a 10-foot cube."
+    "summary": "Once per day, when it takes damage underwater, it releases a 10-foot Cube of ink that Heavily Obscures the area for a minute and moves up to its Swim Speed."
    }
   ],
   "legendaryActions": [],
@@ -28556,7 +28556,7 @@
    {
     "name": "Bubble Dash",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While underwater, it moves up to half its Swim Speed without provoking Opportunity Attacks."
    }
   ],
   "reactions": [],
@@ -28921,7 +28921,7 @@
     "name": "Ink Cloud",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day; affects a 15-foot cube."
+    "summary": "Once per day, when it takes damage underwater, it releases a 15-foot Cube of ink that Heavily Obscures the area for a minute and moves up to its Swim Speed."
    }
   ],
   "legendaryActions": [],
@@ -29041,7 +29041,7 @@
       "type": "Acid"
      }
     ],
-    "summary": "Inflicts acid damage; can impose blinded, grappled, prone, restrained."
+    "summary": "Swallows a Small or smaller creature it is grappling, which becomes Blinded and Restrained with Total Cover from outside, and it can't use Bite while the target is swallowed."
    }
   ],
   "bonusActions": [],
@@ -29634,7 +29634,7 @@
   "traits": [
    {
     "name": "Aberrant Ground",
-    "summary": "Affects a 10-foot emanation."
+    "summary": "The ground within a 10-foot Emanation of it counts as Difficult Terrain."
    },
    {
     "name": "Gibbering",
@@ -30278,7 +30278,7 @@
     "name": "Psi-Powered Leap",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Jump twice per day without spell components."
    }
   ],
   "reactions": [
@@ -30286,7 +30286,7 @@
     "name": "Psionic Defense",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Feather Fall or Shield in response to the spell's trigger without spell components, a limited number of times per day."
    }
   ],
   "legendaryActions": [],
@@ -30427,7 +30427,7 @@
    {
     "name": "Psionic Defense",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Feather Fall or Shield in response to the spell's trigger without spell components."
    }
   ],
   "legendaryActions": [],
@@ -30567,7 +30567,7 @@
     "name": "Psi-Powered Leap",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Jump twice per day without spell components."
    }
   ],
   "reactions": [
@@ -30575,7 +30575,7 @@
     "name": "Psionic Defense",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Feather Fall or Shield in response to the spell's trigger without spell components, a limited number of times per day."
    }
   ],
   "legendaryActions": [],
@@ -31290,7 +31290,7 @@
     "name": "Incite Rampage",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Lets another creature within 60 feet that has the Rampage bonus action make one melee attack as a Reaction, recharging on a roll of 5-6."
    }
   ],
   "bonusActions": [
@@ -31818,7 +31818,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 13 Wis save."
+    "summary": "When a visible creature hits it, that creature makes a DC 13 Wisdom save or the attack misses instead."
    }
   ],
   "legendaryActions": [],
@@ -32214,7 +32214,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 13 Str save; affects a 15-foot cone."
+    "summary": "Creatures in a cone that aren't already affected make a Strength save or have Disadvantage on Strength-based D20 Tests and reduced damage rolls until they pass a repeat save."
    }
   ],
   "bonusActions": [],
@@ -32515,7 +32515,7 @@
    {
     "name": "Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Moves up to half its Speed in a straight line toward a visible enemy."
    }
   ],
   "reactions": [],
@@ -32611,7 +32611,7 @@
    },
    {
     "name": "Corrosive Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Nonmagical ammunition is destroyed on hitting it, and nonmagical weapons that damage it take a cumulative -1 attack penalty and break at -5, which Mending can undo."
    }
   ],
   "actions": [
@@ -34353,7 +34353,7 @@
   "traits": [
    {
     "name": "Blight Seeds",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "After a Long Rest it scatters 1d6 seeds nearby that become Twig, Needle, or Vine Blights under its control after 24 hours."
    }
   ],
   "actions": [
@@ -34519,11 +34519,11 @@
   "traits": [
    {
     "name": "Resistances",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Resists the damage type tied to its Draconic Origin."
    },
    {
     "name": "Draconic Origin",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "The DM picks one of five dragon damage types (Acid, Cold, Fire, Lightning, or Poison), which shapes other parts of its stat block."
    }
   ],
   "actions": [
@@ -34563,7 +34563,7 @@
      }
     ],
     "halfOnSuccess": true,
-    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Dex save; affects a 30-foot cone."
+    "summary": "Creatures in a 30-foot Cone make a DC 14 Dexterity save, taking 28 (8d6) damage of the Draconic Origin type on a failure and half on a success, recharging on a roll of 5-6."
    }
   ],
   "bonusActions": [
@@ -34788,7 +34788,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 17 Con save."
+    "summary": "A creature that casts a spell inside its space must pass a DC 17 Constitution save or the spell is wasted."
    },
    {
     "name": "Undead Restoration",
@@ -34831,7 +34831,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 17 Cha save; affects a 60-foot cone; involves teleportation."
+    "summary": "Creatures in a 60-foot Cone make a DC 17 Charisma save or are teleported into the revenant's space and swallowed, gaining Total Cover from the outside."
    }
   ],
   "bonusActions": [],
@@ -35162,7 +35162,7 @@
    },
    {
     "name": "Spell Immunity",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Is immune to three spells picked by its creator, such as Heat Metal, Lightning Bolt, or Magic Missile."
    }
   ],
   "actions": [
@@ -35773,7 +35773,7 @@
   "traits": [
    {
     "name": "Aura of Authority",
-    "summary": "Can impose incapacitated; involves advantage on certain rolls; affects a 10-foot emanation."
+    "summary": "While it isn't Incapacitated, it and its allies in an Emanation around it have Advantage on attack rolls and saving throws."
    }
   ],
   "actions": [
@@ -35918,7 +35918,7 @@
   "traits": [
    {
     "name": "Aura of Authority",
-    "summary": "Can impose incapacitated; involves advantage on certain rolls; affects a 30-foot emanation."
+    "summary": "While it isn't Incapacitated, it and its allies in an Emanation around it have Advantage on attack rolls and saving throws."
    }
   ],
   "actions": [
@@ -36187,7 +36187,7 @@
   "traits": [
    {
     "name": "Telepathic Bond",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can speak telepathically with its master while both are on the same plane."
    }
   ],
   "actions": [
@@ -36675,11 +36675,11 @@
    },
    {
     "name": "Multiple Heads",
-    "summary": "Restores hit points."
+    "summary": "Has five heads and loses one whenever it takes 25 or more damage in a turn, regrowing two for each lost head at turn end unless it took Fire damage and regaining 20 hit points when it does."
    },
    {
     "name": "Reactive Heads",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Gains an extra Reaction, usable only for Opportunity Attacks, for every head beyond the first."
    }
   ],
   "actions": [
@@ -36967,7 +36967,7 @@
     "name": "Ice Wall",
     "recharge": "6-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 6-6."
+    "summary": "Casts Wall of Ice at level 8 without spell components, using Intelligence, recharging on a roll of 6."
    }
   ],
   "bonusActions": [],
@@ -37105,7 +37105,7 @@
     "name": "Fog Cloud",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Casts Fog Cloud once per day without spell components, using Charisma."
    },
    {
     "name": "Frost Breath",
@@ -37250,7 +37250,7 @@
    {
     "name": "Invisibility",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Invisibility on itself without spell components, using Charisma."
    },
    {
     "name": "Shape-Shift",
@@ -37351,7 +37351,7 @@
   "traits": [
    {
     "name": "Succubus Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "After a Long Rest, it can change into a Succubus and use that stat block instead."
    }
   ],
   "actions": [
@@ -37506,7 +37506,7 @@
   "traits": [
    {
     "name": "Detect Intelligence",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Senses any creature with Intelligence 3 or higher within 300 feet, even through barriers."
    }
   ],
   "actions": [
@@ -37672,11 +37672,11 @@
   "traits": [
    {
     "name": "Air Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can enter another creature's space and stop there, and can squeeze through gaps only an inch wide without paying extra movement."
    },
    {
     "name": "Invisibility",
-    "summary": "Can impose invisible."
+    "summary": "It has the Invisible condition at all times."
    }
   ],
   "actions": [
@@ -37824,7 +37824,7 @@
   "traits": [
    {
     "name": "Fire Absorption",
-    "summary": "Restores hit points."
+    "summary": "Fire damage heals the golem for the amount dealt."
    },
    {
     "name": "Immutable Form",
@@ -38238,11 +38238,11 @@
   "traits": [
    {
     "name": "Resistances",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Its resistance comes from Living Shadow, which applies in Dim Light or Darkness."
    },
    {
     "name": "Living Shadow",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "In Dim Light or Darkness, the dragon resists all damage except Force, Psychic, and Radiant."
    },
    {
     "name": "Sunlight Sensitivity",
@@ -38305,7 +38305,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -38420,7 +38420,7 @@
     "name": "Eldritch Lantern",
     "recharge": "4-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 4-6."
+    "summary": "Casts Faerie Fire using Intelligence, recharging on a roll of 4-6."
    }
   ],
   "reactions": [],
@@ -38991,7 +38991,7 @@
    {
     "name": "Storm Bolt",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Uses Lightning Strike, and can't repeat this until its next turn begins."
    },
    {
     "name": "Toxic Ink",
@@ -39018,12 +39018,12 @@
    {
     "name": "Ocean Tyrant",
     "type": "utility",
-    "summary": "Can impose charmed."
+    "summary": "All Beasts within a mile of the lair are Charmed while they remain in that area."
    },
    {
     "name": "Sea and Storms",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the kraken can cast Control Weather without spell components."
    }
   ],
   "description": "A gargantuan monstrosity of chaotic evil alignment, encountered in Underwater. It can swim, fights with Tentacle, Fling, and Lightning Strike, can take legendary actions, and can shape the area around its lair. Its challenge rating is 23.",
@@ -39307,7 +39307,7 @@
     "name": "Shield of Faith",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Shield of Faith twice per day using its Spellcasting ability."
    }
   ],
   "reactions": [],
@@ -39563,7 +39563,7 @@
     "name": "Shield of Faith",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Shield of Faith twice per day using its Spellcasting ability."
    }
   ],
   "reactions": [],
@@ -39710,7 +39710,7 @@
    {
     "name": "Watery Rush",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While underwater, it moves up to half its Swim Speed without provoking Opportunity Attacks."
    }
   ],
   "reactions": [],
@@ -40181,7 +40181,7 @@
    },
    {
     "name": "Spirit Jar",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "If destroyed, the lich re-forms in 1d10 days at its lair with full hit points, provided its spirit jar survives."
    }
   ],
   "actions": [
@@ -40270,7 +40270,7 @@
    {
     "name": "Protective Magic",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Counterspell or Shield in response to the spell's trigger."
    }
   ],
   "legendaryActions": [
@@ -40284,7 +40284,7 @@
       "type": "Necrotic"
      }
     ],
-    "summary": "Inflicts necrotic damage; involves teleportation."
+    "summary": "Teleports up to 60 feet to an unoccupied space it can see, and each creature within 10 feet of the space it left takes 11 (2d10) Necrotic damage."
    },
    {
     "name": "Disrupt Life",
@@ -40308,7 +40308,7 @@
    {
     "name": "Frightening Gaze",
     "type": "utility",
-    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Fear using its Spellcasting ability, and can't use this action again until the start of its next turn."
    }
   ],
   "legendaryActionUses": {
@@ -40319,12 +40319,12 @@
    {
     "name": "All-Seeing",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the lich can cast Clairvoyance without spell components."
    },
    {
     "name": "Inevitable Siphon",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "The soul of any Humanoid that dies within a mile of the lair is consumed by the lich and can be restored only by True Resurrection or Wish."
    }
   ],
   "description": "A medium undead of neutral evil alignment, encountered in Any. It fights with Eldritch Burst and Paralyzing Touch, can take legendary actions, and can shape the area around its lair. Its challenge rating is 21.",
@@ -40836,7 +40836,7 @@
    {
     "name": "Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Moves up to its Speed or Swim Speed in a straight line toward a visible enemy."
    }
   ],
   "reactions": [],
@@ -40986,7 +40986,7 @@
     "name": "Protective Magic",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Three times per day, casts Counterspell or Shield in response to the spell's trigger."
    }
   ],
   "legendaryActions": [],
@@ -41377,7 +41377,7 @@
    {
     "name": "Ignited Illumination",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Ignites or extinguishes its flames, and while burning it sheds Bright Light in a 10-foot radius and Dim Light 10 feet further."
    }
   ],
   "reactions": [],
@@ -41701,7 +41701,7 @@
   "traits": [
    {
     "name": "Contortionist",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can squeeze through gaps only an inch wide without paying extra movement."
    },
    {
     "name": "Sickening Vapors",
@@ -41747,7 +41747,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -42056,7 +42056,7 @@
     "name": "Misty Veil",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Fog Cloud using its Spellcasting ability, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -42160,7 +42160,7 @@
    },
    {
     "name": "Reactive",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can take one Reaction on every turn of combat."
    }
   ],
   "actions": [
@@ -42224,7 +42224,7 @@
     "name": "Teleport",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6; involves teleportation."
+    "summary": "Teleports up to 120 feet to an unoccupied space it can see, recharging on a roll of 5-6."
    }
   ],
   "reactions": [
@@ -43087,7 +43087,7 @@
     "name": "Teleport",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6; involves teleportation."
+    "summary": "Teleports to an unoccupied space it can see, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -43173,7 +43173,7 @@
    {
     "name": "Adhesive",
     "cost": "Object Form Only",
-    "summary": "Can impose grappled."
+    "summary": "In object form it sticks to anything that touches it, Grappling Huge or smaller creatures (escape DC 13) and giving them Disadvantage on checks to break free."
    }
   ],
   "actions": [
@@ -44668,7 +44668,7 @@
   "traits": [
    {
     "name": "Beast of Burden",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Counts as one size larger when working out how much it can carry."
    }
   ],
   "actions": [
@@ -45036,26 +45036,26 @@
    {
     "name": "Whirlwind of Sand",
     "type": "utility",
-    "summary": "Can impose blinded; involves teleportation."
+    "summary": "When hit by an attack roll, it gains +2 AC against that attack and teleports up to 60 feet, Blinding chosen creatures within 5 feet of its destination until the end of its next turn."
    }
   ],
   "reactions": [
    {
     "name": "Whirlwind of Sand",
     "type": "utility",
-    "summary": "Can impose blinded; involves teleportation."
+    "summary": "When hit by an attack roll, it gains +2 AC against that attack and teleports up to 60 feet, Blinding chosen creatures within 5 feet of its destination until the end of its next turn."
    }
   ],
   "legendaryActions": [
    {
     "name": "Dread Command",
     "type": "utility",
-    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Command at level 2 using its Spellcasting ability, and can't use this action again until the start of its next turn."
    },
    {
     "name": "Glare",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "Uses Eye Rays."
    },
    {
     "name": "Necrotic Strike",
@@ -45078,12 +45078,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Con save."
+    "summary": "A creature other than the mummy or its allies that casts a Divination spell within a mile of the lair must pass a DC 15 Constitution save or the spell fizzles, wasting the action but not the spell's resources."
    },
    {
     "name": "Soul Drain",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "Creatures within a mile of the lair roll death saving throws with disadvantage, and the effect ends if the owner is destroyed or leaves but resumes if it gains a new body."
    }
   ],
   "description": "A medium or small undead of lawful evil alignment, encountered in Desert and Swamp. It fights with Rotting Fist, Channel Negative Energy, and Dreadful Glare, can take legendary actions, and can shape the area around its lair. Its challenge rating is 15.",
@@ -45203,7 +45203,7 @@
    {
     "name": "Rapport Spores",
     "type": "utility",
-    "summary": "Affects a 30-foot emanation."
+    "summary": "Releases spores in a 30-foot Emanation that give nearby creatures with Intelligence 2 or higher (other than Constructs, Elementals, and Undead) 30-foot telepathy for an hour."
    }
   ],
   "bonusActions": [],
@@ -45321,7 +45321,7 @@
     "name": "Animating Spores",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Three times per day, causes a Small or Medium non-Construct, non-Undead corpse within 5 feet to rise 24 hours later as a Myconid Spore Servant for a limited time."
    },
    {
     "name": "Pacifying Spores",
@@ -45341,7 +45341,7 @@
    {
     "name": "Rapport Spores",
     "type": "utility",
-    "summary": "Affects a 30-foot emanation."
+    "summary": "Releases spores in a 30-foot Emanation that give nearby creatures with Intelligence 2 or higher (other than Constructs, Elementals, and Undead) 30-foot telepathy for an hour."
    }
   ],
   "bonusActions": [],
@@ -45557,7 +45557,7 @@
    {
     "name": "Rapport Spores",
     "type": "utility",
-    "summary": "Affects a 30-foot emanation."
+    "summary": "Releases spores in a 30-foot Emanation that give nearby creatures with Intelligence 2 or higher (other than Constructs, Elementals, and Undead) 30-foot telepathy for an hour."
    }
   ],
   "bonusActions": [],
@@ -45694,7 +45694,7 @@
    {
     "name": "Teleport",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports up to 120 feet to an unoccupied space it can see."
    }
   ],
   "bonusActions": [
@@ -45726,7 +45726,7 @@
    {
     "name": "Pursuit",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "When another visible creature ends its move within 120 feet, it uses Teleport to land within 10 feet of that creature."
    }
   ],
   "legendaryActions": [],
@@ -45940,7 +45940,7 @@
    },
    {
     "name": "Soul Bag",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Holds a soul bag that powers its Nightmare Haunting action, and the bag is fragile and releases captured souls if destroyed, though the hag can make a new one after 7 days."
    }
   ],
   "actions": [
@@ -45973,7 +45973,7 @@
     "name": "Nightmare Haunting",
     "uses": "1/Day; Requires Soul Bag",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Once per day, while on the Ethereal Plane with its soul bag, it casts Dream on a creature it sees on the Material Plane, acting as the messenger."
    },
    {
     "name": "Spellcasting",
@@ -46083,7 +46083,7 @@
   "traits": [
    {
     "name": "Confer Fire Resistance",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Grants its rider Resistance to Fire damage while mounted."
    },
    {
     "name": "Illumination",
@@ -46116,7 +46116,7 @@
    {
     "name": "Ethereal Stride",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "It and up to three willing creatures within 5 feet shift from the Material Plane to the Ethereal Plane or back."
    }
   ],
   "bonusActions": [],
@@ -46496,7 +46496,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Recharges on a roll of 6-6; Targets make a DC 14 Wis save."
+    "summary": "A visible creature within 120 feet that fails a DC 14 Wisdom save has one fact or secret learned by the nothic, recharging on a roll of 6."
    }
   ],
   "reactions": [],
@@ -46641,7 +46641,7 @@
    {
     "name": "Shadowy Teleport",
     "type": "utility",
-    "summary": "Can impose invisible; involves teleportation."
+    "summary": "Becomes Invisible for a minute (ending after it deals damage) and teleports up to 30 feet to an unoccupied space it can see."
    }
   ],
   "reactions": [],
@@ -46761,7 +46761,7 @@
    {
     "name": "Split",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "When Large or Medium with at least 10 hit points and Bloodied or hit by Lightning or Slashing damage, it divides into two creatures one size smaller that share its remaining hit points evenly."
    }
   ],
   "legendaryActions": [],
@@ -46838,7 +46838,7 @@
   "traits": [
    {
     "name": "Compression",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can squeeze through gaps only an inch wide without paying extra movement."
    },
    {
     "name": "Water Breathing",
@@ -46869,7 +46869,7 @@
     "name": "Ink Cloud",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day; affects a 5-foot cube."
+    "summary": "Once per day, when a creature ends its turn within 5 feet of it underwater, it releases a 5-foot Cube of ink that Heavily Obscures the area for a minute and moves up to its Swim Speed."
    }
   ],
   "legendaryActions": [],
@@ -47388,7 +47388,7 @@
    {
     "name": "Invisibility",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Invisibility on itself without spell components, using the same spellcasting ability as its Spellcasting."
    }
   ],
   "reactions": [],
@@ -48596,7 +48596,7 @@
   "traits": [
    {
     "name": "Ethereal Sight",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can see 60 feet into the Ethereal Plane from the Material Plane."
    },
    {
     "name": "Spider Climb",
@@ -48647,7 +48647,7 @@
    {
     "name": "Ethereal Jaunt",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports from the Material Plane to the Ethereal Plane or back."
    }
   ],
   "reactions": [],
@@ -49095,7 +49095,7 @@
    {
     "name": "Poison",
     "type": "utility",
-    "summary": "Can impose poisoned."
+    "summary": "The target is Poisoned until the start of the pirate's next turn."
    },
    {
     "name": "Pistol",
@@ -49120,14 +49120,14 @@
     "name": "Rally",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day; involves advantage on certain rolls."
+    "summary": "Once per day, up to three other creatures within 30 feet gain Advantage on attack rolls and saving throws until the start of the pirate's next turn."
    }
   ],
   "reactions": [
    {
     "name": "Defensive Stance",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "When hit by a melee attack roll while holding a weapon, it gains +4 AC against melee attack rolls until the start of its next turn, possibly turning the hit into a miss."
    }
   ],
   "legendaryActions": [],
@@ -49760,7 +49760,7 @@
     "name": "Burst of Wonder",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Entangle, Polymorph, or Tasha's Hideous Laughter without material components, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -49854,7 +49854,7 @@
   "traits": [
    {
     "name": "Divine Awareness",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Knows when it hears a lie."
    },
    {
     "name": "Exalted Restoration",
@@ -49943,7 +49943,7 @@
     "name": "Divine Aid",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -50316,7 +50316,7 @@
    {
     "name": "Vanish",
     "type": "utility",
-    "summary": "Can impose invisible."
+    "summary": "Becomes Invisible or ends that invisibility."
    }
   ],
   "reactions": [],
@@ -50561,7 +50561,7 @@
     "name": "Divine Aid",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -50701,7 +50701,7 @@
     "name": "Divine Aid",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -51126,7 +51126,7 @@
       "type": "Psychic"
      }
     ],
-    "summary": "Inflicts psychic damage."
+    "summary": "When it fails a save against a spell or magical effect, the creature responsible takes 3 (1d6) Psychic damage."
    }
   ],
   "legendaryActions": [],
@@ -51644,7 +51644,7 @@
     "name": "Psionic Defense",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Casts Feather Fall or Shield in response to the spell's trigger without spell components, a limited number of times per day."
    }
   ],
   "legendaryActions": [],
@@ -51763,7 +51763,7 @@
    {
     "name": "Invisibility",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Invisibility on itself without spell components, using Charisma."
    },
    {
     "name": "Scare",
@@ -51871,7 +51871,7 @@
   "traits": [
    {
     "name": "Aura of Bravery",
-    "summary": "Can impose charmed, frightened; affects a 30-foot emanation."
+    "summary": "Creatures of its choice in a 30-foot Emanation are immune to the Charmed and Frightened conditions while there."
    }
   ],
   "actions": [
@@ -52035,7 +52035,7 @@
   "traits": [
    {
     "name": "Greater Magic Resistance",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Automatically passes saves against spells and magical effects, spell attacks always miss it, and without its leave nothing can remotely observe it or read its thoughts, type, or alignment."
    },
    {
     "name": "Fiendish Restoration",
@@ -52201,7 +52201,7 @@
   "traits": [
    {
     "name": "Agile",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Moving out of an enemy's reach does not provoke Opportunity Attacks from it."
    }
   ],
   "actions": [
@@ -52988,7 +52988,7 @@
     "name": "Vow of Revenge",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Once per day, curses a visible creature within 30 feet and always knows the direction and distance to it, until the curse ends by cursing someone else."
    }
   ],
   "reactions": [],
@@ -53309,7 +53309,7 @@
     "name": "Swoop",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6; can impose grappled."
+    "summary": "If it has a creature Grappled, it flies up to half its Fly Speed without provoking Opportunity Attacks and drops that creature, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -53437,7 +53437,7 @@
    {
     "name": "Reel",
     "type": "utility",
-    "summary": "Can impose grappled."
+    "summary": "Pulls each creature it has Grappled up to 30 feet toward itself."
    }
   ],
   "bonusActions": [],
@@ -53512,7 +53512,7 @@
   "traits": [
    {
     "name": "Iron Scent",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can pinpoint ferrous metal within 30 feet."
    }
   ],
   "actions": [
@@ -53552,12 +53552,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 11 Dex save."
+    "summary": "Targets a nonmagical metal armor or weapon held by a creature within 5 feet, which on a failed DC 11 Dexterity save takes a cumulative -1 penalty and is destroyed once it hits the limit."
    },
    {
     "name": "Destroy Metal",
     "type": "utility",
-    "summary": "Affects a 1-foot cube."
+    "summary": "Touches an unattended nonmagical metal object within 5 feet and destroys a 1-foot Cube of it."
    }
   ],
   "bonusActions": [],
@@ -53565,7 +53565,7 @@
    {
     "name": "Reflexive Antennae",
     "type": "utility",
-    "summary": "Triggers another of its listed abilities."
+    "summary": "When an attack roll hits it, it uses Antennae in response."
    }
   ],
   "legendaryActions": [],
@@ -53973,7 +53973,7 @@
     "name": "Fiendish Aid",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Casts Bless or Healing Word twice per day using its Spellcasting ability."
    }
   ],
   "reactions": [],
@@ -54101,7 +54101,7 @@
    {
     "name": "Aquatic Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Swims up to its Swim Speed in a straight line toward a visible enemy."
    }
   ],
   "reactions": [],
@@ -54549,7 +54549,7 @@
       "type": "Fire"
      }
     ],
-    "summary": "Inflicts fire damage; affects a 5-foot emanation."
+    "summary": "Moves up to its Speed without provoking Opportunity Attacks while fire fills a 5-foot Emanation that deals 7 (2d6) Fire damage to creatures it enters, once per turn each."
    }
   ],
   "reactions": [],
@@ -54815,7 +54815,7 @@
       "type": "Psychic"
      }
     ],
-    "summary": "Inflicts psychic damage; can impose frightened."
+    "summary": "The target takes 10 (2d6 + 3) Psychic damage and is Frightened for a minute, ending if it ends a turn out of the satyr's line of sight."
    }
   ],
   "bonusActions": [],
@@ -55297,7 +55297,7 @@
    {
     "name": "Aim",
     "type": "utility",
-    "summary": "Involves advantage on certain rolls."
+    "summary": "Gains Advantage on its next attack roll this turn."
    }
   ],
   "reactions": [
@@ -55454,7 +55454,7 @@
    {
     "name": "Illusory Appearance",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Disguise Self (DC 13, Constitution) with a 24-hour duration."
    }
   ],
   "bonusActions": [],
@@ -55539,7 +55539,7 @@
    {
     "name": "Bubble Dash",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "While underwater, it moves up to its Swim Speed without provoking Opportunity Attacks."
    }
   ],
   "bonusActions": [],
@@ -55647,7 +55647,7 @@
    },
    {
     "name": "Sunlight Weakness",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "In sunlight, the shadow has Disadvantage on D20 Tests."
    }
   ],
   "actions": [
@@ -55673,7 +55673,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -55824,7 +55824,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -55913,7 +55913,7 @@
   "traits": [
    {
     "name": "Resistances",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Its resistance comes from Living Shadow, which applies in Dim Light or Darkness."
    },
    {
     "name": "Legendary Resistance",
@@ -55922,7 +55922,7 @@
    },
    {
     "name": "Living Shadow",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "In Dim Light or Darkness, the dragon resists all damage except Force, Psychic, and Radiant."
    },
    {
     "name": "Sunlight Sensitivity",
@@ -55985,7 +55985,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -56005,7 +56005,7 @@
       "type": "Necrotic"
      }
     ],
-    "summary": "Inflicts necrotic damage."
+    "summary": "Uses Shadow Stealth and deals 10 (3d6) Necrotic damage to a chosen visible creature within 10 feet, and can't repeat this until its next turn begins."
    }
   ],
   "legendaryActionUses": {
@@ -56016,12 +56016,12 @@
    {
     "name": "Negative Energy Suffusion",
     "type": "utility",
-    "summary": "Restores hit points."
+    "summary": "Healing from spells within a mile of the lair is reduced by 1d10 hit points."
    },
    {
     "name": "Stifling Shadows",
     "type": "utility",
-    "summary": "Involves advantage on certain rolls."
+    "summary": "Within a mile of the lair, effects that would shed Bright Light shed Dim Light instead, and creatures there have Advantage on Dexterity (Stealth) checks."
    }
   ],
   "description": "A huge or large dragon of chaotic evil alignment, encountered in Planar (Shadowfell) and Underdark. It can climb and fly, fights with Rend and Shadow Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
@@ -56107,7 +56107,7 @@
   "traits": [
    {
     "name": "Lightning Absorption",
-    "summary": "Restores hit points."
+    "summary": "Lightning damage heals the creature for the amount dealt."
    }
   ],
   "actions": [
@@ -56253,7 +56253,7 @@
   "traits": [
    {
     "name": "Bound",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "The creature is bound to an amulet whose wearer can call it telepathically and shunt half of the damage they take onto it while within 60 feet."
    },
    {
     "name": "Regeneration",
@@ -56261,7 +56261,7 @@
    },
    {
     "name": "Spell Storing",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "The wearer of the guardian's amulet can have it store a spell of level 4 or lower, which it can later cast once using the original caster's choices."
    }
   ],
   "actions": [
@@ -56301,7 +56301,7 @@
    {
     "name": "Protection",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "When an attack hits the amulet's wearer within 5 feet of the guardian, the wearer gets +5 AC until the start of the guardian's next turn, possibly turning the hit into a miss."
    }
   ],
   "legendaryActions": [],
@@ -56384,7 +56384,7 @@
    {
     "name": "Shriek",
     "type": "utility",
-    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+    "summary": "When a creature or Bright Light source comes within 30 feet, it emits a shriek that can be heard 300 feet away for 1 minute or until it dies."
    }
   ],
   "legendaryActions": [],
@@ -56994,7 +56994,7 @@
   "traits": [
    {
     "name": "Divine Awareness",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Knows when it hears a lie."
    },
    {
     "name": "Exalted Restoration",
@@ -57095,7 +57095,7 @@
     "name": "Divine Aid",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Casts one of a short list of supportive spells, such as Bless or Healing Word, a limited number of times per day."
    }
   ],
   "reactions": [],
@@ -57247,7 +57247,7 @@
    {
     "name": "Eye Rays",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Fires one randomly rolled magical eye ray at a visible target, rerolling any ray already used this turn, with effects such as paralysis, fear, and damage that depend on the ray."
    },
    {
     "name": "Confusion Ray",
@@ -57667,7 +57667,7 @@
    {
     "name": "Arcane Prowl",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports up to 30 feet to an unoccupied space it can see and makes one Claw attack."
    },
    {
     "name": "Weight of Years",
@@ -57693,12 +57693,12 @@
    {
     "name": "Distant Sight",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the sphinx can cast Clairvoyance without spell components, with a range of one mile."
    },
    {
     "name": "Infusion of Knowledge",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "The sphinx and its allies add 1d6 to ability checks made for a Study action within a mile of the lair."
    }
   ],
   "description": "A large celestial of lawful neutral alignment, encountered in Desert and Plannar (Upper Planes). It can fly, fights with Claw and Mind-Rending Roar, can take legendary actions, and can shape the area around its lair. Its challenge rating is 11.",
@@ -58087,7 +58087,7 @@
    {
     "name": "Arcane Prowl",
     "type": "utility",
-    "summary": "Involves teleportation."
+    "summary": "Teleports up to 30 feet to an unoccupied space it can see and makes one Claw attack."
    },
    {
     "name": "Weight of Years",
@@ -58113,12 +58113,12 @@
    {
     "name": "Distant Sight",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "While in its lair, the sphinx can cast Clairvoyance without spell components, with a range of one mile."
    },
    {
     "name": "Infusion of Knowledge",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "The sphinx and its allies add 1d6 to ability checks made for a Study action within a mile of the lair."
    }
   ],
   "description": "A large celestial of lawful neutral alignment, encountered in Desert and Plannar (Upper Planes). It can fly, fights with Claw, Roar, and Second Roar, can take legendary actions, and can shape the area around its lair. Its challenge rating is 17.",
@@ -58238,7 +58238,7 @@
     "name": "Burst of Ingenuity",
     "uses": "2/Day",
     "type": "utility",
-    "summary": "Usable 2 per day."
+    "summary": "Twice per day, when it or a creature within 30 feet makes an ability check or saving throw, it adds 2 to the roll."
    }
   ],
   "legendaryActions": [],
@@ -58789,12 +58789,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 10 Cha save."
+    "summary": "Learns the emotions and alignment of a creature within 5 feet that fails a DC 10 Charisma save, and Celestials, Fiends, and Undead fail automatically."
    },
    {
     "name": "Invisibility",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Invisibility on itself without spell components, using Charisma."
    }
   ],
   "bonusActions": [],
@@ -59182,7 +59182,7 @@
   "traits": [
    {
     "name": "Blurred Form",
-    "summary": "Can impose incapacitated."
+    "summary": "Attack rolls against it have Disadvantage unless it is Incapacitated."
    },
    {
     "name": "Death Burst",
@@ -59650,7 +59650,7 @@
     "name": "Slow",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Slow using Constitution without spell components, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -59935,7 +59935,7 @@
   "traits": [
    {
     "name": "Incubus Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "After a Long Rest, it can change into an Incubus and use that stat block instead."
    }
   ],
   "actions": [
@@ -59969,7 +59969,7 @@
    {
     "name": "Charm",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Dominate Person at level 8 without spell components, using Charisma (DC 15)."
    },
    {
     "name": "Draining Kiss",
@@ -61520,7 +61520,7 @@
    },
    {
     "name": "Reflective Carapace",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Magic Missile and spells that need a ranged attack roll don't affect it, and on a 1d6 roll of 6 the spell is turned back on its caster."
    },
    {
     "name": "Siege Monster",
@@ -61662,7 +61662,7 @@
    {
     "name": "World-Shaking Movement",
     "type": "utility",
-    "summary": "Can impose prone; affects a 60-foot emanation."
+    "summary": "Moves up to its Speed and creates a shock wave in a 60-foot Emanation that breaks Concentration and knocks Medium or smaller creatures Prone, and it can't repeat this until its next turn begins."
    }
   ],
   "legendaryActionUses": {
@@ -62405,7 +62405,7 @@
     "name": "Animate Trees",
     "uses": "1/Day",
     "type": "utility",
-    "summary": "Usable 1 per day."
+    "summary": "Once per day, animates up to two trees within 60 feet as Treants with Intelligence and Charisma of 1 that obey it for up to a day."
    }
   ],
   "bonusActions": [],
@@ -62864,7 +62864,7 @@
    {
     "name": "Loathsome Limbs",
     "uses": "4/Day",
-    "summary": "Usable 4 per day; can impose exhaustion; restores hit points."
+    "summary": "If it ends a turn Bloodied after taking 15 or more Slashing damage that turn, a limb falls off and becomes a Troll Limb, and it gains an Exhaustion level for each missing limb until it regrows them, up to four times per day."
    },
    {
     "name": "Regeneration",
@@ -62902,7 +62902,7 @@
    {
     "name": "Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Moves up to half its Speed in a straight line toward a visible enemy."
    }
   ],
   "reactions": [],
@@ -62985,7 +62985,7 @@
    },
    {
     "name": "Troll Spawn",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "A severed limb has the senses of a whole troll and, if not destroyed within 24 hours, has a 1-in-12 chance of growing into a Troll before withering."
    }
   ],
   "actions": [
@@ -63423,7 +63423,7 @@
     "name": "Fiendish Guile",
     "recharge": "4-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 4-6."
+    "summary": "Casts Dispel Magic, Invisibility (self only), Misty Step, or Suggestion without material components, recharging on a roll of 4-6."
    }
   ],
   "reactions": [],
@@ -63543,7 +63543,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Recharges on a roll of 5-6; Targets make a DC 14 Wis save; affects a 30-foot cone."
+    "summary": "Creatures in a 30-foot Cone make a DC 14 Wisdom save or can't take Reactions and act randomly on their next turn, recharging on a roll of 5-6."
    }
   ],
   "reactions": [],
@@ -63714,7 +63714,7 @@
     "name": "Unicorn’s Blessing",
     "uses": "3/Day",
     "type": "utility",
-    "summary": "Usable 3 per day."
+    "summary": "Three times per day, touches another creature with its horn and casts Cure Wounds or Lesser Restoration on it."
    }
   ],
   "reactions": [],
@@ -63727,7 +63727,7 @@
    {
     "name": "Shimmering Shield",
     "type": "utility",
-    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+    "summary": "Gives itself or a creature within 60 feet 10 (3d6) temporary hit points and +2 AC until the end of its next turn, and can't use this action again until its next turn starts."
    }
   ],
   "legendaryActionUses": {
@@ -63737,12 +63737,12 @@
    {
     "name": "Obscuring Foliage",
     "type": "utility",
-    "summary": "Involves advantage on certain rolls."
+    "summary": "The unicorn and its allies have Advantage on Dexterity (Stealth) checks within a mile of the lair."
    },
    {
     "name": "Positive Energy",
     "type": "utility",
-    "summary": "Restores hit points."
+    "summary": "Spell healing within a mile of the lair restores the maximum possible hit points, and curses are suppressed there."
    }
   ],
   "description": "A large celestial of lawful good alignment, encountered in Forest and Planar (Feywild). It fights with Hooves and Radiant Horn, can take legendary actions, and can shape the area around its lair. Its challenge rating is 5.",
@@ -63830,7 +63830,7 @@
    },
    {
     "name": "Misty Escape",
-    "summary": "Can impose paralyzed; restores hit points."
+    "summary": "If dropped to 0 hit points outside its resting place, it becomes mist and must reach the resting place within 2 hours or be destroyed, after which it is Paralyzed until it regains hit points."
    },
    {
     "name": "Spider Climb",
@@ -63938,7 +63938,7 @@
     "name": "Charm",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6; can impose charmed."
+    "summary": "Casts Charm Person at DC 17 for 24 hours, so the target willingly accepts the vampire's Bite and forgets the charm afterward, recharging on a roll of 5-6."
    },
    {
     "name": "Shape-Shift",
@@ -63951,7 +63951,7 @@
    {
     "name": "Beguile",
     "type": "utility",
-    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Command without spell components using Charisma, and can't use this action again until the start of its next turn."
    },
    {
     "name": "Deathless Strike",
@@ -63967,7 +63967,7 @@
    {
     "name": "Children of the Night",
     "type": "utility",
-    "summary": "Can impose charmed."
+    "summary": "From dusk to dawn, Medium or smaller Beasts within a mile of the lair are Charmed."
    },
    {
     "name": "Looming Shadows",
@@ -63979,12 +63979,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Wis save."
+    "summary": "A creature other than the vampire or its allies that short-rests within a mile of the lair must pass a DC 15 Wisdom save or gain no benefit from the rest."
    },
    {
     "name": "Mists",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "A creeping fog lightly obscures the mile around the lair for everyone except the vampire and creatures it chooses, until the vampire dies or leaves."
    }
   ],
   "description": "A medium or small undead of lawful evil alignment, encountered in Underdark and Urban. It can climb, fights with Grave Strike and Bite, can take legendary actions, and can shape the area around its lair. Its challenge rating is 13.",
@@ -64071,7 +64071,7 @@
   "traits": [
    {
     "name": "Vampiric Connection",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Its vampire master can talk to it telepathically and perceive through its senses while both are on the same plane."
    }
   ],
   "actions": [
@@ -64115,7 +64115,7 @@
    {
     "name": "Deathless Agility",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Takes the Dash or Disengage action."
    }
   ],
   "reactions": [],
@@ -64214,7 +64214,7 @@
       "type": "Radiant"
      }
     ],
-    "summary": "Inflicts radiant damage."
+    "summary": "Takes 10 Radiant damage if it starts its turn in sunlight and has Disadvantage on attack rolls and ability checks while in sunlight."
    }
   ],
   "actions": [
@@ -64276,7 +64276,7 @@
    {
     "name": "Shadow Stealth",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "While in Dim Light or Darkness, it takes the Hide action."
    }
   ],
   "reactions": [],
@@ -64456,7 +64456,7 @@
    {
     "name": "Deathless Agility",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Takes the Dash or Disengage action."
    }
   ],
   "reactions": [],
@@ -64555,7 +64555,7 @@
    },
    {
     "name": "Shadow Escape",
-    "summary": "Can impose paralyzed; restores hit points; involves teleportation."
+    "summary": "If dropped to 0 hit points outside its resting place, it teleports into the resting place unless in running water or sunlight, then is Paralyzed for an hour before regaining 1 hit point."
    },
    {
     "name": "Vampire Weakness",
@@ -64642,7 +64642,7 @@
     "name": "Hunger of Hadar",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Hunger of Hadar at level 5 using Charisma (DC 18) without spell components, recharging on a roll of 5-6."
    }
   ],
   "bonusActions": [
@@ -64671,7 +64671,7 @@
    {
     "name": "Beguile",
     "type": "utility",
-    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+    "summary": "Casts Command without spell components using Charisma, and can't use this action again until the start of its next turn."
    },
    {
     "name": "Umbral Strike",
@@ -64687,7 +64687,7 @@
    {
     "name": "Children of the Night",
     "type": "utility",
-    "summary": "Can impose charmed."
+    "summary": "From dusk to dawn, Medium or smaller Beasts within a mile of the lair are Charmed."
    },
    {
     "name": "Looming Shadows",
@@ -64699,12 +64699,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 15 Wis save."
+    "summary": "A creature other than the vampire or its allies that short-rests within a mile of the lair must pass a DC 15 Wisdom save or gain no benefit from the rest."
    },
    {
     "name": "Mists",
     "type": "utility",
-    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+    "summary": "A creeping fog lightly obscures the mile around the lair for everyone except the vampire and creatures it chooses, until the vampire dies or leaves."
    }
   ],
   "description": "A medium or small undead of lawful evil alignment, encountered in Underdark and Urban. It can climb and fly, fights with Grave Strike and Sickening Ray, can take legendary actions, and can shape the area around its lair. Its challenge rating is 15.",
@@ -64912,7 +64912,7 @@
     "name": "Entangling Plants",
     "recharge": "5-6",
     "type": "utility",
-    "summary": "Recharges on a roll of 5-6."
+    "summary": "Casts Entangle using Constitution (DC 12), recharging on a roll of 5-6."
    }
   ],
   "bonusActions": [],
@@ -65756,7 +65756,7 @@
    {
     "name": "Maneuver",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "One ally that can see or hear the warrior may use a Reaction to move up to half its Speed without provoking Opportunity Attacks."
    },
    {
     "name": "Longbow",
@@ -65780,7 +65780,7 @@
    {
     "name": "Tactical Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Moves up to half its Speed straight toward a visible enemy without provoking Opportunity Attacks."
    }
   ],
   "reactions": [
@@ -66108,11 +66108,11 @@
   "traits": [
    {
     "name": "Freeze",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Cold damage cuts its Speed by 20 feet until the end of its next turn."
    },
    {
     "name": "Water Form",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can enter an enemy's space and stop there, and can squeeze through gaps only an inch wide without paying extra movement."
    }
   ],
   "actions": [
@@ -66266,11 +66266,11 @@
   "traits": [
    {
     "name": "Invisible in Water",
-    "summary": "Can impose invisible."
+    "summary": "It has the Invisible condition while fully immersed in water."
    },
    {
     "name": "Water Bound",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "It dies if it leaves its bound water or that water is destroyed."
    }
   ],
   "actions": [
@@ -67036,7 +67036,7 @@
     "name": "Prowl",
     "cost": "Tiger or Hybrid Form Only",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "In tiger or hybrid form, it moves up to its Speed without provoking Opportunity Attacks and can then take the Hide action."
    },
    {
     "name": "Shape-Shift",
@@ -67622,7 +67622,7 @@
   "traits": [
    {
     "name": "Ephemeral",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "The wisp can't wear or carry anything."
    },
    {
     "name": "Illumination",
@@ -67670,12 +67670,12 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 10 Con save; restores hit points."
+    "summary": "A living visible creature within 5 feet at 0 hit points that fails a DC 10 Constitution save dies, and the wisp regains 10 (3d6) hit points."
    },
    {
     "name": "Vanish",
     "type": "utility",
-    "summary": "Can impose invisible."
+    "summary": "Becomes Invisible or ends that invisibility."
    }
   ],
   "reactions": [],
@@ -68256,7 +68256,7 @@
    {
     "name": "Create Specter",
     "type": "utility",
-    "summary": "Special action; see the Monster Manual entry for its exact effect."
+    "summary": "Targets a Humanoid corpse within 10 feet that died within the last minute, raising it as a Specter under the wraith's control, to a maximum of seven."
    }
   ],
   "bonusActions": [],
@@ -68482,7 +68482,7 @@
    },
    {
     "name": "Treasure Sense",
-    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+    "summary": "Can pinpoint precious metals and stones within 60 feet."
    }
   ],
   "actions": [
@@ -68534,7 +68534,7 @@
    {
     "name": "Charge",
     "type": "utility",
-    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+    "summary": "Moves up to its Speed or Burrow Speed in a straight line toward an enemy it can sense."
    }
   ],
   "reactions": [],
@@ -69618,7 +69618,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 14 Con save; affects a 30-foot cone."
+    "summary": "Creatures in a cone make a Constitution save or lose Reactions, have half Speed, and can take only an action or a Bonus Action (not both) until the end of their next turn."
    }
   ],
   "bonusActions": [],
@@ -69772,7 +69772,7 @@
      }
     ],
     "halfOnSuccess": false,
-    "summary": "Targets make a DC 17 Str save; affects a 30-foot cone."
+    "summary": "Creatures in a cone that aren't already affected make a Strength save or have Disadvantage on Strength-based D20 Tests and reduced damage rolls until they pass a repeat save."
    }
   ],
   "bonusActions": [],
@@ -70608,7 +70608,7 @@
       "type": "Bludgeoning"
      }
     ],
-    "summary": "Inflicts bludgeoning damage; can impose grappled, restrained."
+    "summary": "A Large or smaller creature within 5 feet makes a DC 15 Strength save or takes 28 (7d6 + 4) Bludgeoning damage and is Grappled and Restrained, taking half damage on a success."
    },
    {
     "name": "Poison Spray",
