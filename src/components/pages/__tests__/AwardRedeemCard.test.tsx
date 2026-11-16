@@ -128,7 +128,7 @@ describe('AwardRedeemCard', () => {
     const onChange = vi.fn();
     render(<Harness initial={{ ...sheet(5, 'xp', 0), classes: [] }} onChange={onChange} />);
     await paste(await code({ kind: 'level', amount: 8 }));
-    expect(await screen.findByText(/has no class/)).toBeInTheDocument();
+    expect(await screen.findByText(/has no supported class/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
     expect(onChange).not.toHaveBeenCalled();
   });

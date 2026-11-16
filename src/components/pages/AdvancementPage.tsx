@@ -833,8 +833,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
               <p className={styles.placeholder}>No advancement entries yet.</p>
             ) : (
               <ul className={styles.logList} aria-label="Advancement log entries">
-                {[...log].reverse().map((entry) => (
-                  <li key={entry.timestamp} className={styles.logItem}>
+                {[...log].reverse().map((entry, index) => (
+                  // A multi-level award writes several entries with one timestamp, so the position disambiguates.
+                  <li key={`${entry.timestamp}-${index}`} className={styles.logItem}>
                     <span className={styles.logKind}>{entry.kind}</span>
                     <span className={styles.logDetail}>{entry.detail}</span>
                   </li>

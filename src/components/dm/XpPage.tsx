@@ -58,7 +58,7 @@ interface Amount {
 }
 
 const BLOCKED_TEXT: Record<BlockedOutcome, string> = {
-  'class-required': 'Blocked: this sheet has no class.',
+  'class-required': 'Blocked: this sheet has no supported class.',
   'hp-unsupported': 'Blocked: this sheet has a manual HP maximum or rolled-HP total.',
   'milestone-blocked': 'Blocked: this sheet levels by milestone. The player must switch to XP leveling first.',
   'multiclass-unsupported': 'Blocked: more than one class.',

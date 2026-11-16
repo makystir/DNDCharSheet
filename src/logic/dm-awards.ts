@@ -160,6 +160,10 @@ export async function encodeAward(
   }
 }
 
+function hasPrefix(s: string): boolean {
+  return s.slice(0, AWARD_PREFIX.length).toUpperCase() === AWARD_PREFIX;
+}
+
 export async function decodeAward(
   text: string,
 ): Promise<{ ok: true; award: AwardPayload } | { ok: false; error: string; code: AwardErrorCode }> {
@@ -167,10 +171,10 @@ export async function decodeAward(
   try {
     const trimmed = text.trim();
     if (trimmed === '') return fail('Paste an award code.', 'empty');
-    if (trimmed.startsWith(AWARD_PREFIX) && !isGzipSupported()) {
+    if (hasPrefix(trimmed) && !isGzipSupported()) {
       return fail('This browser cannot read award codes (compression is unavailable).', 'bad-code');
     }
-    if (!trimmed.startsWith(AWARD_PREFIX)) {
+    if (!hasPrefix(trimmed)) {
       if (trimmed.includes('#view/') || trimmed.startsWith('{')) {
         return fail(
           'That looks like a character share link or file, not an award code. Award codes start with AWARD-.',
@@ -179,7 +183,7 @@ export async function decodeAward(
       }
       return fail('This is not an award code. Award codes start with AWARD-.', 'not-award');
     }
-    if (trimmed.length > MAX_CODE_CHARS) return fail('This award code is too long.', 'too-large');
+    if (trimmed.replace(/\s+/g, '').length > MAX_CODE_CHARS) return fail('This award code is too long.', 'too-large');
     const decoded = await decodeSharePayload(trimmed.slice(AWARD_PREFIX.length).replace(/\s+/g, ''));
     if (!decoded.ok) {
       if (decoded.code === 'bad-version') return fail('This award code is for a different version of the app.', 'bad-version');
@@ -413,7 +417,10 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
   };
   const character = member.source === 'imported' ? member.character : undefined;
   const storedXp: unknown = character?.advancement?.leveling?.xp;
-  const hasXp = character !== undefined && typeof storedXp === 'number' && Number.isFinite(storedXp);
+  const storedOk = character !== undefined && typeof storedXp === 'number' && Number.isFinite(storedXp);
+  // A level-1 sheet in XP mode with no stored XP starts from 0 (awardXp treats it so, and awardBlocker lets it apply).
+  const impliedZero = !storedOk && character !== undefined && clampLevel(character.level) === 1 && levelingMode(character) === 'xp';
+  const hasXp = storedOk || impliedZero;
   const blocked = character ? awardBlocker(character, award) : null;
   if (!character || !hasXp) {
     // No XP to read (manual member, or a sheet that stores none): current and new XP are unknown,
@@ -444,7 +451,7 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
   }
   const currentLevel = clampLevel(character.level);
   // A blocked sheet keeps its values: they show what the award would do, and the blocker says why it will not.
-  const xp = storedXp as number;
+  const xp = storedOk ? (storedXp as number) : 0;
   const added = award.kind === 'xp' ? award.amount : 0;
   const newXp = xp + added;
   const reach = award.kind === 'xp' ? Math.max(currentLevel, xpToLevel(newXp)) : Math.max(currentLevel, award.amount);
@@ -454,7 +461,7 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
     blocked,
     currentLevel,
     xpTracked: true,
-    currentXp: { total: xp, components: [{ label: 'Recorded XP', value: xp }] },
+    currentXp: { total: xp, components: [{ label: storedOk ? 'Recorded XP' : 'No XP recorded yet (counted as 0)', value: xp }] },
     addedXp: { total: added, components: [{ label: 'Award', value: added }] },
     newXp: {
       total: newXp,

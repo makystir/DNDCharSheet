@@ -333,6 +333,28 @@ describe('previewAward', () => {
     expect(previewAward(member(withMode(sheet(5), 'milestone')), levelAwardOf(8)).blocked).toBeNull();
     expect(previewAward(member(withMode(twoClasses(sheet(5), 5), 'xp', 0)), xpAwardOf(100)).blocked).toBeNull();
   });
+  it('previews a level-1 XP-mode sheet with no stored XP from a labelled baseline of 0', () => {
+    const c = withMode(sheet(1), 'xp');
+    delete c.advancement?.leveling?.xp;
+    const p = previewAward(member(c), xpAwardOf(100));
+    expect(p.blocked).toBeNull();
+    expect(p.xpTracked).toBe(true);
+    expect(p.currentXp?.total).toBe(0);
+    expect(p.currentXp?.components[0].label).toContain('counted as 0');
+    expect(p.newXp?.total).toBe(100);
+    expect(p.reachableLevel?.total).toBe(1);
+    expect(applyAward(c, xpAwardOf(100), NOW).outcome).toBe('applied');
+  });
+
+  it('reads the AWARD- prefix case-insensitively and measures length after whitespace is removed', async () => {
+    const enc = await encodeAward(xpAwardOf(100));
+    if (!enc.ok) throw new Error('encode failed');
+    expect((await decodeAward('award-' + enc.code.slice(6))).ok).toBe(true);
+    const wrapped = enc.code.replace(/(.{20})/g, '$1\n');
+    const r = await decodeAward(wrapped);
+    expect(r.ok).toBe(true);
+  });
+
   it('does not invent XP for a sheet that stores none', () => {
     const c = sheet(5);
     delete c.advancement;
