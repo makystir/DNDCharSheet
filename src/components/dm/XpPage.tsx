@@ -345,15 +345,6 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                     <tr key={r.memberId}>
                       <td>{r.name}</td>
                       <td>{r.currentLevel}</td>
-                      {r.blocked === 'milestone-blocked' || r.blocked === 'multiclass-unsupported' ? (
-                        <>
-                          <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</td>
-                        </>
-                      ) : (
                         <>
                           <td>
                             {r.currentXp ? (
@@ -389,9 +380,8 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                               <span className={xp.blocked}>Needs current XP</span>
                             )}
                           </td>
-                          <td>{r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
+                          <td>{r.blocked === 'milestone-blocked' || r.blocked === 'multiclass-unsupported' ? <span className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</span> : r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
                         </>
-                      )}
                     </tr>
                   ))}
                 </tbody>

@@ -6,6 +6,7 @@ import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { characterXp, levelingMode, xpForLevel } from '../../../logic/advancement';
 import { clampLevel } from '../../../logic/abilities';
+import { lifeStatus } from '../../../logic/hit-points-state';
 import { appliedAwardIds, awardBlocker, MAX_AWARD_XP, previewAward, type AwardPayload } from '../../../logic/dm-awards';
 import { OUTCOME_TEXT, useAwardRedeem } from '../useAwardRedeem';
 import styles from '../AdvancementPage.module.css';
@@ -36,13 +37,30 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
       );
     }
   } else {
+    if (level >= award.amount) return notes;
     notes.push('Applying this sets your level directly.');
     if (levelingMode(character) === 'xp') {
       notes.push('Your XP is unchanged; later level-ups still need the XP threshold.');
+      if (characterXp(character) < xpForLevel(award.amount)) {
+        notes.push(
+          `Your recorded XP (${n(characterXp(character))}) is below the level ${award.amount} threshold (${n(xpForLevel(award.amount))}).`,
+        );
+      }
     }
-    notes.push('New levels use the fixed HP value, and your current HP rises with your maximum. Only your current level\'s HP can be re-recorded on this page.');
+    if (lifeStatus(character) === 'dead') {
+      notes.push('Your character is dead: the level changes, but they stay dead at 0 HP.');
+    } else {
+      notes.push("New levels use the fixed HP value, and your current HP rises with your maximum. Only your current level's HP can be re-recorded on this page.");
+    }
   }
   return notes;
+}
+
+/** The player's own sheet reads absent XP as 0 (characterXp), so the preview shows it. */
+function withOwnXp(c: Character): Character {
+  const l = c.advancement?.leveling;
+  if (l && typeof l.xp === 'number' && Number.isFinite(l.xp)) return c;
+  return { ...c, advancement: { ...c.advancement, leveling: { mode: l?.mode ?? 'milestone', xp: 0 } } };
 }
 
 /** Paste a DM's award code, preview it, and apply it (Stage 8). */
@@ -52,7 +70,7 @@ export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRe
 
   let body = null;
   if (award) {
-    const me: DmPartyMember = { id: 'me', name: character.name || 'You', source: 'imported', character, addedAt: 0, updatedAt: 0 };
+    const me: DmPartyMember = { id: 'me', name: character.name || 'You', source: 'imported', character: withOwnXp(character), addedAt: 0, updatedAt: 0 };
     const preview = previewAward(me, award);
     const already = appliedAwardIds(character).includes(award.id);
     const blocker = already ? null : awardBlocker(character, award);

@@ -26,7 +26,7 @@ import type { Breakdown } from './breakdown';
 import type { EncounterDifficulty } from '../data/xp-tables';
 import { clampLevel } from './abilities';
 import { applyHealingToCharacter, hitPointMaxOf } from './hit-points-state';
-import { appendLogEntry, awardXp, characterXp, levelingMode, setLevel, xpForLevel, xpToLevel } from './advancement';
+import { appendLogEntry, awardXp, levelingMode, setLevel, xpForLevel, xpToLevel } from './advancement';
 import { xpAward, xpBudget, type BudgetMember, type XpAward } from './dm-balance';
 import { isGzipSupported } from './gzip';
 import { decodeSharePayload, encodeSharePayload } from './share-codec';
@@ -370,13 +370,18 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
     unchanged: false,
   };
   const character = member.source === 'imported' ? member.character : undefined;
-  if (!character) {
-    // Manual member: current and new XP are unknown, but the delta and a direct level result are known.
-    const level = clampLevel(member.manual?.level ?? 1);
+  const storedXp: unknown = character?.advancement?.leveling?.xp;
+  const hasXp = character !== undefined && typeof storedXp === 'number' && Number.isFinite(storedXp);
+  const blocked = character ? awardBlocker(character, award) : null;
+  if (!character || !hasXp) {
+    // No XP to read (manual member, or a sheet that stores none): current and new XP are unknown,
+    // but the intended delta and a direct level result are known.
+    const level = clampLevel(character ? character.level : (member.manual?.level ?? 1));
     const added = award.kind === 'xp' ? award.amount : 0;
     const reach = award.kind === 'level' ? Math.max(level, award.amount) : level;
     return {
       ...base,
+      blocked,
       currentLevel: level,
       xpTracked: false,
       addedXp: { total: added, components: [{ label: 'Award', value: added }] },
@@ -396,16 +401,15 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
     };
   }
   const currentLevel = clampLevel(character.level);
-  const blocked = awardBlocker(character, award);
-  if (blocked !== null) return { ...base, currentLevel, xpTracked: true, blocked };
-
-  const xp = characterXp(character);
+  // A blocked sheet keeps its values: they show what the award would do, and the blocker says why it will not.
+  const xp = storedXp as number;
   const added = award.kind === 'xp' ? award.amount : 0;
   const newXp = xp + added;
   const reach = award.kind === 'xp' ? Math.max(currentLevel, xpToLevel(newXp)) : Math.max(currentLevel, award.amount);
   const gained = reach - currentLevel;
   return {
     ...base,
+    blocked,
     currentLevel,
     xpTracked: true,
     currentXp: { total: xp, components: [{ label: 'Recorded XP', value: xp }] },

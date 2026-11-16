@@ -320,17 +320,30 @@ describe('previewAward', () => {
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toMatch(/cannot read award codes/);
   });
-  it('marks blocked rows and leaves their cells empty', () => {
-    const milestone = previewAward(member(withMode(sheet(5), 'milestone')), xpAwardOf(100));
+  it('marks blocked rows but keeps their values and intended delta', () => {
+    const milestone = previewAward(member(withMode(sheet(5), 'milestone', 500)), xpAwardOf(100));
     expect(milestone.blocked).toBe('milestone-blocked');
-    expect(milestone.newXp).toBeNull();
-    expect(milestone.reachableLevel).toBeNull();
+    expect(milestone.currentXp?.total).toBe(500);
+    expect(milestone.addedXp?.total).toBe(100);
+    expect(milestone.newXp?.total).toBe(600);
     const multi = previewAward(member(twoClasses(sheet(5), 5)), levelAwardOf(8));
     expect(multi.blocked).toBe('multiclass-unsupported');
+    expect(multi.reachableLevel?.total).toBe(8);
     expect(previewAward(member(withMode(sheet(5), 'milestone')), levelAwardOf(8)).blocked).toBeNull();
     expect(previewAward(member(withMode(twoClasses(sheet(5), 5), 'xp', 0)), xpAwardOf(100)).blocked).toBeNull();
   });
-});
+  it('does not invent XP for a sheet that stores none', () => {
+    const c = sheet(5);
+    delete c.advancement;
+    const p = previewAward(member(c), levelAwardOf(8));
+    expect(p.xpTracked).toBe(false);
+    expect(p.currentXp).toBeNull();
+    expect(p.newXp).toBeNull();
+    expect(p.reachableLevel?.total).toBe(8);
+    const x = previewAward(member(c), xpAwardOf(100));
+    expect(x.blocked).toBe('milestone-blocked');
+    expect(x.addedXp?.total).toBe(100);
+  });});
 
 describe('applyAward', () => {
   it('adds XP and writes a log entry', () => {

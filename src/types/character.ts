@@ -841,8 +841,8 @@ export interface AdvancementState {
   /** Minimal append-only audit trail, oldest-first (UI reverses). */
   log?: AdvancementLogEntry[];
   /**
-   * IDs of DM award codes already applied (Stage 8), oldest first, capped at
-   * 500. Lets the app refuse a repeat paste. Additive-optional; no version bump.
+   * IDs of DM award codes already applied (Stage 8), oldest first, never
+   * trimmed (dropping an old ID would let that award apply twice). Lets the app refuse a repeat paste. Additive-optional; no version bump.
    */
   appliedAwards?: string[];
 }
