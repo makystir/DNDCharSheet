@@ -28,6 +28,8 @@ export const OUTCOME_TEXT: Record<ApplyOutcome, string> = {
   'multiclass-unsupported': 'This sheet has more than one class. Use the Advancement page to level each class.',
   'milestone-blocked':
     'This sheet levels by milestone. Switch to XP leveling and enter your current XP on the Advancement page first, then apply this code.',
+  'xp-baseline-missing':
+    'This sheet uses XP leveling but has no XP recorded. Enter your current XP on the Advancement page first, then apply this code.',
 };
 
 export function useAwardRedeem(

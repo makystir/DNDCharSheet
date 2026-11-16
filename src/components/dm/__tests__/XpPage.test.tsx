@@ -59,12 +59,21 @@ describe('Party XP page', () => {
     expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent('100');
   });
 
-  it('marks milestone sheets as blocked and adds nothing to the total', () => {
+  it('marks milestone sheets as blocked and counts 0 XP for them in the party total', () => {
     seed([{ id: 'Bea', character: sheet(5, 'milestone', 0) }]);
     render(<Page />);
     typeAmount('100');
     expect(screen.getByText(/this sheet levels by milestone/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent('0');
+    expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent(/^0$/);
+  });
+
+  it('marks an XP-mode sheet with no recorded XP as blocked', () => {
+    const c = sheet(5, 'xp', 0);
+    seed([{ id: 'Cy', character: { ...c, advancement: { ...c.advancement, leveling: { mode: 'xp' } } } }]);
+    render(<Page />);
+    typeAmount('100');
+    expect(screen.getByText(/uses XP leveling but has no XP recorded/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent(/^0$/);
   });
 
   it('shows the known XP for a manual member and counts it in the party total', () => {

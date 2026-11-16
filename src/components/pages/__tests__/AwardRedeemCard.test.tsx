@@ -156,4 +156,46 @@ describe('AwardRedeemCard', () => {
     expect(await screen.findByText(/Your recorded XP \(0\) is below the level 5 threshold/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled();
   });
+
+  it('shows "XP not tracked" for a level award on a sheet with no XP', async () => {
+    render(<Harness initial={sheet(3, undefined)} onChange={() => {}} />);
+    await paste(await code({ kind: 'level', amount: 5 }));
+    const preview = await screen.findByTestId('award-preview');
+    expect(within(preview).getByText(/XP not tracked on this sheet/)).toBeInTheDocument();
+    expect(within(preview).queryByText(/current XP 0/)).not.toBeInTheDocument();
+    expect(within(preview).getByRole('button', { name: /^Level you can reach/ })).toHaveTextContent('5');
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled();
+  });
+
+  it('keeps the numbers visible when an XP award is blocked on a milestone sheet', async () => {
+    render(<Harness initial={sheet(5, 'milestone', 300)} onChange={() => {}} />);
+    await paste(await code({ amount: 100 }));
+    const preview = await screen.findByTestId('award-preview');
+    expect(within(preview).getByRole('alert')).toHaveTextContent(/levels by milestone/);
+    expect(within(preview).getByRole('button', { name: /^New XP/ })).toHaveTextContent('400');
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+  });
+
+  it('keeps the numbers visible when a level award is blocked on a multiclass sheet', async () => {
+    const base = sheet(5, 'xp', 6500);
+    const classes = base.classes ? [{ ...base.classes[0], level: 3 }, { ...base.classes[0], level: 2 }] : undefined;
+    render(<Harness initial={{ ...base, classes }} onChange={() => {}} />);
+    await paste(await code({ kind: 'level', amount: 7 }));
+    const preview = await screen.findByTestId('award-preview');
+    expect(within(preview).getByRole('alert')).toHaveTextContent(/more than one class/);
+    expect(within(preview).getByRole('button', { name: /^Level you can reach/ })).toHaveTextContent('7');
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+  });
+
+  it('blocks an XP award on an XP-mode sheet above level 1 with no recorded XP', async () => {
+    const onChange = vi.fn();
+    const base = sheet(5, 'xp', 0);
+    const c: Character = { ...base, advancement: { ...base.advancement, leveling: { mode: 'xp' } } };
+    render(<Harness initial={c} onChange={onChange} />);
+    await paste(await code({ amount: 450 }));
+    const preview = await screen.findByTestId('award-preview');
+    expect(within(preview).getByRole('alert')).toHaveTextContent(/no XP recorded/);
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

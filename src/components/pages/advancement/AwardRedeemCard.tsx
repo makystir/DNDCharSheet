@@ -56,13 +56,6 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
   return notes;
 }
 
-/** The player's own sheet reads absent XP as 0 (characterXp), so the preview shows it. */
-function withOwnXp(c: Character): Character {
-  const l = c.advancement?.leveling;
-  if (l && typeof l.xp === 'number' && Number.isFinite(l.xp)) return c;
-  return { ...c, advancement: { ...c.advancement, leveling: { mode: l?.mode ?? 'milestone', xp: 0 } } };
-}
-
 /** Paste a DM's award code, preview it, and apply it (Stage 8). */
 export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRedeemCardProps) {
   const redeem = useAwardRedeem(character, onChange, now);
@@ -70,11 +63,11 @@ export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRe
 
   let body = null;
   if (award) {
-    const me: DmPartyMember = { id: 'me', name: character.name || 'You', source: 'imported', character: withOwnXp(character), addedAt: 0, updatedAt: 0 };
+    const me: DmPartyMember = { id: 'me', name: character.name || 'You', source: 'imported', character, addedAt: 0, updatedAt: 0 };
     const preview = previewAward(me, award);
     const already = appliedAwardIds(character).includes(award.id);
     const blocker = already ? null : awardBlocker(character, award);
-    const blocked = blocker === 'milestone-blocked' || blocker === 'multiclass-unsupported' ? blocker : null;
+    const blocked = blocker === 'milestone-blocked' || blocker === 'multiclass-unsupported' || blocker === 'xp-baseline-missing' ? blocker : null;
     const disabled = already || blocked !== null;
     body = (
       <div className={styles.placeholder} data-testid="award-preview">
@@ -88,28 +81,35 @@ export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRe
             {OUTCOME_TEXT[blocked]}
           </p>
         )}
-        {!already && !blocked && preview.newXp && preview.reachableLevel && (
+        {!already && (
           <>
-            <ul>
-              {previewNotes(character, award, preview.newXp.total).map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
+            {!blocked && (
+              <ul>
+                {previewNotes(character, award, preview.newXp?.total ?? 0).map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            )}
             <p style={{ margin: 0 }}>
-              Current level {preview.currentLevel}, current XP {n(characterXp(character))}.
+              Current level {preview.currentLevel},{' '}
+              {preview.xpTracked ? <>current XP {n(preview.currentXp?.total ?? 0)}.</> : 'XP not tracked on this sheet.'}
             </p>
-            <p style={{ margin: 0 }}>
-              New XP:{' '}
-              <CalculatedValue label="New XP" breakdown={preview.newXp}>
-                {n(preview.newXp.total)}
-              </CalculatedValue>
-            </p>
-            <p style={{ margin: 0 }}>
-              Level you can reach:{' '}
-              <CalculatedValue label="Level you can reach" breakdown={preview.reachableLevel}>
-                {preview.reachableLevel.total}
-              </CalculatedValue>
-            </p>
+            {preview.newXp && (
+              <p style={{ margin: 0 }}>
+                New XP:{' '}
+                <CalculatedValue label="New XP" breakdown={preview.newXp}>
+                  {n(preview.newXp.total)}
+                </CalculatedValue>
+              </p>
+            )}
+            {preview.reachableLevel && (
+              <p style={{ margin: 0 }}>
+                Level you can reach:{' '}
+                <CalculatedValue label="Level you can reach" breakdown={preview.reachableLevel}>
+                  {preview.reachableLevel.total}
+                </CalculatedValue>
+              </p>
+            )}
             {preview.unchanged && <p>Your level is already at or above this level, so nothing will change.</p>}
           </>
         )}

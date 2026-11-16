@@ -55,9 +55,10 @@ interface Amount {
   error: string | null;
 }
 
-const BLOCKED_TEXT: Record<'milestone-blocked' | 'multiclass-unsupported', string> = {
+const BLOCKED_TEXT: Record<'milestone-blocked' | 'multiclass-unsupported' | 'xp-baseline-missing', string> = {
   'milestone-blocked': 'Blocked: this sheet levels by milestone. The player must switch to XP leveling first.',
   'multiclass-unsupported': 'Blocked: more than one class.',
+  'xp-baseline-missing': 'Blocked: this sheet uses XP leveling but has no XP recorded. The player must enter their current XP first.',
 };
 
 /** Build one award (DMG 2024 "Awarding XP", "Noncombat Challenges", "Milestones") and copy its code. */
@@ -137,8 +138,8 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const previewAwardPayload: AwardPayload = { kind: amount.kind, amount: Math.max(1, amount.amount), id: PREVIEW_ID, label: cleanedLabel };
   const rows: AwardPreview[] = problem ? [] : party.map((m) => previewAward(m, previewAwardPayload));
   const totalAdded: Breakdown = {
-    total: rows.reduce((s, r) => s + (r.addedXp?.total ?? 0), 0),
-    components: rows.map((r) => ({ label: r.name, value: r.addedXp?.total ?? 0 })),
+    total: rows.reduce((s, r) => s + (r.blocked ? 0 : (r.addedXp?.total ?? 0)), 0),
+    components: rows.map((r) => ({ label: r.blocked ? `${r.name} (blocked)` : r.name, value: r.blocked ? 0 : (r.addedXp?.total ?? 0) })),
   };
 
   const draftKey = JSON.stringify([amount.kind, amount.amount, amount.source, cleanedLabel]);
@@ -210,6 +211,12 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
           </div>
         </div>
       </div>
+
+      {dm.saveFailed && (
+        <p className={styles.error} role="alert">
+          This browser would not save your latest changes (storage may be full or blocked). Export your data now.
+        </p>
+      )}
 
       <Card>
         <SectionHeader icon={Trophy} title="Build an award" />
@@ -380,7 +387,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                               <span className={xp.blocked}>Needs current XP</span>
                             )}
                           </td>
-                          <td>{r.blocked === 'milestone-blocked' || r.blocked === 'multiclass-unsupported' ? <span className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</span> : r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
+                          <td>{r.blocked === 'milestone-blocked' || r.blocked === 'multiclass-unsupported' || r.blocked === 'xp-baseline-missing' ? <span className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</span> : r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
                         </>
                     </tr>
                   ))}

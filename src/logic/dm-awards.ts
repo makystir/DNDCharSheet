@@ -74,7 +74,8 @@ export type ApplyOutcome =
   | 'already-applied'
   | 'no-change'
   | 'multiclass-unsupported'
-  | 'milestone-blocked';
+  | 'milestone-blocked'
+  | 'xp-baseline-missing';
 
 // ---------------------------------------------------------------------- ids
 
@@ -283,6 +284,12 @@ export function awardBlocker(character: Character, award: AwardPayload): ApplyOu
   if (award.kind === 'level' && (character.classes?.length ?? 0) > 1) return 'multiclass-unsupported';
   if (award.kind === 'xp' && levelingMode(character) !== 'xp' && clampLevel(character.level) > 1) {
     return 'milestone-blocked';
+  }
+  // An XP-mode sheet above level 1 with no stored XP has no baseline: adding the award to an implied 0
+  // would leave the total below the next threshold, so the player must enter their XP first.
+  if (award.kind === 'xp' && levelingMode(character) === 'xp' && clampLevel(character.level) > 1) {
+    const stored: unknown = character.advancement?.leveling?.xp;
+    if (typeof stored !== 'number' || !Number.isFinite(stored)) return 'xp-baseline-missing';
   }
   return null;
 }
