@@ -200,6 +200,9 @@ describe('dm-import', () => {
     const r = await importCharacterFromText('AWARD-abc');
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toContain('award code');
+    const lower = await importCharacterFromText('award-abc');
+    expect(lower.ok).toBe(false);
+    if (!lower.ok) expect(lower.error).toContain('award code');
   });
 });
 

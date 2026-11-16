@@ -178,6 +178,21 @@ describe('Party XP page', () => {
       expect(screen.getByRole('button', { name: 'Create code' })).toBeDisabled();
     }
   });
+  it('rejects a sharer count below the number of party members shown', () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }, { id: 'Bo', character: sheet(3, 'xp', 0) }]);
+    render(<Page />);
+    fireEvent.change(screen.getByLabelText('Characters sharing the XP'), { target: { value: '1' } });
+    expect(screen.getByRole('alert')).toHaveTextContent(/cannot be fewer than the 2 party members/);
+    expect(screen.getByRole('button', { name: 'Create code' })).toBeDisabled();
+  });
+
+  it('hides the party XP total on a level award', () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    render(<Page />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Level' }));
+    expect(screen.queryByRole('button', { name: /Party total XP/ })).not.toBeInTheDocument();
+  });
+
   it('lets the DM create a second award with identical values, with its own ID', async () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
     let i = 0;

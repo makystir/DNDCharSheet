@@ -4,6 +4,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { AdvancementPage } from '../AdvancementPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
+import { encodeAward } from '../../../logic/dm-awards';
 
 /**
  * Component tests for the Advancement tab (Stage A6a). They assert the UI wires
@@ -536,5 +537,24 @@ describe('AdvancementPage — every pending item says where to act', () => {
     const hp = screen.getByTestId('pending-hp-2');
     expect(within(hp).getByRole('link', { name: 'Go to Hit Points' })).toBeInTheDocument();
     expect(document.getElementById('adv-section-hp')).not.toBeNull();
+  });
+});
+
+
+describe('AdvancementPage - multi-level award log', () => {
+  it('renders every log row of a multi-level award without duplicate-key errors', async () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { get } = renderStateful({ level: 1, classes: [{ id: 'fighter', level: 1 }], advancement: { leveling: { mode: 'xp', xp: 0 } } } as Partial<Character>);
+    const enc = await encodeAward({ kind: 'level', amount: 4, id: 'abcdef123456', label: '' });
+    if (!enc.ok) throw new Error(enc.error);
+    fireEvent.change(screen.getByLabelText('Paste an award code'), { target: { value: enc.code } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }));
+    expect(get().level).toBe(4);
+    fireEvent.click(screen.getByRole('button', { name: 'Show entries' }));
+    const rows = within(screen.getByLabelText('Advancement log entries')).getAllByRole('listitem');
+    expect(rows.length).toBeGreaterThanOrEqual(3);
+    expect(errors.mock.calls.some((c) => String(c[0]).includes('same key'))).toBe(false);
+    errors.mockRestore();
   });
 });

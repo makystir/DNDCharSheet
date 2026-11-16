@@ -6,6 +6,7 @@
  * character importer), so a bad paste yields a message, never a crash.
  */
 import type { Character } from '../types/character';
+import { hasPrefix as hasAwardPrefix } from './dm-awards';
 import { decodeSharePayload } from './share-codec';
 import { validateSharedPayload } from './share-validate';
 import { VIEW_ROUTE_PREFIX } from './view-route';
@@ -27,7 +28,7 @@ export async function importCharacterFromText(input: string): Promise<ImportResu
   const text = input.trim();
   if (text === '') return { ok: false, error: 'Paste a share link, a share code, or an exported character file.' };
 
-  if (text.startsWith('AWARD-')) return { ok: false, error: "That is an award code. Paste it on a player's Advancement page." };
+  if (hasAwardPrefix(text)) return { ok: false, error: "That is an award code. Paste it on a player's Advancement page." };
   if (text.startsWith('{')) {
     const validated = validateSharedPayload(text);
     return validated.ok ? validated : { ok: false, error: validated.error };

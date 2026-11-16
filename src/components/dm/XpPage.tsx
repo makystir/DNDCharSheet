@@ -100,6 +100,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const amount: Amount = (() => {
     if (tab === 'fight') {
       if (!sharersValid) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: 'Characters sharing the XP must be a whole number of 1 or more, or blank for the whole party.' };
+      if (sharerCount < party.length) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: `Characters sharing the XP cannot be fewer than the ${party.length} party members shown. Leave it blank for the whole party, or enter a number of ${party.length} or more.` };
       if (!encounter) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: 'Save an encounter on the Encounter page first.' };
       const counted = encounter.combatants.filter((c) => c.kind === 'monster' && countsForXp(c));
       const s = fightShare(counted, sharerCount);
@@ -395,6 +396,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                     </tr>
                   ))}
                 </tbody>
+                {amount.kind === 'xp' && (
                 <tfoot>
                   <tr>
                     <td colSpan={3}>Party total</td>
@@ -406,6 +408,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                     <td colSpan={3} />
                   </tr>
                 </tfoot>
+                )}
               </table>
             </div>
           )}

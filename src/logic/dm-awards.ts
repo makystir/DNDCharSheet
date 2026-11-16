@@ -160,7 +160,7 @@ export async function encodeAward(
   }
 }
 
-function hasPrefix(s: string): boolean {
+export function hasPrefix(s: string): boolean {
   return s.slice(0, AWARD_PREFIX.length).toUpperCase() === AWARD_PREFIX;
 }
 
