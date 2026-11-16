@@ -7532,5 +7532,2741 @@
   "lairActions": [],
   "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Radiant Burst and Holy Word. Its challenge rating is 12.",
   "page": 248
+ },
+ {
+  "name": "Assassin",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Implements",
+   "Individual"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 10,
+   "score": 20
+  },
+  "hp": {
+   "avg": 97,
+   "dice": "15d8 + 30"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Acrobatics": 12,
+   "Perception": 16,
+   "Stealth": 20
+  },
+  "resistances": [
+   "Poison"
+  ],
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common",
+   "Thieves' Cant"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 8,
+  "traits": [
+   {
+    "name": "Evasion",
+    "summary": "Takes no damage on a successful Dexterity save against effects that normally halve damage, and only half on a failure."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Shortsword",
+     "Light Crossbow"
+    ],
+    "summary": "Strings together 3 strikes using Shortsword, Light Crossbow."
+   },
+   {
+    "name": "Shortsword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d6 + 4"
+     },
+     {
+      "avg": 17,
+      "type": "Poison",
+      "dice": "5d6"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus poison damage; can impose poisoned."
+   },
+   {
+    "name": "Light Crossbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 7,
+     "range": "80/320"
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "1d8 + 4"
+     },
+     {
+      "avg": 21,
+      "type": "Poison",
+      "dice": "6d6"
+     }
+    ],
+    "summary": "Ranged attack at +7 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Cunning Action",
+    "type": "utility",
+    "summary": "Dashes, disengages, or hides as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Shortsword and Light Crossbow. Its challenge rating is 8.",
+  "page": 22
+ },
+ {
+  "name": "Awakened Shrub",
+  "size": "Small",
+  "type": "Plant",
+  "alignment": "Neutral",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 9,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 10,
+   "dice": "3d6"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "resistances": [
+   "Piercing"
+  ],
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Rake",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 1,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Slashing"
+     }
+    ],
+    "summary": "Melee attack at +1 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small plant of neutral alignment, encountered in Forest. It fights with Rake. Its challenge rating is 0.",
+  "page": 23
+ },
+ {
+  "name": "Awakened Tree",
+  "size": "Huge",
+  "type": "Plant",
+  "alignment": "Neutral",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": -2,
+   "score": 8
+  },
+  "hp": {
+   "avg": 59,
+   "dice": "7d12 + 14"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "resistances": [
+   "Bludgeoning",
+   "Piercing"
+  ],
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge plant of neutral alignment, encountered in Forest. It fights with Slam. Its challenge rating is 2.",
+  "page": 23
+ },
+ {
+  "name": "Axe Beak",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Arctic",
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d10 + 3"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Beak",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Arctic, Grassland, and Hill. It fights with Beak. Its challenge rating is 1/4.",
+  "page": 24
+ },
+ {
+  "name": "Azer Pyromancer",
+  "size": "Medium",
+  "type": "Elemental",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Mountain",
+   "Planar (Elemental Plane of Fire)"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 97,
+   "dice": "13d8 + 39"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Arcana": 4,
+   "Perception": 7
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Primordial (Ignan)"
+  ],
+  "cr": "6",
+  "xp": 2300,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Fire Aura",
+    "damage": [
+     {
+      "avg": 11,
+      "dice": "2d10",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Radiates fire that burns nearby creatures and can ignite flammable objects."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Flame Burst"
+    ],
+    "summary": "Strings together 2 strikes using Flame Burst."
+   },
+   {
+    "name": "Flame Burst",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 7,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Fire",
+      "dice": "2d10 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +7 dealing fire damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Elementalism",
+      "Mage Hand"
+     ],
+     "perDay": {
+      "1": [
+       "Fireball"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Wis with save DC 15, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Hellish Rebuke",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Reaction that burns an attacker who just damaged it."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium elemental of lawful neutral alignment, encountered in Mountain and Planar (Elemental Plane of Fire). It fights with Flame Burst. Its challenge rating is 6.",
+  "page": 25
+ },
+ {
+  "name": "Azer Sentinel",
+  "size": "Medium",
+  "type": "Elemental",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Mountain",
+   "Planar (Elemental Plane of Fire)"
+  ],
+  "treasure": [
+   "Armaments",
+   "Individual"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 39,
+   "dice": "6d8 + 12"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [
+   "Primordial (Ignan)"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Fire Aura",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Radiates fire that burns nearby creatures and can ignite flammable objects."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Burning Hammer",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 3"
+     },
+     {
+      "avg": 3,
+      "type": "Fire",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning plus fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium elemental of lawful neutral alignment, encountered in Mountain and Planar (Elemental Plane of Fire). It fights with Burning Hammer. Its challenge rating is 2.",
+  "page": 25
+ },
+ {
+  "name": "Baboon",
+  "size": "Small",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 3,
+   "dice": "1d6"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 1,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Piercing",
+      "dice": "1d4 - 1"
+     }
+    ],
+    "summary": "Melee attack at +1 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small beast, encountered in Forest and Hill. It can climb and fights with Bite. Its challenge rating is 0.",
+  "page": 349
+ },
+ {
+  "name": "Badger",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 5,
+   "dice": "1d4 + 3"
+  },
+  "speed": {
+   "walk": 20,
+   "burrow": 5
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Perception": 3
+  },
+  "resistances": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 30,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Piercing"
+     }
+    ],
+    "summary": "Melee attack at +2 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Forest. It can burrow and fights with Bite. Its challenge rating is 0.",
+  "page": 349
+ },
+ {
+  "name": "Balor",
+  "size": "Huge",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 287,
+   "dice": "23d12 + 138"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 12
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 9
+   },
+   "cha": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Perception": 9
+  },
+  "resistances": [
+   "Cold",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 19
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "19",
+  "xp": 22000,
+  "pb": 6,
+  "traits": [
+   {
+    "name": "Death Throes",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 20
+     }
+    ],
+    "damage": [
+     {
+      "avg": 31,
+      "dice": "9d6",
+      "type": "Fire"
+     },
+     {
+      "avg": 31,
+      "dice": "9d6",
+      "type": "Force"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 20 Dex save; Inflicts fire/force damage; affects a 30-foot emanation."
+   },
+   {
+    "name": "Fire Aura",
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "3d8",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Radiates fire that burns nearby creatures and can ignite flammable objects."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "3/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Flame Whip",
+     "Lightning Blade"
+    ],
+    "summary": "Strings together 1 strikes using Flame Whip, Lightning Blade."
+   },
+   {
+    "name": "Flame Whip",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 14,
+     "reach": 30
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Force",
+      "dice": "3d6 + 8"
+     },
+     {
+      "avg": 17,
+      "type": "Fire",
+      "dice": "5d6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +14 dealing force plus fire damage; can impose prone."
+   },
+   {
+    "name": "Lightning Blade",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 14,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 21,
+      "type": "Force",
+      "dice": "3d8 + 8"
+     },
+     {
+      "avg": 22,
+      "type": "Lightning",
+      "dice": "4d10"
+     }
+    ],
+    "summary": "Melee attack at +14 dealing force plus lightning damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Teleport",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge fiend of chaotic evil alignment, encountered in Planar (Abyss). It can fly and fights with Flame Whip and Lightning Blade. Its challenge rating is 19.",
+  "page": 26
+ },
+ {
+  "name": "Bandit",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "Bandit"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common",
+   "Thieves' Cant"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Slashing",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing slashing damage."
+   },
+   {
+    "name": "Light Crossbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 3,
+     "range": "80/320"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d8 + 1"
+     }
+    ],
+    "summary": "Ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Scimitar and Light Crossbow. Its challenge rating is 1/8.",
+  "page": 27
+ },
+ {
+  "name": "Bandit Captain",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "Bandit"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "8d8 + 16"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Athletics": 4,
+   "Deception": 4
+  },
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common",
+   "Thieves' Cant"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Scimitar",
+     "Pistol"
+    ],
+    "summary": "Strings together 2 strikes using Scimitar, Pistol."
+   },
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage."
+   },
+   {
+    "name": "Pistol",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "30/90"
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "1d10 + 3"
+     }
+    ],
+    "summary": "Ranged attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Parry",
+    "type": "utility",
+    "summary": "Reaction that adds to its AC against a single melee attack."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Scimitar and Pistol. Its challenge rating is 2.",
+  "page": 27
+ },
+ {
+  "name": "Bandit Crime Lord",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "Bandit"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 9,
+   "score": 19
+  },
+  "hp": {
+   "avg": 169,
+   "dice": "26d8 + 52"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Acrobatics": 9,
+   "Perception": 10,
+   "Stealth": 13
+  },
+  "senses": {
+   "passivePerception": 20
+  },
+  "languages": [
+   "Common",
+   "Thieves' Cant"
+  ],
+  "cr": "11",
+  "xp": 7200,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Evasion",
+    "summary": "Takes no damage on a successful Dexterity save against effects that normally halve damage, and only half on a failure."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Scimitar",
+     "Pistol"
+    ],
+    "summary": "Strings together 3 strikes using Scimitar, Pistol."
+   },
+   {
+    "name": "Scimitar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Slashing",
+      "dice": "2d6 + 5"
+     },
+     {
+      "avg": 14,
+      "type": "Poison",
+      "dice": "4d6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing slashing plus poison damage."
+   },
+   {
+    "name": "Pistol",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 9,
+     "range": "30/90"
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "1d10 + 5"
+     },
+     {
+      "avg": 14,
+      "type": "Poison",
+      "dice": "4d6"
+     }
+    ],
+    "summary": "Ranged attack at +9 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Deadly Aim",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "8d6",
+      "type": "Poison"
+     }
+    ],
+    "summary": "Inflicts poison damage; involves advantage on certain rolls."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Scimitar and Pistol. Its challenge rating is 11.",
+  "page": 28
+ },
+ {
+  "name": "Bandit Deceiver",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "Bandit"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 130,
+   "dice": "20d8 + 40"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Acrobatics": 6,
+   "Perception": 4,
+   "Stealth": 9
+  },
+  "senses": {
+   "passivePerception": 14
+  },
+  "languages": [
+   "Common",
+   "Thieves' Cant"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Dagger"
+    ],
+    "summary": "Strings together 3 strikes using Dagger."
+   },
+   {
+    "name": "Dagger",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 6,
+     "reach": 5,
+     "range": "20/60"
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "2d4 + 3"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee or ranged attack at +6 dealing piercing plus poison damage."
+   },
+   {
+    "name": "Blinding Flash",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "3d6 + 3",
+      "type": "Radiant"
+     }
+    ],
+    "conditions": [
+     "Blinded"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 14 Con save; Inflicts radiant damage; can impose blinded."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 14,
+    "spells": {
+     "atWill": [
+      "Disguise Self",
+      "Mage Hand",
+      "Minor Illusion"
+     ],
+     "perDay": {
+      "1": [
+       "Hold Person (level 4 version)",
+       "Mage Armor (included in AC)",
+       "Major Image"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Int with save DC 14."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Dagger and Blinding Flash. Its challenge rating is 7.",
+  "page": 28
+ },
+ {
+  "name": "Banshee",
+  "size": "Medium",
+  "type": "Undead",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 54,
+   "dice": "12d8"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 40,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Acid",
+   "Bludgeoning",
+   "Fire",
+   "Lightning",
+   "Piercing",
+   "Slashing",
+   "Thunder"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained"
+  ],
+  "damageImmunities": [
+   "Cold",
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common",
+   "Elvish"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Detect Life",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Incorporeal Movement",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Force"
+     }
+    ],
+    "summary": "Moves through creatures and objects as difficult terrain, taking force damage if it ends its turn inside one."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Corrupting Touch",
+     "Horrify"
+    ],
+    "summary": "Strings together 2 strikes using Corrupting Touch, Horrify."
+   },
+   {
+    "name": "Corrupting Touch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Necrotic",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing necrotic damage."
+   },
+   {
+    "name": "Horrify",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 13
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Wis save; can impose frightened."
+   },
+   {
+    "name": "Deathly Wail",
+    "uses": "1/Day",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Psychic"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Usable 1 per day; Targets make a DC 13 Con save; Inflicts psychic damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium undead of chaotic evil alignment, encountered in Any. It can fly and fights with Corrupting Touch, Horrify, and Deathly Wail. Its challenge rating is 4.",
+  "page": 29
+ },
+ {
+  "name": "Barbed Devil",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Devil"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Nine Hells)"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 110,
+   "dice": "13d8 + 52"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   }
+  },
+  "skills": {
+   "Deception": 5,
+   "Insight": 5,
+   "Perception": 8
+  },
+  "resistances": [
+   "Cold"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Barbed Hide",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Piercing"
+     }
+    ],
+    "summary": "Inflicts piercing damage."
+   },
+   {
+    "name": "Diabolical Restoration",
+    "summary": "If it dies away from the Nine Hells, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claws",
+     "Tail",
+     "Hurl Flame"
+    ],
+    "summary": "Strings together 1 strikes using Claws, Tail, Hurl Flame."
+   },
+   {
+    "name": "Claws",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; can impose grappled."
+   },
+   {
+    "name": "Tail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Slashing",
+      "dice": "2d10 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing damage."
+   },
+   {
+    "name": "Hurl Flame",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "150"
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Fire",
+      "dice": "5d6"
+     }
+    ],
+    "summary": "Ranged attack at +5 dealing fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of lawful evil alignment, encountered in Planar (Nine Hells). It can climb and fights with Claws, Tail, and Hurl Flame. Its challenge rating is 5.",
+  "page": 30
+ },
+ {
+  "name": "Barlgura",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 85,
+   "dice": "10d10 + 30"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 5
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 5,
+   "Stealth": 5
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "darkvision": 120,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Tormenting Bite",
+     "Thrash"
+    ],
+    "summary": "Strings together 1 strikes using Tormenting Bite, Thrash."
+   },
+   {
+    "name": "Tormenting Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     },
+     {
+      "avg": 13,
+      "type": "Psychic",
+      "dice": "2d12"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus psychic damage."
+   },
+   {
+    "name": "Thrash",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning damage; can impose prone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "perDay": {
+      "2": [
+       "Disguise Self",
+       "Invisibility (self only)"
+      ],
+      "1": [
+       "Entangle",
+       "Phantasmal Killer (level 6 version)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Wis with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It can climb and fights with Tormenting Bite and Thrash. Its challenge rating is 5.",
+  "page": 31
+ },
+ {
+  "name": "Basilisk",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Mountain",
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 52,
+   "dice": "8d8 + 16"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "2d6 + 3"
+     },
+     {
+      "avg": 7,
+      "type": "Poison",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Petrifying Gaze",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Petrified",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 12 Con save; can impose petrified, restrained; affects a 30-foot cone."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity, encountered in Mountain and Underdark. It fights with Bite. Its challenge rating is 3.",
+  "page": 32
+ },
+ {
+  "name": "Bat",
+  "size": "Tiny",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Mountain",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 1,
+   "dice": "1d4 - 1"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Piercing"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny beast, encountered in Mountain, Underdark, and Urban. It can fly and fights with Bite. Its challenge rating is 0.",
+  "page": 349
+ },
+ {
+  "name": "Bearded Devil",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Devil"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Nine Hells)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 58,
+   "dice": "9d8 + 18"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Cold"
+  ],
+  "conditionImmunities": [
+   "Frightened",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Beard",
+     "Infernal Glaive"
+    ],
+    "summary": "Strings together 1 strikes using Beard, Infernal Glaive."
+   },
+   {
+    "name": "Beard",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d8 + 3"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; can impose poisoned; restores hit points."
+   },
+   {
+    "name": "Infernal Glaive",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Slashing",
+      "dice": "1d10 + 3"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage; Targets make a DC 12 Con save."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of lawful evil alignment, encountered in Planar (Nine Hells). It fights with Beard and Infernal Glaive. Its challenge rating is 3.",
+  "page": 33
+ },
+ {
+  "name": "Behir",
+  "size": "Huge",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 168,
+   "dice": "16d12 + 64"
+  },
+  "speed": {
+   "walk": 50,
+   "climb": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Stealth": 7
+  },
+  "damageImmunities": [
+   "Lightning"
+  ],
+  "senses": {
+   "darkvision": 90,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Draconic"
+  ],
+  "cr": "11",
+  "xp": 7200,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Constrict"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Constrict."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Piercing",
+      "dice": "2d12 + 6"
+     },
+     {
+      "avg": 11,
+      "type": "Lightning",
+      "dice": "2d10"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing piercing plus lightning damage."
+   },
+   {
+    "name": "Constrict",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 18
+     }
+    ],
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "5d8 + 6",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 18 Str save; Inflicts bludgeoning damage; can impose grappled, restrained."
+   },
+   {
+    "name": "Lightning Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 66,
+      "dice": "12d10",
+      "type": "Lightning"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 16 Dex save; Inflicts lightning damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Swallow",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 18
+     },
+     {
+      "ability": "Con",
+      "dc": 14
+     }
+    ],
+    "damage": [
+     {
+      "avg": 21,
+      "dice": "6d6",
+      "type": "Acid"
+     }
+    ],
+    "conditions": [
+     "Blinded",
+     "Grappled",
+     "Prone",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 18 Dex save; Targets make a DC 14 Con save; Inflicts acid damage; can impose blinded, grappled, prone, restrained."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge monstrosity of neutral evil alignment, encountered in Underdark. It can climb and fights with Bite, Constrict, and Lightning Breath. Its challenge rating is 11.",
+  "page": 34
  }
 ]
