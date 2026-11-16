@@ -21883,5 +21883,2969 @@
   "lairActions": [],
   "description": "A large elemental of neutral alignment, encountered in Desert and Planar (Elemental Plane of FIre). It can fly and fights with Heated Blade and Hurl Flame. Its challenge rating is 11.",
   "page": 109
+ },
+ {
+  "name": "Elemental Cataclysm",
+  "size": "Gargantuan",
+  "type": "Elemental",
+  "tags": [
+   "Titan"
+  ],
+  "alignment": "Chaotic Neutral",
+  "habitat": [
+   "Planar (Elemental Chaos)"
+  ],
+  "treasure": [],
+  "ac": 20,
+  "initiative": {
+   "mod": 18,
+   "score": 28
+  },
+  "hp": {
+   "avg": 370,
+   "dice": "20d20 + 160"
+  },
+  "speed": {
+   "walk": 60,
+   "burrow": 60,
+   "fly": 80,
+   "swim": 80,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 11
+   },
+   "con": {
+    "score": 26,
+    "mod": 8,
+    "save": 15
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 9
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": 6
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Blinded",
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Stunned",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "Acid",
+   "Cold",
+   "Fire",
+   "Lightning",
+   "Poison",
+   "Thunder"
+  ],
+  "senses": {
+   "truesight": 150,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Primordial"
+  ],
+  "cr": "22",
+  "xp": 41000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Earth Glide",
+    "summary": "Burrows through earth and stone without disturbing the material it passes through."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Siege Monster",
+    "summary": "Deals extra damage to objects and structures."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Elemental Burst"
+    ],
+    "summary": "Strings together 2 strikes using Elemental Burst."
+   },
+   {
+    "name": "Elemental Burst",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 15,
+     "reach": 30,
+     "range": "150"
+    },
+    "summary": "Melee or ranged attack at +15."
+   },
+   {
+    "name": "Cataclysmic Event",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 23
+     },
+     {
+      "ability": "Str",
+      "dc": 23
+     },
+     {
+      "ability": "Dex",
+      "dc": 23
+     },
+     {
+      "ability": "Str",
+      "dc": 23
+     }
+    ],
+    "damage": [
+     {
+      "avg": 45,
+      "dice": "13d6",
+      "type": "Fire"
+     },
+     {
+      "avg": 22,
+      "dice": "5d8",
+      "type": "Bludgeoning"
+     },
+     {
+      "avg": 22,
+      "dice": "5d8",
+      "type": "Cold"
+     },
+     {
+      "avg": 18,
+      "dice": "4d8",
+      "type": "Lightning"
+     },
+     {
+      "avg": 18,
+      "dice": "4d8",
+      "type": "Thunder"
+     },
+     {
+      "avg": 18,
+      "dice": "4d8",
+      "type": "Bludgeoning"
+     },
+     {
+      "avg": 18,
+      "dice": "4d8",
+      "type": "Acid"
+     }
+    ],
+    "conditions": [
+     "Blinded",
+     "Deafened",
+     "Prone",
+     "Restrained"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 23 Dex save; Targets make a DC 23 Str save; Inflicts acid/bludgeoning/cold/fire/lightning/thunder damage; can impose blinded, deafened, prone, restrained; affects a 90-foot cone."
+   },
+   {
+    "name": "Control Weather",
+    "type": "utility",
+    "summary": "Special action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Eruption",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   },
+   {
+    "name": "Rumbling Movement",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 23
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 23 Con save; can impose prone."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3
+  },
+  "lairActions": [],
+  "description": "A gargantuan elemental of chaotic neutral alignment, encountered in Planar (Elemental Chaos). It can burrow, fly, and swim, fights with Elemental Burst and Cataclysmic Event, and can take legendary actions. Its challenge rating is 22.",
+  "page": 111
+ },
+ {
+  "name": "Elemental Cultist",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "tags": [
+   "Cultist"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Individual",
+   "Relics"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 135,
+   "dice": "18d8 + 54"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Arcana": 5,
+   "Perception": 7,
+   "Religion": 5
+  },
+  "senses": {
+   "passivePerception": 17
+  },
+  "languages": [
+   "Common",
+   "Primordial"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Elemental Flail",
+     "Elemental Claw"
+    ],
+    "summary": "Strings together 3 strikes using Elemental Flail, Elemental Claw."
+   },
+   {
+    "name": "Elemental Flail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "summary": "Melee attack at +7."
+   },
+   {
+    "name": "Elemental Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 7,
+     "range": "120"
+    },
+    "summary": "Ranged attack at +7."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 15,
+    "spells": {
+     "atWill": [
+      "Elementalism",
+      "Mage Hand"
+     ]
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 15."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Elemental Absorption",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of chaotic evil alignment, encountered in Any. It fights with Elemental Flail and Elemental Claw. Its challenge rating is 8.",
+  "page": 87
+ },
+ {
+  "name": "Elephant",
+  "size": "Huge",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 76,
+   "dice": "8d12 + 24"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Gore"
+    ],
+    "summary": "Strings together 2 strikes using Gore."
+   },
+   {
+    "name": "Gore",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 8,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Piercing",
+      "dice": "2d8 + 6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +8 dealing piercing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Trample",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 17,
+      "dice": "2d10 + 6",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 16 Dex save; Inflicts bludgeoning damage; can impose prone."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Grassland. It fights with Gore. Its challenge rating is 4.",
+  "page": 353
+ },
+ {
+  "name": "Elk",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland",
+   "Hill"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d10"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Ram",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 3"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 3,
+      "type": "Bludgeoning",
+      "dice": "1d6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Grassland and Hill. It fights with Ram. Its challenge rating is 1/4.",
+  "page": 353
+ },
+ {
+  "name": "Empyrean",
+  "size": "Huge",
+  "type": "Celestial or Fiend",
+  "tags": [
+   "Titan"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 22,
+  "initiative": {
+   "mod": 19,
+   "score": 29
+  },
+  "hp": {
+   "avg": 346,
+   "dice": "21d12 + 210"
+  },
+  "speed": {
+   "walk": 50,
+   "fly": 50,
+   "swim": 50,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 30,
+    "mod": 10,
+    "save": 17
+   },
+   "dex": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "con": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "wis": {
+    "score": 22,
+    "mod": 6,
+    "save": 13
+   },
+   "cha": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   }
+  },
+  "skills": {
+   "Insight": 13,
+   "Perception": 13
+  },
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Radiant"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 23
+  },
+  "languages": [
+   "All"
+  ],
+  "cr": "23",
+  "xp": 50000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Sacred Weapon",
+     "Divine Ray"
+    ],
+    "summary": "Strings together 2 strikes using Sacred Weapon, Divine Ray."
+   },
+   {
+    "name": "Sacred Weapon",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 17,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 31,
+      "type": "Force",
+      "dice": "6d6 + 10"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 21,
+      "type": "Force"
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "summary": "Melee attack at +17 dealing force damage; can impose stunned."
+   },
+   {
+    "name": "Divine Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 15,
+     "range": "600"
+    },
+    "summary": "Ranged attack at +15."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 23,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Calm Emotions",
+      "Greater Restoration",
+      "Pass without Trace",
+      "Water Breathing"
+     ],
+     "perDay": {
+      "1": [
+       "Commune",
+       "Dispel Evil and Good",
+       "Plane Shift"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (7 spells) using Cha with save DC 23, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Bolster",
+    "type": "utility",
+    "summary": "Involves advantage on certain rolls."
+   },
+   {
+    "name": "Shockwave of Glory",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 23
+     }
+    ],
+    "damage": [
+     {
+      "avg": 27,
+      "dice": "6d8",
+      "type": "Force"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 23 Con save; Inflicts force damage; can impose prone; affects a 30-foot emanation."
+   },
+   {
+    "name": "Smite",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3
+  },
+  "lairActions": [],
+  "description": "A huge celestial or fiend of neutral alignment, encountered in Any. It can fly and swim, fights with Sacred Weapon and Divine Ray, and can take legendary actions. Its challenge rating is 23.",
+  "page": 113
+ },
+ {
+  "name": "Empyrean Iota",
+  "size": "Medium",
+  "type": "Celestial or Fiend",
+  "tags": [
+   "Titan"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "5d8"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "History": 4,
+   "Insight": 5,
+   "Perception": 5
+  },
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Prone"
+  ],
+  "senses": {
+   "truesight": 30,
+   "passivePerception": 15
+  },
+  "languages": [
+   "All"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Incorporeal Movement",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Force"
+     }
+    ],
+    "summary": "Moves through creatures and objects as difficult terrain, taking force damage if it ends its turn inside one."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Otherworldly Strike",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "30"
+    },
+    "summary": "Melee or ranged attack at +5."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "components": "no Material",
+    "spells": {
+     "perDay": {
+      "1": [
+       "Bless",
+       "Lesser Restoration (as an action)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Healing Word",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium celestial or fiend of neutral alignment, encountered in Any. It can fly and fights with Otherworldly Strike. Its challenge rating is 1.",
+  "page": 112
+ },
+ {
+  "name": "Erinyes",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Devil"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Nine Hells)"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 7,
+   "score": 17
+  },
+  "hp": {
+   "avg": 178,
+   "dice": "21d8 + 84"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 8
+   }
+  },
+  "skills": {
+   "Perception": 6,
+   "Persuasion": 8
+  },
+  "resistances": [
+   "Cold"
+  ],
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 16
+  },
+  "languages": [
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "12",
+  "xp": 8400,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Diabolical Restoration",
+    "summary": "If it dies away from the Nine Hells, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Magic Rope",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Withering Sword",
+     "Entangling Rope"
+    ],
+    "summary": "Strings together 3 strikes using Withering Sword, Entangling Rope."
+   },
+   {
+    "name": "Withering Sword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 8,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Slashing",
+      "dice": "2d8 + 4"
+     },
+     {
+      "avg": 11,
+      "type": "Necrotic",
+      "dice": "2d10"
+     }
+    ],
+    "summary": "Melee attack at +8 dealing slashing plus necrotic damage."
+   },
+   {
+    "name": "Entangling Rope",
+    "cost": "Requires Magic Rope",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Force"
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 16 Str save; Inflicts force damage; can impose restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Parry",
+    "type": "utility",
+    "summary": "Reaction that adds to its AC against a single melee attack."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of lawful evil alignment, encountered in Planar (Nine Hells). It can fly and fights with Withering Sword and Entangling Rope. Its challenge rating is 12.",
+  "page": 114
+ },
+ {
+  "name": "Ettercap",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 44,
+   "dice": "8d8 + 8"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 4,
+   "Survival": 3
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Web Walker",
+    "summary": "Ignores movement restrictions caused by webs."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Claw"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Claw."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 2,
+      "type": "Poison",
+      "dice": "1d4"
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage; can impose poisoned."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Slashing",
+      "dice": "2d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   },
+   {
+    "name": "Web Strand",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 12 Dex save; can impose restrained."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Reel",
+    "type": "utility",
+    "summary": "Can impose restrained."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral evil alignment, encountered in Forest. It can climb and fights with Bite, Claw, and Web Strand. Its challenge rating is 2.",
+  "page": 115
+ },
+ {
+  "name": "Ettin",
+  "size": "Large",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Hill",
+   "Mountain",
+   "Underdark"
+  ],
+  "treasure": [
+   "Individual"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 85,
+   "dice": "10d10 + 30"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 4
+  },
+  "conditionImmunities": [
+   "Blinded",
+   "Charmed",
+   "Deafened",
+   "Frightened",
+   "Stunned",
+   "Unconscious"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Giant"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Battleaxe",
+     "Morningstar"
+    ],
+    "summary": "Strings together 1 strikes using Battleaxe, Morningstar."
+   },
+   {
+    "name": "Battleaxe",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Slashing",
+      "dice": "2d8 + 5"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage; can impose prone."
+   },
+   {
+    "name": "Morningstar",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Piercing",
+      "dice": "2d8 + 5"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large giant of chaotic evil alignment, encountered in Hill, Mountain, and Underdark. It fights with Battleaxe and Morningstar. Its challenge rating is 4.",
+  "page": 116
+ },
+ {
+  "name": "Faerie Dragon Adult",
+  "size": "Tiny",
+  "type": "Dragon",
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 35,
+   "dice": "10d4 + 10"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Arcana": 4,
+   "Perception": 3,
+   "Stealth": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Draconic",
+   "Sylvan",
+   "Telepathy"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Piercing",
+      "dice": "1d4 + 5"
+     },
+     {
+      "avg": 3,
+      "type": "Psychic",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing piercing plus psychic damage."
+   },
+   {
+    "name": "Euphoria Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 13
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 13 Wis save; can impose incapacitated; affects a 15-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Dancing Lights",
+      "Mage Hand",
+      "Minor Illusion"
+     ],
+     "perDay": {
+      "1": [
+       "Hallucinatory Terrain",
+       "Polymorph"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Cha with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Superior Invisibility",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny dragon of chaotic good alignment, encountered in Forest. It can fly and fights with Bite and Euphoria Breath. Its challenge rating is 2.",
+  "page": 117
+ },
+ {
+  "name": "Faerie Dragon Youth",
+  "size": "Tiny",
+  "type": "Dragon",
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 21,
+   "dice": "6d4 + 6"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Arcana": 3,
+   "Perception": 3,
+   "Stealth": 5
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Draconic",
+   "Sylvan",
+   "Telepathy"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d4 + 3"
+     },
+     {
+      "avg": 2,
+      "type": "Psychic",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing piercing plus psychic damage."
+   },
+   {
+    "name": "Euphoria Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 12 Wis save; can impose incapacitated; affects a 15-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 12,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Dancing Lights",
+      "Mage Hand",
+      "Minor Illusion"
+     ]
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Cha with save DC 12, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Superior Invisibility",
+    "type": "utility",
+    "summary": "Special bonus action; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny dragon of chaotic good alignment, encountered in Forest. It can fly and fights with Bite and Euphoria Breath. Its challenge rating is 1.",
+  "page": 117
+ },
+ {
+  "name": "Fiend Cultist",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "tags": [
+   "Cultist"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Individual",
+   "Relics"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 127,
+   "dice": "17d8 + 51"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 6
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 7
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 7,
+   "Religion": 4
+  },
+  "senses": {
+   "darkvision": 90,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Infernal"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Pact Axe"
+    ],
+    "summary": "Strings together 3 strikes using Pact Axe."
+   },
+   {
+    "name": "Pact Axe",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "1d12 + 4"
+     },
+     {
+      "avg": 13,
+      "type": "Fire",
+      "dice": "3d8"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 15,
+    "attackBonus": 7,
+    "spells": {
+     "atWill": [
+      "Scorching Ray (level 5 version)",
+      "Thaumaturgy"
+     ],
+     "perDay": {
+      "2": [
+       "Fireball (level 6 version)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Wis with save DC 15."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Hellish Rebuke",
+    "type": "utility",
+    "summary": "Reaction that burns an attacker who just damaged it."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral evil alignment, encountered in Any. It fights with Pact Axe. Its challenge rating is 8.",
+  "page": 87
+ },
+ {
+  "name": "Fire Elemental",
+  "size": "Large",
+  "type": "Elemental",
+  "alignment": "Neutral",
+  "habitat": [
+   "Desert",
+   "Planar (Elemental Plane of FIre)"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 93,
+   "dice": "11d10 + 33"
+  },
+  "speed": {
+   "walk": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Unconscious"
+  ],
+  "damageImmunities": [
+   "FIre",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Primordial (Ignan)"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Fire Aura",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Radiates fire that burns nearby creatures and can ignite flammable objects."
+   },
+   {
+    "name": "Fire Form",
+    "damage": [
+     {
+      "avg": 5,
+      "dice": "1d10",
+      "type": "Fire"
+     }
+    ],
+    "summary": "Inflicts fire damage."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   },
+   {
+    "name": "Water Susceptibility",
+    "damage": [
+     {
+      "avg": 3,
+      "dice": "1d6",
+      "type": "Cold"
+     }
+    ],
+    "summary": "Inflicts cold damage."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Burn"
+    ],
+    "summary": "Strings together 2 strikes using Burn."
+   },
+   {
+    "name": "Burn",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Fire",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large elemental of neutral alignment, encountered in Desert and Planar (Elemental Plane of FIre). It fights with Burn. Its challenge rating is 5.",
+  "page": 118
+ },
+ {
+  "name": "Fire Giant",
+  "size": "Huge",
+  "type": "Giant",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Mountain",
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 162,
+   "dice": "13d12 + 78"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": 3
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 10
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   }
+  },
+  "skills": {
+   "Athletics": 11,
+   "Perception": 6
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Giant"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Flame Sword",
+     "Hammer Throw"
+    ],
+    "summary": "Strings together 2 strikes using Flame Sword, Hammer Throw."
+   },
+   {
+    "name": "Flame Sword",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 11,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 21,
+      "type": "Slashing",
+      "dice": "4d6 + 7"
+     },
+     {
+      "avg": 10,
+      "type": "Fire",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +11 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Hammer Throw",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 11,
+     "range": "60/240"
+    },
+    "damage": [
+     {
+      "avg": 23,
+      "type": "Bludgeoning",
+      "dice": "3d10 + 7"
+     },
+     {
+      "avg": 4,
+      "type": "Fire",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Ranged attack at +11 dealing bludgeoning plus fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge giant of lawful evil alignment, encountered in Mountain and Underdark. It fights with Flame Sword and Hammer Throw. Its challenge rating is 9.",
+  "page": 119
+ },
+ {
+  "name": "Flameskull",
+  "size": "Tiny",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 40,
+   "dice": "9d4 + 18"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 40,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Arcana": 5,
+   "Perception": 2
+  },
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Poisoned",
+   "Prone"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Common",
+   "2 other languages"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Undead Restoration",
+    "summary": "If destroyed, it returns to unlife after a time unless specific countermeasures are taken."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Fire Ray"
+    ],
+    "summary": "Strings together 2 strikes using Fire Ray."
+   },
+   {
+    "name": "Fire Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Fire",
+      "dice": "3d6 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +5 dealing fire damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 13,
+    "components": "no Somatic or Material",
+    "spells": {
+     "atWill": [
+      "Mage Hand"
+     ],
+     "perDay": {
+      "2": [
+       "Magic Missile (level 2 version)"
+      ],
+      "1": [
+       "Fireball"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (3 spells) using Int with save DC 13, no Somatic or Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny undead of neutral evil alignment, encountered in Underdark. It can fly and fights with Fire Ray. Its challenge rating is 4.",
+  "page": 120
+ },
+ {
+  "name": "Flaming Skeleton",
+  "size": "Medium",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 65,
+   "dice": "10d8 + 20"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Bludgeoning"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Understands Common",
+   "Another language"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Death Burst",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 12
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Explodes when it dies, harming nearby creatures."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Flame Scepter",
+     "Hurl Flame"
+    ],
+    "summary": "Strings together 2 strikes using Flame Scepter, Hurl Flame."
+   },
+   {
+    "name": "Flame Scepter",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 2"
+     },
+     {
+      "avg": 3,
+      "type": "Fire",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning plus fire damage."
+   },
+   {
+    "name": "Hurl Flame",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 7,
+      "type": "Fire",
+      "dice": "1d10 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing fire damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium undead of lawful evil alignment, encountered in Planar (Shadowfell), Underdark, and Urban. It fights with Flame Scepter and Hurl Flame. Its challenge rating is 3.",
+  "page": 283
+ },
+ {
+  "name": "Flesh Golem",
+  "size": "Medium",
+  "type": "Construct",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 9,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 127,
+   "dice": "15d8 + 60"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Lightning",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Understands Common",
+   "Another language"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Aversion to Fire",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Berserk",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Immutable Form",
+    "summary": "Cannot be forced out of its current shape."
+   },
+   {
+    "name": "Lightning Absorption",
+    "summary": "Restores hit points."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam"
+    ],
+    "summary": "Strings together 2 strikes using Slam."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     },
+     {
+      "avg": 4,
+      "type": "Lightning",
+      "dice": "1d8"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing bludgeoning plus lightning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct of neutral alignment, encountered in Any. It fights with Slam. Its challenge rating is 5.",
+  "page": 121
+ },
+ {
+  "name": "Flumph",
+  "size": "Small",
+  "type": "Aberration",
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 7,
+   "dice": "2d6"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Arcana": 4,
+   "History": 4,
+   "Religion": 4
+  },
+  "vulnerabilities": [
+   "Psychic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Understands Undercommon",
+   "Telepathy"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Advanced Telepathy",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Prone Deficiency",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 10
+     }
+    ],
+    "conditions": [
+     "Incapacitated",
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 10 Dex save; can impose incapacitated, prone."
+   },
+   {
+    "name": "Telepathic Shroud",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Tentacle",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Acid",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing acid damage."
+   },
+   {
+    "name": "Stench Spray",
+    "uses": "1/Day",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 10
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Usable 1 per day; Targets make a DC 10 Dex save; can impose poisoned; affects a 5-foot emanation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small aberration of lawful good alignment, encountered in Underdark. It can fly and fights with Tentacle and Stench Spray. Its challenge rating is 1/8.",
+  "page": 122
+ },
+ {
+  "name": "Flying Snake",
+  "size": "Tiny",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 5,
+   "dice": "2d4"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "blindsight": 10,
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Piercing"
+     },
+     {
+      "avg": 5,
+      "type": "Poison",
+      "dice": "2d4"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A tiny monstrosity, encountered in Desert, Forest, and Grassland. It can fly and swim and fights with Bite. Its challenge rating is 1/8.",
+  "page": 353
+ },
+ {
+  "name": "Fomorian",
+  "size": "Huge",
+  "type": "Giant",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 172,
+   "dice": "15d12 + 75"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 8,
+   "Stealth": 3
+  },
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 18
+  },
+  "languages": [
+   "Giant",
+   "Undercommon"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Stone Club",
+     "Warping Hex"
+    ],
+    "summary": "Strings together 2 strikes using Stone Club, Warping Hex."
+   },
+   {
+    "name": "Stone Club",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 24,
+      "type": "Bludgeoning",
+      "dice": "4d8 + 6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning damage."
+   },
+   {
+    "name": "Warping Hex",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 16
+     }
+    ],
+    "damage": [
+     {
+      "avg": 21,
+      "dice": "6d6",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Exhaustion"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 16 Wis save; Inflicts psychic damage; can impose exhaustion."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge giant of chaotic evil alignment, encountered in Underdark. It fights with Stone Club and Warping Hex. Its challenge rating is 8.",
+  "page": 123
  }
 ]
