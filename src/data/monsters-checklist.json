@@ -965,122 +965,122 @@
   {
    "name": "Frog",
    "page": 354,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Frost Giant",
    "page": 124,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Galeb Duhr",
    "page": 127,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Gargoyle",
    "page": 128,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Gas Spore Fungus",
    "page": 125,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Gelatinous Cube",
    "page": 129,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ghast",
    "page": 130,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ghast Gravecaller",
    "page": 130,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ghost",
    "page": 131,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ghoul",
    "page": 132,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Ape",
    "page": 354,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Axe Beak",
    "page": 24,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Badger",
    "page": 354,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Bat",
    "page": 355,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Boar",
    "page": 355,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Centipede",
    "page": 355,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Constrictor Snake",
    "page": 355,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Crab",
    "page": 356,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Crocodile",
    "page": 356,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Eagle",
    "page": 356,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Giant Elk",
