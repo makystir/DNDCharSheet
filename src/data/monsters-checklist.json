@@ -125,122 +125,122 @@
   {
    "name": "Ancient Bronze Dragon",
    "page": 60,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient Copper Dragon",
    "page": 80,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient Gold Dragon",
    "page": 146,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient Green Dragon",
    "page": 154,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient Red Dragon",
    "page": 256,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient Silver Dragon",
    "page": 280,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ancient White Dragon",
    "page": 330,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Animal Lord",
    "page": 15,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Animated Armor",
    "page": 16,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Animated Broom",
    "page": 16,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Animated Flying Sword",
    "page": 17,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Animated Rug of Smothering",
    "page": 17,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ankheg",
    "page": 18,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ankylosaurus",
    "page": 348,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Ape",
    "page": 348,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Arcanaloth",
    "page": 19,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Archelon",
    "page": 349,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Arch-hag",
    "page": 21,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Archmage",
    "page": 199,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Archpriest",
    "page": 248,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Assassin",

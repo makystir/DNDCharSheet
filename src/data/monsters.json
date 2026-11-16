@@ -4013,5 +4013,3524 @@
   ],
   "description": "A gargantuan dragon of chaotic good alignment, encountered in Desert. It can burrow and fly, fights with Rend, Fire Breath, and Sleep Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 20.",
   "page": 56
+ },
+ {
+  "name": "Ancient Bronze Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Coastal"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 22,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 444,
+   "dice": "24d20 + 192"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 7
+   },
+   "con": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 10
+   },
+   "cha": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Insight": 10,
+   "Perception": 17,
+   "Stealth": 7
+  },
+  "damageImmunities": [
+   "Lightning"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 27
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "22",
+  "xp": 41000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Repulsion Breath",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Repulsion Breath, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 16,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Slashing",
+      "dice": "2d8 + 9"
+     },
+     {
+      "avg": 9,
+      "type": "Lightning",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +16 dealing slashing plus lightning damage."
+   },
+   {
+    "name": "Lightning Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 23
+     }
+    ],
+    "damage": [
+     {
+      "avg": 82,
+      "dice": "15d10",
+      "type": "Lightning"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 23 Dex save; Inflicts lightning damage."
+   },
+   {
+    "name": "Repulsion Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 23
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 23 Str save; can impose prone; affects a 30-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 22,
+    "attackBonus": 14,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Guiding Bolt (level 2 version)",
+      "Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)",
+      "Speak with Animals",
+      "Thaumaturgy"
+     ],
+     "perDay": {
+      "1": [
+       "Detect Thoughts",
+       "Control Water",
+       "Scrying",
+       "Water Breathing"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (9 spells) using Cha with save DC 22, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Guiding Light",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   },
+   {
+    "name": "Thunderclap",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 22
+     }
+    ],
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "3d8",
+      "type": "Thunder"
+     }
+    ],
+    "conditions": [
+     "Deafened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 22 Con save; Inflicts thunder damage; can impose deafened."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Buoying Currents",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Sun and Storms",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A gargantuan dragon of lawful good alignment, encountered in Coastal. It can fly and swim, fights with Rend, Lightning Breath, and Repulsion Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 22.",
+  "page": 60
+ },
+ {
+  "name": "Ancient Copper Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Hill"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 21,
+  "initiative": {
+   "mod": 15,
+   "score": 25
+  },
+  "hp": {
+   "avg": 367,
+   "dice": "21d20 + 147"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 8
+   },
+   "con": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 10
+   },
+   "cha": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Deception": 13,
+   "Perception": 17,
+   "Stealth": 8
+  },
+  "damageImmunities": [
+   "Acid"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 27
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "21",
+  "xp": 33000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Slowing Breath",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Slowing Breath, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 15,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Slashing",
+      "dice": "2d10 + 8"
+     },
+     {
+      "avg": 9,
+      "type": "Acid",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +15 dealing slashing plus acid damage."
+   },
+   {
+    "name": "Acid Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 22
+     }
+    ],
+    "damage": [
+     {
+      "avg": 63,
+      "dice": "14d8",
+      "type": "Acid"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 22 Dex save; Inflicts acid damage."
+   },
+   {
+    "name": "Slowing Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 22
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 22 Con save; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 21,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Mind Spike (level 5 version)",
+      "Minor Illusion",
+      "Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)"
+     ],
+     "perDay": {
+      "1": [
+       "Greater Restoration",
+       "Major Image",
+       "Project Image"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (7 spells) using Cha with save DC 21, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Giggling Magic",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Cha",
+      "dc": 21
+     }
+    ],
+    "damage": [
+     {
+      "avg": 31,
+      "dice": "9d6",
+      "type": "Psychic"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 21 Cha save; Inflicts psychic damage."
+   },
+   {
+    "name": "Mind Jolt",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Chatty Critters",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Giggle Fits",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Wis save; can impose incapacitated."
+   }
+  ],
+  "description": "A gargantuan dragon of chaotic good alignment, encountered in Hill. It can climb and fly, fights with Rend, Acid Breath, and Slowing Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 21.",
+  "page": 80
+ },
+ {
+  "name": "Ancient Gold Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Forest",
+   "Grassland"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 22,
+  "initiative": {
+   "mod": 16,
+   "score": 26
+  },
+  "hp": {
+   "avg": 546,
+   "dice": "28d20 + 252"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 9
+   },
+   "con": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 10
+   },
+   "cha": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   }
+  },
+  "skills": {
+   "Insight": 10,
+   "Perception": 17,
+   "Persuasion": 16,
+   "Stealth": 9
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 27
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "24",
+  "xp": 62000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Spellcasting",
+     "Weakening Breath"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Spellcasting, Weakening Breath. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 17
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Slashing",
+      "dice": "2d8 + 10"
+     },
+     {
+      "avg": 9,
+      "type": "Fire",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +17 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 24
+     }
+    ],
+    "damage": [
+     {
+      "avg": 71,
+      "dice": "13d10",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 24 Dex save; Inflicts fire damage; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 24,
+    "attackBonus": 16,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Guiding Bolt (level 4 version)",
+      "Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)"
+     ],
+     "perDay": {
+      "1": [
+       "Flame Strike (level 6 version)",
+       "Word of Recall",
+       "Zone of Truth"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Cha with save DC 24, no Material needed."
+   },
+   {
+    "name": "Weakening Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 24
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 24 Str save; affects a 90-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Banish",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Cha",
+      "dc": 24
+     }
+    ],
+    "damage": [
+     {
+      "avg": 24,
+      "dice": "7d6",
+      "type": "Force"
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 24 Cha save; Inflicts force damage; can impose incapacitated."
+   },
+   {
+    "name": "Guiding Light",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Dream Messenger",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Foretelling Fog",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A gargantuan dragon of lawful good alignment, encountered in Forest and Grassland. It can fly and swim, fights with Rend, Fire Breath, and Weakening Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 24.",
+  "page": 146
+ },
+ {
+  "name": "Ancient Green Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 21,
+  "initiative": {
+   "mod": 15,
+   "score": 25
+  },
+  "hp": {
+   "avg": 402,
+   "dice": "23d20 + 161"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 8
+   },
+   "con": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 10
+   },
+   "cha": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Deception": 13,
+   "Perception": 17,
+   "Persuasion": 13,
+   "Stealth": 8
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 27
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "22",
+  "xp": 41000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 15,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Slashing",
+      "dice": "2d8 + 8"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +15 dealing slashing plus poison damage."
+   },
+   {
+    "name": "Poison Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 22
+     }
+    ],
+    "damage": [
+     {
+      "avg": 77,
+      "dice": "22d6",
+      "type": "Poison"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 22 Con save; Inflicts poison damage; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 21,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Mind Spike (level 5 version)"
+     ],
+     "perDay": {
+      "1": [
+       "Geas",
+       "Modify Memory"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Cha with save DC 21, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Mind Invasion",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Noxious Miasma",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 21
+     }
+    ],
+    "damage": [
+     {
+      "avg": 17,
+      "dice": "5d6",
+      "type": "Poison"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 21 Con save; Inflicts poison damage."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 4
+  },
+  "lairActions": [
+   {
+    "name": "Beast Spies",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Poisonous Thicket",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Con save; can impose poisoned."
+   }
+  ],
+  "description": "A gargantuan dragon of lawful evil alignment, encountered in Forest. It can fly and swim, fights with Rend and Poison Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 22.",
+  "page": 154
+ },
+ {
+  "name": "Ancient Red Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Hill",
+   "Mountain"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 22,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 507,
+   "dice": "26d20 + 234"
+  },
+  "speed": {
+   "walk": 40,
+   "climb": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 7
+   },
+   "con": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 9
+   },
+   "cha": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   }
+  },
+  "skills": {
+   "Perception": 16,
+   "Stealth": 7
+  },
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 26
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "24",
+  "xp": 62000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 17,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Slashing",
+      "dice": "2d8 + 10"
+     },
+     {
+      "avg": 10,
+      "type": "Fire",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +17 dealing slashing plus fire damage."
+   },
+   {
+    "name": "Fire Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 24
+     }
+    ],
+    "damage": [
+     {
+      "avg": 91,
+      "dice": "26d6",
+      "type": "Fire"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 24 Dex save; Inflicts fire damage; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 23,
+    "attackBonus": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Command (level 2 version)",
+      "Detect Magic",
+      "Scorching Ray (level 3 version)"
+     ],
+     "perDay": {
+      "1": [
+       "Fireball (level 6 version)",
+       "Scrying"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Cha with save DC 23, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Commanding Presence",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Fiery Rays",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Burning Heat",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Fire"
+     }
+    ],
+    "summary": "Inflicts fire damage."
+   },
+   {
+    "name": "Smoldering Haze",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Con save; can impose poisoned."
+   }
+  ],
+  "description": "A gargantuan dragon of chaotic evil alignment, encountered in Hill and Mountain. It can climb and fly, fights with Rend and Fire Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 24.",
+  "page": 256
+ },
+ {
+  "name": "Ancient Silver Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Metallic"
+  ],
+  "alignment": "Lawful Good",
+  "habitat": [
+   "Mountain",
+   "Urban"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 22,
+  "initiative": {
+   "mod": 14,
+   "score": 24
+  },
+  "hp": {
+   "avg": 468,
+   "dice": "24d20 + 216"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 7
+   },
+   "con": {
+    "score": 28,
+    "mod": 9,
+    "save": 9
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 9
+   },
+   "cha": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   }
+  },
+  "skills": {
+   "History": 11,
+   "Perception": 16,
+   "Stealth": 7
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 26
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "23",
+  "xp": 50000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Paralyzing Breath",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 3 strikes using Rend, Paralyzing Breath, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 17,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 19,
+      "type": "Slashing",
+      "dice": "2d8 + 10"
+     },
+     {
+      "avg": 9,
+      "type": "Cold",
+      "dice": "2d8"
+     }
+    ],
+    "summary": "Melee attack at +17 dealing slashing plus cold damage."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 24
+     }
+    ],
+    "damage": [
+     {
+      "avg": 67,
+      "dice": "15d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 24 Con save; Inflicts cold damage; affects a 90-foot cone."
+   },
+   {
+    "name": "Paralyzing Breath",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 24
+     }
+    ],
+    "conditions": [
+     "Incapacitated",
+     "Paralyzed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 24 Con save; can impose incapacitated, paralyzed; affects a 90-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 23,
+    "attackBonus": 15,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Hold Monster",
+      "Ice Knife (level 2 version)",
+      "Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)"
+     ],
+     "perDay": {
+      "1": [
+       "Control Weather",
+       "Ice Storm (level 7 version)",
+       "Teleport",
+       "Zone of Truth"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (8 spells) using Cha with save DC 23, no Material needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Chill",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Cold Gale",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 23
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 23 Dex save; Inflicts cold damage."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Gentle Gusts",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Sun and Storms",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A gargantuan dragon of lawful good alignment, encountered in Mountain and Urban. It can fly, fights with Rend, Cold Breath, and Paralyzing Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 23.",
+  "page": 280
+ },
+ {
+  "name": "Ancient White Dragon",
+  "size": "Gargantuan",
+  "type": "Dragon",
+  "tags": [
+   "Chromatic"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Arctic"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 20,
+  "initiative": {
+   "mod": 12,
+   "score": 22
+  },
+  "hp": {
+   "avg": 333,
+   "dice": "18d20 + 144"
+  },
+  "speed": {
+   "walk": 40,
+   "burrow": 40,
+   "fly": 80,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 6
+   },
+   "con": {
+    "score": 26,
+    "mod": 8,
+    "save": 8
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 7
+   },
+   "cha": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   }
+  },
+  "skills": {
+   "Perception": 13,
+   "Stealth": 6
+  },
+  "damageImmunities": [
+   "Cold"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "darkvision": 120,
+   "passivePerception": 23
+  },
+  "languages": [
+   "Common",
+   "Draconic"
+  ],
+  "cr": "20",
+  "xp": 25000,
+  "pb": 6,
+  "traits": [
+   {
+    "name": "Ice Walk",
+    "summary": "Moves across icy surfaces without an ability check and ignores icy difficult terrain."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 14,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Slashing",
+      "dice": "2d8 + 8"
+     },
+     {
+      "avg": 7,
+      "type": "Cold",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +14 dealing slashing plus cold damage."
+   },
+   {
+    "name": "Cold Breath",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 22
+     }
+    ],
+    "damage": [
+     {
+      "avg": 63,
+      "dice": "14d8",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 22 Con save; Inflicts cold damage; affects a 90-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Freezing Burst",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 20
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Cold"
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 20 Con save; Inflicts cold damage."
+   },
+   {
+    "name": "Frightful Presence",
+    "type": "utility",
+    "summary": "Frightens nearby creatures by casting its Fear spell as part of this action."
+   },
+   {
+    "name": "Pounce",
+    "type": "utility",
+    "summary": "Moves part of its Speed and follows up with one more attack against a creature it approaches."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Frigid Cold",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Glacial Gloom",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Con save."
+   }
+  ],
+  "description": "A gargantuan dragon of chaotic evil alignment, encountered in Arctic. It can burrow, fly, and swim, fights with Rend and Cold Breath, can take legendary actions, and can shape the area around its lair. Its challenge rating is 20.",
+  "page": 330
+ },
+ {
+  "name": "Animal Lord",
+  "size": "Medium",
+  "type": "Celestial",
+  "alignment": "Neutral",
+  "habitat": [
+   "Planar (Beastlands)"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 19,
+  "initiative": {
+   "mod": 19,
+   "score": 29
+  },
+  "hp": {
+   "avg": 323,
+   "dice": "34d8 + 170"
+  },
+  "speed": {
+   "walk": 60,
+   "fly": 60,
+   "swim": 60,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "dex": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 11
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 22,
+    "mod": 6,
+    "save": 12
+   },
+   "cha": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   }
+  },
+  "skills": {
+   "Acrobatics": 13,
+   "Athletics": 13,
+   "Perception": 18,
+   "Stealth": 13
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Necrotics",
+   "Psychic",
+   "Radiant"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Stunned"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 28
+  },
+  "languages": [
+   "All"
+  ],
+  "cr": "20",
+  "xp": 25000,
+  "pb": 6,
+  "traits": [
+   {
+    "name": "Animal Lordship",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Lordly Presence",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 20
+     }
+    ],
+    "conditions": [
+     "Charmed",
+     "Incapacitated"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 20 Wis save; can impose charmed, incapacitated; affects a 30-foot emanation."
+   },
+   {
+    "name": "Fearful",
+    "cost": "Hunter Only",
+    "summary": "Can impose frightened."
+   },
+   {
+    "name": "Mired",
+    "cost": "Sage Only",
+    "damage": [
+     {
+      "avg": 10,
+      "dice": "3d6",
+      "type": "Psychic"
+     }
+    ],
+    "summary": "Inflicts psychic damage."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend",
+     "Radiant Ray",
+     "Animal Spirit"
+    ],
+    "summary": "Strings together 2 strikes using Rend, Radiant Ray, Animal Spirit."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 13,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Slashing",
+      "dice": "2d6 + 7"
+     },
+     {
+      "avg": 7,
+      "type": "Force",
+      "dice": "2d6"
+     }
+    ],
+    "summary": "Melee attack at +13 dealing slashing plus force damage."
+   },
+   {
+    "name": "Radiant Ray",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 12,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Radiant",
+      "dice": "4d6 + 6"
+     }
+    ],
+    "summary": "Ranged attack at +12 dealing radiant damage."
+   },
+   {
+    "name": "Animal Spirit",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 20
+     }
+    ],
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "4d10 + 6",
+      "type": "Radiant"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 20 Dex save; Inflicts radiant damage; involves advantage on certain rolls."
+   },
+   {
+    "name": "Pesky Swarm",
+    "cost": "Sage Only",
+    "type": "utility",
+    "summary": "Special action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 20,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship",
+      "Animal Messenger",
+      "Speak with Animals"
+     ],
+     "perDay": {
+      "2": [
+       "Awaken",
+       "Greater Restoration 1/Day Each (Sage Only): Animal Shapes",
+       "Sunburst"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Wis with save DC 20, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Feral Strike",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   },
+   {
+    "name": "Radiant Strike",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3
+  },
+  "lairActions": [],
+  "description": "A medium celestial of neutral alignment, encountered in Planar (Beastlands). It can fly and swim, fights with Rend, Radiant Ray, and Animal Spirit, and can take legendary actions. Its challenge rating is 20.",
+  "page": 15
+ },
+ {
+  "name": "Animated Armor",
+  "size": "Medium",
+  "type": "Construct",
+  "tags": [
+   "Animated"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 18,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 33,
+   "dice": "6d8 + 6"
+  },
+  "speed": {
+   "walk": 25
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 6
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam"
+    ],
+    "summary": "Strings together 2 strikes using Slam."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct, encountered in Urban. It fights with Slam. Its challenge rating is 1.",
+  "page": 16
+ },
+ {
+  "name": "Animated Broom",
+  "size": "Small",
+  "type": "Construct",
+  "tags": [
+   "Animated"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 14,
+   "dice": "4d6"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 50,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 7
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Flyby",
+    "summary": "Does not provoke opportunity attacks when it flies out of an enemy's reach."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small construct, encountered in Urban. It can fly and fights with Slam. Its challenge rating is 1/4.",
+  "page": 16
+ },
+ {
+  "name": "Animated Flying Sword",
+  "size": "Small",
+  "type": "Construct",
+  "tags": [
+   "Animated"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 17,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 14,
+   "dice": "4d6"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 50,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 7
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Slash",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small construct, encountered in Urban. It can fly and fights with Slash. Its challenge rating is 1/4.",
+  "page": 17
+ },
+ {
+  "name": "Animated Rug of Smothering",
+  "size": "Large",
+  "type": "Construct",
+  "tags": [
+   "Animated"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 27,
+   "dice": "5d10"
+  },
+  "speed": {
+   "walk": 10
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 6
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Smother",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Blinded",
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage; can impose blinded, grappled, restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large construct, encountered in Urban. It fights with Smother. Its challenge rating is 2.",
+  "page": 17
+ },
+ {
+  "name": "Ankheg",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 30,
+   "burrow": 10
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 60,
+   "tremorsense": 60,
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Tunneler",
+    "summary": "Burrows through solid rock, leaving a tunnel behind."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     },
+     {
+      "avg": 3,
+      "type": "Acid",
+      "dice": "1d6"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +5 dealing slashing plus acid damage; can impose grappled."
+   },
+   {
+    "name": "Acid Spray",
+    "recharge": "6-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 12
+     }
+    ],
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Acid"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 6-6; Targets make a DC 12 Dex save; Inflicts acid damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity, encountered in Forest and Grassland. It can burrow and fights with Bite and Acid Spray. Its challenge rating is 2.",
+  "page": 18
+ },
+ {
+  "name": "Ankylosaurus",
+  "size": "Huge",
+  "type": "Beast",
+  "tags": [
+   "Dinosaur"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 68,
+   "dice": "8d12 + 16"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Tail"
+    ],
+    "summary": "Strings together 2 strikes using Tail."
+   },
+   {
+    "name": "Tail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 4"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Grassland. It fights with Tail. Its challenge rating is 3.",
+  "page": 348
+ },
+ {
+  "name": "Ape",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d8 + 6"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Athletics": 5,
+   "Perception": 3
+  },
+  "senses": {
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Fist"
+    ],
+    "summary": "Strings together 2 strikes using Fist."
+   },
+   {
+    "name": "Fist",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d4 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage."
+   },
+   {
+    "name": "Rock",
+    "recharge": "6-6",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 5,
+     "range": "25/50"
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Bludgeoning",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "summary": "Recharges on a roll of 6-6; Ranged attack at +5 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Forest. It can climb and fights with Fist and Rock. Its challenge rating is 1/2.",
+  "page": 348
+ },
+ {
+  "name": "Arcanaloth",
+  "size": "Medium",
+  "type": "Fiend",
+  "tags": [
+   "Yugoloth"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 175,
+   "dice": "27d8 + 54"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 5
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Arcana": 9,
+   "Deception": 7,
+   "Insight": 7,
+   "Perception": 7
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Acid",
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "All",
+   "Telepathy"
+  ],
+  "cr": "12",
+  "xp": 8400,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Fiendish Restoration",
+    "summary": "If it dies away from its home plane, it reforms there after a time."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Soul Tome",
+    "summary": "Restores hit points."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Banishing Claw",
+     "Fiendish Burst"
+    ],
+    "summary": "Strings together 3 strikes using Banishing Claw, Fiendish Burst."
+   },
+   {
+    "name": "Banishing Claw",
+    "cost": "Requires Soul Tome",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d4 + 5"
+     },
+     {
+      "avg": 19,
+      "type": "Psychic",
+      "dice": "3d12"
+     }
+    ],
+    "saves": [
+     {
+      "ability": "Cha",
+      "dc": 17
+     }
+    ],
+    "conditions": [
+     "Incapacitated"
+    ],
+    "summary": "Melee attack at +9 dealing slashing plus psychic damage; Targets make a DC 17 Cha save; can impose incapacitated."
+   },
+   {
+    "name": "Fiendish Burst",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 9,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 31,
+      "type": "Necrotic",
+      "dice": "4d12 + 5"
+     }
+    ],
+    "summary": "Melee or ranged attack at +9 dealing necrotic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 17,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Alter Self",
+      "Detect Magic",
+      "Identify",
+      "Mage Hand",
+      "Prestidigitation"
+     ],
+     "perDay": {
+      "1": [
+       "Contact Other Plane",
+       "Detect Thoughts",
+       "Dimension Door",
+       "Mind Blank"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (9 spells) using Int with save DC 17, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Teleport",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Counterspell",
+    "type": "utility",
+    "summary": "Reaction that tries to interrupt a spell being cast within range."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of neutral evil alignment, encountered in Planar (Lower Planes). It can fly and fights with Banishing Claw and Fiendish Burst. Its challenge rating is 12.",
+  "page": 19
+ },
+ {
+  "name": "Archelon",
+  "size": "Huge",
+  "type": "Beast",
+  "tags": [
+   "Dinosaur"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 17,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 90,
+   "dice": "12d12 + 12"
+  },
+  "speed": {
+   "walk": 20,
+   "swim": 80
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 5
+  },
+  "senses": {
+   "passivePerception": 12
+  },
+  "languages": [],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Amphibious",
+    "summary": "Breathes both air and water."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite"
+    ],
+    "summary": "Strings together 2 strikes using Bite."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Piercing",
+      "dice": "3d6 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge beast, encountered in Underwater. It can swim and fights with Bite. Its challenge rating is 4.",
+  "page": 349
+ },
+ {
+  "name": "Arch-hag",
+  "size": "Large",
+  "type": "Fey",
+  "tags": [
+   "Hag"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 20,
+  "initiative": {
+   "mod": 16,
+   "score": 26
+  },
+  "hp": {
+   "avg": 333,
+   "dice": "29d10 + 174"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 9
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 11
+   },
+   "cha": {
+    "score": 24,
+    "mod": 7,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Deception": 14,
+   "Perception": 11,
+   "Persuasion": 21
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Psychic"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened"
+  ],
+  "senses": {
+   "truesight": 60,
+   "passivePerception": 21
+  },
+  "languages": [
+   "All"
+  ],
+  "cr": "21",
+  "xp": 33000,
+  "pb": 7,
+  "traits": [
+   {
+    "name": "Coven Magic",
+    "summary": "Casts additional spells when working with other coven members nearby."
+   },
+   {
+    "name": "Legendary Resistance",
+    "uses": "4/Day, or 5/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Spiteful Escape",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Spectral Claw",
+     "Crackling Wave"
+    ],
+    "summary": "Strings together 2 strikes using Spectral Claw, Crackling Wave."
+   },
+   {
+    "name": "Spectral Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 14,
+     "reach": 10,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 17,
+      "type": "Force",
+      "dice": "3d6 + 7"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee or ranged attack at +14 dealing force damage; can impose prone."
+   },
+   {
+    "name": "Crackling Wave",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 22
+     }
+    ],
+    "damage": [
+     {
+      "avg": 32,
+      "dice": "5d12",
+      "type": "Lightning"
+     }
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 22 Dex save; Inflicts lightning damage; affects a 60-foot cone."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Cha",
+    "saveDC": 22,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Thoughts",
+      "Dimension Door",
+      "Dispel Magic",
+      "Hypnotic Pattern"
+     ],
+     "perDay": {
+      "2": [
+       "Mass Suggestion",
+       "Modify Memory",
+       "Plane Shift"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (7 spells) using Cha with save DC 22, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Witch Strike",
+    "type": "utility",
+    "damage": [
+     {
+      "avg": 14,
+      "dice": "4d6",
+      "type": "Lightning"
+     }
+    ],
+    "summary": "Inflicts lightning damage."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Tongue Twister",
+    "type": "utility",
+    "summary": "Special reaction; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "legendaryActions": [
+   {
+    "name": "Hag’s Swipe",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   },
+   {
+    "name": "Malicious Magic",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Lapsus Linguae",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Meddlesome Magic",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A large fey of neutral evil alignment, encountered in Any. It fights with Spectral Claw and Crackling Wave, can take legendary actions, and can shape the area around its lair. Its challenge rating is 21.",
+  "page": 21
+ },
+ {
+  "name": "Archmage",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "wizard"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Arcana",
+   "Individual"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 7,
+   "score": 17
+  },
+  "hp": {
+   "avg": 170,
+   "dice": "31d8 + 31"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Arcana": 13,
+   "History": 9,
+   "Perception": 6
+  },
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "damageImmunities": [
+   "Psychic"
+  ],
+  "senses": {
+   "passivePerception": 16
+  },
+  "languages": [
+   "Common plus five other languages"
+  ],
+  "cr": "12",
+  "xp": 8000,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Arcane Burst"
+    ],
+    "summary": "Strings together 4 strikes using Arcane Burst."
+   },
+   {
+    "name": "Arcane Burst",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 9,
+     "reach": 5,
+     "range": "150"
+    },
+    "damage": [
+     {
+      "avg": 27,
+      "type": "Force",
+      "dice": "4d10 + 5"
+     }
+    ],
+    "summary": "Melee or ranged attack at +9 dealing force damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 17,
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Detect Thoughts",
+      "Disguise Self",
+      "Invisibility",
+      "Light",
+      "Mage Armor (included in AC)",
+      "Mage Hand",
+      "Prestidigitation"
+     ],
+     "perDay": {
+      "2": [
+       "Fly",
+       "Lightning Bolt (level 7 version)"
+      ],
+      "1": [
+       "Cone of Cold (level 9 version)",
+       "Mind Blank (cast before combat)",
+       "Scrying",
+       "Teleport"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (14 spells) using Int with save DC 17."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Misty Step",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Teleports a short distance as a bonus action."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Protective Magic",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Usable 3 per day."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Arcane Burst. Its challenge rating is 12.",
+  "page": 199
+ },
+ {
+  "name": "Archpriest",
+  "size": "Medium or Smaller",
+  "type": "Humanoid",
+  "tags": [
+   "Cleric"
+  ],
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Individual",
+   "Relics"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 240,
+   "dice": "32d8 + 96"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "wis": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {
+   "Insight": 9,
+   "Medicine": 9,
+   "Perception": 9,
+   "Religion": 10
+  },
+  "senses": {
+   "passivePerception": 19
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "12",
+  "xp": 8400,
+  "pb": 4,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Radiant Burst"
+    ],
+    "summary": "Strings together 3 strikes using Radiant Burst."
+   },
+   {
+    "name": "Radiant Burst",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 9,
+     "reach": 5,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 27,
+      "type": "Radiant",
+      "dice": "4d10 + 5"
+     }
+    ],
+    "summary": "Melee or ranged attack at +9 dealing radiant damage."
+   },
+   {
+    "name": "Holy Word",
+    "recharge": "4-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 21,
+      "dice": "6d6",
+      "type": "Radiant"
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 4-6; Targets make a DC 17 Wis save; Inflicts radiant damage; can impose stunned; affects a 20-foot emanation."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 17,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Light",
+      "Thaumaturgy"
+     ],
+     "perDay": {
+      "1": [
+       "Flame Strike (level 6 version)",
+       "Greater Restoration",
+       "Raise Dead",
+       "Zone of Truth"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (6 spells) using Wis with save DC 17, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Divine Aid",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Usable 3 per day."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or smaller humanoid of neutral alignment, encountered in Any. It fights with Radiant Burst and Holy Word. Its challenge rating is 12.",
+  "page": 248
  }
 ]
