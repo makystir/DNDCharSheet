@@ -15,6 +15,7 @@ import {
   MAX_LABEL,
   milestoneShare,
   previewAward,
+  shareBreakdown,
   type AwardPayload,
   type AwardPreview,
 } from '../../logic/dm-awards';
@@ -93,17 +94,27 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
       if (!encounter) return { kind: 'xp', amount: 0, source: 'fight', breakdown: null, error: 'Save an encounter on the Encounter page first.' };
       const counted = encounter.combatants.filter((c) => c.kind === 'monster' && countsForXp(c));
       const s = fightShare(counted, sharerCount);
-      return { kind: 'xp', amount: s.share.total, source: 'fight', breakdown: s.share, error: s.share.total < 1 ? 'No XP to award' : null };
+      const unknown = counted.filter((c) => typeof c.xp !== 'number').map((c) => c.name);
+      const breakdown = shareBreakdown(s.total, sharerCount);
+      const error =
+        unknown.length > 0
+          ? `Set the XP of ${unknown.join(', ')} on the Encounter page, or untick ${unknown.length === 1 ? 'it' : 'them'}, before creating the award.`
+          : s.share.total < 1
+            ? 'No XP to award'
+            : s.share.total > MAX_AWARD_XP
+              ? `The share is over the ${n(MAX_AWARD_XP)} XP limit.`
+              : null;
+      return { kind: 'xp', amount: s.share.total, source: 'fight', breakdown, error };
     }
     if (tab === 'milestone' || (tab === 'noncombat' && noncombat !== 'typed')) {
       const kind = tab === 'milestone' ? milestone : (noncombat as EncounterDifficulty);
-      const s = milestoneShare(budgetMembers, kind);
+      const s = milestoneShare(budgetMembers, kind, partySize);
       return {
         kind: 'xp',
         amount: s.share.total,
         source: tab === 'milestone' ? kind === 'major' ? 'major' : 'minor' : 'noncombat',
-        breakdown: { ...s.share, note: `${s.total.note ?? ''} Total budget ${n(s.total.total)} XP.${s.note ? ` ${s.note}` : ''}`.trim() },
-        error: s.share.total < 1 ? 'No XP to award' : null,
+        breakdown: { ...shareBreakdown(s.total, partySize), note: `${s.total.note ?? ''} Total budget ${n(s.total.total)} XP.${s.note ? ` ${s.note}` : ''}`.trim() },
+        error: s.share.total < 1 ? 'No XP to award' : s.share.total > MAX_AWARD_XP ? `The share is over the ${n(MAX_AWARD_XP)} XP limit.` : null,
       };
     }
     if (tab === 'noncombat') {
@@ -130,9 +141,9 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   // A created code is shown only while the draft still matches the one it was made from.
   const shown = shownRaw && (shownRaw.key === null || shownRaw.key === draftKey) ? shownRaw : null;
 
-  const create = async () => {
+  const create = async (another = false) => {
     if (problem) return;
-    if (shown && shown.key === draftKey) return; // already created for this draft; reuse it
+    if (!another && shown && shown.key === draftKey) return; // already created for this draft; reuse it
     if (creating.current) return;
     creating.current = true;
     try {
@@ -209,6 +220,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
               onClick={() => {
                 setTab(t.id);
                 setShown(null);
+                setCreateError(null);
               }}
             >
               {t.label}
@@ -426,6 +438,9 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
               <div className={styles.row}>
                 <button type="button" className={styles.btn} onClick={() => void copy()}>
                   Copy
+                </button>
+                <button type="button" className={styles.btn} onClick={() => void create(true)}>
+                  Create another award with these values
                 </button>
                 <span className={styles.muted}>Send this to each player. They paste it on their Advancement page.</span>
               </div>

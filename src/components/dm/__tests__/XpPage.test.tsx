@@ -30,9 +30,9 @@ function seed(members: Array<{ id: string; character: Character }> = [], manualL
   saveDmData(d);
 }
 
-function Page({ onNotify = () => {} }: { onNotify?: (t: string) => void }) {
+function Page({ onNotify = () => {}, newId = () => UUID }: { onNotify?: (t: string) => void; newId?: () => string }) {
   const dm = useDmData();
-  return <XpPage dm={dm} onNotify={onNotify} newId={() => UUID} />;
+  return <XpPage dm={dm} onNotify={onNotify} newId={newId} />;
 }
 
 function typeAmount(value: string) {
@@ -120,6 +120,20 @@ describe('Party XP page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Show code' }));
     const again = await screen.findByLabelText('Award code');
     expect((again as HTMLTextAreaElement).value).toBe((code as HTMLTextAreaElement).value);
+  });
+
+  it('lets the DM create a second award with identical values, with its own ID', async () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    let i = 0;
+    render(<Page newId={() => `0000000000${++i}-aaaa-bbbb-cccc-dddddddddddd`} />);
+    typeAmount('50');
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    await screen.findByLabelText('Award code');
+    fireEvent.click(screen.getByRole('button', { name: 'Create another award with these values' }));
+    await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(2));
+    const [a, b] = loadDmData().campaigns[0].awards!;
+    expect(a.id).not.toBe(b.id);
+    expect(a.amount).toBe(b.amount);
   });
 
   it('creates a level award without needing XP', async () => {

@@ -18,6 +18,7 @@ import {
   decodeAward,
   encodeAward,
   fightShare,
+  shareBreakdown,
   ID_PATTERN,
   MAX_APPLIED,
   MAX_AWARD_XP,
@@ -451,4 +452,18 @@ describe('campaign awards', () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+});
+
+describe('shareBreakdown', () => {
+  it('shows each source component and the rounded-down division, summing to the share', () => {
+    const b = shareBreakdown({ total: 150, components: [{ label: 'A', value: 100 }, { label: 'B', value: 50 }, { label: 'C', value: 0 }] }, 4);
+    expect(b.total).toBe(37);
+    expect(b.components.map((c) => c.label).slice(0, 3)).toEqual(['A', 'B', 'C']);
+    expect(b.components.reduce((s, c) => s + c.value, 0)).toBe(37);
+  });
+  it('divides a milestone budget by the given sharers, including a member with no stats', () => {
+    const members = [{ name: 'A', level: 3 }];
+    const total = xpBudget(members, 'high').total;
+    expect(milestoneShare(members, 'major', 2).share.total).toBe(Math.floor(total / 2));
+  });
 });

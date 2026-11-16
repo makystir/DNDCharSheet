@@ -210,10 +210,10 @@ export interface MilestoneShare {
 }
 
 /** Milestone or noncombat XP: the budget for the difficulty, split evenly (DMG L1942-1956). */
-export function milestoneShare(members: BudgetMember[], kind: MilestoneKind): MilestoneShare {
+export function milestoneShare(members: BudgetMember[], kind: MilestoneKind, sharers = members.length): MilestoneShare {
   const difficulty: EncounterDifficulty = kind === 'major' ? 'high' : kind === 'minor' ? 'low' : kind;
   const total = xpBudget(members, difficulty);
-  const size = Math.max(1, members.length);
+  const size = Math.max(1, Math.trunc(sharers));
   const share = Math.floor(total.total / size);
   return {
     total,
@@ -222,6 +222,27 @@ export function milestoneShare(members: BudgetMember[], kind: MilestoneKind): Mi
       components: [{ label: `${total.total} XP divided by ${size} ${size === 1 ? 'character' : 'characters'}, rounded down`, value: share }],
     },
     note: members.length === 0 ? 'There are no party members, so there is nothing to share.' : undefined,
+  };
+}
+
+/**
+ * A per-character share with both stages visible: every source component (zeros
+ * included), then the rounded-down division as a negative component. The
+ * components sum to the share, as the Breakdown invariant requires.
+ */
+export function shareBreakdown(total: Breakdown, sharers: number): Breakdown {
+  const size = Math.max(1, Math.trunc(sharers));
+  const share = Math.floor(total.total / size);
+  return {
+    total: share,
+    components: [
+      ...total.components,
+      {
+        label: `Divided among ${size} ${size === 1 ? 'character' : 'characters'} (${total.total.toLocaleString()} / ${size}, rounded down)`,
+        value: share - total.total,
+      },
+    ],
+    note: total.note,
   };
 }
 
