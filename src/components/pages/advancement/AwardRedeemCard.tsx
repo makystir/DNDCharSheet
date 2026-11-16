@@ -7,7 +7,7 @@ import { CalculatedValue } from '../../shared/CalculatedValue';
 import { characterXp, levelingMode, xpForLevel } from '../../../logic/advancement';
 import { clampLevel } from '../../../logic/abilities';
 import { lifeStatus } from '../../../logic/hit-points-state';
-import { appliedAwardIds, awardBlocker, MAX_AWARD_XP, previewAward, type AwardPayload } from '../../../logic/dm-awards';
+import { appliedAwardIds, awardBlocker, isBlockedOutcome, MAX_AWARD_XP, previewAward, type AwardPayload } from '../../../logic/dm-awards';
 import { OUTCOME_TEXT, useAwardRedeem } from '../useAwardRedeem';
 import styles from '../AdvancementPage.module.css';
 
@@ -67,7 +67,7 @@ export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRe
     const preview = previewAward(me, award);
     const already = appliedAwardIds(character).includes(award.id);
     const blocker = already ? null : awardBlocker(character, award);
-    const blocked = blocker === 'milestone-blocked' || blocker === 'multiclass-unsupported' || blocker === 'xp-baseline-missing' ? blocker : null;
+    const blocked = isBlockedOutcome(blocker) ? blocker : null;
     const disabled = already || blocked !== null;
     body = (
       <div className={styles.placeholder} data-testid="award-preview">

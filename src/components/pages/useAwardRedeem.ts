@@ -30,6 +30,9 @@ export const OUTCOME_TEXT: Record<ApplyOutcome, string> = {
     'This sheet levels by milestone. Switch to XP leveling and enter your current XP on the Advancement page first, then apply this code.',
   'xp-baseline-missing':
     'This sheet uses XP leveling but has no XP recorded. Enter your current XP on the Advancement page first, then apply this code.',
+  'class-required': 'This sheet has no class. Choose your class on the Character page first, then apply this code.',
+  'hp-unsupported':
+    'This sheet has a manual Hit Point maximum or a rolled-HP total, which a level award cannot update. Level up on the Advancement page instead.',
 };
 
 export function useAwardRedeem(

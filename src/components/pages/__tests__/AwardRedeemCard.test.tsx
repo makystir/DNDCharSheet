@@ -123,6 +123,24 @@ describe('AwardRedeemCard', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('blocks a level award on a classless sheet', async () => {
+    const onChange = vi.fn();
+    render(<Harness initial={{ ...sheet(5, 'xp', 0), classes: [] }} onChange={onChange} />);
+    await paste(await code({ kind: 'level', amount: 8 }));
+    expect(await screen.findByText(/has no class/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('blocks a level award on a sheet with a manual HP maximum', async () => {
+    const onChange = vi.fn();
+    render(<Harness initial={sheet(5, 'xp', 0, { hpMax: 40 })} onChange={onChange} />);
+    await paste(await code({ kind: 'level', amount: 8 }));
+    expect(await screen.findByText(/manual Hit Point maximum/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('blocks an XP award on a milestone sheet', async () => {
     const onChange = vi.fn();
     render(<Harness initial={sheet(5, 'milestone')} onChange={onChange} />);

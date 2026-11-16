@@ -16,8 +16,10 @@ import {
   milestoneShare,
   previewAward,
   shareBreakdown,
+  isBlockedOutcome,
   type AwardPayload,
   type AwardPreview,
+  type BlockedOutcome,
 } from '../../logic/dm-awards';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
@@ -55,7 +57,9 @@ interface Amount {
   error: string | null;
 }
 
-const BLOCKED_TEXT: Record<'milestone-blocked' | 'multiclass-unsupported' | 'xp-baseline-missing', string> = {
+const BLOCKED_TEXT: Record<BlockedOutcome, string> = {
+  'class-required': 'Blocked: this sheet has no class.',
+  'hp-unsupported': 'Blocked: this sheet has a manual HP maximum or rolled-HP total.',
   'milestone-blocked': 'Blocked: this sheet levels by milestone. The player must switch to XP leveling first.',
   'multiclass-unsupported': 'Blocked: more than one class.',
   'xp-baseline-missing': 'Blocked: this sheet uses XP leveling but has no XP recorded. The player must enter their current XP first.',
@@ -352,43 +356,41 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                     <tr key={r.memberId}>
                       <td>{r.name}</td>
                       <td>{r.currentLevel}</td>
-                        <>
-                          <td>
-                            {r.currentXp ? (
-                              <CalculatedValue label={`${r.name}: current XP`} breakdown={r.currentXp}>
-                                {n(r.currentXp.total)}
-                              </CalculatedValue>
-                            ) : (
-                              <span className={xp.blocked}>XP not tracked</span>
-                            )}
-                          </td>
-                          <td>
-                            {r.addedXp && (
-                              <CalculatedValue label={`${r.name}: XP added`} breakdown={r.addedXp}>
-                                {n(r.addedXp.total)}
-                              </CalculatedValue>
-                            )}
-                          </td>
-                          <td>
-                            {r.newXp ? (
-                              <CalculatedValue label={`${r.name}: new XP`} breakdown={r.newXp}>
-                                {n(r.newXp.total)}
-                              </CalculatedValue>
-                            ) : (
-                              <span className={xp.blocked}>XP not tracked</span>
-                            )}
-                          </td>
-                          <td>
-                            {r.reachableLevel ? (
-                              <CalculatedValue label={`${r.name}: level you can reach`} breakdown={r.reachableLevel}>
-                                {r.reachableLevel.total}
-                              </CalculatedValue>
-                            ) : (
-                              <span className={xp.blocked}>Needs current XP</span>
-                            )}
-                          </td>
-                          <td>{r.blocked === 'milestone-blocked' || r.blocked === 'multiclass-unsupported' || r.blocked === 'xp-baseline-missing' ? <span className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</span> : r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
-                        </>
+                      <td>
+                        {r.currentXp ? (
+                          <CalculatedValue label={`${r.name}: current XP`} breakdown={r.currentXp}>
+                            {n(r.currentXp.total)}
+                          </CalculatedValue>
+                        ) : (
+                          <span className={xp.blocked}>XP not tracked</span>
+                        )}
+                      </td>
+                      <td>
+                        {r.addedXp && (
+                          <CalculatedValue label={`${r.name}: XP added`} breakdown={r.addedXp}>
+                            {n(r.addedXp.total)}
+                          </CalculatedValue>
+                        )}
+                      </td>
+                      <td>
+                        {r.newXp ? (
+                          <CalculatedValue label={`${r.name}: new XP`} breakdown={r.newXp}>
+                            {n(r.newXp.total)}
+                          </CalculatedValue>
+                        ) : (
+                          <span className={xp.blocked}>XP not tracked</span>
+                        )}
+                      </td>
+                      <td>
+                        {r.reachableLevel ? (
+                          <CalculatedValue label={`${r.name}: level you can reach`} breakdown={r.reachableLevel}>
+                            {r.reachableLevel.total}
+                          </CalculatedValue>
+                        ) : (
+                          <span className={xp.blocked}>Needs current XP</span>
+                        )}
+                      </td>
+                      <td>{isBlockedOutcome(r.blocked) ? <span className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</span> : r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
                     </tr>
                   ))}
                 </tbody>

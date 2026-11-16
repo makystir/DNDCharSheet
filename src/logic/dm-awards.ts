@@ -75,7 +75,16 @@ export type ApplyOutcome =
   | 'no-change'
   | 'multiclass-unsupported'
   | 'milestone-blocked'
-  | 'xp-baseline-missing';
+  | 'xp-baseline-missing'
+  | 'class-required'
+  | 'hp-unsupported';
+
+/** Outcomes that stop an award from being applied (the sheet is unchanged). */
+export type BlockedOutcome = Exclude<ApplyOutcome, 'applied' | 'already-applied' | 'no-change'>;
+
+export function isBlockedOutcome(x: ApplyOutcome | null): x is BlockedOutcome {
+  return x !== null && x !== 'applied' && x !== 'already-applied' && x !== 'no-change';
+}
 
 // ---------------------------------------------------------------------- ids
 
@@ -282,6 +291,18 @@ export function awardBlocker(character: Character, award: AwardPayload): ApplyOu
   if (appliedAwardIds(character).includes(award.id)) return null;
   if (award.kind === 'level' && clampLevel(character.level) >= award.amount) return null;
   if (award.kind === 'level' && (character.classes?.length ?? 0) > 1) return 'multiclass-unsupported';
+  if (award.kind === 'level') {
+    // setLevel writes the new level into classes[0]; without exactly one class there is nothing to raise.
+    if ((character.classes?.length ?? 0) !== 1) return 'class-required';
+    // A stored HP maximum (manual override) or a legacy rolled-HP total does not grow when the level
+    // rises, and no fixed per-level gain can be recorded on top of them. Block rather than skip the HP.
+    const manualMax = typeof character.hpMax === 'number' && Number.isFinite(character.hpMax);
+    const legacyRolled =
+      character.houseRules?.rolledHp === true &&
+      typeof character.rolledHpTotal === 'number' &&
+      Number.isFinite(character.rolledHpTotal);
+    if (manualMax || legacyRolled) return 'hp-unsupported';
+  }
   if (award.kind === 'xp' && levelingMode(character) !== 'xp' && clampLevel(character.level) > 1) {
     return 'milestone-blocked';
   }

@@ -442,6 +442,28 @@ describe('applyAward', () => {
     expect(applyAward(c, levelAwardOf(4, 'abcdef123499'), NOW).outcome).toBe('no-change');
   });
 
+  it('refuses an upward level award on a classless sheet (classes undefined or empty) but allows XP', () => {
+    const lists: Array<Character['classes']> = [undefined, []];
+    for (const classes of lists) {
+      const c = withMode({ ...sheet(5), classes }, 'xp', 0);
+      expect(awardBlocker(c, levelAwardOf(8))).toBe('class-required');
+      const r = applyAward(c, levelAwardOf(8), NOW);
+      expect(r.outcome).toBe('class-required');
+      expect(r.character).toBe(c);
+      expect(applyAward(c, xpAwardOf(100), NOW).outcome).toBe('applied');
+    }
+  });
+
+  it('refuses an upward level award when a manual HP maximum or legacy rolled HP total would skip HP', () => {
+    const manual = withMode({ ...sheet(5), hpMax: 40 }, 'xp', 0);
+    expect(applyAward(manual, levelAwardOf(8), NOW).outcome).toBe('hp-unsupported');
+    expect(applyAward(manual, levelAwardOf(8), NOW).character).toBe(manual);
+    const rolled = withMode({ ...sheet(5), houseRules: { rolledHp: true }, rolledHpTotal: 20 }, 'xp', 0);
+    expect(awardBlocker(rolled, levelAwardOf(8))).toBe('hp-unsupported');
+    expect(applyAward(manual, xpAwardOf(100), NOW).outcome).toBe('applied');
+    expect(applyAward(manual, levelAwardOf(5), NOW).outcome).toBe('no-change');
+  });
+
   it('blocks XP on milestone sheets above level 1 and allows it otherwise', () => {
     for (const mode of [undefined, 'milestone'] as const) {
       const c = withMode(sheet(5), mode);
