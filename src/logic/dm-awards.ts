@@ -157,6 +157,9 @@ export async function decodeAward(
   try {
     const trimmed = text.trim();
     if (trimmed === '') return fail('Paste an award code.', 'empty');
+    if (trimmed.startsWith(AWARD_PREFIX) && !isGzipSupported()) {
+      return fail('This browser cannot read award codes (compression is unavailable).', 'bad-code');
+    }
     if (!trimmed.startsWith(AWARD_PREFIX)) {
       if (trimmed.includes('#view/') || trimmed.startsWith('{')) {
         return fail(
@@ -229,8 +232,19 @@ export function fightShare(counted: DmCombatant[], sharers: number): XpAward {
 
 // ------------------------------------------------------------ apply / block
 
+/**
+ * The replay list as a clean string array. Imported or shared characters can carry
+ * any value here, so every read goes through this: non-arrays give [], items that
+ * are not valid award IDs are dropped, and the list is capped at MAX_APPLIED.
+ */
+export function appliedAwardIds(character: Character): string[] {
+  const raw: unknown = character.advancement?.appliedAwards;
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((x): x is string => typeof x === 'string' && ID_PATTERN.test(x)).slice(-MAX_APPLIED);
+}
+
 function recordId(character: Character, id: string): Character {
-  const existing = character.advancement?.appliedAwards ?? [];
+  const existing = appliedAwardIds(character);
   return {
     ...character,
     advancement: { ...character.advancement, appliedAwards: [...existing, id].slice(-MAX_APPLIED) },
@@ -243,7 +257,7 @@ function recordId(character: Character, id: string): Character {
  * no change, multiclass, milestone.
  */
 export function awardBlocker(character: Character, award: AwardPayload): ApplyOutcome | null {
-  if (character.advancement?.appliedAwards?.includes(award.id)) return null;
+  if (appliedAwardIds(character).includes(award.id)) return null;
   if (award.kind === 'level' && clampLevel(character.level) >= award.amount) return null;
   if (award.kind === 'level' && (character.classes?.length ?? 0) > 1) return 'multiclass-unsupported';
   if (award.kind === 'xp' && levelingMode(character) !== 'xp' && clampLevel(character.level) > 1) {
@@ -261,7 +275,7 @@ export function applyAward(
   award: AwardPayload,
   now: number,
 ): { character: Character; outcome: ApplyOutcome } {
-  if (character.advancement?.appliedAwards?.includes(award.id)) {
+  if (appliedAwardIds(character).includes(award.id)) {
     return { character, outcome: 'already-applied' };
   }
   if (award.kind === 'level' && clampLevel(character.level) >= award.amount) {
@@ -297,7 +311,7 @@ export interface AwardPreview {
   memberId: string;
   name: string;
   currentLevel: number;
-  /** False for a manual member: XP is not tracked, so the XP cells are null. */
+  /** False for a manual member: current and new XP are null, the delta and a direct level result are known. */
   xpTracked: boolean;
   blocked: ApplyOutcome | null;
   currentXp: Breakdown | null;
@@ -323,7 +337,29 @@ export function previewAward(member: DmPartyMember, award: AwardPayload): AwardP
   };
   const character = member.source === 'imported' ? member.character : undefined;
   if (!character) {
-    return { ...base, currentLevel: clampLevel(member.manual?.level ?? 1), xpTracked: false };
+    // Manual member: current and new XP are unknown, but the delta and a direct level result are known.
+    const level = clampLevel(member.manual?.level ?? 1);
+    const added = award.kind === 'xp' ? award.amount : 0;
+    const reach = award.kind === 'level' ? Math.max(level, award.amount) : level;
+    return {
+      ...base,
+      currentLevel: level,
+      xpTracked: false,
+      addedXp: { total: added, components: [{ label: 'Award', value: added }] },
+      reachableLevel:
+        award.kind === 'level'
+          ? {
+              total: reach,
+              components: [
+                { label: 'Current level', value: level },
+                { label: 'Levels to the target', value: reach - level },
+              ],
+              note: `Target level ${award.amount}.`,
+            }
+          : null,
+      levelsGained: reach - level,
+      unchanged: award.kind === 'level' && level >= award.amount,
+    };
   }
   const currentLevel = clampLevel(character.level);
   const blocked = awardBlocker(character, award);

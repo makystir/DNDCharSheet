@@ -132,6 +132,24 @@ describe('AwardRedeemCard', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('drops the preview when the text is edited after Check', async () => {
+    const onChange = vi.fn();
+    render(<Harness initial={sheet(3, 'xp', 0)} onChange={onChange} />);
+    await paste(await code({ id: 'aaaaaaaa1111' }));
+    expect(await screen.findByRole('button', { name: 'Apply' })).toBeEnabled();
+    fireEvent.change(screen.getByLabelText('Paste an award code'), { target: { value: await code({ id: 'bbbbbbbb2222', amount: 999 }) } });
+    expect(screen.queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('does not crash on a malformed appliedAwards value', async () => {
+    const c = sheet(3, 'xp', 0);
+    const bad = { ...c, advancement: { ...c.advancement, appliedAwards: 'abcdef123456' as unknown as string[] } };
+    render(<Harness initial={bad} onChange={() => {}} />);
+    await paste(await code({}));
+    expect(await screen.findByRole('button', { name: 'Apply' })).toBeEnabled();
+  });
+
   it('warns when recorded XP is below the threshold for the current level', async () => {
     render(<Harness initial={sheet(5, 'xp', 0)} onChange={() => {}} />);
     await paste(await code({}));

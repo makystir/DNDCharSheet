@@ -280,6 +280,38 @@ describe('previewAward', () => {
     expect(p.currentLevel).toBe(4);
     expect(p.blocked).toBeNull();
     expect(p.newXp).toBeNull();
+    expect(p.addedXp?.total).toBe(100);
+  });
+  it('gives a manual member the known delta and a direct level result', () => {
+    const manual: DmPartyMember = {
+      id: 'x', name: 'Man', source: 'manual', manual: { ...DEFAULT_MANUAL_STATS, level: 4 }, addedAt: 0, updatedAt: 0,
+    };
+    const lvl = previewAward(manual, levelAwardOf(6));
+    expect(lvl.reachableLevel?.total).toBe(6);
+    expect(lvl.levelsGained).toBe(2);
+    expect(lvl.addedXp?.total).toBe(0);
+    expect(lvl.currentXp).toBeNull();
+    expect(previewAward(manual, xpAwardOf(100)).reachableLevel).toBeNull();
+  });
+  it('survives a malformed appliedAwards value', () => {
+    const base = withMode(sheet(3), 'xp', 0);
+    for (const bad of ['abcdef123456', 5, { a: 1 }, ['BAD', 7, 'abcdef123456']]) {
+      const c = { ...base, advancement: { ...base.advancement, appliedAwards: bad as unknown as string[] } };
+      expect(() => awardBlocker(c, xpAwardOf(10))).not.toThrow();
+      const r = applyAward(c, xpAwardOf(10, 'zzzzzzzz1111'), NOW);
+      expect(r.outcome).toBe('applied');
+      expect(r.character.advancement?.appliedAwards?.at(-1)).toBe('zzzzzzzz1111');
+      expect((r.character.advancement?.appliedAwards ?? []).every((x) => typeof x === 'string' && x.length >= 8)).toBe(true);
+    }
+  });
+  it('reports an unreadable-code error when compression is unavailable', async () => {
+    const encoded = await encodeAward(xpAwardOf(100));
+    if (!encoded.ok) throw new Error(encoded.error);
+    const spy = vi.spyOn(gzipModule, 'isGzipSupported').mockReturnValue(false);
+    const r = await decodeAward(encoded.code);
+    spy.mockRestore();
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error).toMatch(/cannot read award codes/);
   });
   it('marks blocked rows and leaves their cells empty', () => {
     const milestone = previewAward(member(withMode(sheet(5), 'milestone')), xpAwardOf(100));

@@ -67,11 +67,39 @@ describe('Party XP page', () => {
     expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent('0');
   });
 
-  it('shows XP not tracked for a manual member', () => {
+  it('shows the known XP for a manual member and counts it in the party total', () => {
     seed([], 4);
     render(<Page />);
     typeAmount('100');
-    expect(screen.getByText('XP not tracked')).toBeInTheDocument();
+    expect(screen.getAllByText('XP not tracked').length).toBeGreaterThan(0);
+    const row = screen.getByRole('row', { name: /Manny/ });
+    expect(within(row).getByRole('button', { name: /^Manny: XP added:/ })).toHaveTextContent('100');
+    expect(screen.getByRole('button', { name: /Party total XP/ })).toHaveTextContent('100');
+  });
+
+  it('shows the direct level result for a manual member on a level award', () => {
+    seed([], 4);
+    render(<Page />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Level' }));
+    fireEvent.change(screen.getByLabelText('Target level'), { target: { value: '6' } });
+    const row = screen.getByRole('row', { name: /Manny/ });
+    expect(within(row).getByRole('button', { name: /^Manny: level you can reach:/ })).toHaveTextContent('6');
+    expect(within(row).getByText('Levels up')).toBeInTheDocument();
+  });
+
+  it('hides the code and does not mint a second award when the draft changes', async () => {
+    seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
+    render(<Page />);
+    typeAmount('50');
+    const create = screen.getByRole('button', { name: 'Create code' });
+    fireEvent.click(create);
+    fireEvent.click(create);
+    await screen.findByLabelText('Award code');
+    await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(1));
+    fireEvent.change(screen.getByLabelText('Label (optional)'), { target: { value: 'Changed' } });
+    expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('XP per character'), { target: { value: '60' } });
+    expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument();
   });
 
   it('creates a code that decodes to the shown award, and keeps history across a remount', async () => {

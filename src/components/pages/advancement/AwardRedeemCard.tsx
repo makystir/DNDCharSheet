@@ -6,7 +6,7 @@ import { SectionHeader } from '../../shared/SectionHeader';
 import { CalculatedValue } from '../../shared/CalculatedValue';
 import { characterXp, levelingMode, xpForLevel } from '../../../logic/advancement';
 import { clampLevel } from '../../../logic/abilities';
-import { awardBlocker, MAX_AWARD_XP, previewAward, type AwardPayload } from '../../../logic/dm-awards';
+import { appliedAwardIds, awardBlocker, MAX_AWARD_XP, previewAward, type AwardPayload } from '../../../logic/dm-awards';
 import { OUTCOME_TEXT, useAwardRedeem } from '../useAwardRedeem';
 import styles from '../AdvancementPage.module.css';
 
@@ -54,7 +54,7 @@ export function AwardRedeemCard({ character, onChange, now = Date.now }: AwardRe
   if (award) {
     const me: DmPartyMember = { id: 'me', name: character.name || 'You', source: 'imported', character, addedAt: 0, updatedAt: 0 };
     const preview = previewAward(me, award);
-    const already = character.advancement?.appliedAwards?.includes(award.id) ?? false;
+    const already = appliedAwardIds(character).includes(award.id);
     const blocker = already ? null : awardBlocker(character, award);
     const blocked = blocker === 'milestone-blocked' || blocker === 'multiclass-unsupported' ? blocker : null;
     const disabled = already || blocked !== null;

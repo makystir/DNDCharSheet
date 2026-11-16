@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Character } from '../../types/character';
 import { applyAward, decodeAward, type ApplyOutcome, type AwardPayload } from '../../logic/dm-awards';
 
@@ -35,14 +35,26 @@ export function useAwardRedeem(
   onChange: (next: Character) => void,
   now: () => number,
 ): UseAwardRedeemResult {
-  const [text, setText] = useState('');
+  const [text, setTextRaw] = useState('');
   const [award, setAward] = useState<AwardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
 
+  // Editing the text invalidates any earlier Check, so Apply can never use a stale award.
+  const latestText = useRef('');
+  const setText = (v: string) => {
+    latestText.current = v;
+    setTextRaw(v);
+    setAward(null);
+    setError(null);
+    setResult(null);
+  };
+
   const check = async () => {
     setResult(null);
-    const decoded = await decodeAward(text);
+    const checkedText = text;
+    const decoded = await decodeAward(checkedText);
+    if (latestText.current !== checkedText) return; // edited while decoding
     if (!decoded.ok) {
       setAward(null);
       setError(decoded.error);
@@ -59,7 +71,8 @@ export function useAwardRedeem(
     setResult(OUTCOME_TEXT[outcome.outcome]);
     if (outcome.outcome === 'applied' || outcome.outcome === 'no-change' || outcome.outcome === 'already-applied') {
       setAward(null);
-      setText('');
+      latestText.current = '';
+      setTextRaw('');
     }
   };
 

@@ -76,9 +76,11 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const [noncombat, setNoncombat] = useState<EncounterDifficulty | 'typed'>('moderate');
   const [typed, setTyped] = useState('100');
   const [targetLevel, setTargetLevel] = useState('2');
-  const [shown, setShown] = useState<{ code: string; id: string } | null>(null);
+  // `key` ties a created code to the draft it came from; null for a code re-shown from history.
+  const [shownRaw, setShown] = useState<{ code: string; id: string; key: string | null } | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const codeRef = useRef<HTMLTextAreaElement>(null);
+  const creating = useRef(false);
 
   const encounters = campaign?.encounters ?? [];
   const encounter = encounters.find((e) => e.id === encounterId) ?? encounters[0];
@@ -124,8 +126,23 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     components: rows.map((r) => ({ label: r.name, value: r.addedXp?.total ?? 0 })),
   };
 
+  const draftKey = JSON.stringify([amount.kind, amount.amount, amount.source, cleanedLabel]);
+  // A created code is shown only while the draft still matches the one it was made from.
+  const shown = shownRaw && (shownRaw.key === null || shownRaw.key === draftKey) ? shownRaw : null;
+
   const create = async () => {
     if (problem) return;
+    if (shown && shown.key === draftKey) return; // already created for this draft; reuse it
+    if (creating.current) return;
+    creating.current = true;
+    try {
+      await createAward(draftKey);
+    } finally {
+      creating.current = false;
+    }
+  };
+
+  const createAward = async (key: string) => {
     const award: DmAward = {
       id: awardIdFromUuid(newId()),
       kind: amount.kind,
@@ -142,7 +159,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     }
     setCreateError(null);
     if (campaign) dm.update((d) => addAward(d, campaign.id, award));
-    setShown({ code: encoded.code, id: award.id });
+    setShown({ code: encoded.code, id: award.id, key });
   };
 
   const showCode = async (award: DmAward) => {
@@ -152,7 +169,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
       return;
     }
     setCreateError(null);
-    setShown({ code: encoded.code, id: award.id });
+    setShown({ code: encoded.code, id: award.id, key: null });
   };
 
   const copy = async () => {
@@ -320,34 +337,41 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
                           <td>-</td>
                           <td className={xp.blocked}>{BLOCKED_TEXT[r.blocked]}</td>
                         </>
-                      ) : !r.xpTracked || !r.currentXp || !r.addedXp || !r.newXp || !r.reachableLevel ? (
-                        <>
-                          <td colSpan={4} className={xp.blocked}>
-                            XP not tracked
-                          </td>
-                          <td />
-                        </>
                       ) : (
                         <>
                           <td>
-                            <CalculatedValue label={`${r.name}: current XP`} breakdown={r.currentXp}>
-                              {n(r.currentXp.total)}
-                            </CalculatedValue>
+                            {r.currentXp ? (
+                              <CalculatedValue label={`${r.name}: current XP`} breakdown={r.currentXp}>
+                                {n(r.currentXp.total)}
+                              </CalculatedValue>
+                            ) : (
+                              <span className={xp.blocked}>XP not tracked</span>
+                            )}
                           </td>
                           <td>
-                            <CalculatedValue label={`${r.name}: XP added`} breakdown={r.addedXp}>
-                              {n(r.addedXp.total)}
-                            </CalculatedValue>
+                            {r.addedXp && (
+                              <CalculatedValue label={`${r.name}: XP added`} breakdown={r.addedXp}>
+                                {n(r.addedXp.total)}
+                              </CalculatedValue>
+                            )}
                           </td>
                           <td>
-                            <CalculatedValue label={`${r.name}: new XP`} breakdown={r.newXp}>
-                              {n(r.newXp.total)}
-                            </CalculatedValue>
+                            {r.newXp ? (
+                              <CalculatedValue label={`${r.name}: new XP`} breakdown={r.newXp}>
+                                {n(r.newXp.total)}
+                              </CalculatedValue>
+                            ) : (
+                              <span className={xp.blocked}>XP not tracked</span>
+                            )}
                           </td>
                           <td>
-                            <CalculatedValue label={`${r.name}: level you can reach`} breakdown={r.reachableLevel}>
-                              {r.reachableLevel.total}
-                            </CalculatedValue>
+                            {r.reachableLevel ? (
+                              <CalculatedValue label={`${r.name}: level you can reach`} breakdown={r.reachableLevel}>
+                                {r.reachableLevel.total}
+                              </CalculatedValue>
+                            ) : (
+                              <span className={xp.blocked}>Needs current XP</span>
+                            )}
                           </td>
                           <td>{r.levelsGained > 0 && <span className={xp.badge}>Levels up</span>}</td>
                         </>
