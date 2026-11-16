@@ -59848,5 +59848,2720 @@
   "lairActions": [],
   "description": "A huge giant of chaotic good alignment, encountered in Coastal and Underwater. It can fly and swim and fights with Storm Sword, Thunderbolt, and Lightning Storm. Its challenge rating is 13.",
   "page": 302
+ },
+ {
+  "name": "Succubus",
+  "size": "Medium",
+  "type": "Fiend",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)",
+   "Urban"
+  ],
+  "treasure": [
+   "Implements"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 71,
+   "dice": "13d8 + 13"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   }
+  },
+  "skills": {
+   "Deception": 9,
+   "Insight": 5,
+   "Perception": 5,
+   "Persuasion": 9,
+   "Stealth": 7
+  },
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Poison",
+   "Psychic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Infernal",
+   "Telepathy"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Incubus Form",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Fiendish Touch",
+     "Charm",
+     "Draining Kiss"
+    ],
+    "summary": "Strings together 1 strikes using Fiendish Touch, Charm, Draining Kiss."
+   },
+   {
+    "name": "Fiendish Touch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Psychic",
+      "dice": "2d10 + 5"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing psychic damage."
+   },
+   {
+    "name": "Charm",
+    "type": "utility",
+    "summary": "Special action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Draining Kiss",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "3d8",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Charmed"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 15 Con save; Inflicts psychic damage; can impose charmed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fiend of neutral evil alignment, encountered in Planar (Lower Planes) and Urban. It can fly and fights with Fiendish Touch and Draining Kiss. Its challenge rating is 4.",
+  "page": 303
+ },
+ {
+  "name": "Swarm of Bats",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Mountain",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d10"
+  },
+  "speed": {
+   "walk": 5,
+   "fly": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 11
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "2d4"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 2,
+     "type": "Piercing",
+     "dice": "1d4"
+    },
+    "summary": "Melee attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Forest, Mountain, and Underdark. It can fly and fights with Bites. Its challenge rating is 1/4.",
+  "page": 370
+ },
+ {
+  "name": "Swarm of Crawling Claws",
+  "size": "Medium",
+  "type": "Undead",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 49,
+   "dice": "11d8"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Grappled",
+   "Incapacitated",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Understands Common"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Swarm of Grasping Hands",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 20,
+      "type": "Necrotic",
+      "dice": "4d8 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 11,
+     "type": "Necrotic",
+     "dice": "2d8 + 2"
+    },
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +4 dealing necrotic damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium undead of neutral evil alignment, encountered in Any. It can climb and fights with Swarm of Grasping Hands. Its challenge rating is 3.",
+  "page": 83
+ },
+ {
+  "name": "Swarm of Dretches",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Cold",
+   "Fire",
+   "Lightning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Fetid Aura",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Poisoned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 12 Con save; can impose poisoned; affects a 10-foot emanation."
+   },
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 2 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Slashing",
+      "dice": "3d6 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 9,
+     "type": "Slashing",
+     "dice": "3d4 + 2"
+    },
+    "summary": "Melee attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It fights with Rend. Its challenge rating is 4.",
+  "page": 104
+ },
+ {
+  "name": "Swarm of Insects",
+  "size": "Medium",
+  "type": "Beast",
+  "tags": [
+   "Swarms of Insects"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 19,
+   "dice": "3d8 + 6"
+  },
+  "speed": {
+   "walk": 20,
+   "climb": 20,
+   "fly": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 8
+  },
+  "languages": [],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Spider Climb",
+    "summary": "Climbs on difficult surfaces, ceilings included, without needing an ability check."
+   },
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Poison",
+      "dice": "2d4 + 1"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 3,
+     "type": "Poison",
+     "dice": "1d4 + 1"
+    },
+    "summary": "Melee attack at +3 dealing poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Desert, Forest, and Grassland. It can climb and fly and fights with Bites. Its challenge rating is 1/2.",
+  "page": 370
+ },
+ {
+  "name": "Swarm of Larvae",
+  "size": "Large",
+  "type": "Fiend",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "3d10 + 6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Understands all"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 9,
+      "type": "Necrotic",
+      "dice": "2d6 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 7,
+     "type": "Necrotic",
+     "dice": "2d4 + 2"
+    },
+    "summary": "Melee attack at +4 dealing necrotic damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of neutral evil alignment, encountered in Planar (Lower Planes). It fights with Bites. Its challenge rating is 1.",
+  "page": 193
+ },
+ {
+  "name": "Swarm of Lemures",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Devil"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Nine Hells)"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": -2,
+   "score": 8
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Cold",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Poisoned",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Understands Infernal"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Hellish Restoration",
+    "summary": "If it dies away from the Nine Hells, it reforms there after a time."
+   },
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Vile Slime"
+    ],
+    "summary": "Strings together 2 strikes using Vile Slime."
+   },
+   {
+    "name": "Vile Slime",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Poison",
+      "dice": "2d8 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 9,
+     "type": "Poison",
+     "dice": "2d6 + 2"
+    },
+    "summary": "Melee attack at +4 dealing poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of lawful evil alignment, encountered in Planar (Nine Hells). It fights with Vile Slime. Its challenge rating is 3.",
+  "page": 194
+ },
+ {
+  "name": "Swarm of Piranhas",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underwater"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 28,
+   "dice": "8d8 - 8"
+  },
+  "speed": {
+   "walk": 5,
+   "swim": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 8
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   },
+   {
+    "name": "Water Breathing",
+    "summary": "Can breathe underwater."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "2d4 + 3"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 5,
+     "type": "Piercing",
+     "dice": "1d4 + 3"
+    },
+    "summary": "Melee attack at +5 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Underwater. It can swim and fights with Bites. Its challenge rating is 1.",
+  "page": 370
+ },
+ {
+  "name": "Swarm of Rats",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 14,
+   "dice": "4d8 - 4"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   },
+   "con": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "darkvision": 30,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "2d4"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 2,
+     "type": "Piercing",
+     "dice": "1d4"
+    },
+    "summary": "Melee attack at +2 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Forest, Swamp, and Underdark. It can climb and fights with Bites. Its challenge rating is 1/4.",
+  "page": 370
+ },
+ {
+  "name": "Swarm of Ravens",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Hill",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 50
+  },
+  "abilities": {
+   "str": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 5
+  },
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "passivePerception": 15
+  },
+  "languages": [],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Beaks",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Piercing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 2,
+     "type": "Piercing",
+     "dice": "1d4"
+    },
+    "summary": "Melee attack at +4 dealing piercing damage."
+   },
+   {
+    "name": "Cacophony",
+    "recharge": "6-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 10
+     }
+    ],
+    "conditions": [
+     "Deafened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 6-6; Targets make a DC 10 Wis save; can impose deafened."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Hill, Swamp, and Urban. It can fly and fights with Beaks and Cacophony. Its challenge rating is 1/4.",
+  "page": 371
+ },
+ {
+  "name": "Swarm of Stirges",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Mountain",
+   "Swamp",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 36,
+   "dice": "8d8"
+  },
+  "speed": {
+   "walk": 10,
+   "fly": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Swarm of Proboscises",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 14,
+      "type": "Piercing",
+      "dice": "2d10 + 3"
+     }
+    ],
+    "alternateDamage": {
+     "condition": "the swarm is Bloodied",
+     "avg": 8,
+     "type": "Piercing",
+     "dice": "1d10 + 3"
+    },
+    "extraDamage": [
+     {
+      "avg": 7,
+      "type": "Necrotic",
+      "dice": "2d6"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "summary": "Melee attack at +5 dealing piercing damage; can impose grappled."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity, encountered in Desert, Forest, and Grassland. It can fly and fights with Swarm of Proboscises. Its challenge rating is 2.",
+  "page": 299
+ },
+ {
+  "name": "Swarm of Venomous Snakes",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Coastal",
+   "Desert",
+   "Forest",
+   "Grassland",
+   "Hill",
+   "Swamp"
+  ],
+  "treasure": [],
+  "ac": 14,
+  "initiative": {
+   "mod": 4,
+   "score": 14
+  },
+  "hp": {
+   "avg": 36,
+   "dice": "8d8"
+  },
+  "speed": {
+   "walk": 30,
+   "swim": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {
+   "Acrobatics": 8
+  },
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened",
+   "Grappled",
+   "Paralyzed",
+   "Petrified",
+   "Prone",
+   "Restrained",
+   "Stunned"
+  ],
+  "senses": {
+   "blindsight": 10,
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Swarm",
+    "summary": "Can occupy other creatures' spaces and pass through openings small enough for its tiny members; cannot regain hit points or gain temporary hit points as ordinary creatures can."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Bites",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Piercing",
+      "dice": "1d8 + 4"
+     },
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d4 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Poison",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing piercing plus piercing plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Coastal, Desert, and Forest. It can swim and fights with Bites. Its challenge rating is 2.",
+  "page": 371
+ },
+ {
+  "name": "Tarrasque",
+  "size": "Gargantuan",
+  "type": "Monstrosity",
+  "tags": [
+   "Titan"
+  ],
+  "alignment": "Unaligned",
+  "habitat": [
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 25,
+  "initiative": {
+   "mod": 18,
+   "score": 28
+  },
+  "hp": {
+   "avg": 697,
+   "dice": "34d20 + 340"
+  },
+  "speed": {
+   "walk": 60,
+   "burrow": 40,
+   "climb": 60
+  },
+  "abilities": {
+   "str": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 9
+   },
+   "con": {
+    "score": 30,
+    "mod": 10,
+    "save": 10
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": 5
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 9
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 9
+   }
+  },
+  "skills": {
+   "Perception": 9
+  },
+  "resistances": [
+   "Bludgeoning",
+   "Piercing",
+   "Slashing"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Deafened",
+   "Frightened",
+   "Paralyzed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Fire",
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 120,
+   "passivePerception": 19
+  },
+  "languages": [],
+  "cr": "30",
+  "xp": 155000,
+  "pb": 9,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "6/Day",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Reflective Carapace",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Siege Monster",
+    "summary": "Deals extra damage to objects and structures."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Bite",
+     "Claw",
+     "Tail"
+    ],
+    "summary": "Strings together 1 strikes using Bite, Claw, Tail."
+   },
+   {
+    "name": "Bite",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 19,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 36,
+      "type": "Piercing",
+      "dice": "4d12 + 10"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "summary": "Melee attack at +19 dealing piercing damage; can impose grappled, restrained; involves teleportation."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 19,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 28,
+      "type": "Slashing",
+      "dice": "4d8 + 10"
+     }
+    ],
+    "summary": "Melee attack at +19 dealing slashing damage."
+   },
+   {
+    "name": "Tail",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 19,
+     "reach": 30
+    },
+    "damage": [
+     {
+      "avg": 23,
+      "type": "Bludgeoning",
+      "dice": "3d8 + 10"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +19 dealing bludgeoning damage; can impose prone."
+   },
+   {
+    "name": "Thunderous Bellow",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 27
+     }
+    ],
+    "damage": [
+     {
+      "avg": 78,
+      "dice": "12d12",
+      "type": "Thunder"
+     }
+    ],
+    "conditions": [
+     "Deafened",
+     "Frightened"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 27 Con save; Inflicts thunder damage; can impose deafened, frightened; affects a 150-foot cone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Swallow",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 27
+     },
+     {
+      "ability": "Con",
+      "dc": 20
+     }
+    ],
+    "damage": [
+     {
+      "avg": 56,
+      "dice": "16d6",
+      "type": "Acid"
+     }
+    ],
+    "conditions": [
+     "Blinded",
+     "Grappled",
+     "Prone",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 27 Str save; Targets make a DC 20 Con save; Inflicts acid damage; can impose blinded, grappled, prone, restrained; involves teleportation."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [
+   {
+    "name": "Onslaught",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   },
+   {
+    "name": "World-Shaking Movement",
+    "type": "utility",
+    "summary": "Can impose prone; affects a 60-foot emanation."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3
+  },
+  "lairActions": [],
+  "description": "A gargantuan monstrosity, encountered in Urban. It can burrow and climb, fights with Bite, Claw, and Tail, and can take legendary actions. Its challenge rating is 30.",
+  "page": 305
+ },
+ {
+  "name": "Thri-kreen Marauder",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral",
+  "habitat": [
+   "Desert",
+   "Grassland"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 33,
+   "dice": "6d8 + 6"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 5,
+   "Survival": 3
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Thri-kreen",
+   "telepathy"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Gythka",
+     "Chatkcha"
+    ],
+    "summary": "Strings together 2 strikes using Gythka, Chatkcha."
+   },
+   {
+    "name": "Gythka",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d8 + 1"
+     },
+     {
+      "avg": 2,
+      "type": "Poison",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing slashing plus poison damage."
+   },
+   {
+    "name": "Chatkcha",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "30/120"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Slashing",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing slashing damage."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Leap",
+    "type": "utility",
+    "summary": "Jumps a short distance as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral alignment, encountered in Desert and Grassland. It fights with Gythka and Chatkcha. Its challenge rating is 1.",
+  "page": 306
+ },
+ {
+  "name": "Thri-kreen Psion",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral",
+  "habitat": [
+   "Desert",
+   "Grassland"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 149,
+   "dice": "23d8 + 46"
+  },
+  "speed": {
+   "walk": 40,
+   "fly": 20,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 4,
+   "Stealth": 8
+  },
+  "resistances": [
+   "Psychic"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Thri-kreen",
+   "telepathy"
+  ],
+  "cr": "8",
+  "xp": 3900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Psionic Lance"
+    ],
+    "summary": "Strings together 3 strikes using Psionic Lance."
+   },
+   {
+    "name": "Psionic Lance",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 7,
+     "reach": 10,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Psychic",
+      "dice": "4d6 + 4"
+     }
+    ],
+    "summary": "Melee or ranged attack at +7 dealing psychic damage."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 15,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "1": [
+       "Detect Thoughts",
+       "Sending",
+       "Synaptic Static"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (4 spells) using Int with save DC 15, no spell needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral alignment, encountered in Desert and Grassland. It can fly and fights with Psionic Lance. Its challenge rating is 8.",
+  "page": 306
+ },
+ {
+  "name": "Tiger",
+  "size": "Large",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Forest",
+   "Grassland"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "3d10 + 6"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 3,
+   "Stealth": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "2d6 + 3"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +5 dealing slashing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Nimble Escape",
+    "type": "utility",
+    "summary": "Disengages or hides as a bonus action."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large beast, encountered in Forest and Grassland. It fights with Rend. Its challenge rating is 1.",
+  "page": 371
+ },
+ {
+  "name": "Tough",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 32,
+   "dice": "5d8 + 10"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Mace",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   },
+   {
+    "name": "Heavy Crossbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 3,
+     "range": "100/400"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "1d10 + 1"
+     }
+    ],
+    "summary": "Ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Mace and Heavy Crossbow. Its challenge rating is 1/2.",
+  "page": 307
+ },
+ {
+  "name": "Tough Boss",
+  "size": "Medium or Small",
+  "type": "Humanoid",
+  "alignment": "Neutral",
+  "habitat": [
+   "Any"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 82,
+   "dice": "11d8 + 33"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 5
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [
+   "Common plus one other language"
+  ],
+  "cr": "4",
+  "xp": 1100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Pack Tactics",
+    "summary": "Has advantage on attacks against a target when an ally is next to that target and not incapacitated."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Warhammer",
+     "Heavy Crossbow"
+    ],
+    "summary": "Strings together 2 strikes using Warhammer, Heavy Crossbow."
+   },
+   {
+    "name": "Warhammer",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning damage."
+   },
+   {
+    "name": "Heavy Crossbow",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "100/400"
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Piercing",
+      "dice": "2d10 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small humanoid of neutral alignment, encountered in Any. It fights with Warhammer and Heavy Crossbow. Its challenge rating is 4.",
+  "page": 307
+ },
+ {
+  "name": "Treant",
+  "size": "Huge",
+  "type": "Plant",
+  "alignment": "Chaotic Good",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 16,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 138,
+   "dice": "12d12 + 60"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "resistances": [
+   "Bludgeoning",
+   "Piercing"
+  ],
+  "senses": {
+   "passivePerception": 13
+  },
+  "languages": [
+   "Common",
+   "Druidic",
+   "Elvish",
+   "Sylvan"
+  ],
+  "cr": "9",
+  "xp": 5000,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Siege Monster",
+    "summary": "Deals extra damage to objects and structures."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam"
+    ],
+    "summary": "Strings together 2 strikes using Slam."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Bludgeoning",
+      "dice": "3d6 + 6"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing bludgeoning damage."
+   },
+   {
+    "name": "Hail of Bark",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 10,
+     "range": "180"
+    },
+    "damage": [
+     {
+      "avg": 28,
+      "type": "Piercing",
+      "dice": "4d10 + 6"
+     }
+    ],
+    "summary": "Ranged attack at +10 dealing piercing damage."
+   },
+   {
+    "name": "Animate Trees",
+    "uses": "1/Day",
+    "type": "utility",
+    "summary": "Usable 1 per day."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge plant of chaotic good alignment, encountered in Forest. It fights with Slam and Hail of Bark. Its challenge rating is 9.",
+  "page": 308
+ },
+ {
+  "name": "Tree Blight",
+  "size": "Huge",
+  "type": "Plant",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 3,
+   "score": 13
+  },
+  "hp": {
+   "avg": 115,
+   "dice": "10d12 + 50"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 22,
+    "mod": 6,
+    "save": 6
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Deafened"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Understands Common",
+   "Druidic"
+  ],
+  "cr": "7",
+  "xp": 2900,
+  "pb": 3,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Branch",
+     "Grasping Root"
+    ],
+    "summary": "Strings together 2 strikes using Branch, Grasping Root."
+   },
+   {
+    "name": "Branch",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 15
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Bludgeoning",
+      "dice": "3d6 + 6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning damage."
+   },
+   {
+    "name": "Grasping Root",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 13,
+      "dice": "2d6 + 6",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Str save; Inflicts bludgeoning damage; can impose grappled."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Gnash",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 19,
+      "dice": "3d8 + 6",
+      "type": "Piercing"
+     }
+    ],
+    "conditions": [
+     "Grappled"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Targets make a DC 17 Dex save; Inflicts piercing damage; can impose grappled."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A huge plant of neutral evil alignment, encountered in Forest. It fights with Branch and Grasping Root. Its challenge rating is 7.",
+  "page": 44
  }
 ]
