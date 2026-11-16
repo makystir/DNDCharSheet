@@ -335,7 +335,8 @@ export function fromMonsterManual2024Entry(e: MonsterManual2024Entry): LibraryMo
     .join(', ');
   // Monster Manual 2024, "Legendary Actions": the number of uses is printed in each stat block
   // ("Legendary Action Uses: 3 (4 in Lair)"), so it is read from `legendaryActionUses`, not assumed.
-  const legendaryUses = e.legendaryActions.length > 0 ? (e.legendaryActionUses?.normal ?? 3) : 0;
+  // Every monsters.json creature with legendary actions carries `legendaryActionUses` (checked by tests); none is assumed.
+  const legendaryUses = e.legendaryActionUses?.normal ?? 0;
   const inLair = e.legendaryActionUses?.inLair;
   return {
     key: monsterManualKey(e.name),

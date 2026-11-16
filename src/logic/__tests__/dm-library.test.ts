@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { NPC_TEMPLATE_LIST } from '../../data/npc-templates';
 import { CREATURE_LIST } from '../../data/creatures';
+import { MONSTER_MANUAL_2024_LIST } from '../../data/monster-manual-2024';
 import { abilityModifier } from '../abilities';
 import {
   blankCustomMonster,
@@ -11,6 +12,7 @@ import {
   customFromLibrary,
   deleteCustomMonster,
   filterMonsters,
+  fromMonsterManual2024Entry,
   libraryMonsters,
   saveCustomMonster,
   typeOf,
@@ -98,6 +100,31 @@ describe('built-in library', () => {
     expect(c.hp.max).toBe(goblin.hpAverage);
     const bad = all.find((m) => !m.addable);
     if (bad) expect(combatantFromLibrary(bad, 'y')).toBeUndefined();
+  });
+});
+
+describe('Monster Manual 2024 origin', () => {
+  it('adds every monsters.json creature as its own origin', () => {
+    const all = libraryMonsters({ customMonsters: [] });
+    const mm = filterMonsters(all, { origin: 'monster-manual' });
+    expect(mm).toHaveLength(MONSTER_MANUAL_2024_LIST.length);
+    expect(all.length).toBeGreaterThanOrEqual(MONSTER_MANUAL_2024_LIST.length + NPC_TEMPLATE_LIST.length);
+  });
+
+  it('maps a sample entry and reads legendary uses from the data', () => {
+    const entry = MONSTER_MANUAL_2024_LIST.find((e) => e.legendaryActions.length > 0)!;
+    const m = fromMonsterManual2024Entry(entry);
+    expect(m.origin).toBe('monster-manual');
+    expect(m.ac).toBe(entry.ac);
+    expect(m.hpAverage).toBe(entry.hp.avg);
+    expect(m.legendaryUses).toBe(entry.legendaryActionUses?.normal);
+    expect(m.legendaryUses).toBeGreaterThan(0);
+  });
+
+  it('every creature with legendary actions prints its uses', () => {
+    for (const e of MONSTER_MANUAL_2024_LIST) {
+      if (e.legendaryActions.length > 0) expect(e.legendaryActionUses?.normal, e.name).toBeGreaterThan(0);
+    }
   });
 });
 
