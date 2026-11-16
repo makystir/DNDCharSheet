@@ -1565,122 +1565,122 @@
   {
    "name": "Iron Golem",
    "page": 181,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Jackal",
    "page": 364,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Jackalwere",
    "page": 182,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Juvenile Shadow Dragon",
    "page": 275,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kenku",
    "page": 183,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Killer Whale",
    "page": 364,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Knight",
    "page": 184,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kobold Warrior",
    "page": 185,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kraken",
    "page": 187,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kuo-toa",
    "page": 189,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kuo-toa Archpriest",
    "page": 191,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kuo-toa Monitor",
    "page": 190,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Kuo-toa Whip",
    "page": 190,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lacedon Ghoul",
    "page": 132,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lamia",
    "page": 192,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Larva",
    "page": 193,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lemure",
    "page": 194,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lich",
    "page": 196,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lion",
    "page": 364,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lizard",
    "page": 364,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Lizardfolk Geomancer",
