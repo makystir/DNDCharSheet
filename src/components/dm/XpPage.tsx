@@ -83,7 +83,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
   const [typed, setTyped] = useState('100');
   const [targetLevel, setTargetLevel] = useState('2');
   // `key` ties a shown code to the draft that was current when it was made or re-shown; history marks a re-shown past award.
-  const [shownRaw, setShown] = useState<{ code: string; id: string; key: string; history: boolean } | null>(null);
+  const [shownRaw, setShown] = useState<{ code: string; id: string; key: string; history: boolean; kind: 'xp' | 'level'; amount: number; label: string } | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const codeRef = useRef<HTMLTextAreaElement>(null);
   const creating = useRef(false);
@@ -117,12 +117,12 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     }
     if (tab === 'milestone' || (tab === 'noncombat' && noncombat !== 'typed')) {
       const kind = tab === 'milestone' ? milestone : (noncombat as EncounterDifficulty);
-      const s = milestoneShare(budgetMembers, kind, partySize);
+      const s = milestoneShare(budgetMembers, kind, Math.max(1, budgetMembers.length));
       return {
         kind: 'xp',
         amount: s.share.total,
         source: tab === 'milestone' ? kind === 'major' ? 'major' : 'minor' : 'noncombat',
-        breakdown: { ...shareBreakdown(s.total, partySize), note: `${s.total.note ?? ''} Total budget ${n(s.total.total)} XP.${s.note ? ` ${s.note}` : ''}`.trim() },
+        breakdown: { ...shareBreakdown(s.total, Math.max(1, budgetMembers.length)), note: `${s.total.note ?? ''} Total budget ${n(s.total.total)} XP.${s.note ? ` ${s.note}` : ''}`.trim() },
         error: s.share.total < 1 ? 'No XP to award' : s.share.total > MAX_AWARD_XP ? `The share is over the ${n(MAX_AWARD_XP)} XP limit.` : null,
       };
     }
@@ -146,9 +146,10 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     components: rows.map((r) => ({ label: r.blocked ? `${r.name} (blocked)` : r.name, value: r.blocked ? 0 : (r.addedXp?.total ?? 0) })),
   };
 
-  const draftKey = JSON.stringify([amount.kind, amount.amount, amount.source, cleanedLabel]);
-  // A shown code (created or re-shown from history) is hidden as soon as the draft changes, so Copy never sends an award that differs from the form.
-  const shown = shownRaw && shownRaw.key === draftKey ? shownRaw : null;
+  // Everything that can change the award's composition, so a code made for one fight is never reused for another with the same XP.
+  const draftKey = JSON.stringify([tab, tab === 'fight' ? (encounter?.id ?? '') : '', tab === 'fight' ? sharerCount : 0, amount.kind, amount.amount, amount.source, cleanedLabel]);
+  // A code made from the form is hidden as soon as the draft changes. A code re-shown from history stays and names its own award, so it is never mistaken for the form.
+  const shown = shownRaw && (shownRaw.history || shownRaw.key === draftKey) ? shownRaw : null;
 
   const create = async (another = false) => {
     if (problem) return;
@@ -179,7 +180,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
     }
     setCreateError(null);
     if (campaign) dm.update((d) => addAward(d, campaign.id, award));
-    setShown({ code: encoded.code, id: award.id, key, history: false });
+    setShown({ code: encoded.code, id: award.id, key, history: false, kind: award.kind, amount: award.amount, label: award.label });
   };
 
   const showCode = async (award: DmAward) => {
@@ -189,7 +190,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
       return;
     }
     setCreateError(null);
-    setShown({ code: encoded.code, id: award.id, key: draftKey, history: true });
+    setShown({ code: encoded.code, id: award.id, key: draftKey, history: true, kind: award.kind, amount: award.amount, label: award.label });
   };
 
   const copy = async () => {
@@ -437,6 +438,9 @@ export function XpPage({ dm, onNotify, newId = defaultNewId }: XpPageProps) {
           )}
           {shown && (
             <>
+              <p className={styles.muted} data-testid="shown-award">
+                {shown.history ? 'Past award' : 'New award'}: {shown.label || 'Award'} · {shown.kind === 'xp' ? `${n(shown.amount)} XP` : `level ${shown.amount}`}
+              </p>
               <textarea ref={codeRef} className={`${styles.textarea} ${xp.code}`} readOnly value={shown.code} aria-label="Award code" onFocus={(e) => e.currentTarget.select()} />
               <div className={styles.row}>
                 <button type="button" className={styles.btn} onClick={() => void copy()}>

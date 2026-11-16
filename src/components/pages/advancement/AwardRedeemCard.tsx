@@ -25,7 +25,6 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
   const level = clampLevel(character.level);
   if (award.kind === 'xp') {
     notes.push('Leveling up is still done on the Advancement page.');
-    if (levelingMode(character) !== 'xp' && level === 1) notes.push('Applying XP switches this sheet to XP leveling.');
     if (levelingMode(character) === 'xp' && characterXp(character) < xpForLevel(level)) {
       notes.push(
         `Your recorded XP (${n(characterXp(character))}) is below the level ${level} threshold (${n(xpForLevel(level))}). Enter your current XP on the Advancement page first.`,
@@ -38,7 +37,7 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
     }
   } else {
     if (level >= award.amount) return notes;
-    notes.push('Applying this sets your level directly.');
+    notes.push('Applying this raises your level one level at a time, the same way a normal level-up does.');
     if (levelingMode(character) === 'xp') {
       notes.push('Your XP is unchanged; later level-ups still need the XP threshold.');
       if (characterXp(character) < xpForLevel(award.amount)) {
@@ -50,7 +49,7 @@ function previewNotes(character: Character, award: AwardPayload, newXp: number):
     if (lifeStatus(character) === 'dead') {
       notes.push('Your character is dead: the level changes, but they stay dead at 0 HP.');
     } else {
-      notes.push("New levels use the fixed HP value, and your current HP rises with your maximum. Only your current level's HP can be re-recorded on this page.");
+      notes.push("Each new level records the fixed HP value, and your current HP rises with your maximum. Subclass, Ability Score Improvement or feat, and spell choices for the new levels are still yours to make: see Progression on this page.");
     }
   }
   return notes;

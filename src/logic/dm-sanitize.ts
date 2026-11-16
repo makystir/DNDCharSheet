@@ -274,6 +274,8 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   const awards = (Array.isArray(raw.awards) ? raw.awards : [])
     .map(sanitizeAward)
     .filter((a): a is DmAward => a !== undefined)
+    // A repeated ID would give duplicate React keys and two history rows for one code: keep the first.
+    .filter((a, i, all) => all.findIndex((b) => b.id === a.id) === i)
     .slice(-MAX_AWARDS);
   const wantedEncounter = str(raw.activeEncounterId);
   return {

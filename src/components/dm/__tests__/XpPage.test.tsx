@@ -5,6 +5,7 @@ import { useDmData } from '../../../hooks/useDmData';
 import { DM_DATA_KEY, loadDmData, saveDmData } from '../../../storage/dm-store';
 import { addImportedMember, addManualMember, createCampaign, DEFAULT_MANUAL_STATS, emptyDmData } from '../../../logic/dm-campaign';
 import { decodeAward } from '../../../logic/dm-awards';
+import { customCombatant } from '../../../logic/dm-encounter';
 import { generateRandomCharacter } from '../../../logic/personal-details-generation';
 import { createSeededRng } from '../../../logic/random';
 import type { Character } from '../../../types/character';
@@ -131,7 +132,7 @@ describe('Party XP page', () => {
     expect((again as HTMLTextAreaElement).value).toBe((code as HTMLTextAreaElement).value);
   });
 
-  it('hides a code reopened from history once the form is edited', async () => {
+  it('names a code reopened from history and keeps it when the form is edited', async () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
     const first = render(<Page />);
     typeAmount('150');
@@ -142,8 +143,30 @@ describe('Party XP page', () => {
     render(<Page />);
     fireEvent.click(screen.getByRole('button', { name: 'Show code' }));
     await screen.findByLabelText('Award code');
+    expect(screen.getByTestId('shown-award')).toHaveTextContent('Past award: Award · 150 XP');
+    // The form now describes a different award; the shown code still names its own.
     fireEvent.change(screen.getByLabelText('Label (optional)'), { target: { value: 'Edited' } });
+    expect(screen.getByLabelText('Award code')).toBeInTheDocument();
+    expect(screen.getByTestId('shown-award')).toHaveTextContent('Past award: Award · 150 XP');
+  });
+
+  it('does not reuse a created code when another encounter with the same XP is picked', async () => {
+    const mon = (id: string) => ({ ...customCombatant(id, { name: id, ac: 10, hpMax: 10, initiativeMod: 0 }), xp: 100 });
+    let d = createCampaign(emptyDmData(), { id: 'c', name: 'Test', now: 1 });
+    d = addImportedMember(d, 'c', { id: 'Ann', character: { ...sheet(3, 'xp', 0), name: 'Ann' }, now: 1 }).data;
+    const enc = (id: string) => ({ id, name: id, status: 'ended' as const, round: 0, activeId: null, combatants: [{ ...mon(`${id}-orc`), kind: 'monster' as const, xpCounts: true }], log: [], createdAt: 1, updatedAt: 1 });
+    d = { ...d, campaigns: d.campaigns.map((c) => ({ ...c, encounters: [enc('e1'), enc('e2')] })) };
+    saveDmData(d);
+    let i = 0;
+    render(<Page newId={() => `0000000000${++i}-aaaa-bbbb-cccc-dddddddddddd`} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    await screen.findByLabelText('Award code');
+    fireEvent.change(screen.getByLabelText('Encounter'), { target: { value: 'e2' } });
     expect(screen.queryByLabelText('Award code')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    await waitFor(() => expect(loadDmData().campaigns[0].awards).toHaveLength(2));
+    const [a, b] = loadDmData().campaigns[0].awards!;
+    expect(a.id).not.toBe(b.id);
   });
 
   it('rejects an invalid sharer count instead of coercing it', () => {

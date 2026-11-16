@@ -104,7 +104,8 @@ describe('AwardRedeemCard', () => {
     await paste(await code({ kind: 'level', amount: 6 }));
     const preview = await screen.findByTestId('award-preview');
     expect(within(preview).getByText(/Level you can reach/)).toBeInTheDocument();
-    expect(within(preview).getByText('Applying this sets your level directly.')).toBeInTheDocument();
+    expect(within(preview).getByText('Applying this raises your level one level at a time, the same way a normal level-up does.')).toBeInTheDocument();
+    expect(within(preview).getByText(/Subclass, Ability Score Improvement or feat, and spell choices/)).toBeInTheDocument();
     expect(within(preview).getByRole('button', { name: /^Level you can reach/ })).toHaveTextContent('6');
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
     expect(onChange.mock.calls[0][0].level).toBe(6);

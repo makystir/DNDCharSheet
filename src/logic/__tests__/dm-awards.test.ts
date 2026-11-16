@@ -12,6 +12,7 @@ import { importCharacterFromText } from '../dm-import';
 import { encodeSharePayload } from '../share-codec';
 import * as gzipModule from '../gzip';
 import { hitPointMaxOf } from '../hit-points-state';
+import { pendingChoices } from '../pending-choices';
 import {
   applyAward,
   awardBlocker,
@@ -476,13 +477,47 @@ describe('applyAward', () => {
     expect(applyAward(withMode(sheet(5), 'milestone'), levelAwardOf(7), NOW).outcome).toBe('applied');
   });
 
-  it('switches a level 1 sheet to XP mode', () => {
+  it('applies the same milestone rule at level 1: the sheet is never switched to XP mode', () => {
     for (const mode of [undefined, 'milestone'] as const) {
-      const r = applyAward(withMode(sheet(1), mode), xpAwardOf(50), NOW);
-      expect(r.outcome).toBe('applied');
-      expect(levelingMode(r.character)).toBe('xp');
-      expect(characterXp(r.character)).toBe(50);
+      const c = withMode(sheet(1), mode);
+      const r = applyAward(c, xpAwardOf(50), NOW);
+      expect(r.outcome).toBe('milestone-blocked');
+      expect(r.character).toBe(c);
+      expect(levelingMode(r.character)).toBe(mode ?? 'milestone');
     }
+    expect(applyAward(withMode(sheet(1), 'xp', 0), xpAwardOf(50), NOW).outcome).toBe('applied');
+  });
+
+  it('levels a 2+ level jump one level at a time with a fixed HP record for every gained level', () => {
+    for (const mode of [undefined, 'milestone', 'xp'] as const) {
+      const c = withMode(sheet(3), mode, mode === 'xp' ? 0 : undefined);
+      const r = applyAward(c, levelAwardOf(6), NOW);
+      expect(r.outcome).toBe('applied');
+      expect(r.character.level).toBe(6);
+      expect(r.character.classes?.[0].level).toBe(6);
+      for (const lvl of [4, 5, 6]) {
+        const rec = r.character.advancement?.levels?.find((l) => l.level === lvl);
+        expect(rec?.hp?.mode).toBe('fixed');
+      }
+      expect(pendingChoices(r.character).unrecordedHpLevels).not.toEqual(expect.arrayContaining([4]));
+      expect(pendingChoices(r.character).unrecordedHpLevels.filter((l) => l >= 4)).toEqual([]);
+      // The leveling settings are exactly what they were: the loop lifts the XP gate only while it runs.
+      expect(r.character.advancement?.leveling).toEqual(c.advancement?.leveling);
+      expect(r.character.advancement?.log?.filter((e) => e.kind === 'level-up').map((e) => e.level)).toEqual(
+        expect.arrayContaining([4, 5, 6]),
+      );
+    }
+  });
+
+  it('refuses a level award when the only class ID does not resolve in the class catalog', () => {
+    const base = sheet(3);
+    const c = withMode({ ...base, classes: [{ ...base.classes![0], id: 'not-a-class' as never }] }, 'milestone');
+    expect(awardBlocker(c, levelAwardOf(5))).toBe('class-required');
+    const r = applyAward(c, levelAwardOf(5), NOW);
+    expect(r.outcome).toBe('class-required');
+    expect(r.character).toBe(c);
+    expect(r.character.level).toBe(3);
+    expect(r.character.advancement?.appliedAwards).toBeUndefined();
   });
 });
 
@@ -496,6 +531,25 @@ describe('campaign awards', () => {
     const parsed = parseDmData(JSON.stringify(data));
     expect(parsed.ok).toBe(true);
     if (parsed.ok) expect(parsed.data.campaigns[0].awards).toEqual(data.campaigns[0].awards);
+  });
+
+  it('keeps only the first award of a repeated ID', () => {
+    const old = createCampaign(emptyDmData(), { id: 'c', name: 'C', now: NOW });
+    const raw = JSON.parse(JSON.stringify(old));
+    const a = { id: 'abcdef123456', kind: 'xp', amount: 5, label: 'first', source: 'fight', createdAt: 1 };
+    raw.campaigns[0].awards = [a, { ...a, label: 'second' }];
+    const parsed = parseDmData(JSON.stringify(raw));
+    expect(parsed.ok && parsed.data.campaigns[0].awards?.map((x) => x.label)).toEqual(['first']);
+  });
+
+  it('decodes a pasted code that was wrapped across lines', async () => {
+    const encoded = await encodeAward(xpAwardOf(300, 'abcdef123456', 'Wrapped'));
+    expect(encoded.ok).toBe(true);
+    if (!encoded.ok) return;
+    const mid = Math.floor(encoded.code.length / 2);
+    const wrapped = `${encoded.code.slice(0, mid)}\n  ${encoded.code.slice(mid)}`;
+    const decoded = await decodeAward(wrapped);
+    expect(decoded.ok).toBe(true);
   });
 
   it('loads an old campaign without awards and drops junk', () => {

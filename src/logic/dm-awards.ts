@@ -26,7 +26,8 @@ import type { Breakdown } from './breakdown';
 import type { EncounterDifficulty } from '../data/xp-tables';
 import { clampLevel } from './abilities';
 import { applyHealingToCharacter, hitPointMaxOf } from './hit-points-state';
-import { appendLogEntry, awardXp, levelingMode, setLevel, xpForLevel, xpToLevel } from './advancement';
+import { appendLogEntry, applyLevelUp, awardXp, levelingMode, xpForLevel, xpToLevel } from './advancement';
+import { resolveClass } from './classes';
 import { xpAward, xpBudget, type BudgetMember, type XpAward } from './dm-balance';
 import { isGzipSupported } from './gzip';
 import { decodeSharePayload, encodeSharePayload } from './share-codec';
@@ -179,7 +180,7 @@ export async function decodeAward(
       return fail('This is not an award code. Award codes start with AWARD-.', 'not-award');
     }
     if (trimmed.length > MAX_CODE_CHARS) return fail('This award code is too long.', 'too-large');
-    const decoded = await decodeSharePayload(trimmed.slice(AWARD_PREFIX.length));
+    const decoded = await decodeSharePayload(trimmed.slice(AWARD_PREFIX.length).replace(/\s+/g, ''));
     if (!decoded.ok) {
       if (decoded.code === 'bad-version') return fail('This award code is for a different version of the app.', 'bad-version');
       if (decoded.code === 'too-large') return fail('This award code is too long.', 'too-large');
@@ -292,8 +293,9 @@ export function awardBlocker(character: Character, award: AwardPayload): ApplyOu
   if (award.kind === 'level' && clampLevel(character.level) >= award.amount) return null;
   if (award.kind === 'level' && (character.classes?.length ?? 0) > 1) return 'multiclass-unsupported';
   if (award.kind === 'level') {
-    // setLevel writes the new level into classes[0]; without exactly one class there is nothing to raise.
-    if ((character.classes?.length ?? 0) !== 1) return 'class-required';
+    // The per-level flow records HP against the class's Hit Die, so the sole class must resolve
+    // through the class catalog; an unknown class ID would raise the level with no HP gain.
+    if ((character.classes?.length ?? 0) !== 1 || resolveClass(character) === undefined) return 'class-required';
     // A stored HP maximum (manual override) or a legacy rolled-HP total does not grow when the level
     // rises, and no fixed per-level gain can be recorded on top of them. Block rather than skip the HP.
     const manualMax = typeof character.hpMax === 'number' && Number.isFinite(character.hpMax);
@@ -303,7 +305,8 @@ export function awardBlocker(character: Character, award: AwardPayload): ApplyOu
       Number.isFinite(character.rolledHpTotal);
     if (manualMax || legacyRolled) return 'hp-unsupported';
   }
-  if (award.kind === 'xp' && levelingMode(character) !== 'xp' && clampLevel(character.level) > 1) {
+  // One rule at every level: a sheet that is not in XP mode never has its mode changed by an award.
+  if (award.kind === 'xp' && levelingMode(character) !== 'xp') {
     return 'milestone-blocked';
   }
   // An XP-mode sheet above level 1 with no stored XP has no baseline: adding the award to an implied 0
@@ -336,16 +339,27 @@ export function applyAward(
   let next: Character;
   if (award.kind === 'xp') {
     next = awardXp(character, award.amount, awardReason(award), now);
-    // Level 1 exception: recorded XP only counts in XP mode, and at level 1 the threshold is 0.
-    if (next.advancement?.leveling && next.advancement.leveling.mode !== 'xp') {
-      next = {
-        ...next,
-        advancement: { ...next.advancement, leveling: { ...next.advancement.leveling, mode: 'xp' } },
-      };
-    }
   } else {
     const maxBefore = hitPointMaxOf(character);
-    next = setLevel(character, award.amount);
+    // Advance one level at a time through the same flow the Advancement page uses for a normal
+    // level-up (applyLevelUp: class level, spell reconcile, fixed HP record for the level, log).
+    // A DM-granted level is not gated by the XP threshold, so the gate is lifted for the loop only
+    // and the sheet's leveling settings are restored afterwards.
+    next = character;
+    for (let lvl = clampLevel(character.level); lvl < award.amount; lvl += 1) {
+      const gated: Character = {
+        ...next,
+        advancement: { ...next.advancement, leveling: { ...next.advancement?.leveling, mode: 'milestone' } },
+      };
+      const stepped = applyLevelUp(gated, { mode: 'fixed' }, now);
+      if (stepped === null) return { character, outcome: 'class-required' };
+      next = stepped;
+    }
+    next = {
+      ...next,
+      advancement: { ...next.advancement, leveling: character.advancement?.leveling },
+    };
+    if (next.advancement && next.advancement.leveling === undefined) delete next.advancement.leveling;
     // DMG 2024 "Leveling Up": current and maximum HP rise together outside a Long Rest, so
     // a stored current HP gains the same amount as the maximum (never above the new maximum).
     // The gain goes through the healing writer so a character at 0 HP clears death saves and
