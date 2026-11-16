@@ -71143,5 +71143,286 @@
   "lairActions": [],
   "description": "A medium monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It can climb and fights with Bite. Its challenge rating is 3.",
   "page": 343
+ },
+ {
+  "name": "Yuan-ti Malison (Type 3)",
+  "size": "Medium",
+  "type": "Monstrosity",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Desert",
+   "Forest",
+   "Swamp",
+   "Urban"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 66,
+   "dice": "12d8 + 12"
+  },
+  "speed": {
+   "walk": 30,
+   "climb": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 13
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Draconic"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Poison Burst",
+     "Spellcasting"
+    ],
+    "summary": "Strings together 2 strikes using Poison Burst, Spellcasting. It can swap in a spell."
+   },
+   {
+    "name": "Poison Burst",
+    "cost": "Yuan-ti Form Only",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 5,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 12,
+      "type": "Poison",
+      "dice": "2d8 + 3"
+     }
+    ],
+    "summary": "Melee or ranged attack at +5 dealing poison damage."
+   },
+   {
+    "name": "Constrict",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Str",
+      "dc": 13
+     }
+    ],
+    "damage": [
+     {
+      "avg": 21,
+      "dice": "4d8 + 3",
+      "type": "Bludgeoning"
+     }
+    ],
+    "conditions": [
+     "Grappled",
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 13 Str save; Inflicts bludgeoning damage; can impose grappled, restrained."
+   },
+   {
+    "name": "Spellcasting",
+    "cost": "Yuan-ti Form Only",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 13,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Animal Friendship (snakes only)"
+     ],
+     "perDay": {
+      "2": [
+       "Suggestion"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (2 spells) using Wis with save DC 13, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium monstrosity of neutral evil alignment, encountered in Desert, Forest, and Swamp. It can climb and fights with Poison Burst and Constrict. Its challenge rating is 3.",
+  "page": 344
+ },
+ {
+  "name": "Zombie",
+  "size": "Medium",
+  "type": "Undead",
+  "tags": [
+   "Zombie"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 8,
+  "initiative": {
+   "mod": -2,
+   "score": 8
+  },
+  "hp": {
+   "avg": 15,
+   "dice": "2d8 + 6"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {
+   "Survival": 0
+  },
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 8
+  },
+  "languages": [
+   "What it knew in a past life"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Undead Fortitude",
+    "summary": "May drop to 1 hit point instead of 0 after a successful Constitution save, unless hit by radiant damage or a critical hit."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Bludgeoning",
+      "dice": "1d8 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium undead of neutral evil alignment, encountered in Planar (Shadowfell), Underdark, and Urban. It fights with Slam. Its challenge rating is 1/4.",
+  "page": 346
  }
 ]

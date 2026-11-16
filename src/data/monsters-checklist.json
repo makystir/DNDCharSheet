@@ -1,5 +1,5 @@
 {
- "complete": false,
+ "complete": true,
  "note": "Built from rendered Index of Stat Blocks (PDF idx 5-6). Page = printed page; PDF 0-based idx = page+2.",
  "items": [
   {
@@ -3005,14 +3005,14 @@
   {
    "name": "Yuan-ti Malison (Type 3)",
    "page": 344,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   },
   {
    "name": "Zombie",
    "page": 346,
-   "status": "pending",
-   "done": false
+   "status": "done",
+   "done": true
   }
  ]
 }
