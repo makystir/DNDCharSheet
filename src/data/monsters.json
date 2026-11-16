@@ -24858,26 +24858,27 @@
    "Swamp"
   ],
   "treasure": [],
-  "ac": 10,
+  "ac": 11,
   "initiative": {
-   "mod": 0,
-   "score": 10
+   "mod": 1,
+   "score": 11
   },
   "hp": {
    "avg": 1,
    "dice": "1d4 - 1"
   },
   "speed": {
-   "walk": 50
+   "walk": 20,
+   "swim": 20
   },
   "abilities": {
    "str": {
-    "score": 0,
+    "score": 1,
     "mod": -5,
     "save": -5
    },
    "dex": {
-    "score": 12,
+    "score": 13,
     "mod": 1,
     "save": 1
    },
@@ -24887,7 +24888,7 @@
     "save": -1
    },
    "int": {
-    "score": 0,
+    "score": 1,
     "mod": -5,
     "save": -5
    },
@@ -24897,7 +24898,7 @@
     "save": -1
    },
    "cha": {
-    "score": 2,
+    "score": 3,
     "mod": -4,
     "save": -4
    }
@@ -47762,10 +47763,10 @@
    "Hill"
   ],
   "treasure": [],
-  "ac": 12,
+  "ac": 13,
   "initiative": {
-   "mod": 2,
-   "score": 12
+   "mod": 3,
+   "score": 13
   },
   "hp": {
    "avg": 13,
@@ -47782,9 +47783,9 @@
     "save": 2
    },
    "dex": {
-    "score": 14,
-    "mod": 2,
-    "save": 2
+    "score": 16,
+    "mod": 3,
+    "save": 3
    },
    "con": {
     "score": 10,
@@ -47792,7 +47793,7 @@
     "save": 0
    },
    "int": {
-    "score": 2,
+    "score": 3,
     "mod": -4,
     "save": -4
    },
@@ -47802,14 +47803,14 @@
     "save": 2
    },
    "cha": {
-    "score": 6,
+    "score": 7,
     "mod": -2,
     "save": -2
    }
   },
   "skills": {
    "Perception": 4,
-   "Stealth": 6
+   "Stealth": 7
   },
   "senses": {
    "darkvision": 60,
@@ -47839,14 +47840,14 @@
     "summary": "Melee attack at +5 dealing slashing damage."
    }
   ],
-  "bonusActions": [],
-  "reactions": [
+  "bonusActions": [
    {
     "name": "Nimble Escape",
     "type": "utility",
     "summary": "Disengages or hides as a bonus action."
    }
   ],
+  "reactions": [],
   "legendaryActions": [],
   "lairActions": [],
   "description": "A medium beast, encountered in Forest, Grassland, and Hill. It can climb and fights with Rend. Its challenge rating is 1/4.",
@@ -61956,15 +61957,15 @@
    "score": 13
   },
   "hp": {
-   "avg": 22,
-   "dice": "3d10 + 6"
+   "avg": 30,
+   "dice": "4d10 + 8"
   },
   "speed": {
    "walk": 40
   },
   "abilities": {
    "str": {
-    "score": 16,
+    "score": 17,
     "mod": 3,
     "save": 3
    },
@@ -65459,18 +65460,17 @@
    "Urban"
   ],
   "treasure": [],
-  "ac": 12,
+  "ac": 11,
   "initiative": {
-   "mod": 2,
-   "score": 12
+   "mod": 1,
+   "score": 11
   },
   "hp": {
    "avg": 19,
    "dice": "3d10 + 3"
   },
   "speed": {
-   "walk": 30,
-   "swim": 30
+   "walk": 60
   },
   "abilities": {
    "str": {
@@ -65484,7 +65484,7 @@
     "save": 1
    },
    "con": {
-    "score": 12,
+    "score": 13,
     "mod": 1,
     "save": 1
    },
@@ -65499,17 +65499,14 @@
     "save": 3
    },
    "cha": {
-    "score": 6,
+    "score": 7,
     "mod": -2,
     "save": -2
    }
   },
-  "skills": {
-   "Survival": 3
-  },
+  "skills": {},
   "senses": {
-   "blindsight": 10,
-   "passivePerception": 10
+   "passivePerception": 11
   },
   "languages": [],
   "cr": "1/2",
@@ -65549,7 +65546,7 @@
   "reactions": [],
   "legendaryActions": [],
   "lairActions": [],
-  "description": "A large beast, encountered in Urban. It can swim and fights with Hooves. Its challenge rating is 1/2.",
+  "description": "A large beast, encountered in Urban. It fights with Hooves. Its challenge rating is 1/2.",
   "page": 373
  },
  {
@@ -67930,7 +67927,7 @@
  },
  {
   "name": "Wolf",
-  "size": "Large",
+  "size": "Medium",
   "type": "Beast",
   "alignment": "Unaligned",
   "habitat": [
@@ -67939,17 +67936,17 @@
    "Hill"
   ],
   "treasure": [],
-  "ac": 11,
+  "ac": 12,
   "initiative": {
-   "mod": 1,
-   "score": 11
+   "mod": 2,
+   "score": 12
   },
   "hp": {
-   "avg": 19,
-   "dice": "3d10 + 3"
+   "avg": 11,
+   "dice": "2d8 + 2"
   },
   "speed": {
-   "walk": 60
+   "walk": 40
   },
   "abilities": {
    "str": {
@@ -67958,7 +67955,7 @@
     "save": 2
    },
    "dex": {
-    "score": 14,
+    "score": 15,
     "mod": 2,
     "save": 2
    },
@@ -67968,7 +67965,7 @@
     "save": 1
    },
    "int": {
-    "score": 2,
+    "score": 3,
     "mod": -4,
     "save": -4
    },
@@ -68027,7 +68024,7 @@
   "reactions": [],
   "legendaryActions": [],
   "lairActions": [],
-  "description": "A large beast, encountered in Forest, Grassland, and Hill. It fights with Bite. Its challenge rating is 1/4.",
+  "description": "A medium beast, encountered in Forest, Grassland, and Hill. It fights with Bite. Its challenge rating is 1/4.",
   "page": 373
  },
  {

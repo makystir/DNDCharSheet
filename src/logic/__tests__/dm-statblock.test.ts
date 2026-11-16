@@ -318,19 +318,12 @@ describe('legacy label sweep over the real built-ins', () => {
     expect(twins).toBe(NPC_TEMPLATE_LIST.length);
   });
 
-  // Known data discrepancies, NOT fixed here (the data edit needs separate user approval; see the stat-block design,
-  // section 5). The design expected only the Frog; the sweep found these five creature/monster-manual twins whose AC
-  // or average HP differ (src/data/creatures.ts vs src/data/monsters.json). A new disagreement fails this test, and
-  // fixing the data also fails it, which prompts removal from the list.
-  const KNOWN_TWIN_DISAGREEMENTS = [
-    'Frog (Monster Manual 2024, p.354)',
-    'Panther (Monster Manual 2024, p.366)',
-    'Tiger (Monster Manual 2024, p.371)',
-    'Warhorse (Monster Manual 2024, p.373)',
-    'Wolf (Monster Manual 2024, p.373)',
-  ];
+  // The sweep once found five twins whose AC or average HP differed (Frog, Panther, Tiger, Warhorse, Wolf). Each was
+  // checked against the printed 2024 Monster Manual page images (pp.354, 366, 371, 373): monsters.json was wrong
+  // in all five and creatures.ts already matched the book. No twin should disagree now; a new one fails this test.
+  const KNOWN_TWIN_DISAGREEMENTS: string[] = [];
 
-  it('pins the creature/monster-manual twins whose AC or HP disagree', () => {
+  it('finds no creature/monster-manual twins whose AC or HP disagree', () => {
     const byLabel = new Map<string, LibraryMonster[]>();
     for (const m of all) byLabel.set(labelOf(m), [...(byLabel.get(labelOf(m)) ?? []), m]);
     const disagree: string[] = [];
