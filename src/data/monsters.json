@@ -43422,5 +43422,2708 @@
   "lairActions": [],
   "description": "A medium aberration of lawful evil alignment, encountered in Underdark. It can fly and fights with Tentacles, Extract Brain, and Mind Blast. Its challenge rating is 7.",
   "page": 214
+ },
+ {
+  "name": "Mind Flayer Arcanist",
+  "size": "Medium",
+  "type": "Aberration",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 16,
+  "initiative": {
+   "mod": 6,
+   "score": 16
+  },
+  "hp": {
+   "avg": 143,
+   "dice": "26d8 + 26"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 6
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 20,
+    "mod": 5,
+    "save": 9
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 7
+   }
+  },
+  "skills": {
+   "Arcana": 13,
+   "Insight": 7,
+   "Perception": 7,
+   "Stealth": 6
+  },
+  "conditionImmunities": [
+   "Charmed",
+   "Frightened"
+  ],
+  "damageImmunities": [
+   "Psychic"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Deep Speech",
+   "Undercommon",
+   "Telepathy"
+  ],
+  "cr": "11",
+  "xp": 7200,
+  "pb": 4,
+  "traits": [
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Arcane Tentacles"
+    ],
+    "summary": "Strings together 3 strikes using Arcane Tentacles."
+   },
+   {
+    "name": "Arcane Tentacles",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 9,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 27,
+      "type": "Psychic",
+      "dice": "4d10 + 5"
+     }
+    ],
+    "summary": "Melee or ranged attack at +9 dealing psychic damage; involves teleportation."
+   },
+   {
+    "name": "Mind Burst",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Int",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 41,
+      "dice": "8d8 + 5",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": true,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 17 Int save; Inflicts psychic damage; can impose stunned; affects a 40-foot emanation."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 17,
+    "components": "no spell",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Detect Thoughts",
+      "Disguise Self",
+      "Mage Hand (the hand is Invisible)"
+     ],
+     "perDay": {
+      "1": [
+       "Clairvoyance",
+       "Dimension Door",
+       "Fireball (level 5 version)",
+       "Lightning Bolt (level 5 version)",
+       "Plane Shift (self only)",
+       "Sending"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (10 spells) using Int with save DC 17, no spell needed."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [
+   {
+    "name": "Shield",
+    "uses": "2/Day",
+    "type": "utility",
+    "summary": "Reaction that grants a temporary AC boost against an attack or magic missile."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium aberration of lawful evil alignment, encountered in Underdark. It can fly and fights with Arcane Tentacles and Mind Burst. Its challenge rating is 11.",
+  "page": 214
+ },
+ {
+  "name": "Minotaur of Baphomet",
+  "size": "Large",
+  "type": "Monstrosity",
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Armaments"
+  ],
+  "ac": 14,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 85,
+   "dice": "10d10 + 30"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {
+   "Perception": 7,
+   "Survival": 7
+  },
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 17
+  },
+  "languages": [
+   "Abyssal"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Abyssal Glaive",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 10,
+      "type": "Slashing",
+      "dice": "1d12 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Necrotic",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing slashing plus necrotic damage."
+   },
+   {
+    "name": "Gore",
+    "recharge": "5-6",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 18,
+      "type": "Piercing",
+      "dice": "4d6 + 4"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 10,
+      "type": "Piercing",
+      "dice": "3d6"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Recharges on a roll of 5-6; Melee attack at +6 dealing piercing damage; can impose prone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large monstrosity of chaotic evil alignment, encountered in Underdark. It fights with Abyssal Glaive and Gore. Its challenge rating is 3.",
+  "page": 215
+ },
+ {
+  "name": "Minotaur Skeleton",
+  "size": "Large",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Planar (Shadowfell)",
+   "Underdark",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Bludgeoning"
+  ],
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Understands Abyssal"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Gore",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 11,
+      "type": "Piercing",
+      "dice": "2d6 + 4"
+     }
+    ],
+    "extraDamage": [
+     {
+      "avg": 9,
+      "type": "Piercing",
+      "dice": "2d8"
+     }
+    ],
+    "conditions": [
+     "Prone"
+    ],
+    "summary": "Melee attack at +6 dealing piercing damage; can impose prone."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Bludgeoning",
+      "dice": "2d10 + 4"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large undead of lawful evil alignment, encountered in Planar (Shadowfell), Underdark, and Urban. It fights with Gore and Slam. Its challenge rating is 2.",
+  "page": 283
+ },
+ {
+  "name": "Modron Duodrone",
+  "size": "Medium",
+  "type": "Construct",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Mechanus)"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Modron"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Disintegration",
+    "summary": "Its body turns to dust upon death, leaving behind only its carried gear."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Clockwork Blade"
+    ],
+    "summary": "Strings together 2 strikes using Clockwork Blade."
+   },
+   {
+    "name": "Clockwork Blade",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 3,
+     "reach": 5,
+     "range": "30"
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Force",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "onHitOrMiss": "The blade magically returns to the modron’s hand immediately after a ranged attack.",
+    "summary": "Melee or ranged attack at +3 dealing force damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct of lawful neutral alignment, encountered in Planar (Mechanus). It fights with Clockwork Blade. Its challenge rating is 1/4.",
+  "page": 217
+ },
+ {
+  "name": "Modron Monodrone",
+  "size": "Medium",
+  "type": "Construct",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Mechanus)"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 5,
+   "dice": "1d8 + 1"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Modron"
+  ],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Disintegration",
+    "summary": "Its body turns to dust upon death, leaving behind only its carried gear."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Gear",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Force",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing force damage."
+   },
+   {
+    "name": "Gear Flinger",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Force",
+      "dice": "1d8 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing force damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct of lawful neutral alignment, encountered in Planar (Mechanus). It can fly and fights with Gear and Gear Flinger. Its challenge rating is 1/8.",
+  "page": 216
+ },
+ {
+  "name": "Modron Pentadrone",
+  "size": "Large",
+  "type": "Construct",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Mechanus)"
+  ],
+  "treasure": [],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 32,
+   "dice": "5d10 + 5"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {
+   "Perception": 4
+  },
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 14
+  },
+  "languages": [
+   "Modron"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Disintegration",
+    "summary": "Its body turns to dust upon death, leaving behind only its carried gear."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam",
+     "Electrical Discharge"
+    ],
+    "summary": "Strings together 5 strikes using Slam, Electrical Discharge."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Force",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing force damage."
+   },
+   {
+    "name": "Electrical Discharge",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 5,
+      "type": "Lightning",
+      "dice": "1d6 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing lightning damage."
+   },
+   {
+    "name": "Paralysis Gas",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Paralyzed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 11 Con save; can impose paralyzed; affects a 30-foot cone."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large construct of lawful neutral alignment, encountered in Planar (Mechanus). It fights with Slam, Electrical Discharge, and Paralysis Gas. Its challenge rating is 2.",
+  "page": 218
+ },
+ {
+  "name": "Modron Quadrone",
+  "size": "Medium",
+  "type": "Construct",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Mechanus)"
+  ],
+  "treasure": [],
+  "ac": 16,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 22,
+   "dice": "4d8 + 4"
+  },
+  "speed": {
+   "walk": 30,
+   "fly": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {
+   "Perception": 2
+  },
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Modron"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Disintegration",
+    "summary": "Its body turns to dust upon death, leaving behind only its carried gear."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam",
+     "Gears Launcher"
+    ],
+    "summary": "Strings together 4 strikes using Slam, Gears Launcher."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Force",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing force damage."
+   },
+   {
+    "name": "Gears Launcher",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 4,
+     "range": "320"
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Force",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Ranged attack at +4 dealing force damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct of lawful neutral alignment, encountered in Planar (Mechanus). It can fly and fights with Slam and Gears Launcher. Its challenge rating is 1.",
+  "page": 218
+ },
+ {
+  "name": "Modron Tridrone",
+  "size": "Medium",
+  "type": "Construct",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Planar (Mechanus)"
+  ],
+  "treasure": [],
+  "ac": 15,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 16,
+   "dice": "3d8 + 3"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Modron"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Disintegration",
+    "summary": "Its body turns to dust upon death, leaving behind only its carried gear."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Clockwork Spear"
+    ],
+    "summary": "Strings together 3 strikes using Clockwork Spear."
+   },
+   {
+    "name": "Clockwork Spear",
+    "type": "attack",
+    "attack": {
+     "kind": "melee-or-ranged",
+     "bonus": 3,
+     "reach": 5,
+     "range": "120"
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Force",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "onHitOrMiss": "The spear magically returns to the modron’s hand immediately after a ranged attack.",
+    "summary": "Melee or ranged attack at +3 dealing force damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium construct of lawful neutral alignment, encountered in Planar (Mechanus). It fights with Clockwork Spear. Its challenge rating is 1/2.",
+  "page": 217
+ },
+ {
+  "name": "Mud Mephit",
+  "size": "Small",
+  "type": "Elemental",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Swamp",
+   "Planar (Elemental Planes)"
+  ],
+  "treasure": [],
+  "ac": 11,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 13,
+   "dice": "3d6 + 3"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 20,
+   "swim": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {
+   "Stealth": 3
+  },
+  "conditionImmunities": [
+   "Exhaustion",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Primordial (Aquan, Terran)"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Death Burst",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Explodes when it dies, harming nearby creatures."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing bludgeoning damage."
+   },
+   {
+    "name": "Mud Breath",
+    "recharge": "6-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Dex",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Restrained"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 6-6; Targets make a DC 11 Dex save; can impose restrained."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small elemental of neutral evil alignment, encountered in Swamp and Planar (Elemental Planes). It can fly and swim and fights with Slam and Mud Breath. Its challenge rating is 1/4.",
+  "page": 207
+ },
+ {
+  "name": "Mule",
+  "size": "Medium",
+  "type": "Beast",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Desert",
+   "Hill",
+   "Urban"
+  ],
+  "treasure": [],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 11,
+   "dice": "2d8 + 2"
+  },
+  "speed": {
+   "walk": 40
+  },
+  "abilities": {
+   "str": {
+    "score": 14,
+    "mod": 2,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "passivePerception": 10
+  },
+  "languages": [],
+  "cr": "1/8",
+  "xp": 25,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Beast of Burden",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 4,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Bludgeoning",
+      "dice": "1d4 + 2"
+     }
+    ],
+    "summary": "Melee attack at +4 dealing bludgeoning damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium beast, encountered in Desert, Hill, and Urban. It fights with Hooves. Its challenge rating is 1/8.",
+  "page": 365
+ },
+ {
+  "name": "Mummy",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Desert",
+   "Swamp"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 11,
+  "initiative": {
+   "mod": -1,
+   "score": 9
+  },
+  "hp": {
+   "avg": 58,
+   "dice": "9d8 + 18"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 3
+   },
+   "int": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 3
+   },
+   "cha": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   }
+  },
+  "skills": {},
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "darkvision": 60,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Common plus two other languages"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rotting Fist",
+     "Dreadful Glare"
+    ],
+    "summary": "Strings together 2 strikes using Rotting Fist, Dreadful Glare."
+   },
+   {
+    "name": "Rotting Fist",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 8,
+      "type": "Bludgeoning",
+      "dice": "1d10 + 3"
+     },
+     {
+      "avg": 10,
+      "type": "Necrotic",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning plus necrotic damage; restores hit points."
+   },
+   {
+    "name": "Dreadful Glare",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 11 Wis save; can impose frightened."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small undead of lawful evil alignment, encountered in Desert and Swamp. It fights with Rotting Fist and Dreadful Glare. Its challenge rating is 3.",
+  "page": 219
+ },
+ {
+  "name": "Mummy Lord",
+  "size": "Medium or Small",
+  "type": "Undead",
+  "tags": [
+   "Cleric"
+  ],
+  "alignment": "Lawful Evil",
+  "habitat": [
+   "Desert",
+   "Swamp"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 10,
+   "score": 20
+  },
+  "hp": {
+   "avg": 187,
+   "dice": "25d8 + 75"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 5
+   },
+   "wis": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "History": 5,
+   "Perception": 9,
+   "Religion": 5
+  },
+  "vulnerabilities": [
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Charmed",
+   "Exhaustion",
+   "Frightened",
+   "Paralyzed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Necrotic",
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 60,
+   "passivePerception": 19
+  },
+  "languages": [
+   "Common plus three other languages"
+  ],
+  "cr": "15",
+  "xp": 13000,
+  "pb": 5,
+  "traits": [
+   {
+    "name": "Legendary Resistance",
+    "uses": "3/Day, or 4/Day in Lair",
+    "summary": "Can turn a failed saving throw into a success, a limited number of times per day."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Undead Restoration",
+    "summary": "If destroyed, it returns to unlife after a time unless specific countermeasures are taken."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rotting Fist",
+     "Channel Negative Energy",
+     "Dreadful Glare"
+    ],
+    "summary": "Strings together 1 strikes using Rotting Fist, Channel Negative Energy, Dreadful Glare."
+   },
+   {
+    "name": "Rotting Fist",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 9,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 15,
+      "type": "Bludgeoning",
+      "dice": "2d10 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Necrotic",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +9 dealing bludgeoning plus necrotic damage; restores hit points."
+   },
+   {
+    "name": "Channel Negative Energy",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 9,
+     "range": "60"
+    },
+    "damage": [
+     {
+      "avg": 25,
+      "type": "Necrotic",
+      "dice": "6d6 + 4"
+     }
+    ],
+    "summary": "Ranged attack at +9 dealing necrotic damage."
+   },
+   {
+    "name": "Dreadful Glare",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 17
+     }
+    ],
+    "damage": [
+     {
+      "avg": 25,
+      "dice": "6d6 + 4",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Paralyzed"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 17 Wis save; Inflicts psychic damage; can impose paralyzed."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Wis",
+    "saveDC": 17,
+    "attackBonus": 9,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Dispel Magic",
+      "Thaumaturgy"
+     ],
+     "perDay": {
+      "1": [
+       "Animate Dead",
+       "Harm",
+       "Insect Plague (level 7 version)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Wis with save DC 17, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Whirlwind of Sand",
+    "type": "utility",
+    "summary": "Can impose blinded; involves teleportation."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Whirlwind of Sand",
+    "type": "utility",
+    "summary": "Can impose blinded; involves teleportation."
+   }
+  ],
+  "legendaryActions": [
+   {
+    "name": "Dread Command",
+    "type": "utility",
+    "summary": "Special legendary action; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Glare",
+    "type": "utility",
+    "summary": "Triggers another of its listed abilities."
+   },
+   {
+    "name": "Necrotic Strike",
+    "type": "utility",
+    "summary": "Makes extra attacks using its listed attack options."
+   }
+  ],
+  "legendaryActionUses": {
+   "normal": 3,
+   "inLair": 4
+  },
+  "lairActions": [
+   {
+    "name": "Cursed Fate",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 15
+     }
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 15 Con save."
+   },
+   {
+    "name": "Soul Drain",
+    "type": "utility",
+    "summary": "Special lair effect; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "description": "A medium or small undead of lawful evil alignment, encountered in Desert and Swamp. It fights with Rotting Fist, Channel Negative Energy, and Dreadful Glare, can take legendary actions, and can shape the area around its lair. Its challenge rating is 15.",
+  "page": 221
+ },
+ {
+  "name": "Myconid Adult",
+  "size": "Medium",
+  "type": "Plant",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 12,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 16,
+   "dice": "3d8 + 3"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Telepathy"
+  ],
+  "cr": "1/2",
+  "xp": 100,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Sun Sickness",
+    "summary": "Takes damage while in sunlight and is hampered while exposed."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 2,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 4,
+      "type": "Bludgeoning",
+      "dice": "1d8"
+     },
+     {
+      "avg": 3,
+      "type": "Poison",
+      "dice": "1d6"
+     }
+    ],
+    "summary": "Melee attack at +2 dealing bludgeoning plus poison damage."
+   },
+   {
+    "name": "Pacifying Spores",
+    "uses": "1/Day",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 11
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Usable 1 per day; Targets make a DC 11 Con save; can impose stunned."
+   },
+   {
+    "name": "Rapport Spores",
+    "type": "utility",
+    "summary": "Affects a 30-foot emanation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium plant of lawful neutral alignment, encountered in Underdark. It fights with Slam and Pacifying Spores. Its challenge rating is 1/2.",
+  "page": 223
+ },
+ {
+  "name": "Myconid Sovereign",
+  "size": "Large",
+  "type": "Plant",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 45,
+   "dice": "6d10 + 12"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "int": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 12
+  },
+  "languages": [
+   "Telepathy"
+  ],
+  "cr": "2",
+  "xp": 450,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Sun Sickness",
+    "summary": "Takes damage while in sunlight and is hampered while exposed."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Slam",
+     "Pacifying Spores"
+    ],
+    "summary": "Strings together 1 strikes using Slam, Pacifying Spores."
+   },
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "2d4 + 1"
+     },
+     {
+      "avg": 5,
+      "type": "Poison",
+      "dice": "2d4"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing bludgeoning plus poison damage."
+   },
+   {
+    "name": "Animating Spores",
+    "uses": "3/Day",
+    "type": "utility",
+    "summary": "Usable 3 per day."
+   },
+   {
+    "name": "Pacifying Spores",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Con",
+      "dc": 12
+     }
+    ],
+    "conditions": [
+     "Stunned"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Targets make a DC 12 Con save; can impose stunned."
+   },
+   {
+    "name": "Rapport Spores",
+    "type": "utility",
+    "summary": "Affects a 30-foot emanation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large plant of lawful neutral alignment, encountered in Underdark. It fights with Slam and Pacifying Spores. Its challenge rating is 2.",
+  "page": 223
+ },
+ {
+  "name": "Myconid Spore Servant",
+  "size": "Medium or Small",
+  "type": "Plant",
+  "alignment": "Unaligned",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 13,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 37,
+   "dice": "5d8 + 15"
+  },
+  "speed": {
+   "walk": 20
+  },
+  "abilities": {
+   "str": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   },
+   "wis": {
+    "score": 6,
+    "mod": -2,
+    "save": -2
+   },
+   "cha": {
+    "score": 0,
+    "mod": -5,
+    "save": -5
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Blinded",
+   "Charmed",
+   "Frightened",
+   "Paralyzed",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "blindsight": 30,
+   "passivePerception": 8
+  },
+  "languages": [
+   "Telepathy"
+  ],
+  "cr": "1",
+  "xp": 200,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 5,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Bludgeoning",
+      "dice": "1d6 + 3"
+     },
+     {
+      "avg": 2,
+      "type": "Poison",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +5 dealing bludgeoning plus poison damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium or small plant, encountered in Underdark. It fights with Slam. Its challenge rating is 1.",
+  "page": 223
+ },
+ {
+  "name": "Myconid Sprout",
+  "size": "Small",
+  "type": "Plant",
+  "alignment": "Lawful Neutral",
+  "habitat": [
+   "Underdark"
+  ],
+  "treasure": [
+   "Any"
+  ],
+  "ac": 10,
+  "initiative": {
+   "mod": 0,
+   "score": 10
+  },
+  "hp": {
+   "avg": 3,
+   "dice": "1d6"
+  },
+  "speed": {
+   "walk": 10
+  },
+  "abilities": {
+   "str": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "int": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "wis": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "cha": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   }
+  },
+  "skills": {},
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 10
+  },
+  "languages": [
+   "Telepathy"
+  ],
+  "cr": "0",
+  "xp": 10,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Sun Sickness",
+    "summary": "Takes damage while in sunlight and is hampered while exposed."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Slam",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 1,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 1,
+      "type": "Bludgeoning",
+      "dice": "1d4 − 1"
+     },
+     {
+      "avg": 2,
+      "type": "Poison",
+      "dice": "1d4"
+     }
+    ],
+    "summary": "Melee attack at +1 dealing bludgeoning plus poison damage."
+   },
+   {
+    "name": "Rapport Spores",
+    "type": "utility",
+    "summary": "Affects a 30-foot emanation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A small plant of lawful neutral alignment, encountered in Underdark. It fights with Slam. Its challenge rating is 0.",
+  "page": 222
+ },
+ {
+  "name": "Nalfeshnee",
+  "size": "Large",
+  "type": "Fiend",
+  "tags": [
+   "Demon"
+  ],
+  "alignment": "Chaotic Evil",
+  "habitat": [
+   "Planar (Abyss)"
+  ],
+  "treasure": [
+   "Relics"
+  ],
+  "ac": 18,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 184,
+   "dice": "16d10 + 96"
+  },
+  "speed": {
+   "walk": 20,
+   "fly": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 20,
+    "mod": 5,
+    "save": 5
+   },
+   "dex": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "con": {
+    "score": 22,
+    "mod": 6,
+    "save": 11
+   },
+   "int": {
+    "score": 18,
+    "mod": 4,
+    "save": 9
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 6
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 7
+   }
+  },
+  "skills": {},
+  "resistances": [
+   "Cold",
+   "Fire",
+   "Lightning"
+  ],
+  "conditionImmunities": [
+   "Frightened",
+   "Poisoned"
+  ],
+  "damageImmunities": [
+   "Poison"
+  ],
+  "senses": {
+   "truesight": 120,
+   "passivePerception": 11
+  },
+  "languages": [
+   "Abyssal",
+   "Telepathy"
+  ],
+  "cr": "13",
+  "xp": 10000,
+  "pb": 5,
+  "traits": [
+   {
+    "name": "Demonic Restoration",
+    "summary": "If it dies away from the Abyss, it reforms there after a time and is destroyed only if killed there."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Rend"
+    ],
+    "summary": "Strings together 3 strikes using Rend."
+   },
+   {
+    "name": "Rend",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 10,
+     "reach": 10
+    },
+    "damage": [
+     {
+      "avg": 16,
+      "type": "Slashing",
+      "dice": "2d10 + 5"
+     },
+     {
+      "avg": 11,
+      "type": "Force",
+      "dice": "2d10"
+     }
+    ],
+    "summary": "Melee attack at +10 dealing slashing plus force damage."
+   },
+   {
+    "name": "Teleport",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Horror Nimbus",
+    "recharge": "5-6",
+    "type": "save",
+    "saves": [
+     {
+      "ability": "Wis",
+      "dc": 15
+     }
+    ],
+    "damage": [
+     {
+      "avg": 28,
+      "dice": "8d6",
+      "type": "Psychic"
+     }
+    ],
+    "conditions": [
+     "Frightened"
+    ],
+    "halfOnSuccess": false,
+    "summary": "Recharges on a roll of 5-6; Targets make a DC 15 Wis save; Inflicts psychic damage; can impose frightened; affects a 15-foot emanation."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Pursuit",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of chaotic evil alignment, encountered in Planar (Abyss). It can fly and fights with Rend. Its challenge rating is 13.",
+  "page": 224
+ },
+ {
+  "name": "Needle Blight",
+  "size": "Medium",
+  "type": "Plant",
+  "alignment": "Neutral",
+  "habitat": [
+   "Forest"
+  ],
+  "treasure": [],
+  "ac": 12,
+  "initiative": {
+   "mod": 1,
+   "score": 11
+  },
+  "hp": {
+   "avg": 16,
+   "dice": "3d8 + 3"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "dex": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "con": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "int": {
+    "score": 4,
+    "mod": -3,
+    "save": -3
+   },
+   "wis": {
+    "score": 8,
+    "mod": -1,
+    "save": -1
+   },
+   "cha": {
+    "score": 2,
+    "mod": -4,
+    "save": -4
+   }
+  },
+  "skills": {},
+  "conditionImmunities": [
+   "Deafened"
+  ],
+  "senses": {
+   "blindsight": 60,
+   "passivePerception": 9
+  },
+  "languages": [
+   "Understands Common"
+  ],
+  "cr": "1/4",
+  "xp": 50,
+  "pb": 2,
+  "traits": [],
+  "actions": [
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 3,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Slashing",
+      "dice": "2d4 + 1"
+     }
+    ],
+    "summary": "Melee attack at +3 dealing slashing damage."
+   },
+   {
+    "name": "Needles",
+    "type": "attack",
+    "attack": {
+     "kind": "ranged",
+     "bonus": 3,
+     "range": "30/60"
+    },
+    "damage": [
+     {
+      "avg": 6,
+      "type": "Piercing",
+      "dice": "2d4 + 1"
+     }
+    ],
+    "summary": "Ranged attack at +3 dealing piercing damage."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium plant of neutral alignment, encountered in Forest. It fights with Claw and Needles. Its challenge rating is 1/4.",
+  "page": 43
+ },
+ {
+  "name": "Night Hag",
+  "size": "Medium",
+  "type": "Fey",
+  "tags": [
+   "Hag"
+  ],
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)"
+  ],
+  "treasure": [
+   "Arcana"
+  ],
+  "ac": 17,
+  "initiative": {
+   "mod": 5,
+   "score": 15
+  },
+  "hp": {
+   "avg": 112,
+   "dice": "15d8 + 45"
+  },
+  "speed": {
+   "walk": 30
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "wis": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "cha": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   }
+  },
+  "skills": {
+   "Deception": 6,
+   "Insight": 5,
+   "Perception": 5,
+   "Stealth": 5
+  },
+  "resistances": [
+   "Cold",
+   "Fire"
+  ],
+  "conditionImmunities": [
+   "Charmed"
+  ],
+  "senses": {
+   "darkvision": 120,
+   "passivePerception": 15
+  },
+  "languages": [
+   "Abyssal",
+   "Common",
+   "Infernal",
+   "Primordial"
+  ],
+  "cr": "5",
+  "xp": 1800,
+  "pb": 3,
+  "traits": [
+   {
+    "name": "Coven Magic",
+    "summary": "Casts additional spells when working with other coven members nearby."
+   },
+   {
+    "name": "Magic Resistance",
+    "summary": "Gains advantage on saving throws against spells and other magical effects."
+   },
+   {
+    "name": "Soul Bag",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Multiattack",
+    "type": "multiattack",
+    "attacks": [
+     "Claw"
+    ],
+    "summary": "Strings together 2 strikes using Claw."
+   },
+   {
+    "name": "Claw",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 7,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Slashing",
+      "dice": "2d8 + 4"
+     }
+    ],
+    "summary": "Melee attack at +7 dealing slashing damage."
+   },
+   {
+    "name": "Nightmare Haunting",
+    "uses": "1/Day; Requires Soul Bag",
+    "type": "utility",
+    "summary": "Usable 1 per day."
+   },
+   {
+    "name": "Spellcasting",
+    "type": "spellcasting",
+    "ability": "Int",
+    "saveDC": 14,
+    "components": "no Material",
+    "spells": {
+     "atWill": [
+      "Detect Magic",
+      "Etherealness",
+      "Magic Missile (level 4 version)"
+     ],
+     "perDay": {
+      "2": [
+       "Phantasmal Killer",
+       "Plane Shift (self only)"
+      ]
+     }
+    },
+    "summary": "Casts spells from a fixed list (5 spells) using Int with save DC 14, no Material needed."
+   }
+  ],
+  "bonusActions": [
+   {
+    "name": "Shape-Shift",
+    "type": "utility",
+    "summary": "Changes into a different form, keeping its game statistics except where the new form modifies them."
+   }
+  ],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A medium fey of neutral evil alignment, encountered in Planar (Lower Planes). It fights with Claw. Its challenge rating is 5.",
+  "page": 225
+ },
+ {
+  "name": "Nightmare",
+  "size": "Large",
+  "type": "Fiend",
+  "alignment": "Neutral Evil",
+  "habitat": [
+   "Planar (Lower Planes)"
+  ],
+  "treasure": [],
+  "ac": 13,
+  "initiative": {
+   "mod": 2,
+   "score": 12
+  },
+  "hp": {
+   "avg": 68,
+   "dice": "8d10 + 24"
+  },
+  "speed": {
+   "walk": 60,
+   "fly": 90,
+   "hover": true
+  },
+  "abilities": {
+   "str": {
+    "score": 18,
+    "mod": 4,
+    "save": 4
+   },
+   "dex": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   },
+   "con": {
+    "score": 16,
+    "mod": 3,
+    "save": 3
+   },
+   "int": {
+    "score": 10,
+    "mod": 0,
+    "save": 0
+   },
+   "wis": {
+    "score": 12,
+    "mod": 1,
+    "save": 1
+   },
+   "cha": {
+    "score": 14,
+    "mod": 2,
+    "save": 2
+   }
+  },
+  "skills": {},
+  "damageImmunities": [
+   "Fire"
+  ],
+  "senses": {
+   "passivePerception": 11
+  },
+  "languages": [
+   "Understands Abyssal",
+   "Common",
+   "Infernal"
+  ],
+  "cr": "3",
+  "xp": 700,
+  "pb": 2,
+  "traits": [
+   {
+    "name": "Confer Fire Resistance",
+    "summary": "Special trait; see the Monster Manual entry for its exact effect."
+   },
+   {
+    "name": "Illumination",
+    "summary": "Sheds bright and dim light around itself."
+   }
+  ],
+  "actions": [
+   {
+    "name": "Hooves",
+    "type": "attack",
+    "attack": {
+     "kind": "melee",
+     "bonus": 6,
+     "reach": 5
+    },
+    "damage": [
+     {
+      "avg": 13,
+      "type": "Bludgeoning",
+      "dice": "2d8 + 4"
+     },
+     {
+      "avg": 10,
+      "type": "Fire",
+      "dice": "3d6"
+     }
+    ],
+    "summary": "Melee attack at +6 dealing bludgeoning plus fire damage."
+   },
+   {
+    "name": "Ethereal Stride",
+    "type": "utility",
+    "summary": "Involves teleportation."
+   }
+  ],
+  "bonusActions": [],
+  "reactions": [],
+  "legendaryActions": [],
+  "lairActions": [],
+  "description": "A large fiend of neutral evil alignment, encountered in Planar (Lower Planes). It can fly and fights with Hooves. Its challenge rating is 3.",
+  "page": 226
  }
 ]
