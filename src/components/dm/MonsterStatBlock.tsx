@@ -151,8 +151,9 @@ export function MonsterStatBlock({ monster: m }: { monster: LibraryMonster }) {
       <Entries
         title="Legendary Actions"
         entries={m.legendaryActions}
-        intro={m.legendaryUses > 0 ? `Legendary Action Uses: ${m.legendaryUses}. Used right after another creature's turn; all uses return at the start of this creature's turn.` : undefined}
+        intro={m.legendaryUses > 0 ? `Legendary Action Uses: ${m.legendaryUses}${m.legendaryUsesInLair !== undefined ? ` (${m.legendaryUsesInLair} in Lair)` : ''}. Used right after another creature's turn; all uses return at the start of this creature's turn.` : undefined}
       />
+      <Entries title="Lair Actions" entries={m.lairActions ?? []} />
     </article>
   );
 }

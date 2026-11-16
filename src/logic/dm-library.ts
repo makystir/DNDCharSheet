@@ -14,9 +14,10 @@ import type { Ability } from '../types/character';
 import type { DmCombatant, DmCustomMonster, DmData, DmMonsterEntry } from '../types/dm';
 import { CREATURE_LIST, type CreatureStatBlock } from '../data/creatures';
 import { NPC_TEMPLATE_LIST, type NpcTemplate } from '../data/npc-templates';
+import { MONSTER_MANUAL_2024_LIST, type MmFeature, type MonsterManual2024Entry } from '../data/monster-manual-2024';
 import { abilityModifier } from './abilities';
 import { xpForCr } from './dm-balance';
-import { combatantFromCreature, combatantFromTemplate, customCombatant } from './dm-encounter';
+import { combatantFromCreature, combatantFromMonsterManual, combatantFromTemplate, customCombatant } from './dm-encounter';
 
 export const ABILITY_KEYS: readonly Ability[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 export const ABILITY_LABELS: Record<Ability, string> = {
@@ -28,10 +29,11 @@ export const ABILITY_LABELS: Record<Ability, string> = {
   cha: 'CHA',
 };
 
-export type LibraryOrigin = 'npc' | 'creature' | 'custom';
+/** `monster-manual` is the 2024 Monster Manual creature set in `src/data/monsters.json`. */
+export type LibraryOrigin = 'npc' | 'creature' | 'monster-manual' | 'custom';
 
 export interface LibraryMonster {
-  /** Stable key: `npc:<id>`, `creature:<id>` or `custom:<id>`. */
+  /** Stable key: `npc:<id>`, `creature:<id>`, `monster-manual:<name>` or `custom:<id>`. */
   key: string;
   origin: LibraryOrigin;
   name: string;
@@ -68,6 +70,10 @@ export interface LibraryMonster {
   reactions: DmMonsterEntry[];
   legendaryActions: DmMonsterEntry[];
   legendaryUses: number;
+  /** Legendary Action uses when the creature is in its lair, when the stat block prints a different number. */
+  legendaryUsesInLair?: number;
+  /** Lair actions (Monster Manual 2024 creatures only). */
+  lairActions?: DmMonsterEntry[];
   /** Can go straight into an encounter (has a fixed Armor Class and Hit Points). */
   addable: boolean;
   /** Set for custom monsters. */
@@ -237,6 +243,141 @@ function fromCreature(c: CreatureStatBlock): LibraryMonster {
   };
 }
 
+const signedText = (n: number) => `${n >= 0 ? '+' : ''}${n}`;
+
+function mmDamageText(d: { avg: number; dice?: string; type: string }): string {
+  return `${d.avg}${d.dice ? ` (${d.dice})` : ''} ${d.type}`;
+}
+
+function mmDamageList(list: { avg: number; dice?: string; type: string }[]): string {
+  return list.map(mmDamageText).join(' plus ');
+}
+
+/**
+ * One `monsters.json` feature as a library entry. `summary` becomes the
+ * description; the mechanical detail the JSON keeps in separate fields (usage,
+ * recharge, attack bonus, damage, save DCs, spell lists) is appended so nothing
+ * is lost. Wording follows the Monster Manual 2024 stat block conventions.
+ */
+function mmEntry(f: MmFeature): DmMonsterEntry {
+  const tags = [f.uses, f.recharge ? `Recharge ${f.recharge}` : undefined, f.cost].filter(Boolean);
+  const name = tags.length > 0 ? `${f.name} (${tags.join('; ')})` : f.name;
+  const detail: string[] = [];
+  if (f.attack) {
+    const a = f.attack;
+    const kind = a.kind === 'melee' ? 'Melee' : a.kind === 'ranged' ? 'Ranged' : 'Melee or Ranged';
+    const reach = a.reach !== undefined ? `reach ${a.reach} ft.` : '';
+    const range = a.range !== undefined ? `range ${a.range} ft.` : '';
+    detail.push(`${kind} Attack Roll: ${signedText(a.bonus)}, ${[reach, range].filter(Boolean).join(' or ')}`.replace(/, $/, ''));
+  }
+  if (f.attackBonus !== undefined && !f.attack) detail.push(`Attack bonus ${signedText(f.attackBonus)}`);
+  for (const s of f.saves ?? []) {
+    detail.push(`${s.ability} Saving Throw: DC ${s.dc}${f.halfOnSuccess ? ' (half damage on a success)' : ''}`);
+  }
+  if (f.damage?.length) detail.push(`Damage: ${mmDamageList(f.damage)}`);
+  if (f.extraDamage?.length) detail.push(`Extra damage: ${mmDamageList(f.extraDamage)}`);
+  if (f.alternateDamage) {
+    const alts = Array.isArray(f.alternateDamage) ? f.alternateDamage : [f.alternateDamage];
+    for (const alt of alts) detail.push(`Damage instead, if ${alt.condition ?? 'a condition is met'}: ${mmDamageText(alt)}`);
+  }
+  if (f.conditions?.length) detail.push(`Conditions: ${f.conditions.join(', ')}`);
+  if (f.onHitOrMiss) detail.push(f.onHitOrMiss);
+  if (f.type === 'spellcasting' || f.spells) {
+    const bits: string[] = [];
+    if (f.ability) bits.push(`ability ${f.ability}`);
+    if (f.saveDC !== undefined) bits.push(`spell save DC ${f.saveDC}`);
+    if (f.attackBonus !== undefined) bits.push(`spell attack ${signedText(f.attackBonus)}`);
+    if (bits.length) detail.push(`Spellcasting: ${bits.join(', ')}${f.components ? ` (${f.components})` : ''}`);
+    if (f.spells?.atWill?.length) detail.push(`At Will: ${f.spells.atWill.join(', ')}`);
+    for (const [n, list] of Object.entries(f.spells?.perDay ?? {})) detail.push(`${n}/Day Each: ${list.join(', ')}`);
+  }
+  return { name, description: [f.summary, ...detail].filter(Boolean).join(' ') };
+}
+
+function mmSpeed(sp: MonsterManual2024Entry['speed']): string {
+  const parts: string[] = [];
+  if (sp.walk !== undefined) parts.push(`${sp.walk} ft.`);
+  for (const k of ['burrow', 'climb', 'fly', 'swim'] as const) {
+    if (sp[k] !== undefined) parts.push(`${k} ${sp[k]} ft.${k === 'fly' && sp.hover ? ' (hover)' : ''}`);
+  }
+  return parts.join(', ');
+}
+
+function mmSenses(s: MonsterManual2024Entry['senses']): string {
+  return [
+    s.blindsight ? `Blindsight ${s.blindsight} ft.` : '',
+    s.darkvision ? `Darkvision ${s.darkvision} ft.` : '',
+    s.tremorsense ? `Tremorsense ${s.tremorsense} ft.` : '',
+    s.truesight ? `Truesight ${s.truesight} ft.` : '',
+    `Passive Perception ${s.passivePerception}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+/** Stable library key for a Monster Manual 2024 creature (names are unique in `monsters.json`). */
+export function monsterManualKey(name: string): string {
+  return `monster-manual:${name}`;
+}
+
+/** A `monsters.json` creature as a library creature. Printed numbers are copied, not recomputed. */
+export function fromMonsterManual2024Entry(e: MonsterManual2024Entry): LibraryMonster {
+  const abilities: Partial<Record<Ability, number>> = {};
+  const saves: Partial<Record<Ability, number>> = {};
+  for (const a of ABILITY_KEYS) {
+    const entry = e.abilities[a];
+    abilities[a] = entry.score;
+    // The JSON prints a save for every ability; only a save above the modifier is a proficient one.
+    if (entry.save !== entry.mod) saves[a] = entry.save;
+  }
+  const skills = Object.entries(e.skills)
+    .map(([k, v]) => `${k} ${signedText(v)}`)
+    .join(', ');
+  // Monster Manual 2024, "Legendary Actions": the number of uses is printed in each stat block
+  // ("Legendary Action Uses: 3 (4 in Lair)"), so it is read from `legendaryActionUses`, not assumed.
+  const legendaryUses = e.legendaryActions.length > 0 ? (e.legendaryActionUses?.normal ?? 3) : 0;
+  const inLair = e.legendaryActionUses?.inLair;
+  return {
+    key: monsterManualKey(e.name),
+    origin: 'monster-manual',
+    name: e.name,
+    source: `Monster Manual 2024, p.${e.page}`,
+    size: e.size,
+    creatureType: e.tags && e.tags.length > 0 ? `${e.type} (${e.tags.join(', ')})` : e.type,
+    alignment: e.alignment,
+    cr: e.cr,
+    crValue: crToNumber(e.cr),
+    xp: e.xp,
+    ac: e.ac,
+    acNote: '',
+    hpAverage: e.hp.avg,
+    hpDice: e.hp.dice,
+    speed: mmSpeed(e.speed),
+    abilities,
+    saves,
+    proficiencyBonus: e.pb,
+    initiativeMod: e.initiative.mod,
+    conSaveMod: e.abilities.con.save,
+    skills,
+    senses: mmSenses(e.senses),
+    languages: e.languages.join(', '),
+    resistances: (e.resistances ?? []).join('; '),
+    vulnerabilities: (e.vulnerabilities ?? []).join('; '),
+    immunities: (e.damageImmunities ?? []).join('; '),
+    conditionImmunities: (e.conditionImmunities ?? []).join('; '),
+    gear: '',
+    traits: e.traits.map(mmEntry),
+    actions: e.actions.map(mmEntry),
+    bonusActions: e.bonusActions.map(mmEntry),
+    reactions: e.reactions.map(mmEntry),
+    legendaryActions: e.legendaryActions.map(mmEntry),
+    legendaryUses,
+    ...(inLair !== undefined && inLair !== legendaryUses ? { legendaryUsesInLair: inLair } : {}),
+    lairActions: e.lairActions.map(mmEntry),
+    addable: true,
+  };
+}
+
 function fromCustom(m: DmCustomMonster): LibraryMonster {
   const abilities = m.abilities;
   return {
@@ -282,11 +423,12 @@ function fromCustom(m: DmCustomMonster): LibraryMonster {
 
 let builtIns: LibraryMonster[] | undefined;
 
-/** The Monster Manual NPC blocks and the app's creatures (Primal Companions are player features, so they are left out). */
+/** The Monster Manual NPC blocks, the 2024 Monster Manual creatures (monsters.json) and the app's creatures (Primal Companions are player features, so they are left out). */
 export function builtInMonsters(): LibraryMonster[] {
   builtIns ??= [
     ...NPC_TEMPLATE_LIST.map(fromTemplate),
     ...CREATURE_LIST.filter((c) => c.kind !== 'primal-companion').map(fromCreature),
+    ...MONSTER_MANUAL_2024_LIST.map(fromMonsterManual2024Entry),
   ];
   return builtIns;
 }
@@ -431,6 +573,10 @@ export function combatantFromLibrary(m: LibraryMonster, id: string): DmCombatant
   if (m.origin === 'creature') {
     const c = CREATURE_LIST.find((x) => `creature:${x.id}` === m.key);
     return c ? combatantFromCreature(c, id) : undefined;
+  }
+  if (m.origin === 'monster-manual') {
+    const e = MONSTER_MANUAL_2024_LIST.find((x) => monsterManualKey(x.name) === m.key);
+    return e ? combatantFromMonsterManual(e, id) : undefined;
   }
   if (m.ac === null || m.hpAverage === null) return undefined;
   const base = customCombatant(id, {

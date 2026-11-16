@@ -37,6 +37,7 @@ import type { Ability } from '../types/character';
 import { DAMAGE_TYPES, type DamageType } from '../data/damage-types';
 import { CREATURE_LIST, type CreatureStatBlock } from '../data/creatures';
 import type { NpcTemplate } from '../data/npc-templates';
+import type { MonsterManual2024Entry } from '../data/monster-manual-2024';
 import type { ConditionId } from '../data/conditions';
 import { getCondition } from '../data/conditions';
 import { abilityModifier } from './abilities';
@@ -186,6 +187,31 @@ export function combatantFromTemplate(t: NpcTemplate, id: string, name?: string)
     const proficient = (s.saveProficiencies ?? []).includes('con' as Ability);
     c.conSaveMod = abilityModifier(con) + (proficient ? (s.proficiencyBonus ?? 0) : 0);
   }
+  return c;
+}
+
+/**
+ * A combatant from a `monsters.json` (Monster Manual 2024) creature. Numbers
+ * are the printed ones; Legendary Action uses come from the stat block
+ * ("Legendary Action Uses: 3 (4 in Lair)", Monster Manual 2024).
+ */
+export function combatantFromMonsterManual(e: MonsterManual2024Entry, id: string, name?: string): DmCombatant {
+  const c = blank(
+    id,
+    name ?? e.name,
+    'monster',
+    `${e.name} (Monster Manual 2024, p.${e.page})`,
+    e.ac,
+    monsterHp(e.hp.avg),
+    e.initiative.mod,
+  );
+  c.resistances = (e.resistances ?? []).join('; ');
+  c.vulnerabilities = (e.vulnerabilities ?? []).join('; ');
+  c.immunities = (e.damageImmunities ?? []).join('; ');
+  c.cr = e.cr;
+  c.xp = e.xp;
+  c.conSaveMod = e.abilities.con.save;
+  if (e.legendaryActions.length > 0) c.legendary = { max: e.legendaryActionUses?.normal ?? 3, used: 0 };
   return c;
 }
 

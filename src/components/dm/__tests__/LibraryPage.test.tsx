@@ -8,6 +8,7 @@ import type { DmPage } from '../../../logic/dm-mode';
 import { createCampaign, emptyDmData } from '../../../logic/dm-campaign';
 import { createEncounter, saveEncounter, openEncounter } from '../../../logic/dm-encounter';
 import { NPC_TEMPLATE_LIST } from '../../../data/npc-templates';
+import { MONSTER_MANUAL_2024_LIST } from '../../../data/monster-manual-2024';
 
 function Routed({ initial }: { initial: DmPage }) {
   const [page, setPage] = useState<DmPage>(initial);
@@ -50,6 +51,8 @@ describe('Library page', () => {
     render(<Routed initial="library" />);
     fireEvent.change(screen.getByLabelText('Source'), { target: { value: 'npc' } });
     expect(results().getAllByRole('button')).toHaveLength(NPC_TEMPLATE_LIST.length);
+    fireEvent.change(screen.getByLabelText('Source'), { target: { value: 'monster-manual' } });
+    expect(results().getAllByRole('button')).toHaveLength(MONSTER_MANUAL_2024_LIST.length);
     fireEvent.change(screen.getByLabelText('Source'), { target: { value: 'custom' } });
     expect(screen.getByText('No creature matches those filters.')).toBeInTheDocument();
   });
@@ -58,7 +61,7 @@ describe('Library page', () => {
     render(<Routed initial="library" />);
     const t = NPC_TEMPLATE_LIST.find((x) => x.id === 'bandit-captain')!;
     fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });
-    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain/ }));
+    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain.*Monster Manual NPCs/ }));
     const block = screen.getByRole('article', { name: 'Bandit Captain stat block' });
     expect(within(block).getByText(`Monster Manual 2024, p.${t.page}`)).toBeInTheDocument();
     expect(block).toHaveTextContent(`AC ${t.stats.ac}`);
@@ -71,7 +74,7 @@ describe('Library page', () => {
     seed(true);
     render(<Routed initial="library" />);
     fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });
-    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain/ }));
+    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain.*Monster Manual NPCs/ }));
     fireEvent.change(screen.getByLabelText('How many'), { target: { value: '2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add to Ambush' }));
     const e = saved().campaigns[0].encounters[0];
@@ -84,7 +87,7 @@ describe('Library page', () => {
     seed(false);
     render(<Routed initial="library" />);
     fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });
-    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain/ }));
+    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain.*Monster Manual NPCs/ }));
     expect(screen.getByText(/no open encounter to add to/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Add to/ })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Go to Encounter' }));
@@ -94,7 +97,7 @@ describe('Library page', () => {
   it('copies a creature into an editable monster, saves it, edits and deletes it', () => {
     render(<Routed initial="library" />);
     fireEvent.change(screen.getByLabelText('Search by name'), { target: { value: 'Bandit Captain' } });
-    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain/ }));
+    fireEvent.click(results().getByRole('button', { name: /^Bandit Captain.*Monster Manual NPCs/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Make an editable copy' }));
 
     const editor = screen.getByRole('dialog', { name: 'New custom monster' });

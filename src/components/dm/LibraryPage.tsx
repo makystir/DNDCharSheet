@@ -36,6 +36,7 @@ interface LibraryPageProps {
 const ORIGIN_LABEL: Record<LibraryOrigin, string> = {
   npc: 'Monster Manual NPCs',
   creature: 'Creatures',
+  'monster-manual': 'Monster Manual (2024)',
   custom: 'My monsters',
 };
 
@@ -167,7 +168,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
                 <span>{m.name}</span>
                 <span className={lib.resultMeta}>
                   {m.cr !== null ? `CR ${m.cr}` : 'CR ?'} · {typeOf(m) || 'Creature'}
-                  {m.origin === 'custom' ? ' · custom' : ''}
+                  {m.origin === 'custom' ? ' · custom' : ` · ${ORIGIN_LABEL[m.origin]}`}
                 </span>
               </button>
             </li>
