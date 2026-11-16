@@ -23,6 +23,10 @@
 import type { Breakdown } from './breakdown';
 import { rollDie } from './dice';
 import type { RNG } from './random';
+import type { DmEncounter } from '../types/dm';
+import { countsForXp } from './dm-balance';
+import { crToNumber } from './dm-library';
+import { XP_BY_CR } from '../data/xp-tables';
 import {
   ART_OBJECTS,
   COIN_VALUE_GP,
@@ -205,4 +209,42 @@ export function moneyText(formed: FormedMoney): string[] {
   const lines = formed.lines.map((l) => l.text);
   if (formed.leftoverGp > 0 || lines.length === 0) lines.push(`${formed.leftoverGp.toLocaleString()} GP in coins`);
   return lines;
+}
+
+// ------------------------------------------------------- from an encounter
+export interface EncounterCrGroup {
+  /** The CR as printed on the combatant, e.g. "1/4". */
+  cr: string;
+  /** How many counted monsters have this CR. */
+  count: number;
+}
+
+export interface EncounterTreasureSource {
+  groups: EncounterCrGroup[];
+  /** Counted monsters with no usable CR (for example a custom monster without one), left out of the groups. */
+  skipped: number;
+}
+
+/**
+ * The CRs of the monsters in an ended encounter that count as overcome (the same
+ * test the XP award uses, `countsForXp`), grouped by CR from lowest to highest.
+ * This only gathers inputs for the DMG 2024 tables above. Which table to roll
+ * (individual, or a hoard for the leader's CR) stays the DM's choice.
+ */
+export function encounterTreasureSource(enc: DmEncounter): EncounterTreasureSource {
+  const counts = new Map<string, number>();
+  let skipped = 0;
+  for (const c of enc.combatants) {
+    if (c.kind !== 'monster' || !countsForXp(c)) continue;
+    const cr = c.cr?.trim();
+    if (!cr || !(cr in XP_BY_CR)) {
+      skipped++;
+      continue;
+    }
+    counts.set(cr, (counts.get(cr) ?? 0) + 1);
+  }
+  const groups = [...counts.entries()]
+    .sort((a, b) => (crToNumber(a[0]) ?? 0) - (crToNumber(b[0]) ?? 0))
+    .map(([cr, count]) => ({ cr, count }));
+  return { groups, skipped };
 }

@@ -179,6 +179,28 @@ export function saveNote(data: DmData, campaignId: string, note: DmNote, now: nu
   });
 }
 
+/**
+ * Add text to the newest session entry (highest session number), or start a new
+ * session entry with the text when there is none. Returns the entry's title and
+ * whether it was newly created. Text past `MAX_BODY` is cut off by `saveNote`.
+ */
+export function appendToLatestSession(
+  data: DmData,
+  campaignId: string,
+  text: string,
+  id: string,
+  now: number,
+): { data: DmData; title: string; created: boolean } {
+  const journal = data.campaigns.find((c) => c.id === campaignId)?.journal ?? [];
+  const latest = sortNotes(journal.filter((n) => n.kind === 'session'), 'session')[0];
+  if (latest) {
+    const body = `${latest.body.replace(/\s+$/, '')}\n\n${text}\n`;
+    return { data: saveNote(data, campaignId, { ...latest, body }, now), title: latest.title, created: false };
+  }
+  const base = newNote(journal, { id, kind: 'session', now });
+  return { data: saveNote(data, campaignId, { ...base, body: `${base.body.replace(/\s+$/, '')}\n\n${text}\n` }, now), title: base.title, created: true };
+}
+
 function replaceLinks(body: string, from: string, to: string): string {
   return body.replace(LINK, (whole, inner: string) => (same(inner, from) ? `[[${to}]]` : whole));
 }

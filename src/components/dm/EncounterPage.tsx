@@ -8,6 +8,7 @@ import { DIFFICULTIES } from '../../data/xp-tables';
 import {
   activeEncounter,
   addCombatants,
+  combatSummaryText,
   applyEncounterHpToParty,
   combatantFromMember,
   createEncounter,
@@ -23,6 +24,8 @@ import {
   sortByInitiative,
   startEncounter,
 } from '../../logic/dm-encounter';
+import { appendToLatestSession } from '../../logic/dm-journal';
+import { encounterTreasureSource, type EncounterCrGroup } from '../../logic/dm-treasure';
 import { canShowStatBlock, resolveCombatantStatBlock } from '../../logic/dm-library';
 import { createDefaultRng } from '../../logic/random';
 import { clockNow } from '../../logic/dm-mode';
@@ -43,18 +46,22 @@ interface EncounterPageProps {
   onOpenCampaign: () => void;
   /** Open the Party XP page's Fight tab with this encounter already chosen. */
   onOpenPartyXp: (encounterId: string) => void;
+  /** Open the Treasure page with the CRs of the creatures overcome in this fight. */
+  onOpenTreasure: (groups: EncounterCrGroup[]) => void;
+  onOpenJournal: () => void;
 }
 
 const STATUS_LABEL = { setup: 'Setting up', running: 'In progress', ended: 'Finished' } as const;
 
 /** Run an encounter: build the order, roll Initiative, step through turns, track Hit Points. */
-export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: EncounterPageProps) {
+export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onOpenTreasure, onOpenJournal }: EncounterPageProps) {
   const campaign = activeCampaign(dm.data);
   const [adding, setAdding] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [deleting, setDeleting] = useState<DmEncounter | null>(null);
   const [newName, setNewName] = useState('');
   const [startError, setStartError] = useState<string | null>(null);
+  const [summarySaved, setSummarySaved] = useState(false);
   // The stat block drawer. id is the creature last shown (the pinned one when follow is off).
   const [statBlock, setStatBlock] = useState<{ encounterId: string; id: string; follow: boolean } | null>(null);
 
@@ -399,6 +406,45 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: E
               Still standing: {survivors.length === 0 ? 'nobody' : survivors.map((c) => c.name).join(', ')}.
               {defeated.length > 0 && ` Down for good: ${defeated.map((c) => c.name).join(', ')}.`}
             </span>
+            <div className={styles.row} data-testid="after-combat">
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={() => {
+                  const src = encounterTreasureSource(open);
+                  if (src.groups.length === 0) {
+                    onNotify(
+                      src.skipped > 0
+                        ? 'The creatures counted for XP have no CR. Roll treasure on the Treasure page.'
+                        : 'No creatures are counted as overcome. Tick them under "XP for this fight" first.',
+                    );
+                    return;
+                  }
+                  onOpenTreasure(src.groups);
+                }}
+              >
+                Roll treasure for this encounter
+              </button>
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={() => {
+                  const now = clockNow();
+                  const result = appendToLatestSession(dm.data, campaign.id, combatSummaryText(open), crypto.randomUUID(), now);
+                  dm.replace(result.data);
+                  setSummarySaved(true);
+                  onNotify(`Combat summary ${result.created ? 'saved in the new' : 'added to'} session note "${result.title}".`);
+                }}
+              >
+                Add combat summary to the session note
+              </button>
+              {summarySaved && (
+                <button type="button" className={styles.btn} onClick={onOpenJournal}>
+                  Open journal
+                </button>
+              )}
+              <span className={styles.muted}>The combat log is lost if you delete this encounter.</span>
+            </div>
             {pcs.length > 0 && (
               <div className={styles.row}>
                 <button

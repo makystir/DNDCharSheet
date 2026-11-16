@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen, Dices, Gem, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { DmPage } from '../../logic/dm-mode';
+import type { EncounterCrGroup } from '../../logic/dm-treasure';
 import { useDmData } from '../../hooks/useDmData';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { PageContainer } from '../layout/PageContainer';
@@ -62,9 +63,12 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
 
   // Encounter id handed to the Party XP page by the Encounter page's button; any other way of reaching it clears it.
   const [xpEncounterId, setXpEncounterId] = useState<string | undefined>(undefined);
+  // CRs handed to the Treasure page by the Encounter page's button, cleared the same way.
+  const [treasureCrs, setTreasureCrs] = useState<EncounterCrGroup[] | undefined>(undefined);
   const go = useCallback(
     (target: DmPage) => {
       setXpEncounterId(undefined);
+      setTreasureCrs(undefined);
       onNavigate(target);
     },
     [onNavigate],
@@ -74,6 +78,10 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
     onNavigate('xp');
   };
 
+  const openTreasure = (groups: EncounterCrGroup[]) => {
+    setTreasureCrs(groups);
+    onNavigate('treasure');
+  };
   // Number-key shortcuts, ignored while typing in a form field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -154,13 +162,13 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'party' && (
           <PartyPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />
         )}
-        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenPartyXp={openPartyXp} />}
+        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenPartyXp={openPartyXp} onOpenTreasure={openTreasure} onOpenJournal={() => onNavigate('journal')} />}
         {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
         {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
         {page === 'generators' && (
           <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
         )}
-        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} />}
+        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} encounterCrs={treasureCrs} />}
         {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />

@@ -24,6 +24,7 @@ import {
   rollIndividual,
   rollItems,
   specText,
+  type EncounterCrGroup,
   type FormedMoney,
   type MoneyForm,
 } from '../../logic/dm-treasure';
@@ -38,6 +39,8 @@ interface TreasurePageProps {
   dm: DmApi;
   onNotify: (text: string) => void;
   onOpenJournal: () => void;
+  /** CRs of the monsters overcome in an encounter, handed over by the Encounter page's "Roll treasure" button. */
+  encounterCrs?: EncounterCrGroup[];
 }
 
 type Tab = 'individual' | 'hoard' | 'quest' | 'items' | 'reference';
@@ -95,7 +98,7 @@ function outcomeText(o: Outcome): string {
 }
 
 /** Roll treasure from the DMG tables, take it as coins, gems, art or bars, and save it to the journal. */
-export function TreasurePage({ dm, onNotify, onOpenJournal }: TreasurePageProps) {
+export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: TreasurePageProps) {
   const campaign = activeCampaign(dm.data);
   const partyLevels = (campaign?.party ?? []).flatMap((m) => {
     const s = memberStats(m);
@@ -104,8 +107,8 @@ export function TreasurePage({ dm, onNotify, onOpenJournal }: TreasurePageProps)
   const defaultLevel = partyLevels.length > 0 ? Math.floor(partyLevels.reduce((a, b) => a + b, 0) / partyLevels.length) : 1;
 
   const [tab, setTab] = useState<Tab>('individual');
-  const [cr, setCr] = useState('1');
-  const [creatures, setCreatures] = useState('1');
+  const [cr, setCr] = useState(encounterCrs?.[0]?.cr ?? '1');
+  const [creatures, setCreatures] = useState(String(encounterCrs?.[0]?.count ?? 1));
   const [average, setAverage] = useState(false);
   const [twice, setTwice] = useState(false);
   const [level, setLevel] = useState(String(defaultLevel));
@@ -223,6 +226,48 @@ export function TreasurePage({ dm, onNotify, onOpenJournal }: TreasurePageProps)
           <div className={styles.muted}>Dungeon Master's Guide 2024, chapters 4 and 7</div>
         </div>
       </div>
+
+      {encounterCrs && encounterCrs.length > 0 && (
+        <Card>
+          <div className={styles.stack} data-testid="encounter-crs">
+            <strong>From the encounter</strong>
+            <span className={styles.muted}>
+              Creatures the party overcame. Individual treasure: one roll for a group of the same CR, times the number of
+              creatures. Hoard: the table for the CR of the group's leader. You choose which to roll.
+            </span>
+            {encounterCrs.map((g) => (
+              <div key={g.cr} className={styles.row}>
+                <span>
+                  CR {g.cr}: {g.count} {g.count === 1 ? 'creature' : 'creatures'}
+                </span>
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={() => {
+                    setTab('individual');
+                    setCr(g.cr);
+                    setCreatures(String(g.count));
+                    setOutcome(null);
+                  }}
+                >
+                  Individual treasure for CR {g.cr}
+                </button>
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={() => {
+                    setTab('hoard');
+                    setCr(g.cr);
+                    setOutcome(null);
+                  }}
+                >
+                  Hoard for CR {g.cr}
+                </button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card>
         <SectionHeader icon={Gem} title="Roll treasure" />

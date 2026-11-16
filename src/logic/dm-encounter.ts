@@ -616,6 +616,24 @@ export function previousTurn(enc: DmEncounter): DmEncounter {
   return enc;
 }
 
+/**
+ * A plain-text account of a fight for the session note: a heading, who was left
+ * standing and who was down, then the combat log in order. The log keeps at most
+ * `MAX_LOG_LINES` lines, so a long fight's earliest lines may already be gone.
+ */
+export function combatSummaryText(enc: DmEncounter): string {
+  const rounds = Math.max(1, enc.round);
+  const standing = enc.combatants.filter((c) => !isOut(c)).map((c) => c.name);
+  const down = enc.combatants.filter((c) => isOut(c)).map((c) => c.name);
+  const lines = [
+    `Combat: ${enc.name} (${rounds} ${rounds === 1 ? 'round' : 'rounds'}).`,
+    `Still standing: ${standing.length === 0 ? 'nobody' : standing.join(', ')}.`,
+  ];
+  if (down.length > 0) lines.push(`Down for good: ${down.join(', ')}.`);
+  if (enc.log.length > 0) lines.push('', 'Combat log:', ...enc.log.map((l) => `- ${l}`));
+  return lines.join('\n');
+}
+
 export function endEncounter(enc: DmEncounter, now: number): DmEncounter {
   if (enc.status === 'ended') return enc;
   return withLog({ ...enc, status: 'ended', activeId: null, updatedAt: now }, `Combat ends after round ${Math.max(1, enc.round)}.`);
