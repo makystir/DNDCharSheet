@@ -23,6 +23,7 @@ import {
   sortByInitiative,
   startEncounter,
 } from '../../logic/dm-encounter';
+import { canShowStatBlock, resolveCombatantStatBlock } from '../../logic/dm-library';
 import { createDefaultRng } from '../../logic/random';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
@@ -31,6 +32,7 @@ import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { AddCombatantsDialog } from './AddCombatantsDialog';
 import { CombatantCard } from './CombatantCard';
 import { EncounterBalance } from './EncounterBalance';
+import { StatBlockDrawer } from './StatBlockDrawer';
 import { XpAwardCard } from './XpAwardCard';
 import styles from './dm.module.css';
 import enc from './encounter.module.css';
@@ -53,6 +55,8 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: E
   const [deleting, setDeleting] = useState<DmEncounter | null>(null);
   const [newName, setNewName] = useState('');
   const [startError, setStartError] = useState<string | null>(null);
+  // The stat block drawer. id is the creature last shown (the pinned one when follow is off).
+  const [statBlock, setStatBlock] = useState<{ encounterId: string; id: string; follow: boolean } | null>(null);
 
   if (!campaign) {
     return (
@@ -261,6 +265,33 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: E
   const defeated = open.combatants.filter((c) => isOut(c));
   const pcs = open.combatants.filter((c) => c.kind === 'pc');
 
+  // Stat block drawer: which combatant it shows (see the follow-mode cases in the stat-block design).
+  const sb = statBlock && statBlock.encounterId === open.id ? statBlock : null;
+  const activeCombatant = open.combatants.find((c) => c.id === open.activeId);
+  const followTarget = sb?.follow && running && activeCombatant && canShowStatBlock(activeCombatant) ? activeCombatant : undefined;
+  const shownId = followTarget?.id ?? sb?.id;
+  const shownFound = open.combatants.find((c) => c.id === shownId);
+  const shown = shownFound && canShowStatBlock(shownFound) ? shownFound : undefined;
+  // Adjust state while rendering (guarded, so it settles on the next pass).
+  if (sb && followTarget && followTarget.id !== sb.id) setStatBlock({ ...sb, id: followTarget.id });
+  if (sb && !sb.follow && !shown) setStatBlock(null);
+  const drawerOpen = sb !== null && (sb.follow || shown !== undefined);
+  const resolved = shown ? resolveCombatantStatBlock(shown, open, dm.data.customMonsters) : undefined;
+  const customNote =
+    resolved?.customStatus === 'changed'
+      ? 'This monster was edited in the library after it was added. This is the version used in this fight.'
+      : resolved?.customStatus === 'deleted'
+        ? 'This monster was deleted from the library after it was added. This is the version used in this fight.'
+        : undefined;
+  const followNote = !sb?.follow
+    ? undefined
+    : !running || !activeCombatant
+      ? 'No active turn'
+      : !canShowStatBlock(activeCombatant)
+        ? 'Active combatant has no stat block'
+        : undefined;
+  const drawerNote = [followNote, customNote].filter(Boolean).join(' ') || undefined;
+
   const renderCard = (c: DmCombatant) => (
     <CombatantCard
       key={c.id}
@@ -269,11 +300,16 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: E
       isActive={running && c.id === open.activeId}
       onCommit={commit}
       onNotify={onNotify}
+      hasStatBlock={canShowStatBlock(c)}
+      statBlockOpen={drawerOpen && c.id === shown?.id}
+      onToggleStatBlock={() =>
+        setStatBlock(drawerOpen && c.id === shown?.id ? null : { encounterId: open.id, id: c.id, follow: sb?.follow ?? false })
+      }
     />
   );
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${drawerOpen ? `${enc.withDrawer} ${enc.withSheet}` : ''}`}>
       <div className={styles.pageHeader}>
         <div>
           <h1 className={styles.pageTitle}>{open.name}</h1>
@@ -416,13 +452,31 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp }: E
         </Card>
       )}
 
+      {drawerOpen && sb && (
+        <StatBlockDrawer
+          title={shown ? shown.name : 'Stat block'}
+          subtitle={shown && resolved && resolved.monster.name !== shown.name ? resolved.monster.name : undefined}
+          vitals={shown ? `AC ${shown.ac}, HP ${shown.hp.hp}/${shown.hp.max}` : undefined}
+          note={drawerNote}
+          monster={resolved?.monster}
+          empty={
+            shown
+              ? 'No stat block is linked to this combatant. Combatants added before stat blocks were shown in combat, and custom monsters that no longer exist, cannot be matched.'
+              : 'Waiting for a combatant with a stat block'
+          }
+          follow={{ value: sb.follow, onChange: (value) => setStatBlock({ ...sb, follow: value }) }}
+          onNextTurn={running ? () => commit(nextTurn(open)) : undefined}
+          onClose={() => setStatBlock(null)}
+        />
+      )}
+
       {adding && (
         <AddCombatantsDialog
           party={campaign.party}
           customMonsters={dm.data.customMonsters}
           presentMemberIds={presentMemberIds}
           onAdd={(list, keepOpen) => {
-            commit(addCombatants(open, list));
+            commit(addCombatants(open, list, dm.data.customMonsters));
             if (!keepOpen) setAdding(false);
           }}
           onClose={() => setAdding(false)}

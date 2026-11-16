@@ -18,7 +18,7 @@ import type {
   DmPartyMember,
 } from '../types/dm';
 import { CONDITIONS } from '../data/conditions';
-import { MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
+import { customIdOfKey, LIBRARY_KEY_MAX, MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
 import { clampManualStats, DEFAULT_MANUAL_STATS, emptyDmData } from './dm-campaign';
 import { ABILITY_KEYS, blankCustomMonster } from './dm-library';
 import { MAX_BODY, MAX_NOTES, MAX_TITLE, NOTE_KINDS, QUEST_STATUSES } from './dm-journal';
@@ -89,6 +89,8 @@ function int(v: unknown, fallback: number, min: number, max: number): number {
 
 const CONDITION_IDS = new Set<string>(CONDITIONS.map((c) => c.id).filter((id) => id !== 'exhaustion'));
 
+const LIBRARY_KEY_RE = /^(npc|creature|monster-manual|custom):\S/;
+
 function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
   if (!isRecord(raw)) return undefined;
   const id = str(raw.id);
@@ -147,6 +149,8 @@ function sanitizeCombatant(raw: unknown): DmCombatant | undefined {
       out.legendary = { max, used: Math.min(out.legendary.used, max) };
     }
   }
+  const key = typeof raw.libraryKey === 'string' ? raw.libraryKey.trim() : '';
+  if (key.length <= LIBRARY_KEY_MAX && LIBRARY_KEY_RE.test(key)) out.libraryKey = key;
   if (typeof raw.memberId === 'string') out.memberId = raw.memberId;
   if (typeof raw.groupId === 'string') out.groupId = raw.groupId;
   if (typeof raw.cr === 'string' && raw.cr.trim() !== '') out.cr = raw.cr.trim().slice(0, 8);
@@ -166,6 +170,15 @@ function sanitizeEncounter(raw: unknown): DmEncounter | undefined {
     .slice(0, MAX_COMBATANTS);
   const status = raw.status === 'running' || raw.status === 'ended' ? raw.status : 'setup';
   const activeId = typeof raw.activeId === 'string' && combatants.some((c) => c.id === raw.activeId) ? raw.activeId : null;
+  const used = new Set<string>();
+  for (const c of combatants) {
+    const customId = customIdOfKey(c.libraryKey);
+    if (customId !== undefined) used.add(customId);
+  }
+  const snaps = Object.values(isRecord(raw.customMonsterSnapshots) ? raw.customMonsterSnapshots : {})
+    .map(sanitizeMonster)
+    .filter((m): m is DmCustomMonster => m !== undefined && used.has(m.id))
+    .slice(0, MAX_COMBATANTS);
   return {
     id,
     name: str(raw.name, 'Encounter').slice(0, 80) || 'Encounter',
@@ -174,6 +187,7 @@ function sanitizeEncounter(raw: unknown): DmEncounter | undefined {
     activeId: status === 'running' ? activeId : null,
     combatants,
     log: strList(raw.log).slice(-MAX_LOG_LINES),
+    ...(snaps.length > 0 ? { customMonsterSnapshots: Object.fromEntries(snaps.map((m) => [m.id, m])) } : {}),
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),
   };

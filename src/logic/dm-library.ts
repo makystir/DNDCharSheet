@@ -11,13 +11,24 @@
  * when the creature is proficient).
  */
 import type { Ability } from '../types/character';
-import type { DmCombatant, DmCustomMonster, DmData, DmMonsterEntry } from '../types/dm';
+import type { DmCombatant, DmCustomMonster, DmData, DmEncounter, DmMonsterEntry } from '../types/dm';
 import { CREATURE_LIST, type CreatureStatBlock } from '../data/creatures';
 import { NPC_TEMPLATE_LIST, type NpcTemplate } from '../data/npc-templates';
 import { MONSTER_MANUAL_2024_LIST, type MmFeature, type MonsterManual2024Entry } from '../data/monster-manual-2024';
 import { abilityModifier } from './abilities';
 import { xpForCr } from './dm-balance';
-import { combatantFromCreature, combatantFromMonsterManual, combatantFromTemplate, customCombatant, makeCopies } from './dm-encounter';
+import {
+  combatantFromCreature,
+  combatantFromMonsterManual,
+  combatantFromTemplate,
+  customCombatant,
+  customIdOfKey,
+  makeCopies,
+  monsterManualKey,
+  ownSnapshot,
+} from './dm-encounter';
+
+export { monsterManualKey };
 
 export const ABILITY_KEYS: readonly Ability[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 export const ABILITY_LABELS: Record<Ability, string> = {
@@ -315,11 +326,6 @@ function mmSenses(s: MonsterManual2024Entry['senses']): string {
     .join(', ');
 }
 
-/** Stable library key for a Monster Manual 2024 creature (names are unique in `monsters.json`). */
-export function monsterManualKey(name: string): string {
-  return `monster-manual:${name}`;
-}
-
 /** A `monsters.json` creature as a library creature. Printed numbers are copied, not recomputed. */
 export function fromMonsterManual2024Entry(e: MonsterManual2024Entry): LibraryMonster {
   const abilities: Partial<Record<Ability, number>> = {};
@@ -379,7 +385,7 @@ export function fromMonsterManual2024Entry(e: MonsterManual2024Entry): LibraryMo
   };
 }
 
-function fromCustom(m: DmCustomMonster): LibraryMonster {
+export function fromCustom(m: DmCustomMonster): LibraryMonster {
   const abilities = m.abilities;
   return {
     key: `custom:${m.id}`,
@@ -593,6 +599,7 @@ export function combatantFromLibrary(m: LibraryMonster, id: string): DmCombatant
     xp: m.xp ?? xpForCr(m.cr) ?? undefined,
   });
   base.sourceLabel = `${m.name} (custom)`;
+  base.libraryKey = m.key;
   if (m.legendaryUses > 0) base.legendary = { max: m.legendaryUses, used: 0 };
   return base;
 }
@@ -611,4 +618,61 @@ export function notAddableMessage(name: string): string {
 export function libraryCombatants(m: LibraryMonster, count: number, group: boolean, newId: () => string): DmCombatant[] | undefined {
   const base = combatantFromLibrary(m, newId());
   return base ? makeCopies(base, count, newId, group) : undefined;
+}
+// ------------------------------------------------------ stat block resolving
+
+export interface ResolvedStatBlock {
+  monster: LibraryMonster;
+  /** Custom monsters only: how the saved library copy compares with the snapshot used here. */
+  customStatus?: 'same' | 'changed' | 'deleted' | 'no-snapshot';
+}
+
+/** A monster combatant that may have a stat block (not a party member, not a Custom-tab combatant). */
+export function canShowStatBlock(c: DmCombatant): boolean {
+  return c.kind === 'monster' && c.sourceLabel !== 'Custom';
+}
+
+let builtInByKey: Map<string, LibraryMonster> | undefined;
+
+/**
+ * Find the creature a legacy combatant (saved without a libraryKey) came from by its exact sourceLabel
+ * (`Name (Source)`). Several matches resolve only when all share name and source and exactly one is the
+ * monster-manual: entry (every NPC template has a monsters.json twin with the same label); otherwise nothing.
+ */
+export function matchLegacyLabel(label: string, list: readonly LibraryMonster[]): LibraryMonster | undefined {
+  const matches = list.filter((m) => `${m.name} (${m.source})` === label);
+  if (matches.length <= 1) return matches[0];
+  const first = matches[0];
+  if (!matches.every((m) => m.name === first.name && m.source === first.source)) return undefined;
+  const mm = matches.filter((m) => m.key.startsWith('monster-manual:'));
+  return mm.length === 1 ? mm[0] : undefined;
+}
+
+/**
+ * The stat block for a combatant. Order: custom snapshot, then the live custom monster (only when no snapshot
+ * exists), then the built-in creature by key, then the legacy `sourceLabel` match.
+ */
+export function resolveCombatantStatBlock(
+  c: DmCombatant,
+  enc: Pick<DmEncounter, 'customMonsterSnapshots'>,
+  customMonsters: readonly DmCustomMonster[],
+): ResolvedStatBlock | undefined {
+  const customId = customIdOfKey(c.libraryKey);
+  if (customId !== undefined) {
+    const live = customMonsters.find((m) => m.id === customId);
+    const snap = ownSnapshot(enc.customMonsterSnapshots, customId);
+    if (snap) {
+      const customStatus = live === undefined ? 'deleted' : live.updatedAt !== snap.updatedAt ? 'changed' : 'same';
+      return { monster: fromCustom(snap), customStatus };
+    }
+    return live ? { monster: fromCustom(live), customStatus: 'no-snapshot' } : undefined;
+  }
+  if (c.libraryKey !== undefined) {
+    builtInByKey ??= new Map(builtInMonsters().map((m) => [m.key, m]));
+    const hit = builtInByKey.get(c.libraryKey);
+    return hit ? { monster: hit } : undefined;
+  }
+  if (!canShowStatBlock(c)) return undefined;
+  const legacy = matchLegacyLabel(c.sourceLabel, builtInMonsters());
+  return legacy ? { monster: legacy } : undefined;
 }

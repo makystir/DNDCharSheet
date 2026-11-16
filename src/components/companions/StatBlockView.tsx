@@ -1,14 +1,12 @@
-import { Fragment } from 'react';
 import type { ReactNode } from 'react';
-import { CONDITIONS } from '../../data/conditions';
 import {
-  resolveConditionTooltip,
   resolveCreatureFeatureTooltip,
   resolveCreatureTooltip,
 } from '../../logic/tooltip-content';
 import type { CreatureFeatureSection } from '../../logic/tooltip-content';
 import type { StatBlockModel, StatFeature, StatLine, StatValue } from '../../logic/stat-block-model';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { ConditionAwareText } from '../shared/ConditionAwareText';
 import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import styles from './StatBlockView.module.css';
 
@@ -30,28 +28,6 @@ function Value({ value, fallbackLabel }: { value: StatValue; fallbackLabel: stri
     );
   }
   return <>{value.text}</>;
-}
-
-/** Text with a content tooltip on each token that names a condition ("Charmed, Poisoned"). */
-function ConditionAwareText({ text }: { text: string }) {
-  const tokens = text.split(/,\s*/);
-  return (
-    <>
-      {tokens.map((token, i) => {
-        const cond = CONDITIONS.find((c) => c.name.toLowerCase() === token.trim().toLowerCase());
-        return (
-          <Fragment key={`${token}-${i}`}>
-            {i > 0 && ', '}
-            {cond ? (
-              <MaybeContentTooltip content={resolveConditionTooltip(cond.id)}>{token}</MaybeContentTooltip>
-            ) : (
-              token
-            )}
-          </Fragment>
-        );
-      })}
-    </>
-  );
 }
 
 function Line({ line }: { line: StatLine }) {

@@ -29,6 +29,7 @@ import type {
   DmCampaign,
   DmCombatCondition,
   DmCombatant,
+  DmCustomMonster,
   DmData,
   DmEncounter,
   DmPartyMember,
@@ -66,6 +67,54 @@ export const MAX_LOG_LINES = 200;
 export const MAX_COMBATANTS = 60;
 
 const NO_SAVES = { successes: 0, failures: 0 };
+
+// ------------------------------------------------------------- library keys
+
+/** Stable library key for a Monster Manual 2024 creature (names are unique in monsters.json). */
+export function monsterManualKey(name: string): string {
+  return `monster-manual:${name}`;
+}
+
+export const CUSTOM_KEY_PREFIX = 'custom:';
+/** Longest libraryKey kept by the sanitizer. */
+export const LIBRARY_KEY_MAX = 120;
+
+/** The custom monster id inside a custom:<id> library key, or undefined for any other key. */
+export function customIdOfKey(key: string | undefined): string | undefined {
+  return key !== undefined && key.startsWith(CUSTOM_KEY_PREFIX) && key.length > CUSTOM_KEY_PREFIX.length
+    ? key.slice(CUSTOM_KEY_PREFIX.length)
+    : undefined;
+}
+
+/**
+ * The only way snapshots are read: own properties only, so ids such as constructor, 	oString or
+ * __proto__ never return inherited values.
+ */
+export function ownSnapshot(
+  snapshots: Record<string, DmCustomMonster> | undefined,
+  id: string,
+): DmCustomMonster | undefined {
+  return snapshots !== undefined && Object.prototype.hasOwnProperty.call(snapshots, id) ? snapshots[id] : undefined;
+}
+
+/** Keep only the snapshots some combatant still references; undefined when none remain. */
+function pruneSnapshots(
+  snapshots: Record<string, DmCustomMonster> | undefined,
+  combatants: readonly DmCombatant[],
+): Record<string, DmCustomMonster> | undefined {
+  if (snapshots === undefined) return undefined;
+  const used = new Set<string>();
+  for (const c of combatants) {
+    const id = customIdOfKey(c.libraryKey);
+    if (id !== undefined) used.add(id);
+  }
+  const kept: [string, DmCustomMonster][] = [];
+  for (const id of used) {
+    const s = ownSnapshot(snapshots, id);
+    if (s) kept.push([id, s]);
+  }
+  return kept.length > 0 ? Object.fromEntries(kept) : undefined;
+}
 
 // ------------------------------------------------------------------ helpers
 
@@ -178,6 +227,7 @@ export function combatantFromTemplate(t: NpcTemplate, id: string, name?: string)
   );
   c.resistances = s.resistances ?? '';
   c.vulnerabilities = s.vulnerabilities ?? '';
+  c.libraryKey = `npc:${t.id}`;
   c.immunities = s.immunities ?? '';
   if (s.cr) c.cr = s.cr;
   const templateXp = s.xp ?? xpForCr(s.cr);
@@ -208,6 +258,7 @@ export function combatantFromMonsterManual(e: MonsterManual2024Entry, id: string
   c.resistances = (e.resistances ?? []).join('; ');
   c.vulnerabilities = (e.vulnerabilities ?? []).join('; ');
   c.immunities = (e.damageImmunities ?? []).join('; ');
+  c.libraryKey = monsterManualKey(e.name);
   c.cr = e.cr;
   c.xp = e.xp;
   c.conSaveMod = e.abilities.con.save;
@@ -247,6 +298,7 @@ export function combatantFromCreature(cr: CreatureStatBlock, id: string, name?: 
   );
   c.resistances = cr.damageResistances.join('; ');
   c.vulnerabilities = cr.damageVulnerabilities.join('; ');
+  c.libraryKey = `creature:${cr.id}`;
   c.immunities = cr.damageImmunities.join('; ');
   if (cr.challenge.cr) c.cr = cr.challenge.cr;
   const creatureXp = cr.challenge.xp ?? xpForCr(cr.challenge.cr);
@@ -339,7 +391,16 @@ export function createEncounter(id: string, name: string, now: number): DmEncoun
   };
 }
 
-export function addCombatants(enc: DmEncounter, list: DmCombatant[]): DmEncounter {
+/**
+ * Add combatants. For any that came from a custom monster, a copy of that monster in customMonsters is stored
+ * on the encounter the first time it is used and never replaced (first add wins), so later edits or deletes
+ * in the library do not change the stat block of a fight in progress.
+ */
+export function addCombatants(
+  enc: DmEncounter,
+  list: DmCombatant[],
+  customMonsters: readonly DmCustomMonster[] = [],
+): DmEncounter {
   if (enc.status === 'ended') return enc;
   const room = Math.max(0, MAX_COMBATANTS - enc.combatants.length);
   const incoming = list.slice(0, room);
@@ -355,7 +416,16 @@ export function addCombatants(enc: DmEncounter, list: DmCombatant[]): DmEncounte
     }
   }
   combatants = combatants.slice(0, MAX_COMBATANTS);
-  return withLog({ ...enc, combatants }, `${incoming.map((c) => c.name).join(', ')} joined the encounter.`);
+  let snapshots = enc.customMonsterSnapshots;
+  for (const c of incoming) {
+    const id = customIdOfKey(c.libraryKey);
+    if (id === undefined || ownSnapshot(snapshots, id) !== undefined) continue;
+    const live = customMonsters.find((m) => m.id === id);
+    if (live) snapshots = { ...snapshots, [id]: structuredClone(live) };
+  }
+  return withLog(
+    { ...enc, combatants, ...(snapshots !== undefined ? { customMonsterSnapshots: snapshots } : {}) },
+    `${incoming.map((c) => c.name).join(', ')} joined the encounter.`);
 }
 
 export function removeCombatant(enc: DmEncounter, id: string): DmEncounter {
@@ -368,7 +438,14 @@ export function removeCombatant(enc: DmEncounter, id: string): DmEncounter {
     const rest = enc.combatants.filter((x) => x.id !== id);
     activeId = rest.length === 0 ? null : rest[Math.min(idx, rest.length - 1)].id;
   }
-  return withLog({ ...enc, combatants: enc.combatants.filter((x) => x.id !== id), activeId }, `${c.name} left the encounter.`);
+  const combatants = enc.combatants.filter((x) => x.id !== id);
+  const snapshots = pruneSnapshots(enc.customMonsterSnapshots, combatants);
+  const { customMonsterSnapshots: _before, ...rest } = enc;
+  void _before;
+  return withLog(
+    { ...rest, combatants, activeId, ...(snapshots !== undefined ? { customMonsterSnapshots: snapshots } : {}) },
+    `${c.name} left the encounter.`,
+  );
 }
 
 export function renameCombatant(enc: DmEncounter, id: string, name: string): DmEncounter {
@@ -787,9 +864,11 @@ export function duplicateEncounter(src: DmEncounter, newId: () => string, now: n
     }
     return { ...freshCombatant(c), id: newId(), groupId, initiative: null };
   });
+  const snapshots = pruneSnapshots(src.customMonsterSnapshots, combatants);
   return {
     ...createEncounter(newId(), `${src.name} (copy)`.slice(0, 80), now),
     combatants,
+    ...(snapshots !== undefined ? { customMonsterSnapshots: snapshots } : {}),
   };
 }
 

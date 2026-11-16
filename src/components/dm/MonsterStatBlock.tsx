@@ -3,13 +3,15 @@ import { ABILITY_KEYS, ABILITY_LABELS } from '../../logic/dm-library';
 import { abilityModifier, abilityModifierBreakdown } from '../../logic/abilities';
 import { ABILITY_NAMES } from '../../types/character';
 import type { DmMonsterEntry } from '../../types/dm';
+import type { ReactNode } from 'react';
 import { CalculatedValue } from '../shared/CalculatedValue';
+import { ConditionAwareText } from '../shared/ConditionAwareText';
 import styles from './dm.module.css';
 import lib from './library.module.css';
 
 const signed = (n: number) => (n >= 0 ? `+${n}` : String(n));
 
-function Line({ label, value }: { label: string; value: string }) {
+function Line({ label, value }: { label: string; value: ReactNode }) {
   if (!value) return null;
   return (
     <div>
@@ -133,7 +135,7 @@ export function MonsterStatBlock({ monster: m }: { monster: LibraryMonster }) {
         <Line label="Vulnerabilities" value={m.vulnerabilities} />
         <Line label="Resistances" value={m.resistances} />
         <Line label="Immunities" value={m.immunities} />
-        <Line label="Condition immunities" value={m.conditionImmunities} />
+        <Line label="Condition immunities" value={m.conditionImmunities && <ConditionAwareText text={m.conditionImmunities} />} />
         <Line label="Gear" value={m.gear} />
         <Line label="Senses" value={m.senses} />
         <Line label="Languages" value={m.languages} />

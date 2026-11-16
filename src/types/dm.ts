@@ -139,6 +139,12 @@ export interface DmCombatant {
    * on, `legendary.max` is `inLair`, otherwise `normal`. Absent in older saves.
    */
   legendaryLair?: { normal: number; inLair: number; active: boolean };
+  /**
+   * `LibraryMonster.key` of the creature this combatant was built from:
+   * `npc:<id>`, `creature:<id>`, `monster-manual:<name>` or `custom:<id>`.
+   * Absent for party members, Custom-tab combatants and saves from before stat blocks were shown in combat.
+   */
+  libraryKey?: string;
   /** Monster only: make Death Saving Throws at 0 HP instead of dying outright. */
   diesLikeCharacter: boolean;
   notes: string;
@@ -158,6 +164,11 @@ export interface DmEncounter {
   combatants: DmCombatant[];
   /** Newest last, capped. */
   log: string[];
+  /**
+   * Copies of the custom monsters this fight uses, keyed by custom monster id, taken when each was first
+   * added so later edits or deletes do not change a fight in progress. Absent in older saves.
+   */
+  customMonsterSnapshots?: Record<string, DmCustomMonster>;
   createdAt: number;
   updatedAt: number;
 }

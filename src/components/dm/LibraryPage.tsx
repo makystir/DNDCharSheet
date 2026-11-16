@@ -79,7 +79,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
       onNotify(notAddableMessage(m.name));
       return;
     }
-    const next = addCombatants(chosenEncounter, list);
+    const next = addCombatants(chosenEncounter, list, dm.data.customMonsters);
     const now = clockNow();
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
     onNotify(`${count > 1 ? `${count} × ` : ''}${m.name} added to ${chosenEncounter.name}.`);
@@ -95,7 +95,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
     }
     const now = clockNow();
     const created = createEncounter(crypto.randomUUID(), `${m.name} encounter`, now);
-    const next = addCombatants(created, list);
+    const next = addCombatants(created, list, dm.data.customMonsters);
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
     onNotify(`${count > 1 ? `${count} × ` : ''}${m.name} added to the new encounter "${next.name}".`);
   };

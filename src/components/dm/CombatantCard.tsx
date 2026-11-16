@@ -44,6 +44,10 @@ interface CombatantCardProps {
   isActive: boolean;
   onCommit: (next: DmEncounter) => void;
   onNotify: (text: string) => void;
+  /** Show a Stat block button (monster combatants that can have a stat block). */
+  hasStatBlock?: boolean;
+  statBlockOpen?: boolean;
+  onToggleStatBlock?: () => void;
 }
 
 /** Why a concentration DC is what it is (PHB 2024 "Concentration"). */
@@ -61,7 +65,16 @@ function dcBreakdown(dc: number): Breakdown {
 const TRACKABLE = CONDITIONS.filter((c) => c.id !== 'exhaustion');
 
 /** One combatant: the quick numbers up front, the detail panel behind "More". */
-export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onNotify }: CombatantCardProps) {
+export function CombatantCard({
+  encounter,
+  combatant: c,
+  isActive,
+  onCommit,
+  onNotify,
+  hasStatBlock = false,
+  statBlockOpen = false,
+  onToggleStatBlock,
+}: CombatantCardProps) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('');
@@ -175,6 +188,17 @@ export function CombatantCard({ encounter, combatant: c, isActive, onCommit, onN
               </div>
             )}
           </div>
+          {hasStatBlock && (
+            <button
+              type="button"
+              className={styles.btn}
+              aria-pressed={statBlockOpen}
+              aria-label={`${statBlockOpen ? 'Hide' : 'Show'} stat block for ${c.name}`}
+              onClick={onToggleStatBlock}
+            >
+              Stat block
+            </button>
+          )}
           {isActive && <span className={enc.turnTag}>Turn</span>}
           {out && <span className={enc.outTag}>{c.kind === 'pc' ? 'Dead' : 'Defeated'}</span>}
           {down && !out && <span className={enc.outTag}>{c.hp.stable ? 'Stable' : '0 HP'}</span>}
