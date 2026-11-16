@@ -4,6 +4,8 @@
  * same path a share link takes, so stat calculations never see a bad shape.
  */
 import type {
+  DmAward,
+  DmAwardSource,
   DmCampaign,
   DmCombatCondition,
   DmCombatant,
@@ -20,6 +22,7 @@ import { MAX_COMBATANTS, MAX_LOG_LINES } from './dm-encounter';
 import { clampManualStats, DEFAULT_MANUAL_STATS, emptyDmData } from './dm-campaign';
 import { ABILITY_KEYS, blankCustomMonster } from './dm-library';
 import { MAX_BODY, MAX_NOTES, MAX_TITLE, NOTE_KINDS, QUEST_STATUSES } from './dm-journal';
+import { cleanLabel, MAX_AWARDS, MAX_LABEL, validateAward } from './dm-awards';
 import { validateSharedPayload } from './share-validate';
 
 function str(v: unknown, fallback = ''): string {
@@ -236,6 +239,24 @@ function sanitizeNote(raw: unknown): DmNote | undefined {
     updatedAt: num(raw.updatedAt, 0),
   };
 }
+const AWARD_SOURCES: readonly DmAwardSource[] = ['fight', 'major', 'minor', 'noncombat', 'manual', 'level'];
+
+function sanitizeAward(raw: unknown): DmAward | undefined {
+  if (!isRecord(raw)) return undefined;
+  const source = AWARD_SOURCES.find((s) => s === raw.source);
+  if (source === undefined || typeof raw.createdAt !== 'number' || !Number.isFinite(raw.createdAt)) return undefined;
+  const checked = validateAward({
+    t: 'award',
+    k: raw.kind,
+    n: raw.amount,
+    i: raw.id,
+    l: typeof raw.label === 'string' ? cleanLabel(raw.label).slice(0, MAX_LABEL) : '',
+  });
+  if (!checked.ok) return undefined;
+  const { kind, amount, id, label } = checked.award;
+  return { id, kind, amount, label, source, createdAt: raw.createdAt };
+}
+
 function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
   if (!isRecord(raw)) return undefined;
   const id = str(raw.id);
@@ -250,6 +271,10 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
     .map(sanitizeNote)
     .filter((n): n is DmNote => n !== undefined)
     .slice(0, MAX_NOTES);
+  const awards = (Array.isArray(raw.awards) ? raw.awards : [])
+    .map(sanitizeAward)
+    .filter((a): a is DmAward => a !== undefined)
+    .slice(-MAX_AWARDS);
   const wantedEncounter = str(raw.activeEncounterId);
   return {
     id,
@@ -258,6 +283,7 @@ function sanitizeCampaign(raw: unknown): DmCampaign | undefined {
     party,
     encounters,
     journal,
+    awards,
     activeEncounterId: encounters.some((e) => e.id === wantedEncounter) ? wantedEncounter : null,
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),

@@ -27,6 +27,7 @@ export async function importCharacterFromText(input: string): Promise<ImportResu
   const text = input.trim();
   if (text === '') return { ok: false, error: 'Paste a share link, a share code, or an exported character file.' };
 
+  if (text.startsWith('AWARD-')) return { ok: false, error: "That is an award code. Paste it on a player's Advancement page." };
   if (text.startsWith('{')) {
     const validated = validateSharedPayload(text);
     return validated.ok ? validated : { ok: false, error: validated.error };

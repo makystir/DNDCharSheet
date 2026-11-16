@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Trophy } from 'lucide-react';
 import type { DmEncounter } from '../../types/dm';
 import { updateCombatant } from '../../logic/dm-encounter';
-import { xpAward } from '../../logic/dm-balance';
+import { countsForXp, xpAward } from '../../logic/dm-balance';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -20,7 +20,7 @@ interface XpAwardCardProps {
 export function XpAwardCard({ encounter, defaultSharers, onCommit }: XpAwardCardProps) {
   const [sharers, setSharers] = useState(String(Math.max(1, defaultSharers)));
   const monsters = encounter.combatants.filter((c) => c.kind === 'monster');
-  const counts = (c: (typeof monsters)[number]) => c.xpCounts ?? c.hp.dead;
+  const counts = countsForXp;
   const counted = monsters.filter(counts);
   const size = Math.max(1, Math.trunc(Number(sharers)) || 1);
   const award = xpAward(counted, size);

@@ -37,6 +37,7 @@ describe('DM routes', () => {
     expect(parseDmRoute('#dm')).toEqual({ area: 'dm', page: 'party' });
     expect(parseDmRoute('#dm/campaign')).toEqual({ area: 'dm', page: 'campaign' });
     expect(parseDmRoute('#DM/Settings')).toEqual({ area: 'dm', page: 'settings' });
+    expect(parseDmRoute('#DM/XP')).toEqual({ area: 'dm', page: 'xp' });
     expect(parseDmRoute('#dm/nonsense')).toEqual({ area: 'dm', page: 'party' });
   });
 

@@ -128,6 +128,11 @@ export function balanceNotes(members: BudgetMember[], combatants: DmCombatant[],
   return notes;
 }
 
+/** Whether a creature's XP counts as overcome: the DM's choice, else when it is dead. */
+export function countsForXp(c: DmCombatant): boolean {
+  return c.xpCounts ?? c.hp.dead;
+}
+
 export interface XpAward {
   /** Total XP of the creatures counted. */
   total: Breakdown;

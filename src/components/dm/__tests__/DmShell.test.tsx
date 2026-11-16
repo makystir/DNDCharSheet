@@ -150,6 +150,17 @@ describe('DmShell', () => {
     expect(screen.getByDisplayValue('Saved one')).toBeInTheDocument();
   });
 
+  it('opens Party XP with key 8 and Settings with key 9', () => {
+    render(<Harness />);
+    fireEvent.keyDown(window, { key: '8' });
+    expect(screen.getByRole('heading', { name: 'Party XP' })).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: '9' });
+    expect(screen.getByRole('button', { name: 'Turn off DM mode' })).toBeInTheDocument();
+    const labels = within(screen.getByRole('navigation', { name: 'Dungeon Master navigation' }))
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+    expect(labels.indexOf('Party XP')).toBe(labels.indexOf('Settings') - 1);
+  });
   it('turns DM mode off from its settings page', () => {
     const onTurnOff = vi.fn();
     render(<Harness initial="settings" onTurnOff={onTurnOff} />);

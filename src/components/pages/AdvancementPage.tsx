@@ -44,6 +44,7 @@ import { LevelUndoDialog } from './advancement/LevelUndoDialog';
 import { FeatSlotsSection } from './advancement/FeatSlotsSection';
 import { FightingStyleSection } from './advancement/FightingStyleSection';
 import { ProgressionAdvisor } from './advancement/ProgressionAdvisor';
+import { AwardRedeemCard } from './advancement/AwardRedeemCard';
 import { ExpertisePending, ExpertiseOverNote } from './advancement/ExpertisePending';
 import { FeatureLanguagesSection, LanguagePicksPending, LanguagePicksOverNote } from './advancement/LanguagePicksPending';
 import {
@@ -613,6 +614,9 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
           )}
         </div>
       </Card>
+
+      {/* ── DM award code (Stage 8): paste, preview, apply ─────────────────── */}
+      <AwardRedeemCard character={character} onChange={onChange} now={now} />
 
       {/* ── Progression (XP/milestone progress, what to do now, what is coming up) ─ */}
       <ProgressionAdvisor character={character} />

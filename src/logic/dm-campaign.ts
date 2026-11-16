@@ -12,7 +12,8 @@
  * down unless a rule says otherwise). It is a convenience figure, not a rule.
  */
 import type { Character } from '../types/character';
-import type { DmCampaign, DmData, DmManualStats, DmPartyMember } from '../types/dm';
+import type { DmAward, DmCampaign, DmData, DmManualStats, DmPartyMember } from '../types/dm';
+import { MAX_AWARDS } from './dm-awards';
 import type { Breakdown } from './breakdown';
 import { characterArmorClassBreakdown } from './armor-class';
 import { characterHitPointMaxBreakdown, effectiveHp, effectiveTempHp, hitPointMaxOf } from './hit-points-state';
@@ -68,10 +69,20 @@ export function createCampaign(data: DmData, input: { id: string; name: string; 
     encounters: [],
     activeEncounterId: null,
     journal: [],
+    awards: [],
     createdAt: input.now,
     updatedAt: input.now,
   };
   return { ...data, campaigns: [...data.campaigns, campaign], activeCampaignId: campaign.id };
+}
+
+/** Record an award in the campaign's history (newest last, capped). */
+export function addAward(data: DmData, campaignId: string, award: DmAward): DmData {
+  return mapCampaign(data, campaignId, (c) => ({
+    ...c,
+    awards: [...(c.awards ?? []), award].slice(-MAX_AWARDS),
+    updatedAt: award.createdAt,
+  }));
 }
 
 export function renameCampaign(data: DmData, id: string, name: string, now: number): DmData {

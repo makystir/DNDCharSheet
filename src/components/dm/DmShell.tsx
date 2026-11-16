@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen, Dices, Gem } from 'lucide-react';
+import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen, Dices, Gem, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { DmPage } from '../../logic/dm-mode';
 import { useDmData } from '../../hooks/useDmData';
@@ -15,6 +15,7 @@ import { LibraryPage } from './LibraryPage';
 import { JournalPage } from './JournalPage';
 import { GeneratorsPage } from './GeneratorsPage';
 import { TreasurePage } from './TreasurePage';
+import { XpPage } from './XpPage';
 import { DmSettingsPage } from './DmSettingsPage';
 import navStyles from '../layout/Navigation.module.css';
 import appStyles from '../../App.module.css';
@@ -45,7 +46,8 @@ const DM_NAV: DmNavItem[] = [
   { id: 'journal', label: 'Journal', icon: NotebookPen, shortcut: '5' },
   { id: 'generators', label: 'Generators', icon: Dices, shortcut: '6' },
   { id: 'treasure', label: 'Treasure', icon: Gem, shortcut: '7' },
-  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '8' },
+  { id: 'xp', label: 'Party XP', icon: Trophy, shortcut: '8' },
+  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '9' },
 ];
 
 /**
@@ -143,6 +145,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
           <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
         )}
         {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} />}
+        {page === 'xp' && <XpPage dm={dm} onNotify={notify} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
         )}

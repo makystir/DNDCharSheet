@@ -840,6 +840,11 @@ export interface AdvancementState {
   leveling?: { mode: 'milestone' | 'xp'; xp?: number };
   /** Minimal append-only audit trail, oldest-first (UI reverses). */
   log?: AdvancementLogEntry[];
+  /**
+   * IDs of DM award codes already applied (Stage 8), oldest first, capped at
+   * 500. Lets the app refuse a repeat paste. Additive-optional; no version bump.
+   */
+  appliedAwards?: string[];
 }
 
 // ── Stage B7: Unified event log + roll payload ───────────────────────────────

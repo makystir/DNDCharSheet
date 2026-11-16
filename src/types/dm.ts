@@ -53,8 +53,25 @@ export interface DmCampaign {
   activeEncounterId: string | null;
   /** Journal entries: sessions, NPCs, places, quests and plain notes. */
   journal: DmNote[];
+  /** XP and level awards the DM has made, newest last (Stage 8). Absent in older data. */
+  awards?: DmAward[];
   createdAt: number;
   updatedAt: number;
+}
+
+export type DmAwardSource = 'fight' | 'major' | 'minor' | 'noncombat' | 'manual' | 'level';
+
+/** One award the DM turned into a code: an XP amount per character, or a target level. */
+export interface DmAward {
+  /** 12-character ID carried in the code. */
+  id: string;
+  kind: 'xp' | 'level';
+  /** XP per character, or the target level 1-20. */
+  amount: number;
+  /** 0-40 characters. */
+  label: string;
+  source: DmAwardSource;
+  createdAt: number;
 }
 
 export interface DmData {
