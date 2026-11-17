@@ -18,12 +18,18 @@ import { crToNumber } from '../../logic/dm-library';
 import { newNote, saveNote } from '../../logic/dm-journal';
 import { clockNow } from '../../logic/dm-mode';
 import {
+  MAGIC_TIERS,
   formMoney,
+  magicItemMeta,
+  magicItemsText,
   moneyText,
   rollHoard,
   rollIndividual,
   rollItems,
+  rollMagicItems,
   specText,
+  type MagicTier,
+  type RolledMagicItem,
   type EncounterCrGroup,
   type FormedMoney,
   type MoneyForm,
@@ -91,9 +97,10 @@ const THEME_FORM: Record<TreasureTheme, string> = {
   relics: 'art:250',
 };
 
-function outcomeText(o: Outcome): string {
+function outcomeText(o: Outcome, rolled: RolledMagicItem[] = []): string {
   const lines = [o.title, `Monetary treasure: ${o.moneyLabel}${o.moneyLabel.endsWith('GP') ? '' : ` (${n(o.totalGp)} GP)`}`, ...moneyText(o.formed).map((l) => `  ${l}`)];
   if (o.magic) lines.push(`Magic items: ${o.magic.count} (${o.magic.dice})`);
+  for (const l of magicItemsText(rolled)) lines.push(`  ${l}`);
   return lines.join('\n');
 }
 
@@ -115,6 +122,8 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
   const [theme, setTheme] = useState<TreasureTheme | ''>('');
   const [formChoice, setFormChoice] = useState('coins');
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [magicTier, setMagicTier] = useState<MagicTier>('uncommon');
+  const [rolledMagic, setRolledMagic] = useState<RolledMagicItem[]>([]);
 
   const [itemKind, setItemKind] = useState<'gems' | 'art'>('gems');
   const [itemValue, setItemValue] = useState('100');
@@ -128,7 +137,12 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
 
   const finish = (partial: Omit<Outcome, 'formed' | 'form'>, key: string) => {
     const form = formOf(key);
+    setRolledMagic([]);
     setOutcome({ ...partial, form, formed: formMoney(createDefaultRng(), partial.totalGp, form) });
+  };
+
+  const rollMagic = (count: number) => {
+    setRolledMagic(rollMagicItems(createDefaultRng(), count, magicTier, theme || undefined));
   };
 
   const rollIndividualTreasure = () => {
@@ -546,16 +560,58 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
               ))}
             </ul>
             {outcome.magic && outcome.magic.count > 0 && (
-              <p className={styles.muted}>
-                Choose the magic items yourself (the rarity and kind that suit your party), or use the guidance in "Awarding Magic
-                Items" in the Dungeon Master's Guide. This app does not roll magic items yet.
-              </p>
+              <div className={styles.stack} data-testid="magic-roller">
+                <p className={styles.muted}>
+                  Choose the rarity yourself (see "Awarding Magic Items" in the Dungeon Master's Guide), then roll on the Random
+                  Magic Items tables. With no treasure theme, each item rolls 1d4 for Arcana, Armaments, Implements or Relics.
+                </p>
+                <div className={styles.row}>
+                  <label className={styles.field} style={{ flex: '0 1 180px' }}>
+                    <span className={styles.fieldLabel}>Magic item rarity</span>
+                    <select className={styles.input} value={magicTier} onChange={(e) => setMagicTier(e.target.value as MagicTier)}>
+                      {MAGIC_TIERS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button type="button" className={styles.btnPrimary} style={{ alignSelf: 'flex-end' }} onClick={() => rollMagic(outcome.magic?.count ?? 0)}>
+                    Roll {outcome.magic.count} magic {outcome.magic.count === 1 ? 'item' : 'items'}
+                  </button>
+                </div>
+                {rolledMagic.length > 0 && (
+                  <ul className={tr.lines} aria-label="Rolled magic items">
+                    {rolledMagic.map((r, i) => (
+                      <li key={`${i}-${r.item.name}`} data-testid={`magic-item-${r.item.status}`}>
+                        <strong>{r.item.name}</strong>
+                        <span className={styles.muted}>
+                          {' '}
+                          (d100 {r.d100}, {r.theme}
+                          {r.themeRoll !== null ? `, 1d4 ${r.themeRoll}` : ''})
+                        </span>
+                        <div className={styles.muted}>{magicItemMeta(r.item)}</div>
+                        {r.item.description !== null ? (
+                          <>
+                            <p>{r.item.description}</p>
+                            <div className={styles.muted}>Source: {r.item.source}</div>
+                          </>
+                        ) : (
+                          <p role="note" className={styles.muted}>
+                            <strong>Flagged:</strong> {r.item.source} Check the Dungeon Master's Guide.
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
             <div className={styles.row}>
-              <button type="button" className={styles.btn} disabled={!campaign} onClick={() => saveToJournal(outcome.title, outcomeText(outcome))}>
+              <button type="button" className={styles.btn} disabled={!campaign} onClick={() => saveToJournal(outcome.title, outcomeText(outcome, rolledMagic))}>
                 Save to journal
               </button>
-              {savedBody !== null && savedBody === outcomeText(outcome) && (
+              {savedBody !== null && savedBody === outcomeText(outcome, rolledMagic) && (
                 <button type="button" className={styles.btn} onClick={onOpenJournal}>
                   Open journal
                 </button>

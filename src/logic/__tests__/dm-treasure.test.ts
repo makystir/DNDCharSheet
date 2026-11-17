@@ -12,15 +12,23 @@ import {
 } from '../../data/treasure-tables';
 import { createSeededRng, type RNG } from '../random';
 import {
+  MAGIC_TIERS,
+  MAGIC_THEME_ORDER,
   MAX_ITEMS_PER_FORM,
+  MAX_MAGIC_ITEMS,
   averageSpec,
   formMoney,
   hoardRow,
   individualRow,
+  magicItemMeta,
+  magicItemTable,
+  magicItemsText,
   moneyText,
   rollHoard,
   rollIndividual,
   rollItems,
+  rollMagicItem,
+  rollMagicItems,
   rollSpec,
   specText,
 } from '../dm-treasure';
@@ -256,5 +264,70 @@ describe('taking the money in another form', () => {
     expect(f.leftoverGp).toBe(0);
     expect(rollItems(createSeededRng(4), 'art', 12345, 3)).toEqual({ lines: [], leftoverGp: 0 });
     expect(rollItems(createSeededRng(4), 'gems', 10, 0).lines).toEqual([]);
+  });
+});
+
+describe('random magic items (DMG 2024 pp.326-331)', () => {
+  it('has a d100 table for every theme and rarity', () => {
+    for (const theme of MAGIC_THEME_ORDER) {
+      for (const t of MAGIC_TIERS) {
+        const rows = magicItemTable(theme, t.id);
+        expect(rows[0].lo).toBe(1);
+        expect(rows[rows.length - 1].hi).toBe(100);
+      }
+    }
+  });
+
+  it('rolls 1d4 for the theme when none is given (1 Arcana, 2 Armaments, 3 Implements, 4 Relics)', () => {
+    // First draw is the 1d4, second is the d100.
+    const draws = (faces: [number, number]): RNG => {
+      const sides = [4, 100];
+      let i = 0;
+      return () => {
+        const k = i++;
+        return (faces[k] - 0.5) / sides[k];
+      };
+    };
+    expect(rollMagicItem(draws([1, 1]), 'common').theme).toBe('arcana');
+    expect(rollMagicItem(draws([2, 1]), 'common').theme).toBe('armaments');
+    expect(rollMagicItem(draws([3, 1]), 'common').theme).toBe('implements');
+    const relic = rollMagicItem(draws([4, 1]), 'common');
+    expect(relic).toMatchObject({ theme: 'relics', themeRoll: 4, d100: 1 });
+    expect(relic.item.name).toBe(magicItemTable('relics', 'common')[0].name);
+  });
+
+  it('uses the chosen theme without rolling 1d4', () => {
+    const r = rollMagicItem(always(100, 100), 'legendary', 'relics');
+    expect(r.themeRoll).toBeNull();
+    expect(r.d100).toBe(100);
+    expect(r.item.name).toBe('Talisman of Ultimate Evil');
+    expect(r.item.status).toBe('srd');
+  });
+
+  it('attaches rarity, category, attunement and description to a resolved item', () => {
+    // Relics, Rare, 66-73 Spell Scroll; 01-03 Amulet of Health (SRD).
+    const r = rollMagicItem(always(1, 100), 'rare', 'relics');
+    expect(r.item).toMatchObject({ name: 'Amulet of Health', status: 'srd', category: 'Wondrous Item', requiresAttunement: true });
+    expect(r.item.description).toBeTruthy();
+    expect(magicItemMeta(r.item)).toContain('requires attunement');
+  });
+
+  it('resolves a DMG-only item from the DMG module and cites its page', () => {
+    // Relics, Common, 01-08 Ear Horn of Hearing (not in the SRD).
+    const r = rollMagicItem(always(1, 100), 'common', 'relics');
+    expect(r.item).toMatchObject({ name: 'Ear Horn of Hearing', status: 'dmg', rarity: 'Common', category: 'Wondrous Item', requiresAttunement: false });
+    expect(r.item.description).toBeTruthy();
+    expect(r.item.source).toMatch(/DMG 2024 p\.256/);
+  });
+
+  it('rolls the requested count, capped', () => {
+    expect(rollMagicItems(createSeededRng(5), 3, 'uncommon')).toHaveLength(3);
+    expect(rollMagicItems(createSeededRng(5), 0, 'uncommon')).toHaveLength(0);
+    expect(rollMagicItems(createSeededRng(5), 500, 'uncommon')).toHaveLength(MAX_MAGIC_ITEMS);
+  });
+
+  it('describes rolled items for the journal', () => {
+    const lines = magicItemsText(rollMagicItems(always(1, 100), 1, 'common', 'relics'));
+    expect(lines[0]).toMatch(/^Ear Horn of Hearing: Wondrous Item, Common, no attunement$/);
   });
 });

@@ -34,12 +34,19 @@ import {
   HOARD_TREASURE,
   INDIVIDUAL_TREASURE,
   TRADE_BARS,
+  type TreasureTheme,
   type CoinKind,
   type DiceSpec,
   type HoardRow,
   type IndividualRow,
   type ValueTable,
 } from '../data/treasure-tables';
+
+import { ARCANA_RAW } from '../data/random-magic-items/arcana';
+import { ARMAMENTS_RAW } from '../data/random-magic-items/armaments';
+import { IMPLEMENTS_RAW } from '../data/random-magic-items/implements';
+import { RELICS_RAW } from '../data/random-magic-items/relics';
+import { FLAGGED_NOTE, resolveMagicItem, type ResolvedMagicItem } from './magic-item-resolve';
 
 export const MAX_ITEMS_PER_FORM = 500;
 
@@ -201,6 +208,108 @@ export function rollItems(rng: RNG, kind: 'gems' | 'art', value: number, count: 
   if (!table) return { lines: [], leftoverGp: 0 };
   const n = Math.min(MAX_ITEMS_PER_FORM, Math.max(0, Math.trunc(count)));
   return fromTable(rng, n * table.value, table);
+}
+
+// ------------------------------------------------------ random magic items
+//
+// DMG 2024 "Random Magic Items" (chapter 7, pp.326-331, Docs/DungeonMastersGuide.md
+// L12649): the tables are sorted first by treasure theme, then by item rarity. "If
+// an item isn't associated with a theme, roll 1d4 to decide which table to roll on
+// next: on a 1, roll on the Arcana tables; on a 2, Armaments; on a 3, Implements;
+// on a 4, Relics." Each table is a d100. Which rarity to roll is the DM's choice
+// ("Awarding Magic Items" guidelines), so it is an input here, not derived from CR.
+
+export type MagicTier = 'common' | 'uncommon' | 'rare' | 'veryRare' | 'legendary';
+
+export const MAGIC_TIERS: readonly { id: MagicTier; label: string }[] = [
+  { id: 'common', label: 'Common' },
+  { id: 'uncommon', label: 'Uncommon' },
+  { id: 'rare', label: 'Rare' },
+  { id: 'veryRare', label: 'Very Rare' },
+  { id: 'legendary', label: 'Legendary' },
+];
+
+/** The 1d4 order of the themes: 1 Arcana, 2 Armaments, 3 Implements, 4 Relics. */
+export const MAGIC_THEME_ORDER: readonly TreasureTheme[] = ['arcana', 'armaments', 'implements', 'relics'];
+
+const MAGIC_TABLES: Record<TreasureTheme, Record<MagicTier, string>> = {
+  arcana: ARCANA_RAW,
+  armaments: ARMAMENTS_RAW,
+  implements: IMPLEMENTS_RAW,
+  relics: RELICS_RAW,
+};
+
+export interface MagicTableRow {
+  lo: number;
+  hi: number;
+  /** The item as printed in the table. */
+  name: string;
+}
+
+/** Parse "<d100 range> <item>" lines; 00 means 100. */
+export function parseMagicTable(raw: string): MagicTableRow[] {
+  return raw
+    .trim()
+    .split('\n')
+    .map((line) => {
+      const m = /^(\d\d)(?:-(\d\d))? (.+)$/.exec(line.trim());
+      if (!m) throw new Error(`Unparseable magic item table line: "${line}"`);
+      const num = (s: string) => (s === '00' ? 100 : Number(s));
+      return { lo: num(m[1]), hi: m[2] ? num(m[2]) : num(m[1]), name: m[3].trim() };
+    });
+}
+
+const PARSED: Partial<Record<string, MagicTableRow[]>> = {};
+
+/** The rows of one Random Magic Items table. */
+export function magicItemTable(theme: TreasureTheme, tier: MagicTier): MagicTableRow[] {
+  const key = `${theme}:${tier}`;
+  return (PARSED[key] ??= parseMagicTable(MAGIC_TABLES[theme][tier]));
+}
+
+export interface RolledMagicItem {
+  theme: TreasureTheme;
+  tier: MagicTier;
+  /** The 1d4 that chose the theme, or null when the DM chose the theme. */
+  themeRoll: number | null;
+  /** The d100 rolled on the table (1-100). */
+  d100: number;
+  /** The table entry with its description, or a flag when no source has one. */
+  item: ResolvedMagicItem;
+}
+
+/** Roll one magic item: pick the theme (1d4 when none is given), then roll the d100 for the rarity. */
+export function rollMagicItem(rng: RNG, tier: MagicTier, theme?: TreasureTheme): RolledMagicItem {
+  const themeRoll = theme ? null : rollDie(rng, 4);
+  const chosen = theme ?? MAGIC_THEME_ORDER[(themeRoll ?? 1) - 1];
+  const d100 = rollDie(rng, 100);
+  const row = magicItemTable(chosen, tier).find((r) => d100 >= r.lo && d100 <= r.hi);
+  if (!row) throw new Error(`No ${chosen} ${tier} table row for ${d100}`);
+  return { theme: chosen, tier, themeRoll, d100, item: resolveMagicItem(row.name) };
+}
+
+export const MAX_MAGIC_ITEMS = 20;
+
+export function rollMagicItems(rng: RNG, count: number, tier: MagicTier, theme?: TreasureTheme): RolledMagicItem[] {
+  const n = Math.min(MAX_MAGIC_ITEMS, Math.max(0, Math.trunc(count)));
+  return Array.from({ length: n }, () => rollMagicItem(rng, tier, theme));
+}
+
+/** Short one-line summary of a resolved item: rarity, category and attunement. */
+export function magicItemMeta(item: ResolvedMagicItem): string {
+  if (item.status === 'flagged') return FLAGGED_NOTE;
+  const kind = item.typeDetail ? `${item.category} (${item.typeDetail})` : item.category;
+  const attune = item.requiresAttunement
+    ? item.attunementCondition
+      ? `requires attunement by ${item.attunementCondition}`
+      : 'requires attunement'
+    : 'no attunement';
+  return `${kind}, ${item.rarity}, ${attune}`;
+}
+
+/** Journal lines for rolled magic items. */
+export function magicItemsText(rolled: RolledMagicItem[]): string[] {
+  return rolled.map((r) => `${r.item.name}: ${magicItemMeta(r.item)}`);
 }
 
 // ------------------------------------------------------------- journal text
