@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Random Magic Items, Arcana tables (Dungeon Master's Guide 2024, printed pages
- * 326-327). Each line is "<d100 range> <item>", with 00 meaning 100. Read from
+ * 326-328). Each line is "<d100 range> <item>", with 00 meaning 100. Read from
  * the page images; random-magic-items.test.ts checks that every table covers
  * 01-00 exactly once.
  */
@@ -106,5 +106,132 @@ export const ARCANA_RAW = {
 96-97 Wand of Web
 98-99 Wind Fan
 00 Winged Boots
+`,
+  rare: `
+01 Bag of Beans
+02-03 Bead of Force
+04 Bowl of Commanding Water Elementals
+05-06 Bracers of Defense
+07 Brazier of Commanding Fire Elementals
+08-09 Cape of the Mountebank
+10 Censer of Controlling Air Elementals
+11-12 Chime of Opening
+13-14 Cloak of Displacement
+15-16 Cloak of the Bat
+17 Cube of Force
+18 Cube of Summoning
+19 Daern's Instant Fortress
+20-21 Enspelled Staff (level 2 or 3 spell)
+22-23 Figurine of Wondrous Power (bronze griffon, ebony fly, golden lions, ivory goats, marble elephant, onyx dog, or serpentine owl)
+24-25 Folding Boat
+26-27 Gem of Seeing
+28 Helm of Teleportation
+29-30 Heward's Handy Haversack
+31-32 Horseshoes of Speed
+33-34 Ioun Stone (reserve)
+35 Iron Bands of Bilarro
+36 Mantle of Spell Resistance
+37-38 Necklace of Fireballs
+39 Oil of Etherealness
+40 Portable Hole
+41-42 Potion of Clairvoyance
+43-44 Potion of Diminution
+45-46 Potion of Gaseous Form
+47 Potion of Giant Strength (fire)
+48-49 Potion of Giant Strength (frost or stone)
+50-51 Potion of Heroism
+52-53 Potion of Invisibility
+54-55 Potion of Invulnerability
+56-57 Potion of Mind Reading
+58-59 Quaal's Feather Token (bird, swan boat, or whip)
+60-61 Ring of Feather Falling
+62 Ring of Spell Storing
+63 Ring of X-ray Vision
+64-65 Robe of Eyes
+66 Rod of Rulership
+67-68 Rod of the Pact Keeper, +2
+69-70 Scroll of Protection
+71-75 Spell Scroll (level 4 or 5 spell)
+76-77 Staff of Charming
+78-79 Staff of Swarming Insects
+80-81 Staff of Withering
+82 Stone of Controlling Earth Elementals
+83-84 Wand of Binding
+85-86 Wand of Fear
+87-90 Wand of Fireballs
+91-94 Wand of Lightning Bolts
+95-96 Wand of the War Mage, +2
+97-98 Wand of Wonder
+99-00 Wings of Flying
+`,
+  veryRare: `
+01-02 Amulet of the Planes
+03-04 Bag of Devouring
+05-06 Carpet of Flying
+07-08 Cauldron of Rebirth
+09-10 Cloak of Arachnida
+11-12 Crystal Ball
+13 Dancing Sword
+14 Efreeti Bottle
+15-16 Enspelled Staff (level 4 or 5 spell)
+17-18 Figurine of Wondrous Power (obsidian steed)
+19-20 Hat of Many Spells
+21-22 Helm of Brilliance
+23-24 Horseshoes of a Zephyr
+25-26 Ioun Stone (absorption, fortitude, intellect, or leadership)
+27-28 Manual of Golems (clay, flesh, iron, or stone)
+29 Mirror of Life Trapping
+30-31 Nolzur's Marvelous Pigments
+32-34 Oil of Sharpness
+35-38 Potion of Flying
+39-42 Potion of Giant Strength (cloud)
+43-46 Potion of Greater Invisibility
+47-49 Potion of Longevity
+50-53 Potion of Speed
+54-57 Potion of Vitality
+58-59 Ring of Regeneration
+60-61 Ring of Shooting Stars
+62-63 Ring of Telekinesis
+64-65 Robe of Scintillating Colors
+66-67 Robe of Stars
+68-69 Rod of Absorption
+70-71 Rod of Security
+72-73 Rod of the Pact Keeper, +3
+74-85 Spell Scroll (level 6, 7, or 8 spell)
+86-87 Staff of Fire
+88-89 Staff of Frost
+90 Staff of Power
+91-92 Staff of Thunder and Lightning
+93-94 Tome of Clear Thought
+95-97 Wand of Polymorph
+98-00 Wand of the War Mage, +3
+`,
+  legendary: `
+01-04 Apparatus of Kwalish
+05-08 Cloak of Invisibility
+09-12 Crystal Ball of Mind Reading
+13-16 Crystal Ball of Telepathy
+17-20 Crystal Ball of True Seeing
+21-22 Cubic Gate
+23 Deck of Many Things
+24-27 Enspelled Staff (level 6, 7, or 8 spell)
+28-31 Ioun Stone (greater absorption, mastery, or regeneration)
+32-33 Iron Flask
+34-41 Potion of Giant Strength (storm)
+42-45 Ring of Djinni Summoning
+46-49 Ring of Elemental Command (air, earth, fire, or water)
+50-53 Ring of Invisibility
+54-57 Ring of Spell Turning
+58 Ring of Three Wishes
+59 Robe of the Archmagi
+60-61 Scroll of Titan Summoning
+62-65 Sovereign Glue
+66-83 Spell Scroll (level 9 spell)
+84 Sphere of Annihilation
+85 Staff of the Magi
+86-88 Talisman of the Sphere
+89-92 Tome of the Stilled Tongue
+93-96 Universal Solvent
+97-00 Well of Many Worlds
 `,
 } as const;
