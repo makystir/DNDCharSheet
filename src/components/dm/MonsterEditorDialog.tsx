@@ -3,6 +3,7 @@ import type { Ability } from '../../types/character';
 import { ABILITY_NAMES } from '../../types/character';
 import type { DmCustomMonster, DmMonsterEntry } from '../../types/dm';
 import { ABILITY_KEYS, ABILITY_LABELS } from '../../logic/dm-library';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import styles from './dm.module.css';
@@ -46,23 +47,37 @@ export function MonsterEditorDialog({ monster, isNew, onSave, onClose }: Monster
   useBodyScrollLock(true);
   const [d, setD] = useState<DmCustomMonster>(monster);
   // Numbers are typed as text so a field can be empty while editing.
-  const [numbers, setNumbers] = useState({
-    ac: String(monster.ac),
-    hpMax: String(monster.hpMax),
-    initiativeMod: String(monster.initiativeMod),
-    proficiencyBonus: String(monster.proficiencyBonus),
-    legendaryUses: String(monster.legendaryUses),
-    ...Object.fromEntries(ABILITY_KEYS.map((a) => [a, String(monster.abilities[a])])),
-  } as Record<string, string>);
+  const [initialNumbers] = useState(
+    () =>
+      ({
+        ac: String(monster.ac),
+        hpMax: String(monster.hpMax),
+        initiativeMod: String(monster.initiativeMod),
+        proficiencyBonus: String(monster.proficiencyBonus),
+        legendaryUses: String(monster.legendaryUses),
+        ...Object.fromEntries(ABILITY_KEYS.map((a) => [a, String(monster.abilities[a])])),
+      }) as Record<string, string>,
+  );
+  const [numbers, setNumbers] = useState(initialNumbers);
   const [error, setError] = useState<string | null>(null);
+  const [discarding, setDiscarding] = useState(false);
+
+  // Unsaved work: any field differs from what the dialog opened with.
+  const dirty = JSON.stringify(d) !== JSON.stringify(monster) || JSON.stringify(numbers) !== JSON.stringify(initialNumbers);
+  // Overlay click and Escape ask first when there is unsaved work; Cancel is an explicit discard.
+  const requestClose = () => (dirty ? setDiscarding(true) : onClose());
 
   useEffect(() => {
+    if (discarding) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (dirty) setDiscarding(true);
+        else onClose();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, dirty, discarding]);
 
   const setText = <K extends keyof DmCustomMonster>(key: K, value: DmCustomMonster[K]) => setD((x) => ({ ...x, [key]: value }));
   const setNum = (key: string, value: string) => setNumbers((n) => ({ ...n, [key]: value }));
@@ -105,7 +120,8 @@ export function MonsterEditorDialog({ monster, isNew, onSave, onClose }: Monster
   const title = isNew ? 'New custom monster' : 'Edit custom monster';
 
   return (
-    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={title}>
+    <>
+    <div className={styles.overlay} onClick={requestClose} role="dialog" aria-modal="true" aria-label={title}>
       <div ref={ref} className={styles.dialog} style={{ maxWidth: 760 }} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.dialogTitle}>{title}</h2>
         {d.basedOn && <p className={styles.muted}>{d.basedOn}</p>}
@@ -262,5 +278,16 @@ export function MonsterEditorDialog({ monster, isNew, onSave, onClose }: Monster
         </div>
       </div>
     </div>
+    {discarding && (
+      <ConfirmDialog
+        title="Discard changes"
+        message="Discard your unsaved changes to this monster?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        onCancel={() => setDiscarding(false)}
+        onConfirm={onClose}
+      />
+    )}
+    </>
   );
 }

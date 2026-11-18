@@ -115,7 +115,7 @@ export function SettingsPage({
             <span className={styles.settingLabel}>
               <span className={styles.settingName}>Run the app as a Dungeon Master</span>
               <span className={styles.settingHint}>
-                Opens the DM workspace (campaigns and a party tracker) instead of the player sheet. A preference for this
+                Opens the DM workspace (campaigns, party, encounters, library, journal, generators, treasure and party XP) instead of the player sheet. A preference for this
                 device. Your characters stay saved, and you can reach them from the DM navigation.
               </span>
             </span>
@@ -229,7 +229,7 @@ export function SettingsPage({
               Adds sidekicks to the Companions page's People tab: a creature with a
               challenge rating of 1/2 or lower gains an Expert, Spellcaster or
               Warrior class. Optional rules from Tasha's Cauldron of Everything
-              (Docs/TashasCauldronOfEverything.md L6917-7275), a 2014-edition
+              (Sidekicks, in the Dungeon Master's Tools chapter), a 2014-edition
               book, not part of the 2024 rules; off by default.
             </span>
           </span>
@@ -252,9 +252,8 @@ export function SettingsPage({
             </span>
             <span className={styles.settingHint}>
               Tracks a Loyalty Score (0 to 20) for hirelings and NPC party
-              members on the Companions page (DMG 2024 "Loyalty",
-              Docs/DungeonMastersGuide.md L3572-3586). An optional rule; off by
-              default.
+              members on the Companions page (Dungeon Master's Guide 2024,
+              "Loyalty"). An optional rule; off by default.
             </span>
           </span>
           <label className={styles.toggleControl}>

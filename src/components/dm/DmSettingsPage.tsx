@@ -101,11 +101,6 @@ export function DmSettingsPage({ dm, theme, onThemeToggle, onTurnOff, onNotify }
               }}
             />
           </div>
-          {dm.saveFailed && (
-            <p className={styles.error} role="alert">
-              This browser would not save your latest changes (storage may be full or blocked). Export your data now.
-            </p>
-          )}
           {error && (
             <p className={styles.error} role="alert">
               {error}

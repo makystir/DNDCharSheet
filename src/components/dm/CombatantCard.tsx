@@ -17,7 +17,6 @@ import {
   moveCombatant,
   parseDamageTypes,
   recordDeathSave,
-  removeCombatant,
   removeCondition,
   renameCombatant,
   resolveConcentration,
@@ -44,6 +43,8 @@ interface CombatantCardProps {
   isActive: boolean;
   onCommit: (next: DmEncounter) => void;
   onNotify: (text: string) => void;
+  /** Remove this combatant from the encounter (the page shows an undo toast). */
+  onRemove: (id: string) => void;
   /** Show a Stat block button (monster combatants that can have a stat block). */
   hasStatBlock?: boolean;
   statBlockOpen?: boolean;
@@ -71,6 +72,7 @@ export function CombatantCard({
   isActive,
   onCommit,
   onNotify,
+  onRemove,
   hasStatBlock = false,
   statBlockOpen = false,
   onToggleStatBlock,
@@ -373,7 +375,7 @@ export function CombatantCard({
             <button type="button" className={styles.btn} onClick={() => onCommit(reviveCombatant(encounter, c.id, 1))}>
               Revive at 1 HP
             </button>
-            <button type="button" className={styles.btnDanger} onClick={() => onCommit(removeCombatant(encounter, c.id))}>
+            <button type="button" className={styles.btnDanger} onClick={() => onRemove(c.id)}>
               Remove from encounter
             </button>
           </div>
@@ -664,7 +666,7 @@ export function CombatantCard({
               <button type="button" className={styles.btn} onClick={() => onCommit(moveCombatant(encounter, c.id, 1))}>
                 Move later in the order
               </button>
-              <button type="button" className={styles.btnDanger} onClick={() => onCommit(removeCombatant(encounter, c.id))}>
+              <button type="button" className={styles.btnDanger} onClick={() => onRemove(c.id)}>
                 Remove from encounter
               </button>
             </div>
@@ -687,7 +689,7 @@ export function CombatantCard({
             <button type="button" className={styles.btn} onClick={() => onCommit(moveCombatant(encounter, c.id, 1))} aria-label={`Move ${c.name} later`}>
               ↓
             </button>
-            <button type="button" className={styles.btnDanger} onClick={() => onCommit(removeCombatant(encounter, c.id))} aria-label={`Remove ${c.name}`}>
+            <button type="button" className={styles.btnDanger} onClick={() => onRemove(c.id)} aria-label={`Remove ${c.name}`}>
               Remove
             </button>
           </div>

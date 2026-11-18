@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Coins, Scale, Shield as ShieldIcon, Sword, Package } from 'lucide-react';
 import type { Character, InventoryItem } from '../../types/character';
 import type { CurrencyAmount, CurrencyDelta } from '../../logic/currency';
@@ -30,6 +30,8 @@ import { AddButton } from '../shared/AddButton';
 import { ProgressBar } from '../shared/ProgressBar';
 import { ViewModeToggle } from '../shared/ViewModeToggle';
 import { useViewMode } from '../../hooks/useViewMode';
+import { useUndoToast } from '../../hooks/useUndoToast';
+import { Toast } from '../shared/Toast';
 import { Picker } from '../shared/Picker';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { ContentTooltip } from '../shared/ContentTooltip';
@@ -87,6 +89,7 @@ function weaponDamage(w: WeaponData): string {
  */
 export function InventoryPage({ character, onChange }: InventoryPageProps) {
   const { mode: gearView, setMode: setGearView } = useViewMode('viewmode-inventory-gear', 'cards');
+  const undoToast = useUndoToast();
   const [showWeaponPicker, setShowWeaponPicker] = useState(false);
   const [showArmorPicker, setShowArmorPicker] = useState(false);
   const [showGearPicker, setShowGearPicker] = useState(false);
@@ -118,20 +121,44 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
 
   const addItem = (item: InventoryItem) => setInventory([...inventory, item]);
 
+  // The undo toast outlives this render: restore against the LATEST character so edits made while it shows are kept.
+  const latest = useRef({ character, onChange });
+  useEffect(() => {
+    latest.current = { character, onChange };
+  });
+
   const removeItem = (id: string) => {
+    const index = inventory.findIndex((i) => i.id === id);
+    if (index === -1) return;
+    const removed = inventory[index];
+    const wasArmor = equipped.armorItemId === id;
+    const wasShield = equipped.shieldItemId === id;
+    const wasWeapon = equipped.weaponItemIds?.includes(id) ?? false;
     const nextEquipped = { ...equipped };
-    if (nextEquipped.armorItemId === id) delete nextEquipped.armorItemId;
-    if (nextEquipped.shieldItemId === id) delete nextEquipped.shieldItemId;
-    if (nextEquipped.weaponItemIds?.includes(id)) {
-      nextEquipped.weaponItemIds = nextEquipped.weaponItemIds.filter((w) => w !== id);
+    if (wasArmor) delete nextEquipped.armorItemId;
+    if (wasShield) delete nextEquipped.shieldItemId;
+    if (wasWeapon) {
+      nextEquipped.weaponItemIds = (equipped.weaponItemIds ?? []).filter((w) => w !== id);
     }
     onChange({
       ...character,
       inventory: inventory.filter((i) => i.id !== id),
       equipped: nextEquipped,
     });
+    undoToast.show(`${itemName(removed)} removed`, removed, index, (item, at) => {
+      const { character: current, onChange: emit } = latest.current;
+      const list = current.inventory ?? [];
+      if (list.some((i) => i.id === id)) return;
+      const eq = { ...(current.equipped ?? {}) };
+      // Put the item back in the slot it held, unless something else has taken that slot since.
+      if (wasArmor && eq.armorItemId === undefined) eq.armorItemId = id;
+      if (wasShield && eq.shieldItemId === undefined) eq.shieldItemId = id;
+      if (wasWeapon) eq.weaponItemIds = [...(eq.weaponItemIds ?? []), id];
+      const next = [...list];
+      next.splice(Math.min(at, next.length), 0, item as InventoryItem);
+      emit({ ...current, inventory: next, equipped: eq });
+    });
   };
-
   const setQuantity = (id: string, qty: number) =>
     setInventory(inventory.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, qty) } : i)));
 
@@ -636,6 +663,11 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           onClose={() => setShowGearPicker(false)}
         />
       )}
+      <Toast
+        message={undoToast.pending?.message ?? null}
+        duration={5000}
+        action={undoToast.pending ? { label: 'Undo', onAction: undoToast.undo } : undefined}
+      />
     </div>
   );
 }

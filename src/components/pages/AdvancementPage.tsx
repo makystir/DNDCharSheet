@@ -340,11 +340,27 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
 
   return (
     <div className={styles.page}>
+      {/* Jump links to the sections of this one long page (the nav tab lists them). */}
+      <nav className={styles.jump} aria-label="Advancement sections">
+        <ScrollLink targetId="adv-section-level" fallbackHref="#advancement" className={styles.jumpLink}>
+          Level
+        </ScrollLink>
+        <ScrollLink targetId="adv-section-hp" fallbackHref="#advancement" className={styles.jumpLink}>
+          Hit Points
+        </ScrollLink>
+        <ScrollLink targetId="adv-section-next-level" fallbackHref="#advancement" className={styles.jumpLink}>
+          Next level
+        </ScrollLink>
+        <ScrollLink targetId="adv-section-log" fallbackHref="#advancement" className={styles.jumpLink}>
+          Log
+        </ScrollLink>
+      </nav>
+
       {/* Owed choices come first so they cannot be missed. */}
       {owed && pendingCard}
 
       {/* ── Level + leveling mode ───────────────────────────────────────────── */}
-      <Card>
+      <Card id="adv-section-level">
         <SectionHeader icon={TrendingUp} title="Level &amp; Experience" />
 
         <div className={styles.levelRow}>
@@ -808,7 +824,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       {!owed && pendingCard}
 
       {/* ── Audit log ───────────────────────────────────────────────────────── */}
-      <Card>
+      <Card id="adv-section-log">
         <CollapsibleSection title={`Advancement Log (${log.length})`} storageKey="dnd-collapse-adv-log">
           <div className={styles.logActions}>
             <button

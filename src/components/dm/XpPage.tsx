@@ -228,12 +228,6 @@ export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId 
         </div>
       </div>
 
-      {dm.saveFailed && (
-        <p className={styles.error} role="alert">
-          This browser would not save your latest changes (storage may be full or blocked). Export your data now.
-        </p>
-      )}
-
       <Card>
         <SectionHeader icon={Trophy} title="Build an award" />
         <div className={styles.tabs} role="tablist" aria-label="Kind of award">

@@ -155,6 +155,12 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         )}
       </nav>
 
+      {dm.saveFailed && (
+        <p className={styles.saveBanner} role="alert">
+          This browser would not save your latest changes (storage may be full or blocked). Export your data now.
+        </p>
+      )}
+
       <PageContainer pageKey={`dm-${page}`}>
         {page === 'campaign' && (
           <CampaignPage dm={dm} onNotify={notify} onOpenParty={() => onNavigate('party')} />

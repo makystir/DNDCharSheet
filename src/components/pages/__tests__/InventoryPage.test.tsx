@@ -53,6 +53,24 @@ describe('InventoryPage', () => {
     expect(screen.getByRole('progressbar', { name: 'Encumbrance progress' })).toBeInTheDocument();
   });
 
+  it('removes an item with an undo toast, and Undo restores it and its equipped state', () => {
+    const { get } = renderStateful();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Armor' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Chain Mail' }));
+    const id = (get().inventory ?? []).find((i) => i.kind === 'armor')!.id;
+    fireEvent.click(screen.getByLabelText('Wear Chain Mail'));
+    expect(get().equipped?.armorItemId).toBe(id);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Chain Mail' }));
+    expect(get().inventory ?? []).toHaveLength(0);
+    expect(get().equipped?.armorItemId).toBeUndefined();
+    expect(screen.getByText('Chain Mail removed')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect((get().inventory ?? []).map((i) => i.id)).toEqual([id]);
+    expect(get().equipped?.armorItemId).toBe(id);
+  });
+
   it('adds a weapon from the catalog via the picker', () => {
     const { get } = renderStateful();
     // Open the Weapons catalog picker.

@@ -368,3 +368,31 @@
 .pendingAlert .pendingItem a {
   color: var(--accent-gold);
 }
+
+/* Jump links to the sections of the page. */
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.jumpLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.jumpLink:hover,
+.jumpLink:focus-visible {
+  background: var(--bg-tertiary);
+  text-decoration: underline;
+}

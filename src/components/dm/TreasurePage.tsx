@@ -4,6 +4,7 @@ import type { Breakdown } from '../../logic/breakdown';
 import type { DmApi } from './dmApi';
 import {
   ART_OBJECTS,
+  COIN_VALUE_GP,
   GEMSTONES,
   HOARD_TREASURE,
   INDIVIDUAL_TREASURE,
@@ -70,6 +71,8 @@ interface Outcome {
   /** How the money was rolled, as shown (for example "90 PP"). */
   moneyLabel: string;
   moneyBreakdown: Breakdown;
+  /** How the GP total comes from the coins rolled, when the money is not already in GP. */
+  gpBreakdown?: Breakdown;
   magic?: { count: number; breakdown: Breakdown; dice: string };
   formed: FormedMoney;
   form: MoneyForm;
@@ -154,6 +157,11 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
         totalGp: r.valueGp,
         moneyLabel: `${n(r.coins)} ${r.coin}`,
         moneyBreakdown: r.roll.breakdown,
+        gpBreakdown: {
+          total: r.valueGp,
+          components: [{ label: `${n(r.coins)} ${r.coin} at ${COIN_VALUE_GP[r.coin]} GP each`, value: r.valueGp }],
+          note: 'A Platinum Piece is worth 10 GP (PHB 2024, "Coins").',
+        },
       },
       formChoice,
     );
@@ -540,7 +548,16 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
                     {outcome.moneyLabel}
                   </CalculatedValue>
                 </span>
-                {!outcome.moneyLabel.endsWith('GP') && <span className={styles.muted}>{n(outcome.totalGp)} GP in all</span>}
+                {!outcome.moneyLabel.endsWith('GP') && (
+                  <span className={styles.muted}>
+                    <CalculatedValue
+                      label="Total in GP"
+                      breakdown={outcome.gpBreakdown ?? { total: outcome.totalGp, components: [{ label: 'Money rolled', value: outcome.totalGp }] }}
+                    >
+                      {n(outcome.totalGp)} GP in all
+                    </CalculatedValue>
+                  </span>
+                )}
               </div>
               {outcome.magic && (
                 <div className={styles.stat}>

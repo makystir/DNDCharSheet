@@ -22,6 +22,8 @@
 }
 
 .card {
+  /* Clear the sticky toolbar when scrolled into view. */
+  scroll-margin-top: 72px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -343,3 +345,15 @@
     padding-right: 436px;
   }
 }
+
+/* Running combat: keep Next turn within reach while the active card scrolls into view. */
+.toolbarSticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+

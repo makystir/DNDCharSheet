@@ -19,6 +19,8 @@ import {
   nextTurn,
   openEncounter,
   previousTurn,
+  removeCombatant,
+  restoreCombatant,
   rollInitiatives,
   saveEncounter,
   sortByInitiative,
@@ -27,11 +29,14 @@ import {
 import { appendToLatestSession } from '../../logic/dm-journal';
 import { encounterTreasureSource, type EncounterCrGroup } from '../../logic/dm-treasure';
 import { canShowStatBlock, resolveCombatantStatBlock } from '../../logic/dm-library';
+import { useUndoToast } from '../../hooks/useUndoToast';
 import { createDefaultRng } from '../../logic/random';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
+import { CalculatedValue } from '../shared/CalculatedValue';
+import { Toast } from '../shared/Toast';
 import { AddCombatantsDialog } from './AddCombatantsDialog';
 import { CombatantCard } from './CombatantCard';
 import { EncounterBalance } from './EncounterBalance';
@@ -62,6 +67,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
   const [newName, setNewName] = useState('');
   const [startError, setStartError] = useState<string | null>(null);
   const [summarySaved, setSummarySaved] = useState(false);
+  const undoToast = useUndoToast();
   // The stat block drawer. id is the creature last shown (the pinned one when follow is off).
   const [statBlock, setStatBlock] = useState<{ encounterId: string; id: string; follow: boolean } | null>(null);
 
@@ -100,9 +106,10 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
   };
   /** Encounter XP and where it sits against the DMG 2024 budgets (same math as the balance card). */
   const summaryOf = (e: DmEncounter) => {
-    const xp = encounterXp(e.combatants).total.total;
+    const xpBreakdown = encounterXp(e.combatants).total;
+    const xp = xpBreakdown.total;
     const [low, moderate, high] = DIFFICULTIES.map((d) => xpBudget(budgetMembersFor(e.combatants), d).total);
-    return { xp, fit: fitLabel(difficultyFit(xp, { low, moderate, high })) };
+    return { xp, xpBreakdown, fit: fitLabel(difficultyFit(xp, { low, moderate, high })) };
   };
 
   const commit = (next: DmEncounter) => {
@@ -145,7 +152,11 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
                       </span>
                       <span className={styles.muted} data-testid="encounter-summary">
                         {' '}
-                        · {sum.xp.toLocaleString()} XP · {sum.fit}
+                        ·{' '}
+                        <CalculatedValue label="Encounter XP" breakdown={sum.xpBreakdown}>
+                          {sum.xp.toLocaleString()} XP
+                        </CalculatedValue>{' '}
+                        · {sum.fit}
                       </span>
                     </span>
                     <span className={styles.row}>
@@ -299,6 +310,21 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         : undefined;
   const drawerNote = [followNote, customNote].filter(Boolean).join(' ') || undefined;
 
+  // Removing a combatant is undoable for a few seconds; the restore applies to the latest saved encounter.
+  const removeWithUndo = (id: string) => {
+    const index = open.combatants.findIndex((x) => x.id === id);
+    const removed = open.combatants[index];
+    if (!removed) return;
+    const before = open;
+    commit(removeCombatant(open, id));
+    undoToast.show(`${removed.name} removed from the encounter`, removed, index, (item, at) => {
+      dm.update((d) => {
+        const current = d.campaigns.find((x) => x.id === campaign.id)?.encounters.find((x) => x.id === before.id);
+        return current ? saveEncounter(d, campaign.id, restoreCombatant(current, item as DmCombatant, at, before), Date.now()) : d;
+      });
+    });
+  };
+
   const renderCard = (c: DmCombatant) => (
     <CombatantCard
       key={c.id}
@@ -307,6 +333,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
       isActive={running && c.id === open.activeId}
       onCommit={commit}
       onNotify={onNotify}
+      onRemove={removeWithUndo}
       hasStatBlock={canShowStatBlock(c)}
       statBlockOpen={drawerOpen && c.id === shown?.id}
       onToggleStatBlock={() =>
@@ -329,7 +356,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         </button>
       </div>
 
-      <div className={enc.toolbar}>
+      <div className={running ? `${enc.toolbar} ${enc.toolbarSticky}` : enc.toolbar} data-testid="encounter-toolbar">
         {!ended && (
           <button type="button" className={styles.btn} onClick={() => setAdding(true)}>
             Add combatants
@@ -528,6 +555,12 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
           onClose={() => setAdding(false)}
         />
       )}
+
+      <Toast
+        message={undoToast.pending?.message ?? null}
+        duration={5000}
+        action={undoToast.pending ? { label: 'Undo', onAction: undoToast.undo } : undefined}
+      />
 
       {confirmEnd && (
         <ConfirmDialog

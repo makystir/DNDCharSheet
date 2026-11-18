@@ -698,8 +698,8 @@ export function SpellsPage({
             </div>
           </div>
           <p className={styles.focusNote}>
-            Focus is shown for reference from your class data; it is not tracked
-            as an item this stage.
+            Your spellcasting focus is shown for reference from your class
+            data. It is not tracked as an item in your inventory.
           </p>
         </Card>
       )}

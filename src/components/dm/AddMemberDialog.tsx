@@ -3,6 +3,7 @@ import type { Character } from '../../types/character';
 import type { DmManualStats } from '../../types/dm';
 import { DEFAULT_MANUAL_STATS } from '../../logic/dm-campaign';
 import { importCharacterFromText } from '../../logic/dm-import';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import styles from './dm.module.css';
@@ -113,17 +114,28 @@ export function AddMemberDialog({
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [draft, setDraft] = useState<Draft>(() =>
+  const [initialDraft] = useState<Draft>(() =>
     toDraft(initialManual?.name ?? '', initialManual?.stats ?? DEFAULT_MANUAL_STATS),
   );
+  const [draft, setDraft] = useState<Draft>(initialDraft);
+  const [discarding, setDiscarding] = useState(false);
+
+  // Unsaved work: pasted text, or a manual entry that differs from what the dialog opened with.
+  const dirty = text.trim() !== '' || JSON.stringify(draft) !== JSON.stringify(initialDraft);
+  // Overlay click and Escape ask first when there is unsaved work; Cancel is an explicit discard.
+  const requestClose = () => (dirty ? setDiscarding(true) : onClose());
 
   useEffect(() => {
+    if (discarding) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (dirty) setDiscarding(true);
+        else onClose();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, dirty, discarding]);
 
   const submitImport = async () => {
     setBusy(true);
@@ -142,7 +154,8 @@ export function AddMemberDialog({
   const title = lockedTo === 'import' ? 'Update from a share link' : editing ? 'Edit party member' : 'Add a party member';
 
   return (
-    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={title}>
+    <>
+    <div className={styles.overlay} onClick={requestClose} role="dialog" aria-modal="true" aria-label={title}>
       <div ref={dialogRef} className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.dialogTitle}>{title}</h2>
 
@@ -288,5 +301,16 @@ export function AddMemberDialog({
         )}
       </div>
     </div>
+    {discarding && (
+      <ConfirmDialog
+        title="Discard changes"
+        message="Discard what you have entered?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        onCancel={() => setDiscarding(false)}
+        onConfirm={onClose}
+      />
+    )}
+    </>
   );
 }

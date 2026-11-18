@@ -229,23 +229,7 @@ export function Navigation({
         <span className={styles.mobileLabelRow}>Search</span>
       </button>
 
-      {/* Stage B6: keyboard-shortcuts overlay affordance (mobile scroll row). */}
-      <button
-        type="button"
-        className={styles.navItem}
-        onClick={() => openShortcuts()}
-        onTouchEnd={(e) => {
-          e.preventDefault();
-          openShortcuts();
-        }}
-        aria-label="Keyboard shortcuts"
-        data-section="shortcuts"
-      >
-        <span className={styles.iconWrapper}>
-          <Keyboard size={18} />
-        </span>
-        <span className={styles.mobileLabelRow}>Shortcuts</span>
-      </button>
+      {/* The keyboard-shortcuts affordance is desktop-only (see renderDesktopNav): no keyboard on a touch device. */}
 
       {/* Stage B8: Character Assistant trigger (mobile scroll row). */}
       <AssistantTrigger

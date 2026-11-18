@@ -51,6 +51,18 @@ describe('Treasure page', () => {
     expect(screen.getByText('1,100 GP in all')).toBeInTheDocument();
   });
 
+  it('explains the GP total with the coins it comes from', () => {
+    seed();
+    render(<Routed initial="treasure" />);
+    fireEvent.change(screen.getByLabelText("Monster's CR"), { target: { value: '12' } });
+    fireEvent.click(screen.getByLabelText('Use the average instead of rolling'));
+    fireEvent.click(screen.getByRole('button', { name: 'Use the average' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Total in GP: / }));
+    const tip = screen.getByRole('tooltip');
+    expect(tip).toHaveTextContent('110 PP at 10 GP each');
+    expect(tip).toHaveTextContent('1100');
+  });
+
   it('multiplies a group by the number of creatures', () => {
     seed();
     render(<Routed initial="treasure" />);

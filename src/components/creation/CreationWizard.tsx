@@ -414,6 +414,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
   // ─── Step 1 handlers ─────────────────────────────────────────────────────
 
+  // Confirming before the saved draft is thrown away.
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+
   // A pending change that would clear picks the player has made, awaiting OK.
   const [pendingChange, setPendingChange] = useState<
     { kind: 'class'; id: ClassId | ''; message: string } | { kind: 'background'; id: BackgroundId; message: string } | null
@@ -1940,7 +1943,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
             <button type="button" className={styles.primaryBtn} onClick={() => resumeDraft(savedDraft)}>
               Resume
             </button>
-            <button type="button" className={styles.secondaryBtn} onClick={discardDraft}>
+            <button type="button" className={styles.secondaryBtn} onClick={() => setConfirmDiscard(true)}>
               Start over
             </button>
           </div>
@@ -1952,6 +1955,19 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         <p className={styles.blockedNote} role="status" data-testid="wizard-missing">
           To {step === steps.length - 1 ? 'finish' : 'continue'}: {listText(missing)}.
         </p>
+      )}
+      {confirmDiscard && (
+        <ConfirmDialog
+          title="Start over"
+          message="Discard your saved unfinished character and start a new one? This cannot be undone."
+          confirmLabel="Start over"
+          cancelLabel="Keep draft"
+          onConfirm={() => {
+            discardDraft();
+            setConfirmDiscard(false);
+          }}
+          onCancel={() => setConfirmDiscard(false)}
+        />
       )}
       {pendingChange && (
         <ConfirmDialog

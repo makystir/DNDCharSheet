@@ -125,6 +125,14 @@ describe('Draft save and resume', () => {
     cleanup();
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
+    // Asks first: the draft survives until confirmed, and Keep draft leaves it alone.
+    const confirm = screen.getByRole('dialog', { name: 'Start over' });
+    expect(localStorage.getItem(WIZARD_DRAFT_KEY)).not.toBeNull();
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Keep draft' }));
+    expect(screen.queryByRole('dialog', { name: 'Start over' })).toBeNull();
+    expect(localStorage.getItem(WIZARD_DRAFT_KEY)).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Start over' })).getByRole('button', { name: 'Start over' }));
     expect(localStorage.getItem(WIZARD_DRAFT_KEY)).toBeNull();
     expect(screen.getByLabelText('Class')).toHaveValue('');
   });

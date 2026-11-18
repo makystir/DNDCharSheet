@@ -53,8 +53,9 @@ describe('SettingsPage: Companions house-rule toggles', () => {
     renderStateful();
     expect(screen.getByLabelText('Sidekicks (house rule)')).not.toBeChecked();
     expect(screen.getByLabelText('Loyalty (house rule)')).not.toBeChecked();
-    expect(screen.getByText(/Docs\/TashasCauldronOfEverything\.md L6917-7275/)).toBeInTheDocument();
-    expect(screen.getByText(/Docs\/DungeonMastersGuide\.md L3572-3586/)).toBeInTheDocument();
+    expect(screen.getByText(/Tasha's Cauldron of Everything\s+\(Sidekicks, in the Dungeon Master's Tools chapter\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Dungeon Master's Guide 2024,\s+"Loyalty"/)).toBeInTheDocument();
+    expect(screen.queryByText(/Docs\//)).toBeNull();
     expect(screen.getByRole('button', { name: /Sidekicks \(Tasha's 2020, 5e \/ 2014 rules\)/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Loyalty \(DMG 2024\)/ })).toBeInTheDocument();
   });

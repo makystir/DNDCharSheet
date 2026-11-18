@@ -448,6 +448,31 @@ export function removeCombatant(enc: DmEncounter, id: string): DmEncounter {
   );
 }
 
+/**
+ * Put a removed combatant back (undo for removeCombatant), at its old position or the end if the list
+ * has shrunk. `before` is the encounter as it was when the combatant was removed: it supplies the turn
+ * pointer and the custom-monster snapshot the removal pruned. Does nothing if the combatant is already
+ * back, the fight has ended, or the encounter is full.
+ */
+export function restoreCombatant(enc: DmEncounter, removed: DmCombatant, index: number, before: DmEncounter): DmEncounter {
+  if (enc.status === 'ended' || enc.combatants.some((c) => c.id === removed.id) || enc.combatants.length >= MAX_COMBATANTS) {
+    return enc;
+  }
+  const combatants = [...enc.combatants];
+  combatants.splice(Math.max(0, Math.min(index, combatants.length)), 0, removed);
+  let snapshots = enc.customMonsterSnapshots;
+  const customId = customIdOfKey(removed.libraryKey);
+  const snap = customId !== undefined ? ownSnapshot(before.customMonsterSnapshots, customId) : undefined;
+  if (customId !== undefined && snap !== undefined && ownSnapshot(snapshots, customId) === undefined) {
+    snapshots = { ...snapshots, [customId]: snap };
+  }
+  const activeId = before.activeId === removed.id ? removed.id : enc.activeId;
+  return withLog(
+    { ...enc, combatants, activeId, ...(snapshots !== undefined ? { customMonsterSnapshots: snapshots } : {}) },
+    `${removed.name} returned to the encounter.`,
+  );
+}
+
 export function renameCombatant(enc: DmEncounter, id: string, name: string): DmEncounter {
   const clean = name.trim().slice(0, 60);
   return clean === '' ? enc : mapCombatant(enc, id, (c) => ({ ...c, name: clean }));
