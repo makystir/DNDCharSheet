@@ -3,6 +3,7 @@ import { Download, Settings as SettingsIcon, Upload } from 'lucide-react';
 import type { DmData } from '../../types/dm';
 import type { DmApi } from './dmApi';
 import { dmDataToJson, dmExportFileName } from '../../storage/dm-store';
+import { recordDmExport } from '../../storage/dm-backup';
 import { parseDmData } from '../../logic/dm-sanitize';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -15,10 +16,12 @@ interface DmSettingsPageProps {
   onThemeToggle: () => void;
   onTurnOff: () => void;
   onNotify: (text: string) => void;
+  /** Called after a successful export so the shell can refresh its backup reminder. */
+  onExported?: () => void;
 }
 
 /** DM mode settings: theme, leaving DM mode, and a file backup of the DM data. */
-export function DmSettingsPage({ dm, theme, onThemeToggle, onTurnOff, onNotify }: DmSettingsPageProps) {
+export function DmSettingsPage({ dm, theme, onThemeToggle, onTurnOff, onNotify, onExported }: DmSettingsPageProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<DmData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +35,8 @@ export function DmSettingsPage({ dm, theme, onThemeToggle, onTurnOff, onNotify }
     a.download = dmExportFileName(new Date());
     a.click();
     URL.revokeObjectURL(url);
+    recordDmExport();
+    onExported?.();
     onNotify('Dungeon Master data exported.');
   };
 

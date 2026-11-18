@@ -2,10 +2,13 @@ import { useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { SHORTCUT_GROUPS } from '../../config/shortcuts';
+import type { ShortcutGroup } from '../../config/shortcuts';
 import styles from './ShortcutsHelp.module.css';
 
 export interface ShortcutsHelpProps {
   onClose: () => void;
+  /** Shortcut groups to list; defaults to the player app's. */
+  groups?: ShortcutGroup[];
 }
 
 /**
@@ -20,7 +23,7 @@ export interface ShortcutsHelpProps {
  * to discover the shortcuts. This overlay only DOCUMENTS the number keys; it
  * registers no handler for them (integration point 2, approach (a)).
  */
-export function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
+export function ShortcutsHelp({ onClose, groups = SHORTCUT_GROUPS }: ShortcutsHelpProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Dismiss on Escape.
@@ -106,7 +109,7 @@ export function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
         </div>
 
         <div className={styles.groups}>
-          {SHORTCUT_GROUPS.map((group) => (
+          {groups.map((group) => (
             <section key={group.title} className={styles.group}>
               <h3 className={styles.groupTitle}>{group.title}</h3>
               <dl className={styles.list}>

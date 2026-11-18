@@ -33,6 +33,23 @@ export type DmPage = (typeof DM_PAGES)[number];
 export const DEFAULT_DM_PAGE: DmPage = 'party';
 
 /**
+ * Label and number-key shortcut for each DM page. The single source for the DM
+ * navigation, its shortcut handler, the command palette entries and the
+ * shortcuts overlay, so they cannot drift apart.
+ */
+export const DM_PAGE_INFO: ReadonlyArray<{ id: DmPage; label: string; shortcut: string }> = [
+  { id: 'campaign', label: 'Campaign', shortcut: '1' },
+  { id: 'party', label: 'Party', shortcut: '2' },
+  { id: 'encounter', label: 'Encounter', shortcut: '3' },
+  { id: 'library', label: 'Library', shortcut: '4' },
+  { id: 'journal', label: 'Journal', shortcut: '5' },
+  { id: 'generators', label: 'Generators', shortcut: '6' },
+  { id: 'treasure', label: 'Treasure', shortcut: '7' },
+  { id: 'xp', label: 'Party XP', shortcut: '8' },
+  { id: 'settings', label: 'Settings', shortcut: '9' },
+];
+
+/**
  * Where the current hash points while DM mode is on. `#dm/<page>` is a DM page,
  * an empty hash is the DM home, and any player page hash (`#character`,
  * `#combat`, ...) is the player area. A `#view/...` link is handled before this.

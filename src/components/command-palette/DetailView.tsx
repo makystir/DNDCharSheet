@@ -69,6 +69,13 @@ export function DetailView({ entity, onBack }: DetailViewProps) {
     switch (displayData.type) {
       case 'page':
         return <PageDetail data={displayData} />;
+      case 'dm-page':
+        return (
+          <dl className={styles.fieldList}>
+            <Field label="Page" value={displayData.page} />
+            <Field label="Shortcut" value={displayData.hint} />
+          </dl>
+        );
       case 'action':
         return <ActionDetail data={displayData} />;
       case 'condition':

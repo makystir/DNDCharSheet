@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Character } from '../../types/character';
 import type { PageSection } from '../../components/layout/navItems';
+import type { DmPage } from '../../logic/dm-mode';
 import { CommandPaletteContext } from './commandPaletteContextValue';
 
 // FRAMEWORK ported from PWACharSheet's CommandPaletteContext.tsx (open/close +
@@ -15,6 +16,7 @@ export function CommandPaletteProvider({
   character,
   navigate,
   runAction,
+  dmNavigate,
 }: {
   children: ReactNode;
   /** The active character (gates the Spells page command). */
@@ -23,6 +25,8 @@ export function CommandPaletteProvider({
   navigate: (page: PageSection) => void;
   /** Run an app-level action by key. */
   runAction: (action: string) => void;
+  /** Dungeon Master workspace only: navigate to a DM page (switches the palette to DM pages). */
+  dmNavigate?: (page: DmPage) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -51,6 +55,7 @@ export function CommandPaletteProvider({
         character,
         navigate,
         runAction,
+        dmNavigate,
       }}
     >
       {children}

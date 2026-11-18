@@ -13,6 +13,7 @@ import { useHashRoute } from './hooks/useHashRoute';
 import { useViewRoute } from './hooks/useViewRoute';
 import { useDmRoute } from './hooks/useDmRoute';
 import { DmShell } from './components/dm/DmShell';
+import { DmDiceRoller } from './components/dm/DmDiceRoller';
 import { formatDmHash, readDmMode, writeDmMode, DEFAULT_DM_PAGE } from './logic/dm-mode';
 import { SharedCharacterViewer } from './components/shared/SharedCharacterViewer';
 import { useConditionalRouteGuard } from './hooks/useConditionalRouteGuard';
@@ -29,6 +30,7 @@ import { useCommandPaletteContext } from './components/command-palette/commandPa
 import { useCommandPalette } from './components/command-palette/useCommandPalette';
 import { CommandPalette } from './components/command-palette/CommandPalette';
 import { ShortcutsHelp } from './components/shared/ShortcutsHelp';
+import { DM_SHORTCUT_GROUPS } from './config/shortcuts';
 import { lazy } from 'react';
 import { CharacterPage } from './components/pages/CharacterPage';
 import { PageLoader } from './components/layout/PageLoader';
@@ -99,11 +101,13 @@ const THEME_KEY = 'dnd-theme';
  */
 function CommandPaletteHost() {
   useCommandPalette();
-  const { shortcutsOpen, closeShortcuts } = useCommandPaletteContext();
+  const { shortcutsOpen, closeShortcuts, dmNavigate } = useCommandPaletteContext();
   return (
     <>
       <CommandPalette />
-      {shortcutsOpen && <ShortcutsHelp onClose={closeShortcuts} />}
+      {shortcutsOpen && (
+        <ShortcutsHelp onClose={closeShortcuts} groups={dmNavigate ? DM_SHORTCUT_GROUPS : undefined} />
+      )}
     </>
   );
 }
@@ -531,16 +535,28 @@ function App() {
   if (dmMode && dmRoute.area === 'dm') {
     return (
       <SWUpdateProvider>
-        <DmShell
-          page={dmRoute.page}
-          onNavigate={(p) => {
+        {/* The palette, shortcuts overlay and dice roller are the player shell's own
+            components. DM mode has no Assistant (no AssistantProvider). */}
+        <CommandPaletteProvider
+          navigate={(p) => navigate(p)}
+          runAction={runAction}
+          dmNavigate={(p) => {
             window.location.hash = formatDmHash(p);
           }}
-          onOpenPlayer={() => navigate('character')}
-          onTurnOff={() => changeDmMode(false)}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-        />
+        >
+          <DmShell
+            page={dmRoute.page}
+            onNavigate={(p) => {
+              window.location.hash = formatDmHash(p);
+            }}
+            onOpenPlayer={() => navigate('character')}
+            onTurnOff={() => changeDmMode(false)}
+            theme={theme}
+            onThemeToggle={toggleTheme}
+          />
+          <DmDiceRoller />
+          <CommandPaletteHost />
+        </CommandPaletteProvider>
       </SWUpdateProvider>
     );
   }

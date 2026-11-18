@@ -33,6 +33,8 @@ function getTypeSummary(entry: SearchResultEntry): string {
       const page = data as PageDisplayData;
       return page.hint || 'Navigate';
     }
+    case 'dm-page':
+      return data.hint;
     case 'action': {
       const action = data as ActionDisplayData;
       return action.description || '—';

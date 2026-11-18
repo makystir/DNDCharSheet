@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { Character } from '../../types/character';
 import type { PageSection } from '../../components/layout/navItems';
+import type { DmPage } from '../../logic/dm-mode';
 
 // The context object + its value type + the consumer hook, split out of
 // CommandPaletteContext.tsx so that file exports ONLY the Provider component
@@ -26,6 +27,11 @@ export interface CommandPaletteContextValue {
   navigate: (page: PageSection) => void;
   /** Run an app-level action by key (e.g. 'toggle-theme'). */
   runAction: (action: string) => void;
+  /**
+   * Set only in the Dungeon Master workspace: navigates to a DM page. Its presence
+   * switches the palette and shortcuts overlay to the DM page list.
+   */
+  dmNavigate?: (page: DmPage) => void;
 }
 
 export const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(null);

@@ -1,4 +1,5 @@
 import { NAV_ITEMS } from '../components/layout/navItems';
+import { DM_PAGE_INFO } from '../logic/dm-mode';
 
 /**
  * Single source of truth for the app's keyboard shortcuts, surfaced by the
@@ -45,6 +46,18 @@ const PAGE_SHORTCUTS: KeyboardShortcut[] = NAV_ITEMS.map((item) => ({
 const GLOBAL_SHORTCUTS: KeyboardShortcut[] = [
   // Ctrl/Cmd+K → toggles the command palette (see useCommandPalette.ts).
   { keys: 'Ctrl / ⌘ + K', description: 'Open search / command palette' },
+];
+
+/** Dungeon Master page shortcuts, derived from DM_PAGE_INFO (the list DmShell's key handler matches against). */
+const DM_PAGE_SHORTCUTS: KeyboardShortcut[] = DM_PAGE_INFO.map((info) => ({
+  keys: info.shortcut,
+  description: `Go to ${info.label}`,
+}));
+
+/** Shortcut groups shown by the overlay while in the Dungeon Master workspace. */
+export const DM_SHORTCUT_GROUPS: ShortcutGroup[] = [
+  { title: 'Dungeon Master pages', shortcuts: DM_PAGE_SHORTCUTS },
+  { title: 'Actions', shortcuts: GLOBAL_SHORTCUTS },
 ];
 
 /** Grouped shortcut definitions consumed by the ShortcutsHelp overlay. */

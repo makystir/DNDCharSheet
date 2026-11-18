@@ -365,3 +365,20 @@
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--accent-red);
 }
+
+.backupNudge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--accent-gold);
+}

@@ -3,6 +3,8 @@ import { NAV_ITEMS, visibleNavItems } from '../../components/layout/navItems';
 import type { PageSection } from '../../components/layout/navItems';
 import { CONDITIONS } from '../../data/conditions';
 import { fuzzyMatch } from './fuzzyMatch';
+import { DM_PAGE_INFO } from '../../logic/dm-mode';
+import type { DmPage } from '../../logic/dm-mode';
 
 // ─── Search Index (D&D 5.5e / 2024) ───────────────────────────────────────────
 //
@@ -29,6 +31,13 @@ export interface PageDisplayData {
   hint?: string;
 }
 
+export interface DmPageDisplayData {
+  type: 'dm-page';
+  /** The Dungeon Master page this command navigates to. */
+  page: DmPage;
+  hint: string;
+}
+
 export interface ActionDisplayData {
   type: 'action';
   /** A stable action key the palette consumer dispatches. */
@@ -45,6 +54,7 @@ export interface ConditionDisplayData {
 
 export type EntityDisplayData =
   | PageDisplayData
+  | DmPageDisplayData
   | ActionDisplayData
   | ConditionDisplayData;
 
@@ -117,8 +127,26 @@ const ACTION_DEFS: ActionDef[] = [
   },
 ];
 
-function buildActionEntries(): SearchableEntity[] {
-  return ACTION_DEFS.map((def) => ({
+/** The Dungeon Master workspace's "Go to <page>" commands, one per DM page. */
+function buildDmPageEntries(): SearchableEntity[] {
+  return DM_PAGE_INFO.map((info) => ({
+    id: `dm-page-${info.id}`,
+    name: `Go to ${info.label}`,
+    type: 'page' as const,
+    searchText: `go to ${info.label} dungeon master dm`.toLowerCase(),
+    displayData: {
+      type: 'dm-page',
+      page: info.id,
+      hint: `Press ${info.shortcut}`,
+    },
+  }));
+}
+
+/** Actions that make sense in the Dungeon Master workspace (no character is loaded there). */
+const DM_ACTIONS = new Set(['toggle-theme']);
+
+function buildActionEntries(dmMode: boolean): SearchableEntity[] {
+  return ACTION_DEFS.filter((def) => !dmMode || DM_ACTIONS.has(def.action)).map((def) => ({
     id: `action-${def.action}`,
     name: def.name,
     type: 'action' as const,
@@ -179,10 +207,10 @@ export interface ResultGroup {
  * character (Spells is gated on isSpellcaster), so the character is threaded in;
  * actions and conditions are character-independent.
  */
-export function buildSearchIndex(character?: Character): SearchableEntity[] {
+export function buildSearchIndex(character?: Character, dmMode = false): SearchableEntity[] {
   return [
-    ...buildPageEntries(character),
-    ...buildActionEntries(),
+    ...(dmMode ? buildDmPageEntries() : buildPageEntries(character)),
+    ...buildActionEntries(dmMode),
     ...buildConditionEntries(),
   ];
 }

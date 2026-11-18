@@ -86,7 +86,7 @@ function paletteReducer(state: PaletteState, action: PaletteAction): PaletteStat
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function CommandPalette() {
-  const { isOpen, close, openShortcuts, character, navigate, runAction } =
+  const { isOpen, close, openShortcuts, character, navigate, runAction, dmNavigate } =
     useCommandPaletteContext();
   const [state, dispatch] = useReducer(paletteReducer, INITIAL_STATE);
 
@@ -100,7 +100,7 @@ export function CommandPalette() {
 
   // Build search index from the active character (Spells page command is gated
   // on isSpellcaster through visibleNavItems — no dead command for a non-caster).
-  const searchIndex = useMemo(() => buildSearchIndex(character), [character]);
+  const searchIndex = useMemo(() => buildSearchIndex(character, dmNavigate !== undefined), [character, dmNavigate]);
 
   // Compute results from query
   const results: GroupedResults = useMemo(() => {
@@ -160,6 +160,11 @@ export function CommandPalette() {
         handleClose();
         return;
       }
+      if (data.type === 'dm-page') {
+        dmNavigate?.(data.page);
+        handleClose();
+        return;
+      }
       if (data.type === 'action') {
         runAction(data.action);
         handleClose();
@@ -168,7 +173,7 @@ export function CommandPalette() {
       const scrollPos = bodyRef.current?.scrollTop ?? 0;
       dispatch({ type: 'SELECT_RESULT', entity: entry, scrollPosition: scrollPos });
     },
-    [navigate, runAction, handleClose],
+    [navigate, runAction, dmNavigate, handleClose],
   );
 
   // ── Backdrop click ──

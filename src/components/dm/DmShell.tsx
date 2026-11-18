@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollText, Users, Settings, User, Swords, BookOpen, NotebookPen, Dices, Gem, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { DM_PAGE_INFO } from '../../logic/dm-mode';
 import type { DmPage } from '../../logic/dm-mode';
 import type { EncounterCrGroup } from '../../logic/dm-treasure';
 import { useDmData } from '../../hooks/useDmData';
@@ -9,6 +10,8 @@ import { PageContainer } from '../layout/PageContainer';
 import { Toast } from '../shared/Toast';
 import { AriaLiveAnnouncer } from '../shared/AriaLiveAnnouncer';
 import { UpdateBanner } from '../shared/UpdateBanner';
+import { DmBackupNudge } from './DmBackupNudge';
+import { getDmLastExportAt } from '../../storage/dm-backup';
 import { CampaignPage } from './CampaignPage';
 import { PartyPage } from './PartyPage';
 import { EncounterPage } from './EncounterPage';
@@ -39,18 +42,19 @@ interface DmNavItem {
   shortcut: string;
 }
 
-const DM_NAV: DmNavItem[] = [
-  { id: 'campaign', label: 'Campaign', icon: ScrollText, shortcut: '1' },
-  { id: 'party', label: 'Party', icon: Users, shortcut: '2' },
-  { id: 'encounter', label: 'Encounter', icon: Swords, shortcut: '3' },
-  { id: 'library', label: 'Library', icon: BookOpen, shortcut: '4' },
-  { id: 'journal', label: 'Journal', icon: NotebookPen, shortcut: '5' },
-  { id: 'generators', label: 'Generators', icon: Dices, shortcut: '6' },
-  { id: 'treasure', label: 'Treasure', icon: Gem, shortcut: '7' },
-  { id: 'xp', label: 'Party XP', icon: Trophy, shortcut: '8' },
-  { id: 'settings', label: 'Settings', icon: Settings, shortcut: '9' },
-];
+const DM_ICONS: Record<DmPage, LucideIcon> = {
+  campaign: ScrollText,
+  party: Users,
+  encounter: Swords,
+  library: BookOpen,
+  journal: NotebookPen,
+  generators: Dices,
+  treasure: Gem,
+  xp: Trophy,
+  settings: Settings,
+};
 
+const DM_NAV: DmNavItem[] = DM_PAGE_INFO.map((info) => ({ ...info, icon: DM_ICONS[info.id] }));
 /**
  * The Dungeon Master workspace: its own navigation and pages, shown instead of
  * the player sheet while DM mode is on. DM data lives in its own store.
@@ -58,6 +62,7 @@ const DM_NAV: DmNavItem[] = [
 export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onThemeToggle }: DmShellProps) {
   const dm = useDmData();
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const [lastExportAt, setLastExportAt] = useState<number | null>(getDmLastExportAt);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const notify = useCallback((text: string) => setToast((prev) => ({ id: (prev?.id ?? 0) + 1, text })), []);
 
@@ -161,6 +166,9 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         </p>
       )}
 
+      {!dm.saveFailed && (
+        <DmBackupNudge hasCampaigns={dm.data.campaigns.length > 0} lastExportAt={lastExportAt} onOpenSettings={() => go('settings')} />
+      )}
       <PageContainer pageKey={`dm-${page}`}>
         {page === 'campaign' && (
           <CampaignPage dm={dm} onNotify={notify} onOpenParty={() => onNavigate('party')} />
@@ -177,7 +185,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} encounterCrs={treasureCrs} />}
         {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} />}
         {page === 'settings' && (
-          <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} />
+          <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} onExported={() => setLastExportAt(getDmLastExportAt())} />
         )}
       </PageContainer>
 
