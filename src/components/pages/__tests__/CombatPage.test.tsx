@@ -388,3 +388,13 @@ describe('CombatPage - layout and jump links', () => {
     expect(strip.parentElement).toBe(nav.parentElement);
   });
 });
+
+describe('Rest pointer (P-E1)', () => {
+  it('points to Character > Overview for Hit Dice and rests, without adding rest controls', () => {
+    renderPage();
+    const pointer = screen.getByTestId('combat-rest-pointer');
+    expect(pointer).toHaveTextContent('Resting? Hit Dice and rests are on Character › Overview');
+    expect(within(pointer).getByRole('link', { name: 'Character › Overview' })).toHaveAttribute('href', '#character/identity');
+    expect(screen.queryByRole('button', { name: /long rest|short rest/i })).toBeNull();
+  });
+});

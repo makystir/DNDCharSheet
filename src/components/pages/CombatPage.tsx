@@ -147,6 +147,11 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
         </div>
       </div>
 
+      {/* Rests deliberately live only on Character > Overview; point there instead of duplicating them. */}
+      <p className={styles.restPointer} data-testid="combat-rest-pointer">
+        Resting? Hit Dice and rests are on <a href="#character/identity">Character › Overview</a>.
+      </p>
+
       <QuickRulesCard />
     </div>
   );

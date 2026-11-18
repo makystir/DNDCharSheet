@@ -357,26 +357,47 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
       </div>
 
       <div className={running ? `${enc.toolbar} ${enc.toolbarSticky}` : enc.toolbar} data-testid="encounter-toolbar">
-        {!ended && (
-          <button type="button" className={styles.btn} onClick={() => setAdding(true)}>
-            Add combatants
-          </button>
+        {running && (
+          <>
+            <button type="button" className={styles.btn} onClick={() => setAdding(true)}>
+              Add combatants
+            </button>
+          </>
         )}
         {setup && (
           <>
-            <button type="button" className={styles.btn} onClick={addWholeParty}>
-              Add whole party
-            </button>
-            <button
-              type="button"
-              className={styles.btn}
-              onClick={() => commit(rollInitiatives(open, createDefaultRng(), { monstersOnly: true }))}
-            >
-              Roll Initiative for monsters
-            </button>
-            <button type="button" className={styles.btn} onClick={() => commit(rollInitiatives(open, createDefaultRng()))}>
-              Roll everyone missing
-            </button>
+            <div className={enc.cluster} role="group" aria-label="Add">
+              <span className={enc.clusterTitle}>Add</span>
+              <div className={enc.clusterButtons}>
+                <button type="button" className={styles.btn} onClick={() => setAdding(true)}>
+                  Add combatants
+                </button>
+                <button type="button" className={styles.btn} onClick={addWholeParty}>
+                  Add whole party
+                </button>
+              </div>
+              <span className={styles.muted}>Pick monsters and characters one at a time, or bring in every party member at once.</span>
+            </div>
+            <div className={enc.cluster} role="group" aria-label="Initiative">
+              <span className={enc.clusterTitle}>Initiative</span>
+              <div className={enc.clusterButtons}>
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={() => commit(rollInitiatives(open, createDefaultRng(), { monstersOnly: true }))}
+                >
+                  Roll Initiative for monsters
+                </button>
+                <button type="button" className={styles.btn} onClick={() => commit(rollInitiatives(open, createDefaultRng()))}>
+                  Roll everyone missing
+                </button>
+              </div>
+              <span className={styles.muted}>
+                Players roll their own Initiative: type it in. The DM rolls for monsters, and a group of identical creatures
+                shares one roll. A surprised combatant rolls with Disadvantage. Ties are yours to break: move a combatant up or
+                down.
+              </span>
+            </div>
             <span className={enc.spacer} />
             <button type="button" className={styles.btnPrimary} onClick={start}>
               Start combat
@@ -416,11 +437,14 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         </p>
       )}
 
-      {setup && (
-        <p className={styles.muted}>
-          Players roll their own Initiative: type it in. The DM rolls for monsters, and a group of identical creatures shares
-          one roll. A surprised combatant rolls with Disadvantage. Ties are yours to break: move a combatant up or down.
-        </p>
+      {ended && (
+        <XpAwardCard
+          encounter={open}
+          // The Party XP page awards every party member and rejects a smaller count, so start from the same number.
+          defaultSharers={Math.max(1, campaign.party.length)}
+          onCommit={commit}
+          onOpenPartyXp={() => onOpenPartyXp(open.id)}
+        />
       )}
 
       {ended && (
@@ -443,7 +467,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
                     onNotify(
                       src.skipped > 0
                         ? 'The creatures counted for XP have no CR. Roll treasure on the Treasure page.'
-                        : 'No creatures are counted as overcome. Tick them under "XP for this fight" first.',
+                        : 'No creatures are counted as overcome. Tick them under "XP for this fight" above first.',
                     );
                     return;
                   }
@@ -493,16 +517,6 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
       )}
 
       {!ended && <EncounterBalance members={budgetMembers} combatants={open.combatants} />}
-
-      {ended && (
-        <XpAwardCard
-          encounter={open}
-          // The Party XP page awards every party member and rejects a smaller count, so start from the same number.
-          defaultSharers={Math.max(1, campaign.party.length)}
-          onCommit={commit}
-          onOpenPartyXp={() => onOpenPartyXp(open.id)}
-        />
-      )}
 
       {open.combatants.length === 0 ? (
         <Card>

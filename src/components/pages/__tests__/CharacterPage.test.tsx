@@ -219,13 +219,14 @@ describe('CharacterPage', () => {
       expect(screen.getByRole('link', { name: 'Level up on Advancement' })).toBeInTheDocument();
     });
 
-    it('puts Personal Details (with portrait) above the vitals strip', () => {
+    it('puts Personal Details (with portrait) below the vitals strip', () => {
       renderPage({ level: 3 });
       const details = screen.getByRole('heading', { name: 'Personal Details' });
       const species = screen.getByRole('combobox', { name: 'Species' });
       const vitals = screen.getByRole('group', { name: 'Vitals' });
       expect(details.compareDocumentPosition(species) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-      expect(species.compareDocumentPosition(vitals) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      // P-E2: the Vitals session card sits above the Personal Details edit form.
+      expect(vitals.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       // Species is no longer behind a collapse and no longer on Class & Features.
       expect(species).toBeVisible();
     });

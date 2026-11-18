@@ -54,8 +54,8 @@ describe('Advancement jump links (P-B4)', () => {
     render(<AdvancementPage character={createCharacter('Tester')} onChange={vi.fn()} now={() => 1000} />);
     const bar = screen.getByRole('navigation', { name: 'Advancement sections' });
     const links = Array.from(bar.querySelectorAll('a')).map((a) => a.textContent);
-    expect(links).toEqual(['Level', 'Hit Points', 'Next level', 'Log']);
-    for (const id of ['adv-section-level', 'adv-section-hp', 'adv-section-next-level', 'adv-section-log']) {
+    expect(links).toEqual(['Level', 'Hit Points', 'Next level', 'Feats', 'Multiclass', 'Log']);
+    for (const id of ['adv-section-level', 'adv-section-hp', 'adv-section-next-level', 'adv-section-feats', 'adv-section-multiclass', 'adv-section-log']) {
       expect(document.getElementById(id)).not.toBeNull();
     }
   });

@@ -251,6 +251,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // The pending-choices card. When choices are owed it is shown first and styled as a
   // call to action; with none owed it stays a quiet note at the bottom of the page.
   const owed = pendingCount > 0;
+  const showClassChoices = classChoices.length > 0 || languagePicks.owed > 0 || languagePicks.chosen > 0;
   const pendingCard = (
     <section id="adv-section-pending" aria-labelledby="adv-pending-title">
       <Card className={owed ? styles.pendingAlert : undefined}>
@@ -351,6 +352,17 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
         <ScrollLink targetId="adv-section-next-level" fallbackHref="#advancement" className={styles.jumpLink}>
           Next level
         </ScrollLink>
+        <ScrollLink targetId="adv-section-feats" fallbackHref="#advancement" className={styles.jumpLink}>
+          Feats
+        </ScrollLink>
+        <ScrollLink targetId="adv-section-multiclass" fallbackHref="#advancement" className={styles.jumpLink}>
+          Multiclass
+        </ScrollLink>
+        {showClassChoices && (
+          <ScrollLink targetId="adv-section-class-choices" fallbackHref="#advancement" className={styles.jumpLink}>
+            Choices
+          </ScrollLink>
+        )}
         <ScrollLink targetId="adv-section-log" fallbackHref="#advancement" className={styles.jumpLink}>
           Log
         </ScrollLink>
@@ -705,7 +717,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       </Card>
 
       {/* ── Multiclass: add a level in a new (or existing) class ────────────── */}
-      <Card>
+      <Card id="adv-section-multiclass">
         <SectionHeader icon={Layers} title="Multiclass" />
         {cls === undefined ? (
           <p className={styles.placeholder}>
@@ -812,8 +824,8 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
       <FeatSlotsSection character={character} onChange={onChange} now={now} />
 
       {/* ── Class choices (Metamagic, Invocations, Maneuvers, orders, ...) ──── */}
-      {(classChoices.length > 0 || languagePicks.owed > 0 || languagePicks.chosen > 0) && (
-        <Card>
+      {showClassChoices && (
+        <Card id="adv-section-class-choices">
           <SectionHeader icon={ScrollText} title={`Class Choices (${classChoices.length})`} />
           <ClassChoicesSection character={character} onChange={onChange} statuses={classChoices} />
           <FeatureLanguagesSection character={character} onChange={onChange} />

@@ -19,7 +19,7 @@ function headingOrder(): string[] {
 }
 
 describe('CharacterPage Overview order', () => {
-  it('places Finish setting up between Personal Details and Vitals only when choices are pending', () => {
+  it('places Finish setting up directly above Vitals, ahead of Personal Details, only when choices are pending (P-E2)', () => {
     const pending: Character = {
       ...createCharacter('Pending'),
       classes: [{ id: 'wizard', level: 1 }],
@@ -29,8 +29,8 @@ describe('CharacterPage Overview order', () => {
     const details = order.findIndex((h) => h.includes('Personal Details'));
     const setup = order.findIndex((h) => h.includes('Finish setting up'));
     const vitals = order.findIndex((h) => h.includes('Vitals'));
-    expect(setup).toBe(details + 1);
     expect(vitals).toBe(setup + 1);
+    expect(details).toBeGreaterThan(vitals);
     cleanup();
 
     const done: Character = {
@@ -44,7 +44,7 @@ describe('CharacterPage Overview order', () => {
     expect(screen.queryByTestId('overview-setup-class-skills')).toBeNull();
   });
 
-  it('stacks Personal Details, Vitals, Inspiration, then the grid cards', () => {
+  it('stacks Vitals, Inspiration, Personal Details, then the grid cards (P-E2: session cards above the edit form)', () => {
     const wizard: Character = {
       ...createCharacter('Caster'),
       level: 5,
@@ -53,9 +53,9 @@ describe('CharacterPage Overview order', () => {
     renderOverview(wizard);
     const order = headingOrder();
     const expected = [
-      'Personal Details',
       'Vitals',
       'Heroic Inspiration',
+      'Personal Details',
       'Right now',
       'Spellcasting',
       'Traits & Feats',

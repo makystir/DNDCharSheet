@@ -99,7 +99,7 @@ function aliasSubTab(value: string | null | undefined): CharSubTab | null {
 
 /**
  * The Character tab. Overview is the one-page session sheet, top to bottom:
- * Personal Details + portrait, Species, Vitals, Heroic Inspiration, then a grid
+ * Setup, Vitals, Rest, Heroic Inspiration, Personal Details + portrait (an edit form, kept\n * below the session cards), then a grid
  * of cards (Conditions, Reactions, Attacks, Spellcasting for casters, then
  * Abilities, Saves & Skills with its Edit toggle, and Traits & Feats). Class & Features
  * holds class, subclass, skill choices and the feature list. Every
@@ -355,6 +355,11 @@ export function CharacterPage({
 
       {activeSubTab === 'identity' && (
         <>
+          <OverviewSetup character={character} />
+          <OverviewVitals character={character} onChange={onChange} />
+          <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
+          <OverviewInspiration character={character} onChange={onChange} />
+          {/* Personal Details is an edit form: it sits below the session cards so Vitals are on screen first. */}
           <PersonalDetailsSection
             character={character}
             onChange={onChange}
@@ -364,10 +369,6 @@ export function CharacterPage({
             onSpeciesChange={setSpecies}
             onSpeciesChoiceChange={setSpeciesChoice}
           />
-          <OverviewSetup character={character} />
-          <OverviewVitals character={character} onChange={onChange} />
-          <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
-          <OverviewInspiration character={character} onChange={onChange} />
           {/* Two independent column stacks on a wide page (no shared grid rows,
               so a short card never leaves a hole beside a tall one). Left: the
               "Right now" summary, Spellcasting, and Traits & Feats (here to

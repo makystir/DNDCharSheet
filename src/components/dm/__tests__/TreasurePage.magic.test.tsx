@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useState } from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { SWUpdateProvider } from '../../../hooks/useSWUpdate';
@@ -107,5 +107,38 @@ describe('Treasure page: random magic items', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
     const body = JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal[0].body as string;
     expect(body).toContain('Ear Horn of Hearing: Wondrous Item, Common, no attunement');
+  });
+});
+
+describe('Treasure page: direct Magic items tab (D-E1)', () => {
+  it('rolls magic items by rarity, theme and count without a hoard roll, and saves them', () => {
+    seed();
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+    render(<Routed initial="treasure" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Magic items' }));
+    expect(screen.queryByTestId('magic-roller')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Magic item rarity'), { target: { value: 'common' } });
+    fireEvent.change(screen.getByLabelText('Treasure theme (optional)'), { target: { value: 'relics' } });
+    fireEvent.change(screen.getByLabelText('How many'), { target: { value: '3' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Roll magic items' }));
+    const list = screen.getByRole('list', { name: 'Rolled magic items' });
+    expect(within(list).getAllByTestId('magic-item-dmg')).toHaveLength(3);
+    expect(list).toHaveTextContent('Ear Horn of Hearing');
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    const body = JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal[0].body as string;
+    expect(body).toContain('Ear Horn of Hearing: Wondrous Item, Common, no attunement');
+  });
+});
+
+describe('Treasure page: result scrolls into view (D-E2)', () => {
+  it('scrolls the result into view after a roll', () => {
+    seed();
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    render(<Routed initial="treasure" />);
+    expect(scroll).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(scroll.mock.instances[0]).toBe(screen.getByLabelText('Treasure result'));
   });
 });

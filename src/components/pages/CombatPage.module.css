@@ -105,3 +105,13 @@
   outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
 }
+
+/* One-line pointer to the Overview, where Hit Dice and rests live. */
+.restPointer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.restPointer a {
+  color: var(--accent-gold);
+}

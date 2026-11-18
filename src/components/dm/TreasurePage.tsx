@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Gem } from 'lucide-react';
 import type { Breakdown } from '../../logic/breakdown';
 import type { DmApi } from './dmApi';
@@ -20,6 +20,7 @@ import { newNote, saveNote } from '../../logic/dm-journal';
 import { clockNow } from '../../logic/dm-mode';
 import {
   MAGIC_TIERS,
+  MAX_MAGIC_ITEMS,
   formMoney,
   magicItemMeta,
   magicItemsText,
@@ -50,12 +51,13 @@ interface TreasurePageProps {
   encounterCrs?: EncounterCrGroup[];
 }
 
-type Tab = 'individual' | 'hoard' | 'quest' | 'items' | 'reference';
+type Tab = 'individual' | 'hoard' | 'quest' | 'magic' | 'items' | 'reference';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'individual', label: 'Individual' },
   { id: 'hoard', label: 'Hoard' },
   { id: 'quest', label: 'Quest reward' },
+  { id: 'magic', label: 'Magic items' },
   { id: 'items', label: 'Gems and art' },
   { id: 'reference', label: 'Reference' },
 ];
@@ -127,6 +129,15 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [magicTier, setMagicTier] = useState<MagicTier>('uncommon');
   const [rolledMagic, setRolledMagic] = useState<RolledMagicItem[]>([]);
+  const [magicCount, setMagicCount] = useState('1');
+
+  /** Bumped after every roll so the result is scrolled into view (it can sit below the fold on a phone). */
+  const [rollSeq, setRollSeq] = useState(0);
+  const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (rollSeq === 0) return;
+    resultRef.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+  }, [rollSeq]);
 
   const [itemKind, setItemKind] = useState<'gems' | 'art'>('gems');
   const [itemValue, setItemValue] = useState('100');
@@ -142,10 +153,12 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
     const form = formOf(key);
     setRolledMagic([]);
     setOutcome({ ...partial, form, formed: formMoney(createDefaultRng(), partial.totalGp, form) });
+    setRollSeq((s) => s + 1);
   };
 
   const rollMagic = (count: number) => {
     setRolledMagic(rollMagicItems(createDefaultRng(), count, magicTier, theme || undefined));
+    setRollSeq((s) => s + 1);
   };
 
   const rollIndividualTreasure = () => {
@@ -206,6 +219,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
 
   const rollGemsOrArt = () => {
     setItems(rollItems(createDefaultRng(), itemKind, Number(itemValue), Number(itemCount)));
+    setRollSeq((s) => s + 1);
   };
 
   const saveToJournal = (title: string, body: string) => {
@@ -216,6 +230,33 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
     setSavedBody(body);
     onNotify(`Saved to the journal as "${base.title}".`);
   };
+
+  const magicList =
+    rolledMagic.length > 0 && (
+          <ul className={tr.lines} aria-label="Rolled magic items">
+            {rolledMagic.map((r, i) => (
+              <li key={`${i}-${r.item.name}`} data-testid={`magic-item-${r.item.status}`}>
+                <strong>{r.item.name}</strong>
+                <span className={styles.muted}>
+                  {' '}
+                  (d100 {r.d100}, {r.theme}
+                  {r.themeRoll !== null ? `, 1d4 ${r.themeRoll}` : ''})
+                </span>
+                <div className={styles.muted}>{magicItemMeta(r.item)}</div>
+                {r.item.description !== null ? (
+                  <>
+                    <p>{r.item.description}</p>
+                    <div className={styles.muted}>Source: {r.item.source}</div>
+                  </>
+                ) : (
+                  <p role="note" className={styles.muted}>
+                    <strong>Flagged:</strong> {r.item.source} Check the Dungeon Master's Guide.
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        );
 
   const tiers = itemKind === 'gems' ? GEMSTONES : ART_OBJECTS;
   const themeInfo = TREASURE_THEMES.find((t) => t.id === theme);
@@ -304,6 +345,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
               onClick={() => {
                 setTab(t.id);
                 setOutcome(null);
+                setRolledMagic([]);
               }}
             >
               {t.label}
@@ -382,8 +424,72 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
             </>
           )}
 
-          {tab === 'items' && (
+          {tab === 'magic' && (
             <>
+              <p className={styles.muted}>
+                Choose the rarity yourself (see "Awarding Magic Items" in the Dungeon Master's Guide), then roll on the Random Magic
+                Items tables. With no treasure theme, each item rolls 1d4 for Arcana, Armaments, Implements or Relics.
+              </p>
+              <div className={styles.row} data-testid="magic-direct">
+                <label className={styles.field} style={{ flex: '0 1 180px' }}>
+                  <span className={styles.fieldLabel}>Magic item rarity</span>
+                  <select className={styles.input} value={magicTier} onChange={(e) => setMagicTier(e.target.value as MagicTier)}>
+                    {MAGIC_TIERS.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={styles.field} style={{ flex: '0 1 220px' }}>
+                  <span className={styles.fieldLabel}>Treasure theme (optional)</span>
+                  <select className={styles.input} value={theme} onChange={(e) => setTheme(e.target.value as TreasureTheme | '')}>
+                    <option value="">No theme</option>
+                    {TREASURE_THEMES.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={styles.field} style={{ flex: '0 1 120px' }}>
+                  <span className={styles.fieldLabel}>How many</span>
+                  <input className={styles.input} type="number" min={1} max={MAX_MAGIC_ITEMS} value={magicCount} onChange={(e) => setMagicCount(e.target.value)} />
+                </label>
+                <button
+                  type="button"
+                  className={styles.btnPrimary}
+                  style={{ alignSelf: 'flex-end' }}
+                  onClick={() => rollMagic(Math.min(MAX_MAGIC_ITEMS, Math.max(1, Math.trunc(Number(magicCount)) || 1)))}
+                >
+                  Roll magic items
+                </button>
+              </div>
+              {rolledMagic.length > 0 && (
+                <div className={tr.result} aria-label="Rolled magic items result" ref={resultRef}>
+                  {magicList}
+                  <div className={styles.row}>
+                    <button
+                      type="button"
+                      className={styles.btn}
+                      disabled={!campaign}
+                      onClick={() => saveToJournal('magic items', magicItemsText(rolledMagic).join('\n'))}
+                    >
+                      Save to journal
+                    </button>
+                    {savedBody !== null && savedBody === magicItemsText(rolledMagic).join('\n') && (
+                      <button type="button" className={styles.btn} onClick={onOpenJournal}>
+                        Open journal
+                      </button>
+                    )}
+                    {!campaign && <span className={styles.muted}>Create a campaign to save to its journal.</span>}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === 'items' && (            <>
               <div className={styles.row}>
                 <label className={styles.field} style={{ flex: '0 1 160px' }}>
                   <span className={styles.fieldLabel}>Kind</span>
@@ -420,7 +526,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
                 </button>
               </div>
               {items && (
-                <div className={tr.result} aria-label="Rolled items">
+                <div className={tr.result} aria-label="Rolled items" ref={resultRef}>
                   <ul className={tr.lines}>
                     {moneyText({ ...items, leftoverGp: 0 }).filter((l) => !l.startsWith('0 GP')).map((l) => (
                       <li key={l}>{l}</li>
@@ -538,7 +644,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
 
       {outcome && tab !== 'items' && tab !== 'reference' && (
         <Card>
-          <div className={tr.result} aria-label="Treasure result">
+          <div className={tr.result} aria-label="Treasure result" ref={resultRef}>
             <h2 className={tr.heading}>{outcome.title}</h2>
             <div className={styles.summaryGrid}>
               <div className={styles.stat}>
@@ -597,31 +703,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
                     Roll {outcome.magic.count} magic {outcome.magic.count === 1 ? 'item' : 'items'}
                   </button>
                 </div>
-                {rolledMagic.length > 0 && (
-                  <ul className={tr.lines} aria-label="Rolled magic items">
-                    {rolledMagic.map((r, i) => (
-                      <li key={`${i}-${r.item.name}`} data-testid={`magic-item-${r.item.status}`}>
-                        <strong>{r.item.name}</strong>
-                        <span className={styles.muted}>
-                          {' '}
-                          (d100 {r.d100}, {r.theme}
-                          {r.themeRoll !== null ? `, 1d4 ${r.themeRoll}` : ''})
-                        </span>
-                        <div className={styles.muted}>{magicItemMeta(r.item)}</div>
-                        {r.item.description !== null ? (
-                          <>
-                            <p>{r.item.description}</p>
-                            <div className={styles.muted}>Source: {r.item.source}</div>
-                          </>
-                        ) : (
-                          <p role="note" className={styles.muted}>
-                            <strong>Flagged:</strong> {r.item.source} Check the Dungeon Master's Guide.
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {magicList}
               </div>
             )}
             <div className={styles.row}>
