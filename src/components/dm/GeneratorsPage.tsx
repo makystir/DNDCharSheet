@@ -27,6 +27,8 @@ import {
 import { clockNow } from '../../logic/dm-mode';
 import { createDefaultRng } from '../../logic/random';
 import { Card } from '../shared/Card';
+import { DmgGenerator } from './DmgGenerator';
+import type { DmgGeneratorId } from '../../logic/dmg-generators';
 import { SectionHeader } from '../shared/SectionHeader';
 import styles from './dm.module.css';
 import gen from './generators.module.css';
@@ -38,12 +40,18 @@ interface GeneratorsPageProps {
   onOpenJournal: () => void;
 }
 
-type Tab = 'npc' | 'tavern' | 'shop';
+type Tab = 'npc' | 'tavern' | 'shop' | DmgGeneratorId;
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'npc', label: 'Quick NPC' },
   { id: 'tavern', label: 'Tavern' },
   { id: 'shop', label: 'Shop' },
+  { id: 'settlement', label: 'Settlement' },
+  { id: 'adventure', label: 'Adventure seed' },
+  { id: 'dungeon', label: 'Dungeon' },
+  { id: 'npcDetails', label: 'NPC details' },
+  { id: 'weather', label: 'Weather' },
+  { id: 'monster', label: 'Monster behavior' },
 ];
 
 const GENDER_OPTIONS: { value: NameGender; label: string }[] = [
@@ -356,7 +364,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
   );
 }
 
-/** Tools for improvising: an NPC, a tavern, a shop. */
+/** Tools for improvising: an NPC, a tavern, a shop, and the Dungeon Master's Guide 2024 tables. */
 export function GeneratorsPage({ dm, onNotify, onOpenCampaign, onOpenJournal }: GeneratorsPageProps) {
   const [tab, setTab] = useState<Tab>('npc');
   const campaign = activeCampaign(dm.data);
@@ -398,6 +406,9 @@ export function GeneratorsPage({ dm, onNotify, onOpenCampaign, onOpenJournal }: 
           {tab === 'npc' && <NpcGenerator dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
           {tab === 'tavern' && <PlaceGenerator key="tavern" kind="tavern" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
           {tab === 'shop' && <PlaceGenerator key="shop" kind="shop" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
+          {tab !== 'npc' && tab !== 'tavern' && tab !== 'shop' && (
+            <DmgGenerator key={tab} id={tab} dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />
+          )}
         </div>
       </Card>
     </div>
