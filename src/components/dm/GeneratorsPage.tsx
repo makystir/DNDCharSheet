@@ -10,13 +10,16 @@ import type { DmApi } from './dmApi';
 import { activeCampaign } from '../../logic/dm-campaign';
 import {
   NPC_PARTS,
+  dmgShopName,
   firstName,
+  generateDmgTavernName,
   generateNpc,
   generateShopName,
   generateTavernName,
   npcHeadline,
   npcJournalBody,
   npcSpecies,
+  rollDmgShopType,
   rerollNpcPart,
   saveNpcToJournal,
   savePlaceWithOwner,
@@ -261,32 +264,40 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
 function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' | 'shop' } & Omit<GeneratorsPageProps, 'onOpenCampaign'>) {
   const campaign = activeCampaign(dm.data);
   const [trade, setTrade] = useState(SHOP_TYPES[0].id);
-  const [place, setPlace] = useState<{ name: string; owner: GeneratedNpc } | null>(null);
+  // 'original' uses this app's word lists; 'dmg' uses the DMG 2024 p.94 tables.
+  const [source, setSource] = useState<'original' | 'dmg'>('original');
+  const [place, setPlace] = useState<{ name: string; owner: GeneratedNpc; dmgType?: string } | null>(null);
+  const dmg = source === 'dmg';
 
-  const rollOwner = (tradeId: string) => {
+  const rollOwner = (role: string) => generateNpc(createDefaultRng(), { role: role.toLowerCase() });
+  const ownerRole = (tradeLabel: string) => (kind === 'tavern' ? 'innkeeper' : tradeLabel);
+
+  /** Names a place for an owner. A DMG shop name is built from the rolled DMG shop type. */
+  const build = (owner: GeneratedNpc, dmgType?: string) => {
     const rng = createDefaultRng();
-    return generateNpc(rng, { role: kind === 'tavern' ? 'innkeeper' : shopTypeById(tradeId).label.toLowerCase() });
+    if (kind === 'tavern') return { owner, name: dmg ? generateDmgTavernName(rng) : generateTavernName(rng) };
+    if (dmg) return { owner, dmgType, name: dmgShopName(dmgType ?? '', firstName(owner.name)) };
+    return { owner, name: generateShopName(rng, trade, firstName(owner.name)) };
   };
 
   const roll = () => {
-    const rng = createDefaultRng();
-    const owner = rollOwner(trade);
-    setPlace({ owner, name: kind === 'tavern' ? generateTavernName(rng) : generateShopName(rng, trade, firstName(owner.name)) });
+    const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
+    setPlace(build(rollOwner(ownerRole(dmgType ?? shopTypeById(trade).label)), dmgType));
   };
 
   const newName = () =>
-    setPlace((cur) =>
-      cur
-        ? { ...cur, name: kind === 'tavern' ? generateTavernName(createDefaultRng()) : generateShopName(createDefaultRng(), trade, firstName(cur.owner.name)) }
-        : cur,
-    );
+    setPlace((cur) => {
+      if (!cur) return cur;
+      const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
+      return build(cur.owner, dmgType);
+    });
 
   const newOwner = () => {
-    const rng = createDefaultRng();
-    const owner = rollOwner(trade);
-    setPlace((cur) =>
-      cur ? { owner, name: kind === 'tavern' ? cur.name : generateShopName(rng, trade, firstName(owner.name)) } : cur,
-    );
+    const owner = rollOwner(ownerRole(place?.dmgType ?? shopTypeById(trade).label));
+    setPlace((cur) => {
+      if (!cur) return cur;
+      return kind === 'tavern' ? { ...cur, owner } : build(owner, cur.dmgType);
+    });
   };
 
   const save = () => {
@@ -295,7 +306,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
     const result = savePlaceWithOwner(
       dm.data,
       campaign.id,
-      { kind, name: place.name, trade: kind === 'shop' ? shopTypeById(trade).label : undefined },
+      { kind, name: place.name, trade: kind === 'shop' ? (place.dmgType ?? shopTypeById(trade).label) : undefined },
       place.owner,
       { place: crypto.randomUUID(), owner: crypto.randomUUID() },
       now,
@@ -306,7 +317,14 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
 
   return (
     <div className={styles.stack}>
-      {kind === 'shop' && (
+      <label className={styles.field} style={{ flex: '0 1 260px' }}>
+        <span className={styles.fieldLabel}>Name source</span>
+        <select className={styles.input} value={source} onChange={(e) => setSource(e.target.value as 'original' | 'dmg')}>
+          <option value="original">Original word lists</option>
+          <option value="dmg">{kind === 'tavern' ? 'DMG Tavern Names table (p.94)' : 'DMG Random Shops table (p.94)'}</option>
+        </select>
+      </label>
+      {kind === 'shop' && !dmg && (
         <label className={styles.field} style={{ flex: '0 1 260px' }}>
           <span className={styles.fieldLabel}>Kind of shop</span>
           <select className={styles.input} value={trade} onChange={(e) => setTrade(e.target.value)}>
@@ -348,7 +366,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
             {place.name}
           </h3>
           <span className={styles.muted}>
-            {kind === 'tavern' ? 'A tavern' : `A ${shopTypeById(trade).label.toLowerCase()}`}, owned by {npcHeadline(place.owner)}.
+            {kind === 'tavern' ? 'A tavern' : `A ${(place.dmgType ?? shopTypeById(trade).label).toLowerCase()}`}, owned by {npcHeadline(place.owner)}.
           </span>
           <NpcCard
             npc={place.owner}

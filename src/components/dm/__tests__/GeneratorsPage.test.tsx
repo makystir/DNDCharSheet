@@ -7,6 +7,8 @@ import { DM_DATA_KEY } from '../../../storage/dm-store';
 import type { DmPage } from '../../../logic/dm-mode';
 import { createCampaign, emptyDmData } from '../../../logic/dm-campaign';
 import type { DmNote } from '../../../types/dm';
+import { RANDOM_SHOPS_RAW, TAVERN_FIRST_PART_RAW, TAVERN_SECOND_PART_RAW } from '../../../data/dmg-tavern-shop';
+import { parseRawTable } from '../../../logic/dmg-generators';
 
 function Routed({ initial }: { initial: DmPage }) {
   const [page, setPage] = useState<DmPage>(initial);
@@ -115,5 +117,33 @@ describe('Generators page', () => {
     expect(screen.getByLabelText('Generated shop')).toHaveTextContent(/blacksmith/i);
     fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
     expect(journal().find((n) => n.kind === 'location')!.body).toContain('blacksmith shop');
+  });
+
+  it('names a tavern from the DMG table when that source is chosen', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    fireEvent.change(screen.getByLabelText('Name source'), { target: { value: 'dmg' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Generate tavern' }));
+    const first = parseRawTable(TAVERN_FIRST_PART_RAW).map((r) => r.text);
+    const second = parseRawTable(TAVERN_SECOND_PART_RAW).map((r) => r.text);
+    const name = screen.getByTestId('place-name').textContent!;
+    expect(first.some((f) => name.startsWith(`${f} `))).toBe(true);
+    expect(second.some((s) => name.endsWith(` ${s}`))).toBe(true);
+  });
+
+  it('rolls a shop type from the DMG table when that source is chosen', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Shop' }));
+    fireEvent.change(screen.getByLabelText('Name source'), { target: { value: 'dmg' } });
+    expect(screen.queryByLabelText('Kind of shop')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Generate shop' }));
+    const types = parseRawTable(RANDOM_SHOPS_RAW).map((r) => r.text);
+    const name = screen.getByTestId('place-name').textContent!;
+    expect(types.some((t) => name.endsWith(` ${t}`))).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    const body = journal().find((n) => n.kind === 'location')!.body;
+    expect(types.some((t) => body.includes(`${t.toLowerCase()} shop`) || body.includes(t))).toBe(true);
   });
 });

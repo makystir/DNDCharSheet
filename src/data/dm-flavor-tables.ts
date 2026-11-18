@@ -1,9 +1,11 @@
 /**
  * Word lists for the Dungeon Master's tavern and shop name generators.
  *
- * These are flavor written for this app. They are not from any rulebook and
- * carry no rules: a name is only a name. The books list no tavern or shop name
- * tables, so there is nothing here to check against them.
+ * These word lists are original flavor written for this app, used for
+ * procedural variety. They are not from any rulebook and carry no rules: a
+ * name is only a name. The Dungeon Master's Guide 2024 does print a Tavern
+ * Names table and a Random Shops table (p.94). Those are transcribed
+ * separately in data/dmg-tavern-shop.ts and offered as an alternative source.
  */
 
 export const TAVERN_ADJECTIVES: readonly string[] = [

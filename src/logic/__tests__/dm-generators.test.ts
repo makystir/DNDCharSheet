@@ -2,14 +2,19 @@ import { describe, it, expect } from 'vitest';
 import { ALIGNMENTS } from '../../types/character';
 import { CLASS_LIST } from '../../data/classes';
 import { SHOP_TYPES } from '../../data/dm-flavor-tables';
+import { RANDOM_SHOPS_RAW, TAVERN_FIRST_PART_RAW, TAVERN_SECOND_PART_RAW } from '../../data/dmg-tavern-shop';
+import { parseRawTable } from '../dmg-generators';
 import { createSeededRng } from '../random';
 import { createCampaign, emptyDmData } from '../dm-campaign';
 import { backlinks, outgoingLinks, resolveLink } from '../dm-journal';
 import {
   firstName,
   generateNpc,
+  dmgShopName,
+  generateDmgTavernName,
   generateShopName,
   generateTavernName,
+  rollDmgShopType,
   npcHeadline,
   npcJournalBody,
   npcSpecies,
@@ -161,6 +166,29 @@ describe('tavern and shop names', () => {
     expect(generateShopName(rng(1), 'nonsense')).toMatch(/^The /);
   });
 
+  it('builds tavern names from the DMG table: one roll per part', () => {
+    const first = parseRawTable(TAVERN_FIRST_PART_RAW).map((r) => r.text);
+    const second = parseRawTable(TAVERN_SECOND_PART_RAW).map((r) => r.text);
+    const names = Array.from({ length: 80 }, (_, i) => generateDmgTavernName(rng(i + 1)));
+    for (const n of names) {
+      expect(first.some((f) => n.startsWith(`${f} `))).toBe(true);
+      expect(second.some((s) => n.endsWith(` ${s}`))).toBe(true);
+    }
+    expect(new Set(names).size).toBeGreaterThan(40);
+    // rng 0 -> d20 roll 1 for both parts
+    expect(generateDmgTavernName(() => 0)).toBe('The Golden Lyre');
+    expect(generateDmgTavernName(() => 0.999)).toBe('The Witch and Dragon');
+  });
+  it('rolls a shop type from the DMG table and names it', () => {
+    const types = parseRawTable(RANDOM_SHOPS_RAW).map((r) => r.text);
+    const rolled = Array.from({ length: 80 }, (_, i) => rollDmgShopType(rng(i + 1)));
+    for (const t of rolled) expect(types).toContain(t);
+    expect(new Set(rolled).size).toBeGreaterThan(8);
+    expect(rollDmgShopType(() => 0)).toBe('Pawnshop');
+    expect(rollDmgShopType(() => 0.999)).toBe('Scribe');
+    expect(dmgShopName('Smithy', 'Mira')).toBe("Mira's Smithy");
+    expect(dmgShopName('Smithy')).toBe('The Smithy');
+  });
   it('takes the first word of a name', () => {
     expect(firstName('Mira Vance')).toBe('Mira');
     expect(firstName('  Vip ')).toBe('Vip');

@@ -20,6 +20,8 @@ import {
   TAVERN_PAIRS,
   type ShopType,
 } from '../data/dm-flavor-tables';
+import { RANDOM_SHOPS_RAW, TAVERN_FIRST_PART_RAW, TAVERN_SECOND_PART_RAW } from '../data/dmg-tavern-shop';
+import { parseRawTable, type TableRow } from './dmg-generators';
 import type { NameGender } from '../data/name-tables';
 import { generateAge, generateAppearance, generateName, type GeneratedAppearance } from './personal-details-generation';
 import { generateDescription, generateFlaw, generateIdeal, generateLongTermGoal, generateShortTermGoal } from './character-description';
@@ -205,6 +207,35 @@ export function generateTavernName(rng: RNG): string {
     TAVERN_NOUNS.filter((n) => n !== first),
   );
   return `The ${first} & ${second}`;
+}
+
+/** Looks up the row of a parsed d20 table that covers a roll. */
+function dmgLookup(rows: readonly TableRow[], roll: number): string {
+  return (rows.find((r) => roll >= r.lo && roll <= r.hi) ?? rows[0]).text;
+}
+
+const DMG_TAVERN_FIRST = parseRawTable(TAVERN_FIRST_PART_RAW);
+const DMG_TAVERN_SECOND = parseRawTable(TAVERN_SECOND_PART_RAW);
+const DMG_SHOPS = parseRawTable(RANDOM_SHOPS_RAW);
+
+/** DMG 2024 p.94, Tavern Names: a separate d20 for each part, e.g. "The Golden Lyre". */
+export function generateDmgTavernName(rng: RNG): string {
+  const first = dmgLookup(DMG_TAVERN_FIRST, Math.floor(rng() * 20) + 1);
+  const second = dmgLookup(DMG_TAVERN_SECOND, Math.floor(rng() * 20) + 1);
+  return `${first} ${second}`;
+}
+
+/** DMG 2024 p.94, Random Shops: the shop type from a d20 (a type, not a name). */
+export function rollDmgShopType(rng: RNG): string {
+  return dmgLookup(DMG_SHOPS, Math.floor(rng() * 20) + 1);
+}
+
+/**
+ * A shop name for a DMG-table shop type. The book gives only the type, so the
+ * name is the owner's name plus that type ("Mira's Smithy"), or "The Smithy".
+ */
+export function dmgShopName(type: string, ownerFirstName?: string): string {
+  return ownerFirstName ? `${ownerFirstName}'s ${type}` : `The ${type}`;
 }
 
 export function shopTypeById(id: string): ShopType {
