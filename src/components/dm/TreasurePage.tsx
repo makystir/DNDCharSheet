@@ -489,7 +489,8 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
             </>
           )}
 
-          {tab === 'items' && (            <>
+          {tab === 'items' && (
+            <>
               <div className={styles.row}>
                 <label className={styles.field} style={{ flex: '0 1 160px' }}>
                   <span className={styles.fieldLabel}>Kind</span>

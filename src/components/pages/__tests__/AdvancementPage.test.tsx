@@ -426,6 +426,43 @@ describe('AdvancementPage - Progression Advisor subclass link', () => {
   });
 });
 
+describe('AdvancementPage - jump bar', () => {
+  const jump = () => within(screen.getByRole('navigation', { name: 'Advancement sections' }));
+
+  it('links Level, Hit Points, Next level, Feats, Multiclass and Log, each to an existing section', () => {
+    renderStateful(fighter4());
+    const expected: Array<[string, string]> = [
+      ['Level', 'adv-section-level'],
+      ['Hit Points', 'adv-section-hp'],
+      ['Next level', 'adv-section-next-level'],
+      ['Feats', 'adv-section-feats'],
+      ['Multiclass', 'adv-section-multiclass'],
+      ['Log', 'adv-section-log'],
+    ];
+    for (const [name, id] of expected) {
+      expect(jump().getByRole('link', { name })).toBeInTheDocument();
+      expect(document.getElementById(id)).not.toBeNull();
+    }
+  });
+
+  it('shows the Choices link only when the character has class choices, and it targets the Class Choices card', () => {
+    renderStateful(fighter4());
+    expect(jump().queryByRole('link', { name: 'Choices' })).toBeNull();
+    expect(document.getElementById('adv-section-class-choices')).toBeNull();
+  });
+
+  it('shows the Choices link for a Sorcerer with Metamagic choices and scrolls to the card', () => {
+    renderStateful({ level: 2, classes: [{ id: 'sorcerer', level: 2 }] });
+    const link = jump().getByRole('link', { name: 'Choices' });
+    const target = document.getElementById('adv-section-class-choices')!;
+    expect(target).not.toBeNull();
+    const scroll = vi.fn();
+    target.scrollIntoView = scroll;
+    fireEvent.click(link);
+    expect(scroll).toHaveBeenCalled();
+  });
+});
+
 describe('AdvancementPage - Progression Advisor action links', () => {
   const advisor = () => screen.getByRole('list', { name: 'Advisor suggestions' });
 

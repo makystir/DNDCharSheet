@@ -99,7 +99,8 @@ function aliasSubTab(value: string | null | undefined): CharSubTab | null {
 
 /**
  * The Character tab. Overview is the one-page session sheet, top to bottom:
- * Setup, Vitals, Rest, Heroic Inspiration, Personal Details + portrait (an edit form, kept\n * below the session cards), then a grid
+ * Setup, Vitals, Rest, Heroic Inspiration, Personal Details + portrait (an edit form, kept
+ * below the session cards), then a grid
  * of cards (Conditions, Reactions, Attacks, Spellcasting for casters, then
  * Abilities, Saves & Skills with its Edit toggle, and Traits & Feats). Class & Features
  * holds class, subclass, skill choices and the feature list. Every
