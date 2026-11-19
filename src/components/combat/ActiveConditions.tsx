@@ -208,7 +208,7 @@ export function ActiveConditions({ character, onChange, pickerOpen, onClosePicke
                 </span>
               )}
               <span className={styles.implied}>
-                Applied to in-app rolls such as Death Saving Throws; not applied to the static skill, save, attack, or Speed totals.
+                Applied to every D20 Test total on the sheet (attacks, spell attacks, skills, saving throws, Initiative), to Death Saving Throws, and to Speed. Each breakdown lists the Exhaustion line.
               </span>
             </div>
           )}

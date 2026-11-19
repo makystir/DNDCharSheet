@@ -175,7 +175,7 @@ describe('Exhaustion', () => {
     expect(exhaustionAfterLongRest(0)).toBe(0);
   });
 
-  it('does NOT feed any derived total (informational only)', () => {
+  it('does not change ability scores or character level', () => {
     const plain = base();
     const tired = setExhaustion(plain, 4);
     expect(tired.abilities).toEqual(plain.abilities);

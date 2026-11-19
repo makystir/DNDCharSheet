@@ -130,7 +130,7 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
             <h2 id="combat-spells-heading" className={styles.groupHeading} tabIndex={-1}>
               {isCaster ? 'Spells and turn options' : 'Turn options'}
             </h2>
-            <SpellcastingQuickCard character={character} onChange={onChange} />
+            <SpellcastingQuickCard character={character} onChange={onChange} onNotify={onNotify} />
             <TurnOptionsCard character={character} />
           </section>
 

@@ -1,12 +1,13 @@
 import { Sparkles } from 'lucide-react';
 import type { Character } from '../../types/character';
-import { getSpell } from '../../data/spells';
+import { getSpell, type SpellId } from '../../data/spells';
 import { formatSigned } from '../../logic/breakdown';
 import {
   anySpellcaster,
   perClassSpellcasting,
   spellSlotAvailableBreakdown,
 } from '../../logic/spellcasting';
+import { setConcentrating } from '../../logic/concentration';
 import { knownSpellsByClass } from '../../logic/known-spells';
 import { pactSlots, setPactExpended, setSlotsExpended, slotLevels } from '../../logic/spell-slot-spend';
 import { Card } from '../shared/Card';
@@ -18,6 +19,8 @@ import styles from './SpellcastingQuickCard.module.css';
 export interface SpellcastingQuickCardProps {
   character: Character;
   onChange: (next: Character) => void;
+  /** Optional app-level Toast sink (Concentration changes). */
+  onNotify?: (message: string) => void;
 }
 
 /** One pip per slot: filled = available. Tapping an available pip spends one; a spent pip recovers one. */
@@ -65,16 +68,24 @@ function SlotPips({
  * name opens its spell tooltip). The full lists are edited on the Spells page.
  * Renders nothing for a character who cannot cast spells.
  */
-export function SpellcastingQuickCard({ character, onChange }: SpellcastingQuickCardProps) {
+export function SpellcastingQuickCard({ character, onChange, onNotify }: SpellcastingQuickCardProps) {
   if (!anySpellcaster(character)) return null;
   const casters = perClassSpellcasting(character);
   const levels = slotLevels(character);
   const pact = pactSlots(character);
   const known = knownSpellsByClass(character);
 
+  // Same Concentration logic as the Spells > Prepared toggle (logic/concentration.ts).
+  const toggleConcentration = (id: string, on: boolean) => {
+    const out = setConcentrating(character, id as SpellId, on);
+    onChange(out.character);
+    onNotify?.(out.message);
+  };
+
   const spellRow = (id: string) => {
     const spell = getSpell(id);
     if (!spell) return null;
+    const concentratingHere = character.concentration?.spellId === id;
     return (
       <li key={id} className={styles.spell}>
         <span className={styles.spellName}>
@@ -84,6 +95,17 @@ export function SpellcastingQuickCard({ character, onChange }: SpellcastingQuick
           {spell.castingTime.split(',')[0]}
           {spell.concentration && <span className={styles.tag}>Conc.</span>}
           {spell.ritual && <span className={styles.tag}>Ritual</span>}
+          {spell.concentration && (
+            <button
+              type="button"
+              className={styles.concBtn}
+              aria-pressed={concentratingHere}
+              aria-label={concentratingHere ? `Stop concentrating on ${spell.name}` : `Start concentrating on ${spell.name}`}
+              onClick={() => toggleConcentration(id, !concentratingHere)}
+            >
+              {concentratingHere ? 'Stop concentrating' : 'Start concentrating'}
+            </button>
+          )}
         </span>
       </li>
     );

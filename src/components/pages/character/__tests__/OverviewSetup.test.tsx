@@ -64,7 +64,7 @@ describe('OverviewSetup', () => {
     ] as const) {
       const row = screen.getByTestId('overview-setup-' + kind);
       expect(row).toHaveTextContent(text);
-      expect(within(row).getByRole('link')).toHaveAttribute('href', '#spells');
+      expect(within(row).getByRole('link')).toHaveAttribute('href', '#spells/prepared');
     }
   });
 

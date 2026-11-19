@@ -56,14 +56,16 @@ import type { IllegalSpellSelection } from '../../logic/spellcasting';
 import { getClass } from '../../data/classes';
 import { SPELLCASTING_DESCRIPTORS } from '../../data/spell-progression';
 import { getSpell, spellsForClass } from '../../data/spells';
-import type { CatalogSpell, SpellId, SpellSchool } from '../../data/spells';
+import type { CatalogSpell, SpellId } from '../../data/spells';
 import { ABILITY_NAMES } from '../../types/character';
-import { endConcentration, startConcentration } from '../../logic/concentration';
+import { setConcentrating as setConcentratingLogic } from '../../logic/concentration';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import { Card } from '../shared/Card';
 import { CollapsibleSection } from '../shared/CollapsibleSection';
 import { EmptyState } from '../shared/EmptyState';
 import { SpellPickList } from '../shared/SpellPickList';
+import { SpellFilterBar } from '../shared/SpellFilterBar';
+import { EMPTY_SPELL_FILTER, matchesSpellFilter, type SpellFilterState } from '../shared/spellFilter';
 import { SpellName, SpellNameList } from '../shared/SpellName';
 import { SpellText } from '../shared/SpellText';
 import { SPELL_SOURCE_NOTE } from '../../logic/spell-source';
@@ -144,6 +146,55 @@ function spellLevelLabel(level: number): string {
   return level === 0 ? 'Cantrips' : `Level ${level}`;
 }
 
+/** Everything browseSpellState needs from the Spells page (single-class only). */
+interface BrowseContext {
+  /** Whether the spell may be chosen as that kind for the primary class (isSpellLegalForEntry). */
+  isLegal: (kind: 'cantrip' | 'spellbook', id: SpellId) => boolean;
+  spellbook: readonly SpellId[];
+  usesSpellbook: boolean;
+  chosenCantrips: readonly SpellId[];
+  requiredCantrips: readonly SpellId[];
+  cantripCap: number;
+  alwaysPrepared: readonly SpellId[];
+  chosenPrepared: readonly SpellId[];
+  preparedCap: number;
+  topSpellLevel: number;
+}
+
+/**
+ * The prepared / known state of a spell for a Browse row and, when the Prepare
+ * toggle is unavailable, the reason why (so the control never just goes dead).
+ * The toggle itself calls the page's toggleCantrip / togglePrepared, so the same
+ * caps and legality checks apply (PHB 2024 class "Spellcasting" tables and the
+ * Wizard "Spellbook" gate).
+ */
+function browseSpellState(ctx: BrowseContext, s: CatalogSpell) {
+  if (s.level === 0) {
+    const known = ctx.chosenCantrips.includes(s.id);
+    const locked = ctx.requiredCantrips.includes(s.id);
+    let reason: string | null = null;
+    if (!known && !ctx.isLegal('cantrip', s.id)) reason = 'Not on your cantrip list.';
+    else if (!known && ctx.chosenCantrips.length >= ctx.cantripCap)
+      reason = `Cantrips known ${ctx.chosenCantrips.length} of ${ctx.cantripCap}. Remove one to learn another.`;
+    return { badge: known ? (locked ? 'Known (required)' : 'Known') : null, on: known, locked, reason, noun: 'cantrip' as const };
+  }
+  const always = ctx.alwaysPrepared.includes(s.id);
+  const prepared = always || ctx.chosenPrepared.includes(s.id);
+  const inBook = ctx.usesSpellbook && ctx.spellbook.includes(s.id);
+  let reason: string | null = null;
+  if (!prepared) {
+    // 'spellbook' legality = on the class list and of a castable level, without the
+    // spellbook gate (that gate gets its own message below).
+    if (s.level > ctx.topSpellLevel)
+      reason = `You have no level ${s.level} spell slots yet (highest is level ${ctx.topSpellLevel}).`;
+    else if (!ctx.isLegal('spellbook', s.id)) reason = 'Not on your class spell list.';
+    else if (ctx.usesSpellbook && !inBook) reason = 'Not in your spellbook. Scribe it on the Prepared tab first.';
+    else if (ctx.chosenPrepared.length >= ctx.preparedCap)
+      reason = `Prepared spells ${ctx.chosenPrepared.length} of ${ctx.preparedCap}. Unprepare one to prepare another.`;
+  }
+  const badge = always ? 'Always prepared' : prepared ? 'Prepared' : inBook ? 'In spellbook' : null;
+  return { badge, on: prepared, locked: always, reason, noun: 'spell' as const };
+}
 /**
  * A breakdown for a "chosen N of cap" selection count, so the displayed count
  * carries a tooltip (calculated-totals steering). The single component is the
@@ -461,19 +512,9 @@ export function SpellsPage({
   // Starting one ends any other (PHB 2024 "Concentration"), announced by Toast;
   // the rule lives in logic/concentration.ts.
   const setConcentrating = (id: SpellId, on: boolean) => {
-    if (!on) {
-      onChange(endConcentration(character));
-      onNotify?.(`Concentration on ${getSpell(id)?.name ?? id} ended.`);
-      return;
-    }
-    const started = startConcentration(character, id, getSpell(id)?.concentration === true);
-    onChange(started.character);
-    const name = getSpell(id)?.name ?? id;
-    onNotify?.(
-      started.endedPrevious
-        ? `Now concentrating on ${name}. Concentration on ${getSpell(started.endedPrevious)?.name ?? started.endedPrevious} ended.`
-        : `Now concentrating on ${name}.`,
-    );
+    const out = setConcentratingLogic(character, id, on);
+    onChange(out.character);
+    onNotify?.(out.message);
   };
 
   const toggleSpellbook = (id: SpellId, checked: boolean) => {
@@ -529,28 +570,16 @@ export function SpellsPage({
   };
 
   // ── Browse filter state ───────────────────────────────────────────────────
-  const [filterLevel, setFilterLevel] = useState<'all' | number>('all');
-  const [filterSchool, setFilterSchool] = useState<'all' | SpellSchool>('all');
-  const [filterRitual, setFilterRitual] = useState(false);
-  const [filterConcentration, setFilterConcentration] = useState(false);
-  // Free-text search over the spell's name and its full description.
-  const [browseQuery, setBrowseQuery] = useState('');
+  // Free-text search (name, effect text, material) plus level/school/ritual/
+  // concentration filters, shared with the Prepared lists via SpellFilterBar.
+  const [browseFilter, setBrowseFilter] = useState<SpellFilterState>(EMPTY_SPELL_FILTER);
+  const browseQuery = browseFilter.query;
   const searchTerm = browseQuery.trim().toLowerCase();
 
-  const browseSpells = useMemo(() => {
-    return classSpells.filter((s) => {
-      if (searchTerm) {
-        const material = (s.components as { material?: string }).material ?? '';
-        const haystack = `${s.name}\n${s.effect}\n${material}`.toLowerCase();
-        if (!haystack.includes(searchTerm)) return false;
-      }
-      if (filterLevel !== 'all' && s.level !== filterLevel) return false;
-      if (filterSchool !== 'all' && s.school !== filterSchool) return false;
-      if (filterRitual && !s.ritual) return false;
-      if (filterConcentration && !s.concentration) return false;
-      return true;
-    });
-  }, [classSpells, searchTerm, filterLevel, filterSchool, filterRitual, filterConcentration]);
+  const browseSpells = useMemo(
+    () => classSpells.filter((s) => matchesSpellFilter(s, browseFilter)),
+    [classSpells, browseFilter],
+  );
 
   const browseByLevel = useMemo(() => {
     const map = new Map<number, CatalogSpell[]>();
@@ -597,6 +626,25 @@ export function SpellsPage({
     () => cantripListSpells.filter((s) => s.level === 0),
     [cantripListSpells],
   );
+
+  // Browse rows: prepared / known state and the Prepare toggle (see browseSpellState).
+  // Single-class only: a multiclass character prepares per class on the Prepared tab.
+  const browseCtx: BrowseContext | null =
+    isMulticlass || primaryId === undefined
+      ? null
+      : {
+          // primaryId is defined exactly when primaryEntry is (primaryId = primaryEntry?.id).
+          isLegal: (kind, id) => isSpellLegalForEntry(character, primaryEntry!, kind, id),
+          spellbook: perClass.spellbook ?? [],
+          usesSpellbook,
+          chosenCantrips,
+          requiredCantrips: required,
+          cantripCap,
+          alwaysPrepared,
+          chosenPrepared,
+          preparedCap,
+          topSpellLevel,
+        };
 
   return (
     <div className={styles.page}>
@@ -965,6 +1013,8 @@ export function SpellsPage({
                   chosen)
                 </p>
                 <SpellPickList
+                  filterable
+                  filterLabel="cantrips"
                   spells={cantripSpells}
                   selectedIds={chosenCantrips}
                   atCap={chosenCantrips.length >= cantripCap}
@@ -1005,6 +1055,8 @@ export function SpellsPage({
               )}
               {preparableSpells.length > 0 || alwaysPrepared.length > 0 ? (
                 <SpellPickList
+                  filterable
+                  filterLabel="prepared"
                   spells={preparedPickSpells}
                   selectedIds={[...chosenPrepared, ...alwaysPrepared]}
                   atCap={chosenPrepared.length >= preparedCap}
@@ -1034,6 +1086,8 @@ export function SpellsPage({
               <CollapsibleSection title="Spellbook" storageKey="dnd-collapse-spellbook">
                 <SpellbookAllowance level={primaryEntry?.level ?? 1} count={(perClass.spellbook ?? []).length} />
                 <SpellPickList
+                  filterable
+                  filterLabel="spellbook"
                   spells={spellbookCandidates}
                   selectedIds={perClass.spellbook ?? []}
                   atCap={false}
@@ -1048,75 +1102,7 @@ export function SpellsPage({
 
       {activeSubTab === 'browse' && (
         <Card>
-          <div className={styles.filterRow}>
-            <label className={`${styles.filterField} ${styles.searchField}`}>
-              <span className={styles.fieldLabel}>Search</span>
-              <input
-                type="search"
-                className={styles.searchInput}
-                value={browseQuery}
-                placeholder="Spell name or any word in its text"
-                aria-label="Search spells"
-                onChange={(e) => setBrowseQuery(e.target.value)}
-              />
-            </label>
-
-            <label className={styles.filterField}>
-              <span className={styles.fieldLabel}>Level</span>
-              <select
-                className={styles.filterSelect}
-                value={filterLevel === 'all' ? 'all' : String(filterLevel)}
-                aria-label="Filter by spell level"
-                onChange={(e) =>
-                  setFilterLevel(e.target.value === 'all' ? 'all' : Number(e.target.value))
-                }
-              >
-                <option value="all">All levels</option>
-                {Array.from({ length: 10 }, (_, i) => i).map((l) => (
-                  <option key={l} value={l}>
-                    {spellLevelLabel(l)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className={styles.filterField}>
-              <span className={styles.fieldLabel}>School</span>
-              <select
-                className={styles.filterSelect}
-                value={filterSchool}
-                aria-label="Filter by school"
-                onChange={(e) => setFilterSchool(e.target.value as 'all' | SpellSchool)}
-              >
-                <option value="all">All schools</option>
-                {(Object.keys(SCHOOL_LABELS) as SpellSchool[]).map((s) => (
-                  <option key={s} value={s}>
-                    {SCHOOL_LABELS[s]}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className={styles.filterCheck}>
-              <input
-                type="checkbox"
-                checked={filterRitual}
-                aria-label="Only rituals"
-                onChange={(e) => setFilterRitual(e.target.checked)}
-              />
-              <span className={styles.checkboxText}>Ritual</span>
-            </label>
-
-            <label className={styles.filterCheck}>
-              <input
-                type="checkbox"
-                checked={filterConcentration}
-                aria-label="Only concentration spells"
-                onChange={(e) => setFilterConcentration(e.target.checked)}
-              />
-              <span className={styles.checkboxText}>Concentration</span>
-            </label>
-          </div>
+          <SpellFilterBar value={browseFilter} onChange={setBrowseFilter} />
 
           {browseByLevel.length === 0 ? (
             <EmptyState
@@ -1143,11 +1129,37 @@ export function SpellsPage({
                   forceExpanded={searchTerm.length > 0}
                 >
                   <ul className={styles.browseList} aria-label={`${spellLevelLabel(lvl)} spells`}>
-                    {spells.map((s) => (
+                    {spells.map((s) => {
+                      const st = browseCtx ? browseSpellState(browseCtx, s) : null;
+                      return (
                       <li key={s.id} className={styles.browseRow} data-testid={`browse-spell-${s.id}`}>
-                        <span className={styles.browseName}>
-                          <SpellName id={s.id} />
+                        <span className={styles.browseHead}>
+                          <span className={styles.browseName}>
+                            <SpellName id={s.id} />
+                          </span>
+                          {st?.badge && (
+                            <span className={styles.stateBadge} data-testid={`browse-badge-${s.id}`}>
+                              {st.badge}
+                            </span>
+                          )}
+                          {st && !st.locked && (
+                            <button
+                              type="button"
+                              className={styles.prepareBtn}
+                              disabled={st.reason !== null}
+                              aria-describedby={st.reason ? `browse-reason-${s.id}` : undefined}
+                              aria-label={`${st.on ? (st.noun === 'cantrip' ? 'Remove cantrip' : 'Unprepare') : st.noun === 'cantrip' ? 'Learn cantrip' : 'Prepare'} ${s.name}`}
+                              onClick={() => (st.noun === 'cantrip' ? toggleCantrip(s.id, !st.on) : togglePrepared(s.id, !st.on))}
+                            >
+                              {st.on ? (st.noun === 'cantrip' ? 'Remove' : 'Unprepare') : st.noun === 'cantrip' ? 'Learn' : 'Prepare'}
+                            </button>
+                          )}
                         </span>
+                        {st?.reason && (
+                          <span id={`browse-reason-${s.id}`} className={styles.browseReason}>
+                            {st.reason}
+                          </span>
+                        )}
                         <span className={styles.browseMeta}>
                           {SCHOOL_LABELS[s.school]} · {s.castingTime} · {s.range}
                           {s.concentration ? ' · Concentration' : ''}
@@ -1158,7 +1170,8 @@ export function SpellsPage({
                         </span>
                         <SpellText text={s.effect} />
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </CollapsibleSection>
               ))}
@@ -1324,19 +1337,9 @@ function PreparedClassSection({
   };
 
   const setConcentrating = (id: SpellId, on: boolean) => {
-    if (!on) {
-      onChange(endConcentration(character));
-      onNotify?.(`Concentration on ${getSpell(id)?.name ?? id} ended.`);
-      return;
-    }
-    const started = startConcentration(character, id, getSpell(id)?.concentration === true);
-    onChange(started.character);
-    const name = getSpell(id)?.name ?? id;
-    onNotify?.(
-      started.endedPrevious
-        ? `Now concentrating on ${name}. Concentration on ${getSpell(started.endedPrevious)?.name ?? started.endedPrevious} ended.`
-        : `Now concentrating on ${name}.`,
-    );
+    const out = setConcentratingLogic(character, id, on);
+    onChange(out.character);
+    onNotify?.(out.message);
   };
 
   // Castability per prepared spell (cross-pool, PHB 2024 L2168): true when some
@@ -1376,6 +1379,8 @@ function PreparedClassSection({
               chosen)
             </p>
             <SpellPickList
+              filterable
+              filterLabel={`${className} cantrips`}
               spells={cantripSpells}
               selectedIds={chosenCantrips}
               atCap={chosenCantrips.length >= cantripCap}
@@ -1417,6 +1422,8 @@ function PreparedClassSection({
           )}
           {preparableSpells.length > 0 || alwaysPrepared.length > 0 ? (
             <SpellPickList
+              filterable
+              filterLabel={`${className} prepared`}
               spells={preparedPickSpells}
               selectedIds={[...chosenPrepared, ...alwaysPrepared]}
               atCap={chosenPrepared.length >= preparedCap}
@@ -1450,6 +1457,8 @@ function PreparedClassSection({
           >
             <SpellbookAllowance level={entry.level} count={(perClass.spellbook ?? []).length} />
             <SpellPickList
+              filterable
+              filterLabel={`${className} spellbook`}
               spells={spellbookCandidates}
               selectedIds={perClass.spellbook ?? []}
               atCap={false}

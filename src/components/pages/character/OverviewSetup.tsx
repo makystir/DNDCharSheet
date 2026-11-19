@@ -30,7 +30,7 @@ const FEATURE_LABEL: Record<FeaturePickKind, string> = {
 function destination(kind: PendingKind): { href: string; text: string } {
   return kind === 'class-skills'
     ? { href: '#character/build', text: 'Choose on Class & Features' }
-    : { href: '#spells', text: 'Choose on Spells' };
+    : { href: '#spells/prepared', text: 'Choose on Spells' };
 }
 
 /**

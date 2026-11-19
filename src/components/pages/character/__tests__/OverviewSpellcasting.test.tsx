@@ -37,7 +37,7 @@ describe('OverviewSpellcasting', () => {
       formatSigned(atk.total),
     );
     expect(container.textContent).not.toMatch(/slot/i);
-    expect(screen.getByRole('link', { name: 'Manage spells' })).toHaveAttribute('href', '#spells');
+    expect(screen.getByRole('link', { name: 'Manage spells' })).toHaveAttribute('href', '#spells/prepared');
     expect(screen.getAllByTestId('overview-spell-row')).toHaveLength(1);
   });
 

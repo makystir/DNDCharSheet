@@ -196,12 +196,12 @@ export function HitPointsCard({ character, onChange, onNotify }: HitPointsCardPr
       {/* Heal and Temp HP. */}
       <section className={styles.subsection} aria-labelledby="heal-heading">
       <h4 id="heal-heading" className={styles.subheading}>
-        Heal
+        Healing and Temp HP
       </h4>
       <div className={styles.controls}>
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel} htmlFor="hp-heal-amount">
-            Heal
+            Restore HP
           </label>
           <input
             id="hp-heal-amount"

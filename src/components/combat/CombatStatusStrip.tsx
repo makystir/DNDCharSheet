@@ -1,4 +1,7 @@
-﻿import { Heart, Shield, Footprints, Brain, Eye } from 'lucide-react';
+import { Heart, Shield, Footprints, Brain, Eye } from 'lucide-react';
+import { CONDITION_COLORS, CONDITION_COLOR_FALLBACK, getCondition } from '../../data/conditions';
+import { exhaustionLevelOf } from '../../logic/conditions';
+import { characterResources } from '../../logic/resources';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
 import type { Character } from '../../types/character';
 import { characterArmorClassBreakdown } from '../../logic/armor-class';
@@ -10,10 +13,14 @@ import {
   effectiveTempHp,
   currentHpBreakdown,
   characterHitPointMaxBreakdown,
+  effectiveConditionIds,
 } from '../../logic/hit-points-state';
 import { currentRound, initiativeResult, isInFight } from '../../logic/combat-round';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './CombatStatusStrip.module.css';
+
+/** Most resource chips shown in the strip before a "+N more" chip. */
+const MAX_STRIP_RESOURCES = 4;
 
 export interface CombatStatusStripProps {
   character: Character;
@@ -37,6 +44,14 @@ export function CombatStatusStrip({ character }: CombatStatusStripProps) {
   const inFight = isInFight(character);
   const initiative = initiativeResult(character);
   const concentrating = character.concentration;
+  // Active conditions (stored plus the read-only ones implied by 0 HP) so a Prone,
+  // Frightened or Restrained badge is visible while attacking.
+  const conditionIds = effectiveConditionIds(character);
+  const exhaustion = exhaustionLevelOf(character);
+  // Limited-use features (Rage, Second Wind, Channel Divinity ...): a compact
+  // glance; spending and recovering stay on the Resources card.
+  const resources = characterResources(character);
+  const shownResources = resources.slice(0, MAX_STRIP_RESOURCES);
   const spellName = concentrating ? (getSpell(concentrating.spellId)?.name ?? concentrating.spellId) : null;
 
   return (
@@ -97,6 +112,30 @@ export function CombatStatusStrip({ character }: CombatStatusStripProps) {
       {spellName && (
         <span className={styles.chip} data-testid="strip-concentration">
           <Brain size={14} aria-hidden="true" /> Concentrating: {spellName}
+        </span>
+      )}
+      {conditionIds.map((id) => {
+        const colors = CONDITION_COLORS[id] ?? CONDITION_COLOR_FALLBACK;
+        const name = getCondition(id)?.name ?? id;
+        return (
+          <span
+            key={id}
+            className={styles.chip}
+            style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.bg }}
+            data-testid={`strip-condition-${id}`}
+          >
+            {id === 'exhaustion' ? `${name} (${exhaustion})` : name}
+          </span>
+        );
+      })}
+      {shownResources.map((r) => (
+        <span key={r.id} className={styles.chip} data-testid={`strip-resource-${r.id}`}>
+          {r.name} {r.remaining}/{r.max}
+        </span>
+      ))}
+      {resources.length > shownResources.length && (
+        <span className={styles.chip} data-testid="strip-resource-more">
+          +{resources.length - shownResources.length} more
         </span>
       )}
     </div>

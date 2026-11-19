@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import type { CatalogSpell, SpellId } from '../../data/spells';
 import { SCHOOL_LABELS } from './spellSchoolLabels';
@@ -5,6 +6,13 @@ import { ContentTooltip } from './ContentTooltip';
 import { SpellName } from './SpellName';
 import { resolveSpellTooltip } from '../../logic/tooltip-content';
 import { EmptyState } from './EmptyState';
+import { SpellFilterBar } from './SpellFilterBar';
+import {
+  EMPTY_SPELL_FILTER,
+  matchesSpellFilter,
+  spellFilterActive,
+  type SpellFilterState,
+} from './spellFilter';
 import styles from './SpellPickList.module.css';
 
 export interface SpellPickListProps {
@@ -34,6 +42,10 @@ export interface SpellPickListProps {
    * tooltip carrying the catalog description.
    */
   showDetails?: boolean;
+  /** Show a search + level/school/ritual/concentration filter row above the list (Spells > Prepared). */
+  filterable?: boolean;
+  /** Appended to the filter controls' aria-labels when several lists share a page. */
+  filterLabel?: string;
 }
 
 /** A checkbox list of spells, disabling unchecked rows once the cap is reached. */
@@ -49,7 +61,10 @@ export function SpellPickList({
   concentratingId,
   onToggleConcentration,
   showDetails,
+  filterable,
+  filterLabel,
 }: SpellPickListProps) {
+  const [filter, setFilter] = useState<SpellFilterState>(EMPTY_SPELL_FILTER);
   if (spells.length === 0) {
     return (
       <EmptyState
@@ -60,9 +75,10 @@ export function SpellPickList({
       />
     );
   }
-  return (
+  const shown = filterable ? spells.filter((s) => matchesSpellFilter(s, filter)) : spells;
+  const list = (
     <ul className={styles.pickList} aria-label="Spell choices">
-      {spells.map((s) => {
+      {shown.map((s) => {
         const checked = selectedIds.includes(s.id);
         const locked = lockedIds.includes(s.id);
         return (
@@ -134,5 +150,18 @@ export function SpellPickList({
         );
       })}
     </ul>
+  );
+  if (!filterable) return list;
+  return (
+    <>
+      <SpellFilterBar value={filter} onChange={setFilter} labelSuffix={filterLabel} />
+      {shown.length === 0 && spellFilterActive(filter) ? (
+        <p className={styles.filterEmpty} role="status">
+          No spells match the search or filters. Clear them to see the whole list.
+        </p>
+      ) : (
+        list
+      )}
+    </>
   );
 }

@@ -34,7 +34,7 @@
  * condition" plus "Incapacitated or Dead".
  */
 import type { Breakdown, BreakdownComponent } from './breakdown';
-import type { SpellId } from '../data/spells';
+import { getSpell, type SpellId } from '../data/spells';
 import type { Character } from '../types/character';
 import { effectiveConditionIds, lifeStatus } from './hit-points-state';
 import { exhaustionLevelOf, impliedConditions } from './conditions';
@@ -209,4 +209,23 @@ export function startConcentration(
   return previous !== undefined && previous !== spellId
     ? { character: expireOnConcentrationEnd(next), endedPrevious: previous }
     : { character: next };
+}
+
+/**
+ * Start or stop Concentration on a spell from the UI (the Spells > Prepared
+ * toggle and Combat's spell list share this). Starting a concentration spell ends
+ * any other (PHB 2024 "Concentration"); the message is the Toast text.
+ */
+export function setConcentrating(
+  character: Character,
+  spellId: SpellId,
+  on: boolean,
+): { character: Character; message: string } {
+  const name = getSpell(spellId)?.name ?? spellId;
+  if (!on) return { character: endConcentration(character), message: `Concentration on ${name} ended.` };
+  const started = startConcentration(character, spellId, getSpell(spellId)?.concentration === true);
+  const message = started.endedPrevious
+    ? `Now concentrating on ${name}. Concentration on ${getSpell(started.endedPrevious)?.name ?? started.endedPrevious} ended.`
+    : `Now concentrating on ${name}.`;
+  return { character: started.character, message };
 }

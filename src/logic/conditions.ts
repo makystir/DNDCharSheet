@@ -57,7 +57,7 @@ export function exhaustionAfterLongRest(level: number): number {
   return clampExhaustionLevel(clampExhaustionLevel(level) - EXHAUSTION.longRestReduction);
 }
 
-/** Informational Exhaustion penalties for a level (not wired into totals). */
+/** Exhaustion penalties for a level (PHB 2024 "Exhaustion [Condition]"). */
 export interface ExhaustionEffects {
   level: number;
   /** Change to D20 Test rolls: total is -2 x level (<= 0). */
@@ -70,8 +70,8 @@ export interface ExhaustionEffects {
 
 /**
  * PHB 2024 "Exhaustion" (L21024-21026): D20 Tests are reduced by 2 x level;
- * Speed is reduced by 5 ft x level. Pure so it CAN be wired into totals later;
- * today it is displayed informationally only.
+ * Speed is reduced by 5 ft x level. Applied to the D20 Test totals (attacks, spell
+ * attacks, skills, saves, Initiative; see withExhaustion), Death Saving Throws and Speed.
  */
 export function exhaustionEffects(rawLevel: number): ExhaustionEffects {
   const level = clampExhaustionLevel(rawLevel);

@@ -1,0 +1,65 @@
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.filterSelect {
+  min-width: 140px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.filterSelect:focus-visible,
+.searchInput:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.filterCheck {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+/* Search spans the row so the box is wide enough to type in. */
+.searchField {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.95rem;
+}

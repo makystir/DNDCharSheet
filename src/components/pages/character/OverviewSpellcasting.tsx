@@ -76,7 +76,7 @@ export function OverviewSpellcasting({ character }: OverviewSpellcastingProps) {
             </li>
           ))}
         </ul>
-        <OverviewFooter links={[{ href: '#spells', text: 'Manage spells' }]} />
+        <OverviewFooter links={[{ href: '#spells/prepared', text: 'Manage spells' }]} />
       </Card>
     </div>
   );

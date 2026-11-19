@@ -231,3 +231,53 @@
     min-height: 44px;
   }
 }
+
+/* Browse rows: name, prepared/known badge and the Prepare toggle on one line. */
+.browseHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.stateBadge {
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+}
+
+.prepareBtn {
+  margin-left: auto;
+  min-height: 36px;
+  padding: 4px 12px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.prepareBtn:disabled {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.prepareBtn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
+}
+
+.browseReason {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+@media (hover: none), (max-width: 767px) {
+  .prepareBtn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

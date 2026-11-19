@@ -314,7 +314,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 data-testid={`pending-spell-${item.kind}${item.spellLevel ? `-${item.spellLevel}` : ''}`}
               >
                 {spellPickLabel(item)}: {item.have} of {item.need} chosen.{' '}
-                <a className={styles.inlineLink} href="#spells">
+                <a className={styles.inlineLink} href="#spells/prepared">
                   Choose on the Spells page
                 </a>
               </li>
@@ -324,7 +324,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
                 {illegalSpells.length} selected {illegalSpells.length === 1 ? 'spell is' : 'spells are'} not on your
                 class&apos;s spell list:{' '}
                 <SpellNameList ids={[...new Set(illegalSpells.map((s) => s.id))]} />.{' '}
-                <a className={styles.inlineLink} href="#spells">
+                <a className={styles.inlineLink} href="#spells/prepared">
                   Review on the Spells page
                 </a>
               </li>
