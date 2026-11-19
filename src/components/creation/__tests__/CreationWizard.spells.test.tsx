@@ -224,6 +224,22 @@ describe('CreationWizard Review step', () => {
     expect(screen.getByRole('group', { name: /cantrips: choose/ })).toBeInTheDocument();
   });
 
+  it('maps the Expertise Fix button to Class Features and the languages Fix button to Species & Languages', () => {
+    toReview('rogue', 0, false);
+    const backToReview = () => {
+      for (let i = 0; i < 8; i++) {
+        if (screen.queryByRole('heading', { name: /Review/ })) break;
+        fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      }
+      expect(screen.getByRole('heading', { name: /Review/ })).toBeInTheDocument();
+    };
+    fireEvent.click(within(screen.getByTestId('review-open')).getByRole('button', { name: 'Fix Expertise skills' }));
+    expect(screen.getByRole('heading', { name: /Class Features/ })).toBeInTheDocument();
+    backToReview();
+    fireEvent.click(within(screen.getByTestId('review-open')).getByRole('button', { name: 'Fix feature languages' }));
+    expect(screen.getByRole('heading', { name: /Species & Languages/ })).toBeInTheDocument();
+  });
+
   it('shows the chosen spells and "Everything is set." when nothing is open, and Finish works', () => {
     const onComplete = toReview('wizard', 2, true);
     expect(screen.getByRole('list', { name: 'Spells chosen' })).toBeInTheDocument();

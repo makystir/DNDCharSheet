@@ -1103,6 +1103,11 @@ export function SpellsPage({
       {activeSubTab === 'browse' && (
         <Card>
           <SpellFilterBar value={browseFilter} onChange={setBrowseFilter} />
+          {isMulticlass && (
+            <p className={styles.sourceNote} data-testid="browse-multiclass-hint">
+              Prepare spells for each class on the Prepared tab.
+            </p>
+          )}
 
           {browseByLevel.length === 0 ? (
             <EmptyState

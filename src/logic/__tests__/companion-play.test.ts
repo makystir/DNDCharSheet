@@ -113,3 +113,26 @@ describe('companionSuggestions', () => {
     expect(companionSuggestions(createCharacter('Nobody'))).toEqual([]);
   });
 });
+
+describe('combatAllies listKey', () => {
+  it('names the list that holds each record kind, including the sidekick fallback', () => {
+    const c: Character = {
+      ...createCharacter('Boss'),
+      houseRules: { sidekicks: true },
+      companions: [{ id: 'c1', creatureId: 'cat', origin: 'pet' }],
+      hirelings: [{ id: 'h1', name: 'Smith', kind: 'skilled', units: 1, stats: { hpMax: 11 } }],
+      npcPartyMembers: [{ id: 'n1', name: 'Scout', stats: { hpMax: 9 } }],
+      sidekicks: [{ id: 's1', creatureId: 'cat', classId: 'warrior', level: 1, baseHpMax: 8, levelUps: [] }],
+    };
+    const byId = Object.fromEntries(combatAllies(c).map((a) => [a.id, a.listKey]));
+    expect(byId).toEqual({ c1: 'companions', h1: 'hirelings', n1: 'npcPartyMembers', s1: 'sidekicks' });
+  });
+
+  it('leaves sidekicks out while their house rule is off', () => {
+    const c: Character = {
+      ...createCharacter('Boss'),
+      sidekicks: [{ id: 's1', creatureId: 'cat', classId: 'warrior', level: 1, baseHpMax: 8, levelUps: [] }],
+    };
+    expect(combatAllies(c)).toEqual([]);
+  });
+});

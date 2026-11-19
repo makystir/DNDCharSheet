@@ -54,6 +54,12 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
   // A creature just added is opened and scrolled to; otherwise a deep link's target (if any) applies.
   const linkedFocus = useContext(RecordFocusContext);
   const [addedId, setAddedId] = useState<string | null>(null);
+  // A deep link that arrives later supersedes the added creature, so drop the stale addedId.
+  const [seenLinked, setSeenLinked] = useState(linkedFocus);
+  if (seenLinked !== linkedFocus) {
+    setSeenLinked(linkedFocus);
+    setAddedId(null);
+  }
   const { list, atMax, patch, add, deleting, requestDelete, cancelDelete, confirmDelete } = useRecordList(
     character,
     onChange,

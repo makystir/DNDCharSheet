@@ -271,6 +271,8 @@ export function AdvancementPage({ character, onChange, now = Date.now, onNotify 
     const prev = prevPendingRef.current;
     prevPendingRef.current = pendingCount;
     if (!leveledUpRef.current) return;
+    // Consumed on the level change even when the pending count did not move, so a stale
+    // flag cannot fire a toast on a later, unrelated rise.
     leveledUpRef.current = false;
     if (prev === null || pendingCount <= prev) return;
     onNotify?.(`Level ${level}. ${pendingCount} choice${pendingCount === 1 ? '' : 's'} pending.`);
@@ -279,8 +281,8 @@ export function AdvancementPage({ character, onChange, now = Date.now, onNotify 
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView?.({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     el.focus?.({ preventScroll: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fires only when the pending count changes
-  }, [pendingCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fires only when the pending count or level changes
+  }, [pendingCount, level]);
   const showClassChoices = classChoices.length > 0 || languagePicks.owed > 0 || languagePicks.chosen > 0;
   const pendingCard = (
     <section id="adv-section-pending" tabIndex={-1} aria-labelledby="adv-pending-title">

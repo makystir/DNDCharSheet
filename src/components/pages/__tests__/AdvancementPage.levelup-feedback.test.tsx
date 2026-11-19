@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
 import { AdvancementPage } from '../AdvancementPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
@@ -37,6 +37,30 @@ describe('AdvancementPage - level-up feedback', () => {
     Element.prototype.scrollIntoView = scroll;
     const onNotify = renderWithNotify({ level: 1, classes: [{ id: 'fighter', level: 1 }] });
     fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    expect(onNotify).not.toHaveBeenCalled();
+  });
+
+  it('does not let a level-up that left the count unchanged toast on a later unrelated rise', () => {
+    Element.prototype.scrollIntoView = vi.fn();
+    const onNotify = vi.fn();
+    let setExternal: (c: Character) => void = () => {};
+    function Harness() {
+      const [character, setCharacter] = useState<Character>({
+        ...createCharacter('Tester'),
+        level: 1,
+        classes: [{ id: 'fighter', level: 1 }],
+      });
+      setExternal = setCharacter;
+      return <AdvancementPage character={character} now={() => 1000} onChange={setCharacter} onNotify={onNotify} />;
+    }
+    render(<Harness />);
+    // Level 1 -> 2 leaves the pending count unchanged: no toast, and the flag must not linger.
+    fireEvent.click(screen.getByRole('button', { name: 'Level up (fixed HP)' }));
+    expect(onNotify).not.toHaveBeenCalled();
+    // An unrelated change (not the Level up button) later raises the pending count.
+    act(() => {
+      setExternal({ ...createCharacter('Tester'), level: 4, classes: [{ id: 'fighter', level: 4, subclassId: 'champion' }] });
+    });
     expect(onNotify).not.toHaveBeenCalled();
   });
 });

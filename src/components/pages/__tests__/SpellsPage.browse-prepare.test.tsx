@@ -89,6 +89,27 @@ describe('Spells > Browse: prepared state and Prepare toggle (UX audit Summary-4
   });
 });
 
+describe('Spells > Browse: multiclass pointer', () => {
+  it('points multiclass characters to the Prepared tab and omits it for single-class', () => {
+    renderSpells(
+      {
+        level: 6,
+        classes: [
+          { id: 'wizard', level: 3 },
+          { id: 'cleric', level: 3 },
+        ],
+      },
+      'browse',
+    );
+    expect(screen.getByTestId('browse-multiclass-hint')).toHaveTextContent(/Prepared tab/);
+  });
+
+  it('shows no hint for a single-class caster', () => {
+    renderSpells(wizard5, 'browse');
+    expect(screen.queryByTestId('browse-multiclass-hint')).toBeNull();
+  });
+});
+
 describe('Spells > Prepared: search and filters (UX audit E4.2)', () => {
   const book = {
     ...wizard5,

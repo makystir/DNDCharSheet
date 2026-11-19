@@ -6,6 +6,8 @@ import { CompanionsPage } from '../../pages/CompanionsPage';
 import type { Character } from '../../../types/character';
 import { plainCharacter, rangerCharacter, track, undoStub } from './helpers';
 import { Stateful } from './Stateful';
+import { RecordFocusContext } from '../RecordFocus';
+import { useState } from 'react';
 
 beforeEach(() => localStorage.clear());
 afterEach(() => {
@@ -144,5 +146,48 @@ describe('Companions page deep link', () => {
     const card = screen.getByTestId('companion-p1');
     expect(card).toHaveAttribute('data-focused', 'true');
     expect(within(card).getAllByRole('button')[0]).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
+describe('Adding a creature then following a deep link on the same tab', () => {
+  it('lets a later deep link win over the just-added creature', () => {
+    const initial = plainCharacter({ companions: [{ id: 'p1', creatureId: 'cat', origin: 'pet', nickname: 'Old' }] });
+    const latest = { current: initial };
+    function Harness() {
+      const [focus, setFocus] = useState<string | null>(null);
+      return (
+        <RecordFocusContext.Provider value={focus}>
+          <button type="button" onClick={() => setFocus('p1')}>
+            follow link
+          </button>
+          <Stateful initial={initial} onState={track(latest)}>
+            {(character, onChange) => <CreaturesTab character={character} onChange={onChange} undo={undoStub()} />}
+          </Stateful>
+        </RecordFocusContext.Provider>
+      );
+    }
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Creature' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Add creature' })).getByRole('button', { name: 'Add creature' }));
+    const added = latest.current.companions!.find((c) => c.id !== 'p1')!;
+    expect(screen.getByTestId(`companion-${added.id}`)).toHaveAttribute('data-focused', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'follow link' }));
+    expect(screen.getByTestId('companion-p1')).toHaveAttribute('data-focused', 'true');
+    expect(screen.getByTestId(`companion-${added.id}`)).not.toHaveAttribute('data-focused', 'true');
+  });
+});
+
+describe('Allies card without an HP maximum', () => {
+  it('shows no HP readout or stepper for an ally whose maximum is not set', () => {
+    const c: Character = {
+      ...plainCharacter(),
+      hirelings: [{ id: 'h1', name: 'Gerta', kind: 'skilled', units: 1 } as never],
+    };
+    render(<CombatPage character={c} onChange={vi.fn()} />);
+    const row = screen.getByTestId('ally-h1');
+    expect(row).not.toHaveTextContent(/HP \d/);
+    expect(within(row).queryByRole('group', { name: 'Gerta hit point controls' })).toBeNull();
+    expect(within(row).queryByRole('button', { name: 'Lose 1 HP: Gerta' })).toBeNull();
   });
 });
