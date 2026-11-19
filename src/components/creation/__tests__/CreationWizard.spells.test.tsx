@@ -209,6 +209,21 @@ describe('CreationWizard Review step', () => {
     expect(open).toHaveTextContent('You can finish these any time — the Overview will remind you.');
   });
 
+  it('gives each "Still open" row a Fix button that returns to the step owning it (editStep)', () => {
+    toReview('wizard', 1, false);
+    const open = screen.getByTestId('review-open');
+    // class-skills -> Skills step
+    fireEvent.click(within(open).getByRole('button', { name: 'Fix class skills' }));
+    expect(screen.getByRole('group', { name: /Choose \d+ class skill/ })).toBeInTheDocument();
+    // Back to Review, then cantrips / spellbook / prepared -> Spells step
+    for (let i = 0; i < 5; i++) {
+      if (screen.queryByRole('heading', { name: /Review/ })) break;
+      next();
+    }
+    fireEvent.click(within(screen.getByTestId('review-open')).getByRole('button', { name: 'Fix cantrips' }));
+    expect(screen.getByRole('group', { name: /cantrips: choose/ })).toBeInTheDocument();
+  });
+
   it('shows the chosen spells and "Everything is set." when nothing is open, and Finish works', () => {
     const onComplete = toReview('wizard', 2, true);
     expect(screen.getByRole('list', { name: 'Spells chosen' })).toBeInTheDocument();

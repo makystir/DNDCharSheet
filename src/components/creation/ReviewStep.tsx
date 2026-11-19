@@ -62,6 +62,16 @@ export interface ReviewStepProps {
   onEdit?: (target: ReviewEditTarget) => void;
 }
 
+/** The wizard step that owns each "Still open" kind (the Fix button target). */
+const PENDING_STEP: Record<PendingItem['kind'] | FeaturePickItem['kind'], ReviewEditTarget> = {
+  'class-skills': 'skills',
+  cantrips: 'spells',
+  spellbook: 'spells',
+  prepared: 'spells',
+  expertise: 'features',
+  languages: 'species',
+};
+
 const PENDING_LABEL: Record<PendingItem['kind'] | FeaturePickItem['kind'], string> = {
   'class-skills': 'class skills',
   cantrips: 'cantrips',
@@ -433,6 +443,19 @@ export function ReviewStep({ character, onEdit }: ReviewStepProps) {
               <li key={`${item.kind}-${item.classId ?? ''}`}>
                 {item.className ? `${item.className}: ` : ''}
                 {PENDING_LABEL[item.kind]}: {item.have} of {item.need}
+                {onEdit && (
+                  <>
+                    {' '}
+                    <button
+                      type="button"
+                      className={styles.bgChoose}
+                      aria-label={`Fix ${PENDING_LABEL[item.kind]}`}
+                      onClick={() => onEdit(PENDING_STEP[item.kind])}
+                    >
+                      Fix
+                    </button>
+                  </>
+                )}
               </li>
             ))}
           </ul>

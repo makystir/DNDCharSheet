@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TrendingUp, Heart, TriangleAlert, ListChecks, ScrollText, Trash2, Layers } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { Card } from '../shared/Card';
@@ -69,6 +69,8 @@ export interface AdvancementPageProps {
    * Date.now in production.
    */
   now?: () => number;
+  /** Toast channel (App's notify). Confirms a level-up that leaves choices pending. */
+  onNotify?: (message: string) => void;
 }
 
 /**
@@ -84,7 +86,10 @@ export interface AdvancementPageProps {
  * (Proficiency Bonus, the HP choice, the leveling mode) is a ContentTooltip
  * (content-tooltips steering). PHB 2024 "Gaining a Level".
  */
-export function AdvancementPage({ character, onChange, now = Date.now }: AdvancementPageProps) {
+export function AdvancementPage({ character, onChange, now = Date.now, onNotify }: AdvancementPageProps) {
+  // Set by the level-up handlers; consumed by the effect below once the new level renders.
+  const leveledUpRef = useRef(false);
+  const prevPendingRef = useRef<number | null>(null);
   const [showLog, setShowLog] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   // The HP-roll dialog is opened by two distinct buttons with different intent;
@@ -190,7 +195,10 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // ── Level up with a fixed HP choice (gates on canLevelUp).
   const handleFixedLevelUp = () => {
     const next = applyHeldLevelUp({ mode: 'fixed' });
-    if (next) onChange(next);
+    if (next) {
+      leveledUpRef.current = true;
+      onChange(next);
+    }
   };
 
   // ── Level up with a rolled HP choice: the dialog captures the raw Hit Die face,
@@ -198,7 +206,10 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const handleRolledLevelUp = (choice: HpChoice) => {
     setHpRoll(null);
     const next = applyHeldLevelUp(choice);
-    if (next) onChange(next);
+    if (next) {
+      leveledUpRef.current = true;
+      onChange(next);
+    }
   };
 
   // ── Re-record the HP choice for the CURRENT level (a correction, not a level-up).
@@ -214,6 +225,7 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   const handleMulticlassLevel = (classId: ClassId, choice: HpChoice) => {
     const next = applyMulticlassLevel(character, classId, choice, now());
     if (next) {
+      leveledUpRef.current = true;
       onChange(next);
       setSelectedNewClass('');
     }
@@ -251,9 +263,27 @@ export function AdvancementPage({ character, onChange, now = Date.now }: Advance
   // The pending-choices card. When choices are owed it is shown first and styled as a
   // call to action; with none owed it stays a quiet note at the bottom of the page.
   const owed = pendingCount > 0;
+
+  // After a level-up that raised the pending count, the card sits above the Level
+  // card and is off-screen: toast it and scroll/focus to it. Only a level-up the
+  // player just did triggers this (not other edits or the initial load).
+  useEffect(() => {
+    const prev = prevPendingRef.current;
+    prevPendingRef.current = pendingCount;
+    if (!leveledUpRef.current) return;
+    leveledUpRef.current = false;
+    if (prev === null || pendingCount <= prev) return;
+    onNotify?.(`Level ${level}. ${pendingCount} choice${pendingCount === 1 ? '' : 's'} pending.`);
+    const el = document.getElementById('adv-section-pending');
+    if (!el) return;
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView?.({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    el.focus?.({ preventScroll: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fires only when the pending count changes
+  }, [pendingCount]);
   const showClassChoices = classChoices.length > 0 || languagePicks.owed > 0 || languagePicks.chosen > 0;
   const pendingCard = (
-    <section id="adv-section-pending" aria-labelledby="adv-pending-title">
+    <section id="adv-section-pending" tabIndex={-1} aria-labelledby="adv-pending-title">
       <Card className={owed ? styles.pendingAlert : undefined}>
         <SectionHeader
           icon={owed ? TriangleAlert : ListChecks}

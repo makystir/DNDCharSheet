@@ -662,7 +662,7 @@ function App() {
                 )}
                 {page === 'advancement' && (
                   <PageLoader skeleton={<AdvancementSkeleton />}>
-                    <AdvancementPage character={character} onChange={undoableChange} />
+                    <AdvancementPage character={character} onChange={undoableChange} onNotify={notify} />
                   </PageLoader>
                 )}
                 {page === 'settings' && (
