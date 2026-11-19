@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { Character, CompanionOrigin, CompanionRecord, CompanionSpiritType } from '../../types/character';
-import { creatureOptionsForOrigin, ORIGIN_LABELS } from '../../logic/companion-model';
+import { creatureOptionsForOrigin } from '../../logic/companion-model';
 import { primalCompanionOwner } from '../../logic/companion-view';
 import {
   OTHERWORLDLY_STEED_MAX_SPELL_LEVEL,
@@ -14,7 +14,7 @@ import styles from './CompanionCreationFlow.module.css';
 
 export interface CompanionCreationFlowProps {
   character: Character;
-  /** Source to start on (a suggestion's Add button). Defaults to Primal Companion. */
+  /** Source to start on (a suggestion's Add button). Defaults to a pet, mount or pack animal. */
   initialOrigin?: CompanionOrigin;
   onConfirm: (record: CompanionRecord) => void;
   onCancel: () => void;
@@ -29,6 +29,20 @@ const ORIGINS: CompanionOrigin[] = [
   'animate-dead',
   'pet',
 ];
+
+/**
+ * Plain-language names for the Source dropdown. Only the labels change; the
+ * stored origin values and the card badges (ORIGIN_LABELS) are unchanged.
+ */
+const SOURCE_OPTION_LABELS: Record<CompanionOrigin, string> = {
+  'primal-companion': 'Primal Companion (Beast Master Ranger)',
+  'find-familiar': 'Find Familiar (spell)',
+  'pact-of-the-chain': 'Pact of the Chain (Warlock familiar)',
+  'wild-companion': 'Wild Companion (Druid familiar)',
+  'find-steed': 'Find Steed (spell)',
+  'animate-dead': 'Animate Dead (undead servant)',
+  pet: 'Pet / other companion (mount, pack animal)',
+};
 
 const SPELL_LEVELS = Array.from(
   { length: OTHERWORLDLY_STEED_MAX_SPELL_LEVEL - OTHERWORLDLY_STEED_MIN_SPELL_LEVEL + 1 },
@@ -83,7 +97,7 @@ function CreatureOptions({ origin }: { origin: CompanionOrigin }) {
  * a couple of origin options). The Primal Companion warning is shown here and on
  * the card; it never blocks adding.
  */
-export function CompanionCreationFlow({ character, initialOrigin = 'primal-companion', onConfirm, onCancel }: CompanionCreationFlowProps) {
+export function CompanionCreationFlow({ character, initialOrigin = 'pet', onConfirm, onCancel }: CompanionCreationFlowProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, true);
   useBodyScrollLock(true);
@@ -131,7 +145,7 @@ export function CompanionCreationFlow({ character, initialOrigin = 'primal-compa
           <select className={styles.control} value={origin} onChange={(e) => changeOrigin(e.target.value as CompanionOrigin)}>
             {ORIGINS.map((o) => (
               <option key={o} value={o}>
-                {ORIGIN_LABELS[o]}
+                {SOURCE_OPTION_LABELS[o]}
               </option>
             ))}
           </select>

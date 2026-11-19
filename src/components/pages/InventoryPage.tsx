@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Coins, Scale, Shield as ShieldIcon, Sword, Package } from 'lucide-react';
 import type { Character, InventoryItem } from '../../types/character';
 import type { CurrencyAmount, CurrencyDelta } from '../../logic/currency';
+import { characterArmorClassBreakdown } from '../../logic/armor-class';
 import { applyCurrencyDelta, ZERO_CURRENCY } from '../../logic/currency';
 import {
   carriedWeightBreakdown,
@@ -93,6 +94,8 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
   const [showWeaponPicker, setShowWeaponPicker] = useState(false);
   const [showArmorPicker, setShowArmorPicker] = useState(false);
   const [showGearPicker, setShowGearPicker] = useState(false);
+  // What the open picker last added, so it can stay open and confirm each pick (name and how many this visit).
+  const [pickerAdded, setPickerAdded] = useState<{ id: string; name: string; count: number } | null>(null);
   // The id of the custom (catalog-less) item currently open for editing, so its
   // name/weight/notes can be set (finding #2). Null = no item open.
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -105,6 +108,8 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
   const gear = inventory.filter((i) => i.kind === 'equipment' && i.maxDoses === undefined);
 
   const coins = characterCoins(character);
+  // The same Armor Class assembly the Combat page and Overview show (one number everywhere).
+  const acBd = characterArmorClassBreakdown(character);
 
   // ── Derived totals (calculated-totals) ──
   const capacityBd = carryingCapacityBreakdown(character);
@@ -192,12 +197,35 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
     onChange({ ...character, coins: applyCurrencyDelta(character.coins ?? ZERO_CURRENCY, delta) });
 
   // ── Catalog add handlers ──
-  const addWeaponFromCatalog = (w: WeaponData) =>
+  // The pickers stay open after a pick and show "Added: X" (with "x2" on repeats).
+  const noteAdded = (id: string, name: string) =>
+    setPickerAdded((prev) => ({ id, name, count: prev?.id === id ? prev.count + 1 : 1 }));
+  const closePicker = () => {
+    setShowWeaponPicker(false);
+    setShowArmorPicker(false);
+    setShowGearPicker(false);
+    setPickerAdded(null);
+  };
+  const pickerStatus = pickerAdded
+    ? `Added: ${pickerAdded.name}${pickerAdded.count > 1 ? ` x${pickerAdded.count}` : ''}`
+    : undefined;
+
+  // Weapons and armor stay separate rows (each is equipped on its own).
+  const addWeaponFromCatalog = (w: WeaponData) => {
     addItem({ id: newCharacterId(), kind: 'weapon', catalogId: w.id, quantity: 1 });
-  const addArmorFromCatalog = (a: (typeof ARMOR_LIST)[number]) =>
+    noteAdded(w.id, w.name);
+  };
+  const addArmorFromCatalog = (a: (typeof ARMOR_LIST)[number]) => {
     addItem({ id: newCharacterId(), kind: 'armor', catalogId: a.id, quantity: 1 });
-  const addGearFromCatalog = (e: EquipmentData) =>
-    addItem({ id: newCharacterId(), kind: 'equipment', catalogId: e.id, quantity: 1 });
+    noteAdded(a.id, a.name);
+  };
+  // Re-adding gear already carried (same catalog entry) raises its quantity instead of adding a duplicate row.
+  const addGearFromCatalog = (e: EquipmentData) => {
+    const existing = inventory.find((i) => i.kind === 'equipment' && i.catalogId === e.id && i.maxDoses === undefined);
+    if (existing) setQuantity(existing.id, existing.quantity + 1);
+    else addItem({ id: newCharacterId(), kind: 'equipment', catalogId: e.id, quantity: 1 });
+    noteAdded(e.id, e.name);
+  };
 
   // ── Custom item field editing (finding #2) ──
   // Update one supported field on a custom item instance.
@@ -409,6 +437,12 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           title="Armor & Shields"
           action={
             <div className={styles.actionRow}>
+              <span className={styles.acLine}>
+                <span className={styles.fieldLabel}>Armor Class</span>
+                <CalculatedValue label="Armor Class" breakdown={acBd}>
+                  {acBd.total}
+                </CalculatedValue>
+              </span>
               <AddButton label="Add Armor" onClick={() => setShowArmorPicker(true)} />
               <AddButton label="Add Custom Armor" onClick={() => addCustom('armor')} />
             </div>
@@ -483,6 +517,12 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
                   >
                     ✕
                   </button>
+                  {isCustom(item) && isEquipped && (
+                    <p className={styles.armorNote} data-testid="custom-armor-note">
+                      Custom armor has no catalog stats, so it does not set your AC. To use its AC, enter an Armor Class override on
+                      Overview, Vitals, Adjust.
+                    </p>
+                  )}
                 </div>
               );
             })}
@@ -632,9 +672,9 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           getGroup={(w) => `${w.category === 'simple' ? 'Simple' : 'Martial'} ${w.range === 'melee' ? 'Melee' : 'Ranged'}`}
           onSelect={(w) => {
             addWeaponFromCatalog(w);
-            setShowWeaponPicker(false);
           }}
-          onClose={() => setShowWeaponPicker(false)}
+          status={pickerStatus}
+          onClose={closePicker}
         />
       )}
       {showArmorPicker && (
@@ -645,9 +685,9 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           getGroup={(a) => a.category.charAt(0).toUpperCase() + a.category.slice(1)}
           onSelect={(a) => {
             addArmorFromCatalog(a);
-            setShowArmorPicker(false);
           }}
-          onClose={() => setShowArmorPicker(false)}
+          status={pickerStatus}
+          onClose={closePicker}
         />
       )}
       {showGearPicker && (
@@ -658,9 +698,9 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           getGroup={(e) => e.kind.charAt(0).toUpperCase() + e.kind.slice(1)}
           onSelect={(e) => {
             addGearFromCatalog(e);
-            setShowGearPicker(false);
           }}
-          onClose={() => setShowGearPicker(false)}
+          status={pickerStatus}
+          onClose={closePicker}
         />
       )}
       <Toast

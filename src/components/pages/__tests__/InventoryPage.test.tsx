@@ -5,6 +5,7 @@ import { InventoryPage } from '../InventoryPage';
 import { CombatPage } from '../CombatPage';
 import type { Character } from '../../../types/character';
 import { createCharacter } from '../../../storage/character-store';
+import { EQUIPMENT_LIST } from '../../../data/equipment';
 
 /**
  * The CombatPage renders the Armor Class exactly once, in the sticky summary
@@ -240,5 +241,52 @@ describe('Inventory → Combat armour→AC integration', () => {
     const tip = screen.getByRole('tooltip');
     expect(tip).toHaveTextContent('Dragon Scale');
     expect(tip).toHaveTextContent(/unarmored/i);
+  });
+});
+
+describe('InventoryPage: Armor Class, custom armor and pickers', () => {
+  it('shows the resulting Armor Class in the Armor & Shields header with a breakdown tooltip', () => {
+    renderStateful();
+    const ac = screen.getByRole('button', { name: /^Armor Class:/ });
+    fireEvent.click(ac);
+    expect(screen.getByRole('tooltip')).toHaveTextContent(/Dexterity|base/i);
+  });
+
+  it('explains that a worn custom armor does not set AC', () => {
+    const { get } = renderStateful();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Custom Armor' }));
+    const id = (get().inventory ?? []).find((i) => i.kind === 'armor')!.id;
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Moon Plate' } });
+    fireEvent.click(screen.getByRole('button', { name: /save|done/i }));
+    expect(screen.queryByTestId('custom-armor-note')).toBeNull();
+    fireEvent.click(screen.getByLabelText('Wear Moon Plate'));
+    expect(get().equipped?.armorItemId).toBe(id);
+    expect(screen.getByTestId('custom-armor-note')).toHaveTextContent(/does not set your AC.*override/);
+  });
+
+  it('keeps the picker open after an add and confirms it', () => {
+    const { get } = renderStateful();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Weapon' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Dagger' }));
+    expect(screen.getByRole('dialog', { name: 'Add Weapon' })).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Add Weapon' });
+    expect(within(dialog).getByRole('status')).toHaveTextContent('Added: Dagger');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Dagger' }));
+    expect(within(dialog).getByRole('status')).toHaveTextContent('Added: Dagger x2');
+    expect((get().inventory ?? []).filter((i) => i.catalogId === 'dagger')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog', { name: 'Add Weapon' })).toBeNull();
+  });
+
+  it('re-adding the same gear raises its quantity instead of adding a row', () => {
+    const { get } = renderStateful();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Gear' }));
+    const first = EQUIPMENT_LIST.find((e) => EQUIPMENT_LIST.filter((o) => o.name === e.name).length === 1)!;
+    const dialog = screen.getByRole('dialog', { name: 'Add Gear' });
+    fireEvent.click(within(dialog).getByRole('button', { name: first.name }));
+    fireEvent.click(within(dialog).getByRole('button', { name: first.name }));
+    const rows = (get().inventory ?? []).filter((i) => i.catalogId === first.id);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].quantity).toBe(2);
   });
 });

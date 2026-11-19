@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronDown, Trash2 } from 'lucide-react';
 import { usePortrait } from '../../hooks/usePortrait';
 import { COMPANION_PORTRAIT_MAX_SIDE, downscaleImage } from '../../logic/portrait';
+import { RecordFocusContext } from './RecordFocus';
 import { RecordPortrait, RecordThumbnail } from './RecordPortrait';
 import type { RecordPortraitConfig } from './RecordPortrait';
 import styles from './CompanionsShared.module.css';
@@ -40,11 +41,24 @@ export interface RecordCardProps {
  * stay the same on every tab.
  */
 export function RecordCard({ testId, name, kind, meta, hp, muted, portrait, onDelete, children }: RecordCardProps) {
-  const [expanded, setExpanded] = useState(false);
+  const focusId = useContext(RecordFocusContext);
+  // Record ids are the tail of the test id (companion-<id>, hireling-<id>, ...).
+  const focused = focusId !== null && testId.endsWith(`-${focusId}`);
+  const [expanded, setExpanded] = useState(focused);
+  // A card that is targeted after it mounted (a deep link on the same page) opens too.
+  const [openedFor, setOpenedFor] = useState<string | null>(focused ? focusId : null);
+  if (focused && openedFor !== focusId) {
+    setOpenedFor(focusId);
+    setExpanded(true);
+  }
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (focused) rootRef.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+  }, [focused, focusId]);
   const image = usePortrait(portrait.storeKey, shrinkPortrait);
   const bodyId = `${testId}-body`;
   return (
-    <div className={muted ? styles.cardMuted : styles.card} data-testid={testId}>
+    <div ref={rootRef} className={muted ? styles.cardMuted : styles.card} data-testid={testId} data-focused={focused ? 'true' : undefined}>
       <button
         type="button"
         className={styles.header}

@@ -254,7 +254,7 @@ function CompanionBody({ record, character, name, hpMax, ridingOpen, onToggleRid
         </div>
       )}
 
-      {formulaNote && <p className={styles.figureLabel}>Formulas (not computed yet): {formulaNote}.</p>}
+      {formulaNote && <p className={styles.figureLabel}>The exact numbers can't be worked out yet (they depend on your class and level). The rules give: {formulaNote}.</p>}
 
       <StatBlockView model={model} />
 

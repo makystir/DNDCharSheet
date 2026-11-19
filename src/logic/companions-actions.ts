@@ -81,6 +81,15 @@ export function updateRecord<K extends CompanionListKey>(
   return withList(character, key, next);
 }
 
+/**
+ * Apply a tracked-field patch (HP, temp HP, conditions) to a record in any list.
+ * Every list record extends TrackedCreature, so one patch shape fits all four;
+ * this is the single write path for glance views such as the Combat Allies card.
+ */
+export function patchTrackedRecord(character: Character, key: CompanionListKey, id: string, patch: Partial<TrackedCreature>): Character {
+  return updateRecord(character, key as 'companions', id, patch);
+}
+
 /** Remove the record with `id`; the field is deleted when the list becomes empty. */
 export function removeRecord<K extends CompanionListKey>(character: Character, key: K, id: string): Character {
   const list = recordsOf(character, key);

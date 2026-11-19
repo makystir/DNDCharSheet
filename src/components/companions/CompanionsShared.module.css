@@ -541,3 +541,12 @@
     width: 100%;
   }
 }
+
+/* A record opened by a deep link or right after it was added. */
+
+.card[data-focused='true'],
+.cardMuted[data-focused='true'] {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+

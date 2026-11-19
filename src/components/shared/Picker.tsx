@@ -10,6 +10,8 @@ interface PickerProps<T> {
   onSelect: (item: T) => void;
   onClose: () => void;
   title?: string;
+  /** Confirmation line (e.g. "Added: Dagger") shown under the list when the picker stays open after a pick. */
+  status?: string;
 }
 
 /**
@@ -27,6 +29,7 @@ export function Picker<T>({
   onSelect,
   onClose,
   title,
+  status,
 }: PickerProps<T>) {
   const [search, setSearch] = useState('');
   const searchLower = search.toLowerCase();
@@ -102,6 +105,11 @@ export function Picker<T>({
           autoFocus
         />
         <div className={styles.list}>{renderList()}</div>
+        {status && (
+          <div role="status" className={styles.status}>
+            {status}
+          </div>
+        )}
         <button type="button" onClick={onClose} className={styles.close}>
           Close
         </button>

@@ -71,3 +71,45 @@
   min-height: 44px;
   color: var(--accent-gold);
 }
+
+.nameLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-gold);
+}
+.hpControls {
+  flex-basis: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.hpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.hpBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.hpAmount {
+  width: 80px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font: inherit;
+}
+

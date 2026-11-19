@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ChevronDown, PawPrint, Plus } from 'lucide-react';
 import type { Character, CompanionOrigin, CompanionRecord } from '../../types/character';
 import { CREATURE_CATALOG } from '../../data/creatures';
@@ -17,6 +17,7 @@ import { MaybeContentTooltip } from '../shared/ContentTooltip';
 import { HelpPopover } from '../shared/HelpPopover';
 import { CompanionCard } from './CompanionCard';
 import { CompanionCreationFlow } from './CompanionCreationFlow';
+import { RecordFocusContext } from './RecordFocus';
 import { useRecordList } from './useRecordList';
 import type { UndoSink } from './useRecordList';
 import styles from './CompanionsShared.module.css';
@@ -50,6 +51,9 @@ function isRidingCreature(rec: CompanionRecord): boolean {
 export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
   const [creating, setCreating] = useState<CompanionOrigin | null>(null);
   const [showDismissed, setShowDismissed] = useState(false);
+  // A creature just added is opened and scrolled to; otherwise a deep link's target (if any) applies.
+  const linkedFocus = useContext(RecordFocusContext);
+  const [addedId, setAddedId] = useState<string | null>(null);
   const { list, atMax, patch, add, deleting, requestDelete, cancelDelete, confirmDelete } = useRecordList(
     character,
     onChange,
@@ -92,7 +96,7 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
   );
 
   return (
-    <>
+    <RecordFocusContext.Provider value={addedId ?? linkedFocus}>
       <Card>
         <SectionHeader
           icon={PawPrint}
@@ -103,7 +107,7 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
             </span>
           }
           action={
-            <button type="button" className={styles.addBtn} disabled={atMax} onClick={() => setCreating('primal-companion')}>
+            <button type="button" className={styles.addBtn} disabled={atMax} onClick={() => setCreating(suggestions[0]?.origin ?? 'pet')}>
               <Plus size={14} aria-hidden="true" />
               Add Creature
             </button>
@@ -215,6 +219,7 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
           onCancel={() => setCreating(null)}
           onConfirm={(record) => {
             add(record);
+            setAddedId(record.id);
             setCreating(null);
           }}
         />
@@ -228,6 +233,6 @@ export function CreaturesTab({ character, onChange, undo }: CreaturesTabProps) {
           onCancel={cancelDelete}
         />
       )}
-    </>
+    </RecordFocusContext.Provider>
   );
 }

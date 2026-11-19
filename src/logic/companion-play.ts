@@ -32,7 +32,7 @@ import { PRIMAL_COMPANION_IDS } from './primal-companion';
 import { pactSlots, setPactExpended, setSlotsExpended, slotLevels } from './spell-slot-spend';
 import { partyRoster } from './party-roster';
 import type { RosterEntry } from './party-roster';
-import type { StatValue } from './stat-block-model';
+import type { StatFeatureDerived, StatValue } from './stat-block-model';
 import type { SpellId } from '../data/spells';
 
 // ─── Allies (Combat page glance) ─────────────────────────────────────────────
@@ -41,9 +41,11 @@ export interface AllyEntry extends RosterEntry {
   /** Armor Class as the stat block shows it (with its breakdown when derived). */
   ac: StatValue | null;
   /** The first attack in the stat block, e.g. { name: "Beast's Strike", bonus: "+5" }. */
-  attack: { name: string; bonus: StatValue } | null;
+  attack: { name: string; bonus: StatValue; damage: StatFeatureDerived[] } | null;
   /** Which Companions sub-tab holds the record. */
   tab: 'creatures' | 'people';
+  /** The Character list that holds the record (for HP edits through the shared record patch). */
+  listKey: 'companions' | 'hirelings' | 'npcPartyMembers' | 'sidekicks';
 }
 
 /** Active allies only (not dismissed, not dead), in roster order. */
@@ -59,11 +61,18 @@ export function combatAllies(character: Character): AllyEntry[] {
         const built = buildCompanionModel(companion, character);
         const first = built?.model.actions.find((a) => a.derived.some((d) => d.label === 'Attack bonus'));
         const bonus = first?.derived.find((d) => d.label === 'Attack bonus')?.value;
-        return { ...e, tab: 'creatures', ac: built?.model.ac ?? null, attack: first && bonus ? { name: first.name, bonus } : null };
+        return {
+          ...e,
+          tab: 'creatures',
+          listKey: 'companions',
+          ac: built?.model.ac ?? null,
+          attack: first && bonus ? { name: first.name, bonus, damage: first.derived.filter((d) => d.label === 'Damage') } : null,
+        };
       }
       const typed = hirelings.get(e.id)?.stats ?? npcs.get(e.id)?.stats;
       const ac = typed?.ac !== undefined ? { text: String(typed.ac) } : null;
-      return { ...e, tab: 'people', ac, attack: null };
+      const listKey = hirelings.has(e.id) ? 'hirelings' : npcs.has(e.id) ? 'npcPartyMembers' : 'sidekicks';
+      return { ...e, tab: 'people', listKey, ac, attack: null };
     });
 }
 

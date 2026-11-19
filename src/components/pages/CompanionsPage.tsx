@@ -9,6 +9,7 @@ import { SubTabBar } from '../shared/SubTabBar';
 import { Toast } from '../shared/Toast';
 import { CreaturesTab } from '../companions/CreaturesTab';
 import { PeopleTab } from '../companions/PeopleTab';
+import { RecordFocusContext } from '../companions/RecordFocus';
 import type { PeopleFilter } from '../companions/PeopleTab';
 import styles from './CompanionsPage.module.css';
 
@@ -44,6 +45,13 @@ const LEGACY_SUBTABS: Record<string, { tab: CompanionsSubTab; filter?: PeopleFil
   'npc-party': { tab: 'people', filter: 'npc' },
   sidekicks: { tab: 'people', filter: 'sidekicks' },
 };
+
+/** The record id in a #companions/<tab>/<id> deep link (from the Combat Allies card), else null. */
+function recordIdFromHash(): string | null {
+  if (typeof window === 'undefined') return null;
+  const [page, , id] = window.location.hash.replace(/^#/, '').split('/');
+  return page?.toLowerCase() === 'companions' && id ? decodeURIComponent(id) : null;
+}
 
 function resolveId(value: string | null | undefined): { tab: CompanionsSubTab; filter?: PeopleFilter } | null {
   if (value == null) return null;
@@ -110,7 +118,10 @@ export function CompanionsPage({ character, onChange, subTab, onSubTabChange }: 
     onSubTabChange?.(tab);
   };
 
+  const hashFocus = recordIdFromHash();
+
   return (
+    <RecordFocusContext.Provider value={hashFocus}>
     <div className={styles.page}>
       <SubTabBar
         tabs={orderedTabs}
@@ -142,6 +153,7 @@ export function CompanionsPage({ character, onChange, subTab, onSubTabChange }: 
       />
       <Toast message={saveError ? 'Tab order could not be saved' : null} duration={5000} />
     </div>
+    </RecordFocusContext.Provider>
   );
 }
 

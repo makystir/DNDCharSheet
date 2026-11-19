@@ -71,7 +71,7 @@ describe('Combat page: Allies card', () => {
     expect(screen.queryByRole('list', { name: 'Allies' })).toBeNull();
   });
 
-  it('shows each active ally with HP, AC and attack, read-only, with a link to edit them', () => {
+  it('shows each active ally with HP, AC and attack, with HP controls and a link to edit conditions', () => {
     const c: Character = {
       ...rangerCharacter(5, 16),
       companions: [
@@ -88,7 +88,6 @@ describe('Combat page: Allies card', () => {
     expect(ash).toHaveTextContent("Beast's Strike");
     expect(ash).toHaveTextContent('Prone');
     expect(within(status).queryByTestId('ally-gone')).toBeNull();
-    expect(within(status).queryByRole('button', { name: 'Damage' })).toBeNull();
-    expect(within(status).getByRole('link', { name: 'Change HP or conditions on Companions' })).toHaveAttribute('href', '#companions/creatures');
+    expect(within(status).getByRole('link', { name: 'Change conditions on Companions' })).toHaveAttribute('href', '#companions/creatures');
   });
 });

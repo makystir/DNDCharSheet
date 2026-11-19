@@ -104,7 +104,7 @@ export function CombatPage({ character, onChange, onNotify }: CombatPageProps) {
             <SavesPanel character={character} />
             <AffectingYouCard character={character} onChange={onChange} />
             <ConcentrationCard character={character} onChange={onChange} onNotify={onNotify} />
-            <AlliesCard character={character} />
+            <AlliesCard character={character} onChange={onChange} />
           </section>
         </div>
 
