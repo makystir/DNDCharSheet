@@ -356,11 +356,7 @@ export function CharacterPage({
 
       {activeSubTab === 'identity' && (
         <>
-          <OverviewSetup character={character} />
-          <OverviewVitals character={character} onChange={onChange} />
-          <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
-          <OverviewInspiration character={character} onChange={onChange} />
-          {/* Personal Details is an edit form: it sits below the session cards so Vitals are on screen first. */}
+          {/* Personal Details leads the Overview (user decision, reverses P-E2); session cards follow. */}
           <PersonalDetailsSection
             character={character}
             onChange={onChange}
@@ -370,6 +366,10 @@ export function CharacterPage({
             onSpeciesChange={setSpecies}
             onSpeciesChoiceChange={setSpeciesChoice}
           />
+          <OverviewSetup character={character} />
+          <OverviewVitals character={character} onChange={onChange} />
+          <OverviewRest character={character} onChange={onChange} onNotify={onNotify} />
+          <OverviewInspiration character={character} onChange={onChange} />
           {/* Two independent column stacks on a wide page (no shared grid rows,
               so a short card never leaves a hole beside a tall one). Left: the
               "Right now" summary, Spellcasting, and Traits & Feats (here to
