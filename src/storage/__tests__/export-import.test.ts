@@ -347,3 +347,15 @@ describe('companions fields round trip', () => {
     }
   });
 });
+
+describe('personalDetailsCollapsed round trip', () => {
+  it('survives export then import, and defaults to absent (expanded) for older exports', async () => {
+    const collapsed = importFromJSON(exportToJSON(makeChar({ personalDetailsCollapsed: true })));
+    expect(collapsed.success).toBe(true);
+    expect(collapsed.character?.personalDetailsCollapsed).toBe(true);
+
+    const legacy = importFromJSON(exportToJSON(makeChar()));
+    expect(legacy.success).toBe(true);
+    expect(legacy.character?.personalDetailsCollapsed).toBeFalsy();
+  });
+});

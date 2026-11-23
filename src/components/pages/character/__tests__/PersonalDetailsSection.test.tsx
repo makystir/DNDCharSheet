@@ -244,6 +244,31 @@ describe('PersonalDetailsSection', () => {
   });
 });
 
+describe('PersonalDetailsSection collapse', () => {
+  it('is expanded by default for a character without the field', () => {
+    renderSection();
+    const toggle = screen.getByRole('button', { name: 'Personal Details' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('personal-details-grid')).toBeVisible();
+  });
+
+  it('toggling emits personalDetailsCollapsed on the character', () => {
+    const { onChange } = renderSection();
+    fireEvent.click(screen.getByRole('button', { name: 'Personal Details' }));
+    expect(onChange.mock.calls.at(-1)?.[0].personalDetailsCollapsed).toBe(true);
+  });
+
+  it('collapsed: hides the fields, keeps the portrait, and expands again', () => {
+    const { onChange } = renderSection({ personalDetailsCollapsed: true });
+    const toggle = screen.getByRole('button', { name: 'Personal Details' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('personal-details-grid')).not.toBeVisible();
+    expect(screen.getByText('No portrait set')).toBeVisible();
+    fireEvent.click(toggle);
+    expect(onChange.mock.calls.at(-1)?.[0].personalDetailsCollapsed).toBe(false);
+  });
+});
+
 describe('PersonalDetailsSection dice on filled fields', () => {
   it('hides the 🎲 once a field has a value, keeping an empty slot so inputs stay aligned', () => {
     renderSection({

@@ -1190,6 +1190,13 @@ export interface Character {
   shortTermGoal?: string;
   /** Free-text long-term goal (the ambition of a lifetime). Flavor only. */
   longTermGoal?: string;
+  /**
+   * UI state saved with the character (so it travels with exports/imports):
+   * true = the Personal Details card on Character > Overview is collapsed to its
+   * header (the portrait stays visible). Additive-optional, no CURRENT_VERSION
+   * bump: absent = false (expanded).
+   */
+  personalDetailsCollapsed?: boolean;
 
   // ── Stage A7: Character Creation (background / languages / generation) ─────
   // Additive-optional, no CURRENT_VERSION bump: absent = a valid prior state

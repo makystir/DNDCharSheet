@@ -150,6 +150,9 @@ export function PersonalDetailsSection({
   const faithListId = useId();
   const personalityId = useId();
   const [showPromptDialog, setShowPromptDialog] = useState(false);
+  // Saved on the character (not localStorage) so it travels with exports. The
+  // portrait sits outside the Card, so it stays visible when collapsed.
+  const collapsed = character.personalDetailsCollapsed === true;
 
   const setField = (field: keyof Character, value: string) =>
     onChange({ ...character, [field]: value });
@@ -275,8 +278,17 @@ export function PersonalDetailsSection({
         />
         <div className={styles.detailsColumn}>
           <Card>
-            <SectionHeader icon={User} title="Personal Details" titleId={headerId} />
-            <div className={styles.fieldsContainer}>
+            <SectionHeader
+              icon={User}
+              title="Personal Details"
+              titleId={headerId}
+              collapsible
+              collapsed={collapsed}
+              onToggleCollapse={() =>
+                onChange({ ...character, personalDetailsCollapsed: !collapsed })
+              }
+            />
+            <div className={styles.fieldsContainer} hidden={collapsed}>
               <div className={styles.fieldGrid} data-testid="personal-details-grid">
                 {/* Row 1: Name, Gender, Alignment, Faith / Deity, Age.
                     Keep the accessible name "Character name" — it is the single
