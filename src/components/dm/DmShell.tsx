@@ -198,7 +198,7 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
         {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} initialNoteId={journalNoteId} />}
         {page === 'generators' && (
-          <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => openJournal()} />
+          <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={openJournal} />
         )}
         {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => openJournal()} encounterCrs={treasureCrs} onRolled={treasureEncounterId ? () => { const eid = treasureEncounterId; const cid = activeCampaign(dm.data)?.id; if (cid) dm.update((d) => markAfterCombat(d, cid, eid, { treasureRolled: true }, Date.now())); } : undefined} />}
         {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} initialSharers={xpSharers} />}

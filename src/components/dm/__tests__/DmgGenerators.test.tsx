@@ -8,7 +8,9 @@ import type { DmPage } from '../../../logic/dm-mode';
 import { createCampaign, emptyDmData } from '../../../logic/dm-campaign';
 import type { DmNote } from '../../../types/dm';
 import { createSeededRng } from '../../../logic/random';
-import { dmgPartKeys, rollDmgGenerator, rollDmgPart, type DmgGeneratorId } from '../../../logic/dmg-generators';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { dmgPartKeys, dmgResultTitle, rollDmgGenerator, rollDmgPart, type DmgGeneratorId, type RolledPart } from '../../../logic/dmg-generators';
 
 function Routed({ initial }: { initial: DmPage }) {
   const [page, setPage] = useState<DmPage>(initial);
@@ -141,5 +143,85 @@ describe('DMG generator logic', () => {
     const card = screen.getByLabelText('Generated weather');
     expect(within(card).getByRole('button', { name: /30/ })).toBeInTheDocument();
     expect(card).toHaveTextContent('30 degrees Fahrenheit hotter');
+  });
+});
+
+describe('Generator results across tabs, saving and the journal', () => {
+  it('keeps each tab\'s result when switching tabs', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate NPC' }));
+    const npc = screen.getByLabelText('Generated NPC').textContent;
+    fireEvent.click(screen.getByRole('tab', { name: 'Weather' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll weather' }));
+    const weather = screen.getByLabelText('Generated weather').textContent;
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate tavern' }));
+    const tavern = screen.getByTestId('place-name').textContent;
+    fireEvent.click(screen.getByRole('tab', { name: 'Quick NPC' }));
+    expect(screen.getByLabelText('Generated NPC').textContent).toBe(npc);
+    fireEvent.click(screen.getByRole('tab', { name: 'Weather' }));
+    expect(screen.getByLabelText('Generated weather').textContent).toBe(weather);
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    expect(screen.getByTestId('place-name').textContent).toBe(tavern);
+  });
+
+  it('shows Saved after saving, saves only once, and Open journal selects that note', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Dungeon' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate dungeon' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    const saved = screen.getByRole('button', { name: 'Saved' });
+    expect(saved).toBeDisabled();
+    expect(journal()).toHaveLength(1);
+    expect(journal()[0].title).toMatch(/^Dungeon: .+/);
+    // The saved state survives a tab switch, and rolling again makes a new, unsaved result.
+    fireEvent.click(screen.getByRole('tab', { name: 'Weather' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Dungeon' }));
+    expect(screen.getByRole('button', { name: 'Saved' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Open journal' }));
+    expect(within(screen.getByLabelText('Journal entries')).getByRole('button', { pressed: true })).toHaveTextContent(journal()[0].title);
+  });
+
+  it('allows saving again once the result is rolled again', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Monster behavior' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate monster behavior' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate monster behavior' }));
+    expect(screen.getByRole('button', { name: 'Save to journal' })).toBeEnabled();
+  });
+
+  it('marks a saved NPC and tavern as Saved too', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate NPC' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    expect(screen.getByRole('button', { name: 'Saved' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate tavern' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    expect(screen.getByRole('button', { name: 'Saved' })).toBeDisabled();
+    expect(journal()).toHaveLength(3);
+  });
+
+  it('wraps the tab strip on narrow screens', () => {
+    const css = readFileSync(join(__dirname, '..', 'dm.module.css'), 'utf8');
+    expect(css).toMatch(/\.tabs\s*\{[^}]*flex-wrap:\s*wrap/);
+  });
+});
+
+describe('dmgResultTitle', () => {
+  const part = (key: string, text: string): RolledPart => ({ key, label: key, source: '', roll: 1, text });
+  it('uses the first rolled line, the size for settlements, and all of weather', () => {
+    expect(dmgResultTitle('dungeon', [part('a', 'Haunted'), part('b', 'Ruined')])).toBe('Dungeon: Haunted');
+    expect(dmgResultTitle('settlement', [part('a', 'Trade hub')], { size: 'Town' })).toBe('Settlement: Town, Trade hub');
+    expect(dmgResultTitle('weather', [part('a', 'Cold'), part('b', 'Calm'), part('c', 'Rain')])).toBe('Weather: Cold, Calm, Rain');
+  });
+  it('shortens long text and falls back to the generator name', () => {
+    expect(dmgResultTitle('dungeon', [part('a', 'x'.repeat(200))]).length).toBeLessThan(90);
+    expect(dmgResultTitle('dungeon', [])).toBe('Dungeon');
   });
 });

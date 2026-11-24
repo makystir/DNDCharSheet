@@ -6,7 +6,7 @@ import { getSpecies, type SpeciesId } from '../../data/species';
 import { NPC_TEMPLATE_LIST } from '../../data/npc-templates';
 import { SHOP_TYPES } from '../../data/dm-flavor-tables';
 import type { NameGender } from '../../data/name-tables';
-import type { DmApi } from './dmApi';
+import type { DmApi, OpenJournal } from './dmApi';
 import { activeCampaign } from '../../logic/dm-campaign';
 import {
   NPC_PARTS,
@@ -30,7 +30,7 @@ import {
 import { clockNow } from '../../logic/dm-mode';
 import { createDefaultRng } from '../../logic/random';
 import { Card } from '../shared/Card';
-import { DmgGenerator } from './DmgGenerator';
+import { DmgGenerator, type DmgResult } from './DmgGenerator';
 import type { DmgGeneratorId } from '../../logic/dmg-generators';
 import { SectionHeader } from '../shared/SectionHeader';
 import styles from './dm.module.css';
@@ -40,8 +40,22 @@ interface GeneratorsPageProps {
   dm: DmApi;
   onNotify: (text: string) => void;
   onOpenCampaign: () => void;
-  onOpenJournal: () => void;
+  onOpenJournal: OpenJournal;
 }
+
+/** A generated NPC, and the journal note it was saved as (cleared when the NPC changes). */
+interface NpcResult {
+  npc: GeneratedNpc;
+  savedId?: string;
+}
+
+interface PlaceResult {
+  place: { name: string; owner: GeneratedNpc; dmgType?: string };
+  /** The place's journal note (the owner's note is linked from it). */
+  savedId?: string;
+}
+
+type ResultProps<T> = { result: T | null; onResult: (r: T | null) => void };
 
 type Tab = 'npc' | 'tavern' | 'shop' | DmgGeneratorId;
 
@@ -118,34 +132,36 @@ function NpcCard({ npc, onReroll }: { npc: GeneratedNpc; onReroll: (part: NpcPar
 }
 
 /** Quick NPC: pick what you know, leave the rest random, roll parts again, save to the journal. */
-function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps, 'onOpenCampaign'>) {
+function NpcGenerator({ dm, onNotify, onOpenJournal, result: current, onResult }: Omit<GeneratorsPageProps, 'onOpenCampaign'> & ResultProps<NpcResult>) {
   const campaign = activeCampaign(dm.data);
   const [species, setSpecies] = useState<SpeciesId | ''>('');
   const [gender, setGender] = useState<NameGender | ''>('');
   const [alignment, setAlignment] = useState<Alignment | ''>('');
   const [classId, setClassId] = useState<ClassId | ''>('');
   const [role, setRole] = useState('');
-  const [npc, setNpc] = useState<GeneratedNpc | null>(null);
+  const npc = current?.npc ?? null;
   const [templateId, setTemplateId] = useState('');
 
   const roll = () =>
-    setNpc(
-      generateNpc(createDefaultRng(), {
+    onResult({
+      npc: generateNpc(createDefaultRng(), {
         species: species || undefined,
         gender: gender || undefined,
         alignment: alignment || undefined,
         classId: classId || undefined,
         role,
       }),
-    );
+    });
 
   const save = () => {
     if (!npc || !campaign) return;
     const now = clockNow();
     const template = NPC_TEMPLATE_LIST.find((t) => t.id === templateId);
     const statBlock = template ? { name: template.name, source: `Monster Manual 2024, p.${template.page}` } : undefined;
-    const result = saveNpcToJournal(dm.data, campaign.id, npc, { npc: crypto.randomUUID() }, now, statBlock);
+    const noteId = crypto.randomUUID();
+    const result = saveNpcToJournal(dm.data, campaign.id, npc, { npc: noteId }, now, statBlock);
     dm.replace(result.data);
+    onResult({ npc, savedId: noteId });
     onNotify(`${result.title} saved to the journal of ${campaign.name}.`);
   };
 
@@ -213,8 +229,8 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
         </button>
         {npc && (
           <>
-            <button type="button" className={styles.btn} onClick={save} disabled={!campaign}>
-              Save to journal
+            <button type="button" className={styles.btn} onClick={save} disabled={!campaign || !!current?.savedId}>
+              {current?.savedId ? 'Saved' : 'Save to journal'}
             </button>
             <button
               type="button"
@@ -224,7 +240,7 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
               Copy text
             </button>
             {campaign && (
-              <button type="button" className={styles.btn} onClick={onOpenJournal}>
+              <button type="button" className={styles.btn} onClick={() => onOpenJournal(current?.savedId)}>
                 Open journal
               </button>
             )}
@@ -251,7 +267,7 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
           </span>
         </div>
       )}
-      {npc && <NpcCard npc={npc} onReroll={(part) => setNpc((cur) => (cur ? rerollNpcPart(createDefaultRng(), cur, part) : cur))} />}
+      {npc && <NpcCard npc={npc} onReroll={(part) => onResult({ npc: rerollNpcPart(createDefaultRng(), npc, part) })} />}
       <p className={styles.muted}>
         Names, looks and the description come from the same generators as the character wizard. Class flavor only changes how
         the description reads. It gives the NPC no class features, and the species is not a stat block.
@@ -261,12 +277,12 @@ function NpcGenerator({ dm, onNotify, onOpenJournal }: Omit<GeneratorsPageProps,
 }
 
 /** A tavern or a shop: a name and an owner, saved to the journal as two linked entries. */
-function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' | 'shop' } & Omit<GeneratorsPageProps, 'onOpenCampaign'>) {
+function PlaceGenerator({ kind, dm, onNotify, onOpenJournal, result: current, onResult }: { kind: 'tavern' | 'shop' } & Omit<GeneratorsPageProps, 'onOpenCampaign'> & ResultProps<PlaceResult>) {
   const campaign = activeCampaign(dm.data);
   const [trade, setTrade] = useState(SHOP_TYPES[0].id);
   // 'original' uses this app's word lists; 'dmg' uses the DMG 2024 p.94 tables.
   const [source, setSource] = useState<'original' | 'dmg'>('original');
-  const [place, setPlace] = useState<{ name: string; owner: GeneratedNpc; dmgType?: string } | null>(null);
+  const place = current?.place ?? null;
   const dmg = source === 'dmg';
 
   const rollOwner = (role: string) => generateNpc(createDefaultRng(), { role: role.toLowerCase() });
@@ -282,36 +298,35 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
 
   const roll = () => {
     const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
-    setPlace(build(rollOwner(ownerRole(dmgType ?? shopTypeById(trade).label)), dmgType));
+    onResult({ place: build(rollOwner(ownerRole(dmgType ?? shopTypeById(trade).label)), dmgType) });
   };
 
-  const newName = () =>
-    setPlace((cur) => {
-      if (!cur) return cur;
-      const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
-      return build(cur.owner, dmgType);
-    });
+  const newName = () => {
+    if (!place) return;
+    const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
+    onResult({ place: build(place.owner, dmgType) });
+  };
 
   const newOwner = () => {
     const owner = rollOwner(ownerRole(place?.dmgType ?? shopTypeById(trade).label));
-    setPlace((cur) => {
-      if (!cur) return cur;
-      return kind === 'tavern' ? { ...cur, owner } : build(owner, cur.dmgType);
-    });
+    if (!place) return;
+    onResult({ place: kind === 'tavern' ? { ...place, owner } : build(owner, place.dmgType) });
   };
 
   const save = () => {
     if (!place || !campaign) return;
     const now = clockNow();
+    const placeId = crypto.randomUUID();
     const result = savePlaceWithOwner(
       dm.data,
       campaign.id,
       { kind, name: place.name, trade: kind === 'shop' ? (place.dmgType ?? shopTypeById(trade).label) : undefined },
       place.owner,
-      { place: crypto.randomUUID(), owner: crypto.randomUUID() },
+      { place: placeId, owner: crypto.randomUUID() },
       now,
     );
     dm.replace(result.data);
+    onResult({ place, savedId: placeId });
     onNotify(`${result.placeTitle} and its owner ${result.ownerTitle} saved to the journal.`);
   };
 
@@ -348,11 +363,11 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
             <button type="button" className={styles.btn} onClick={newOwner}>
               New owner
             </button>
-            <button type="button" className={styles.btn} onClick={save} disabled={!campaign}>
-              Save to journal
+            <button type="button" className={styles.btn} onClick={save} disabled={!campaign || !!current?.savedId}>
+              {current?.savedId ? 'Saved' : 'Save to journal'}
             </button>
             {campaign && (
-              <button type="button" className={styles.btn} onClick={onOpenJournal}>
+              <button type="button" className={styles.btn} onClick={() => onOpenJournal(current?.savedId)}>
                 Open journal
               </button>
             )}
@@ -370,7 +385,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
           </span>
           <NpcCard
             npc={place.owner}
-            onReroll={(part) => setPlace((cur) => (cur ? { ...cur, owner: rerollNpcPart(createDefaultRng(), cur.owner, part) } : cur))}
+            onReroll={(part) => onResult({ place: { ...place, owner: rerollNpcPart(createDefaultRng(), place.owner, part) } })}
           />
         </div>
       )}
@@ -385,6 +400,10 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal }: { kind: 'tavern' 
 /** Tools for improvising: an NPC, a tavern, a shop, and the Dungeon Master's Guide 2024 tables. */
 export function GeneratorsPage({ dm, onNotify, onOpenCampaign, onOpenJournal }: GeneratorsPageProps) {
   const [tab, setTab] = useState<Tab>('npc');
+  // Each generator's last result lives here, so it survives switching tabs (and its saved-note id travels with it).
+  const [npcResult, setNpcResult] = useState<NpcResult | null>(null);
+  const [placeResults, setPlaceResults] = useState<Partial<Record<'tavern' | 'shop', PlaceResult>>>({});
+  const [dmgResults, setDmgResults] = useState<Partial<Record<DmgGeneratorId, DmgResult>>>({});
   const campaign = activeCampaign(dm.data);
   return (
     <div className={styles.page}>
@@ -421,11 +440,23 @@ export function GeneratorsPage({ dm, onNotify, onOpenCampaign, onOpenJournal }: 
           ))}
         </div>
         <div style={{ marginTop: 16 }}>
-          {tab === 'npc' && <NpcGenerator dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
-          {tab === 'tavern' && <PlaceGenerator key="tavern" kind="tavern" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
-          {tab === 'shop' && <PlaceGenerator key="shop" kind="shop" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />}
+          {tab === 'npc' && <NpcGenerator dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} result={npcResult} onResult={setNpcResult} />}
+          {tab === 'tavern' && (
+            <PlaceGenerator key="tavern" kind="tavern" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} result={placeResults.tavern ?? null} onResult={(r) => setPlaceResults((cur) => ({ ...cur, tavern: r ?? undefined }))} />
+          )}
+          {tab === 'shop' && (
+            <PlaceGenerator key="shop" kind="shop" dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} result={placeResults.shop ?? null} onResult={(r) => setPlaceResults((cur) => ({ ...cur, shop: r ?? undefined }))} />
+          )}
           {tab !== 'npc' && tab !== 'tavern' && tab !== 'shop' && (
-            <DmgGenerator key={tab} id={tab} dm={dm} onNotify={onNotify} onOpenJournal={onOpenJournal} />
+            <DmgGenerator
+              key={tab}
+              id={tab}
+              dm={dm}
+              onNotify={onNotify}
+              onOpenJournal={onOpenJournal}
+              result={dmgResults[tab] ?? null}
+              onResult={(r) => setDmgResults((cur) => ({ ...cur, [tab]: r ?? undefined }))}
+            />
           )}
         </div>
       </Card>

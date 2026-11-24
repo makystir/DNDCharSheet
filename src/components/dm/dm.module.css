@@ -307,13 +307,14 @@
 
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .tab,
 .tabActive {
   font: inherit;
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 44px;
   border-radius: var(--radius-sm);
   cursor: pointer;

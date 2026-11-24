@@ -245,6 +245,17 @@ export const DMG_GENERATOR_TITLES: Record<DmgGeneratorId, string> = {
   monster: 'Monster behavior',
 };
 
+const TITLE_DETAIL_MAX = 70;
+
+/** A journal title drawn from what was rolled, e.g. "Settlement: Town, Ancient ruins" (weather joins all three lines). */
+export function dmgResultTitle(id: DmgGeneratorId, parts: readonly RolledPart[], opts: DmgOptions = {}): string {
+  const texts = parts.map((p) => p.text.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  const detail = id === 'weather' ? texts.join(', ') : [id === 'settlement' ? opts.size : '', texts[0]].filter(Boolean).join(', ');
+  if (!detail) return DMG_GENERATOR_TITLES[id];
+  const short = detail.length > TITLE_DETAIL_MAX ? `${detail.slice(0, TITLE_DETAIL_MAX - 1).trimEnd()}\u2026` : detail;
+  return `${DMG_GENERATOR_TITLES[id]}: ${short}`;
+}
+
 /** Save a result to a campaign's journal as a plain note. */
 export function saveDmgResultToJournal(
   data: DmData,
@@ -256,7 +267,7 @@ export function saveDmgResultToJournal(
   now: number,
 ): { data: DmData; title: string } {
   const journal = data.campaigns.find((c) => c.id === campaignId)?.journal ?? [];
-  const title = uniqueTitle(journal, DMG_GENERATOR_TITLES[id]);
+  const title = uniqueTitle(journal, dmgResultTitle(id, parts, opts));
   const note: DmNote = {
     id: noteId,
     kind: 'note',

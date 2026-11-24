@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Dices } from 'lucide-react';
-import type { DmApi } from './dmApi';
+import type { DmApi, OpenJournal } from './dmApi';
 import { activeCampaign } from '../../logic/dm-campaign';
 import {
   ADVENTURE_TIERS,
@@ -24,11 +24,22 @@ import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './dm.module.css';
 import gen from './generators.module.css';
 
+/** One generator's last result. Held by the Generators page so it survives switching tabs. */
+export interface DmgResult {
+  parts: RolledPart[];
+  /** Options that were in force when the result was rolled, so the card never disagrees with the table it came from. */
+  rolledWith: DmgOptions;
+  /** The journal note this exact result was saved as. Cleared when the result changes. */
+  savedId?: string;
+}
+
 interface DmgGeneratorProps {
   id: DmgGeneratorId;
   dm: DmApi;
   onNotify: (text: string) => void;
-  onOpenJournal: () => void;
+  onOpenJournal: OpenJournal;
+  result: DmgResult | null;
+  onResult: (result: DmgResult | null) => void;
 }
 
 const BUTTON_LABELS: Record<DmgGeneratorId, string> = {
@@ -62,28 +73,30 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 /** A generator that rolls transcribed DMG 2024 tables: options, a Generate button, a result card with per-line "Again". */
-export function DmgGenerator({ id, dm, onNotify, onOpenJournal }: DmgGeneratorProps) {
+export function DmgGenerator({ id, dm, onNotify, onOpenJournal, result, onResult }: DmgGeneratorProps) {
   const campaign = activeCampaign(dm.data);
   const [size, setSize] = useState<DmgOptions['size']>('');
   const [tier, setTier] = useState<AdventureTier>('1-4');
   const [hook, setHook] = useState<HookKind>('patron');
-  const [parts, setParts] = useState<RolledPart[] | null>(null);
-  // Options that were in force when the result was rolled, so the card never disagrees with the table it came from.
-  const [rolledWith, setRolledWith] = useState<DmgOptions>({});
+  const parts = result?.parts ?? null;
+  const rolledWith = result?.rolledWith ?? {};
   const title = DMG_GENERATOR_TITLES[id];
 
   const roll = () => {
     const opts: DmgOptions = { size, tier, hook };
-    setRolledWith(opts);
-    setParts(rollDmgGenerator(createDefaultRng(), id, opts));
+    onResult({ parts: rollDmgGenerator(createDefaultRng(), id, opts), rolledWith: opts });
   };
-  const again = (key: string) =>
-    setParts((cur) => (cur ? cur.map((p) => (p.key === key ? rollDmgPart(createDefaultRng(), id, key, rolledWith) : p)) : cur));
+  const again = (key: string) => {
+    if (!result) return;
+    onResult({ parts: result.parts.map((p) => (p.key === key ? rollDmgPart(createDefaultRng(), id, key, rolledWith) : p)), rolledWith });
+  };
   const save = () => {
     if (!parts || !campaign) return;
-    const result = saveDmgResultToJournal(dm.data, campaign.id, id, parts, rolledWith, crypto.randomUUID(), clockNow());
-    dm.replace(result.data);
-    onNotify(`${result.title} saved to the journal of ${campaign.name}.`);
+    const noteId = crypto.randomUUID();
+    const saved = saveDmgResultToJournal(dm.data, campaign.id, id, parts, rolledWith, noteId, clockNow());
+    dm.replace(saved.data);
+    onResult({ parts, rolledWith, savedId: noteId });
+    onNotify(`${saved.title} saved to the journal of ${campaign.name}.`);
   };
   const sizeInfo = id === 'settlement' ? settlementSize(rolledWith.size ?? '') : undefined;
 
@@ -132,8 +145,8 @@ export function DmgGenerator({ id, dm, onNotify, onOpenJournal }: DmgGeneratorPr
         </button>
         {parts && (
           <>
-            <button type="button" className={styles.btn} onClick={save} disabled={!campaign}>
-              Save to journal
+            <button type="button" className={styles.btn} onClick={save} disabled={!campaign || !!result?.savedId}>
+              {result?.savedId ? 'Saved' : 'Save to journal'}
             </button>
             <button
               type="button"
@@ -145,7 +158,7 @@ export function DmgGenerator({ id, dm, onNotify, onOpenJournal }: DmgGeneratorPr
               Copy text
             </button>
             {campaign && (
-              <button type="button" className={styles.btn} onClick={onOpenJournal}>
+              <button type="button" className={styles.btn} onClick={() => onOpenJournal(result?.savedId)}>
                 Open journal
               </button>
             )}
