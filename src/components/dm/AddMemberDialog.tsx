@@ -17,6 +17,8 @@ export interface AddMemberDialogProps {
   lockedTo?: AddMemberMode;
   /** Editing a manual member: start from these values. */
   initialManual?: { name: string; stats: DmManualStats };
+  /** The member being refreshed (when `lockedTo` is import): named in the title and helper text. */
+  memberName?: string;
   onImport: (character: Character) => void;
   onSaveManual: (name: string, stats: DmManualStats) => void;
   onClose: () => void;
@@ -103,6 +105,7 @@ export function AddMemberDialog({
   initialMode,
   lockedTo,
   initialManual,
+  memberName,
   onImport,
   onSaveManual,
   onClose,
@@ -151,7 +154,11 @@ export function AddMemberDialog({
 
   const setField = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft((d) => ({ ...d, [key]: value }));
   const editing = initialManual !== undefined;
-  const title = lockedTo === 'import' ? 'Update from a share link' : editing ? 'Edit party member' : 'Add a party member';
+  const title =
+    lockedTo === 'import'
+      ? memberName
+        ? `Update ${memberName} from a share link`
+        : 'Update from a share link' : editing ? 'Edit party member' : 'Add a party member';
 
   return (
     <>
@@ -166,7 +173,10 @@ export function AddMemberDialog({
               role="tab"
               aria-selected={mode === 'import'}
               className={mode === 'import' ? styles.tabActive : styles.tab}
-              onClick={() => setMode('import')}
+              onClick={() => {
+                setMode('import');
+                setError(null);
+              }}
             >
               From a share link
             </button>
@@ -175,7 +185,10 @@ export function AddMemberDialog({
               role="tab"
               aria-selected={mode === 'manual'}
               className={mode === 'manual' ? styles.tabActive : styles.tab}
-              onClick={() => setMode('manual')}
+              onClick={() => {
+                setMode('manual');
+                setError(null);
+              }}
             >
               Enter by hand
             </button>
@@ -185,9 +198,9 @@ export function AddMemberDialog({
         {mode === 'import' ? (
           <div className={styles.stack}>
             <p className={styles.muted}>
-              Ask the player to open Settings, then Share (read-only link), and send you the link. Paste it here. The
-              party card is a snapshot: to refresh it later, paste a new link. A character with the same name as an
-              existing member updates that member.
+              {lockedTo === 'import' && memberName
+                ? `This replaces ${memberName}'s party card with a fresh snapshot. Ask the player to open Settings, then Share (read-only link), and send you the new link. Paste it here.`
+                : 'Ask the player to open Settings, then Share (read-only link), and send you the link. Paste it here. The party card is a snapshot: to refresh it later, paste a new link. A character with the same name as an existing member updates that member.'}
             </p>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>Share link, code, or exported character file text</span>
@@ -236,7 +249,11 @@ export function AddMemberDialog({
             <div className={styles.formGrid}>
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Name</span>
-                <input className={styles.input} value={draft.name} onChange={(e) => setField('name', e.target.value)} autoFocus />
+                <input className={styles.input} value={draft.name} onChange={(e) => {
+                    setField('name', e.target.value);
+                    setError(null);
+                  }}
+                  autoFocus />
               </label>
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Class (for example Rogue 4)</span>

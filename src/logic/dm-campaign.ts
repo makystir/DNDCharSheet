@@ -24,6 +24,7 @@ import { activeConditionIds, exhaustionLevelOf } from './conditions';
 import { knownLanguages } from './languages';
 import { primaryClass, resolveClass } from './classes';
 import { getCondition } from '../data/conditions';
+import { BACKUP_STALE_DAYS } from '../storage/backup-reminder';
 
 export function emptyDmData(): DmData {
   return { v: 1, campaigns: [], customMonsters: [], activeCampaignId: null };
@@ -105,6 +106,24 @@ export function setActiveCampaign(data: DmData, id: string): DmData {
 }
 
 // ------------------------------------------------------------------- party
+
+/**
+ * A party card not updated for this many days is flagged stale. Matches the
+ * app's existing staleness threshold (the backup reminder's 14 days). A UX
+ * cue only, not a game rule.
+ */
+export const PARTY_STALE_DAYS = BACKUP_STALE_DAYS;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Whole days since the member was last updated, or null when the date is unknown. */
+export function memberAgeDays(member: DmPartyMember, now: number): number | null {
+  return member.updatedAt > 0 ? Math.max(0, Math.floor((now - member.updatedAt) / MS_PER_DAY)) : null;
+}
+
+export function isMemberStale(member: DmPartyMember, now: number): boolean {
+  const age = memberAgeDays(member, now);
+  return age !== null && age >= PARTY_STALE_DAYS;
+}
 
 export type AddMemberOutcome = 'added' | 'refreshed';
 

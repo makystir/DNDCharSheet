@@ -40,7 +40,10 @@ function listOrNone(items: string[]): string {
 export function PartyPage({ dm, onNotify, onOpenCampaign }: PartyPageProps) {
   const campaign = activeCampaign(dm.data);
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [now] = useState(() => Date.now());
   const [removing, setRemoving] = useState<DmPartyMember | null>(null);
+  /** A pasted link whose character name differs from the card it would replace, awaiting confirmation. */
+  const [mismatch, setMismatch] = useState<{ character: Character; memberId: string; memberName: string } | null>(null);
 
   const rows = useMemo(
     () =>
@@ -73,8 +76,7 @@ export function PartyPage({ dm, onNotify, onOpenCampaign }: PartyPageProps) {
   const editing = dialog?.kind === 'edit' ? campaign.party.find((m) => m.id === dialog.memberId) : undefined;
   const hidden = campaign.party.length - rows.length;
 
-  const handleImport = (character: Character) => {
-    const replaceMemberId = dialog?.kind === 'refresh' ? dialog.memberId : undefined;
+  const applyImport = (character: Character, replaceMemberId: string | undefined) => {
     // Computed from the current document (not inside an updater) so the
     // message can say whether the member was added or refreshed.
     const result = addImportedMember(dm.data, campaign.id, {
@@ -88,6 +90,20 @@ export function PartyPage({ dm, onNotify, onOpenCampaign }: PartyPageProps) {
     setDialog(null);
   };
 
+  const handleImport = (character: Character) => {
+    if (dialog?.kind === 'refresh') {
+      const target = campaign.party.find((m) => m.id === dialog.memberId);
+      const incoming = character.name.trim();
+      // A link for a different character must not silently overwrite this card.
+      if (target && incoming.toLowerCase() !== target.name.trim().toLowerCase()) {
+        setMismatch({ character, memberId: target.id, memberName: target.name });
+        return;
+      }
+      applyImport(character, dialog.memberId);
+      return;
+    }
+    applyImport(character, undefined);
+  };
   const handleManual = (name: string, stats: DmManualStats) => {
     if (dialog?.kind === 'edit') {
       const memberId = dialog.memberId;
@@ -163,6 +179,7 @@ export function PartyPage({ dm, onNotify, onOpenCampaign }: PartyPageProps) {
               key={member.id}
               member={member}
               stats={stats}
+              now={now}
               onUpdate={() => setDialog({ kind: 'refresh', memberId: member.id })}
               onEdit={() => setDialog({ kind: 'edit', memberId: member.id })}
               onRemove={() => setRemoving(member)}
@@ -176,12 +193,27 @@ export function PartyPage({ dm, onNotify, onOpenCampaign }: PartyPageProps) {
           initialMode={dialog.kind === 'add' ? dialog.mode : dialog.kind === 'refresh' ? 'import' : 'manual'}
           lockedTo={dialog.kind === 'refresh' ? 'import' : dialog.kind === 'edit' ? 'manual' : undefined}
           initialManual={editing?.manual ? { name: editing.name, stats: editing.manual } : undefined}
+          memberName={dialog.kind === 'refresh' ? campaign.party.find((m) => m.id === dialog.memberId)?.name : undefined}
           onImport={handleImport}
           onSaveManual={handleManual}
           onClose={() => setDialog(null)}
         />
       )}
 
+      {mismatch && (
+        <ConfirmDialog
+          title="Replace party member"
+          message={`This link is for ${mismatch.character.name.trim() || 'an unnamed character'}, not ${mismatch.memberName}. Replace ${mismatch.memberName}?`}
+          confirmLabel="Replace"
+          cancelLabel={`Keep ${mismatch.memberName}`}
+          onCancel={() => setMismatch(null)}
+          onConfirm={() => {
+            const pending = mismatch;
+            setMismatch(null);
+            applyImport(pending.character, pending.memberId);
+          }}
+        />
+      )}
       {removing && (
         <ConfirmDialog
           title="Remove party member"

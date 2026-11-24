@@ -3,6 +3,7 @@ import type { DmCombatant, DmCustomMonster, DmPartyMember } from '../../types/dm
 import { combatantFromMember, customCombatant, makeCopies, parseCopyCount, MAX_COMBATANTS } from '../../logic/dm-encounter';
 import { xpForCr } from '../../logic/dm-balance';
 import { libraryCombatants, libraryMonsters, notAddableMessage, type LibraryMonster } from '../../logic/dm-library';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { MonsterFilterBar, useMonsterFilter } from './MonsterFilterBar';
@@ -31,6 +32,19 @@ export interface AddCombatantsDialogProps {
 
 const newId = () => crypto.randomUUID();
 
+const CUSTOM_DEFAULTS = {
+  name: '',
+  ac: '12',
+  hpMax: '10',
+  initiativeMod: '0',
+  conSaveMod: '',
+  cr: '',
+  xp: '',
+  resistances: '',
+  vulnerabilities: '',
+  immunities: '',
+};
+
 /** Rows are not virtualised, so only this many matches are drawn; narrow the filters to reach the rest. */
 const MAX_SHOWN = 100;
 
@@ -57,27 +71,23 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   const [qty, setQty] = useState('1');
   const [group, setGroup] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [custom, setCustom] = useState({
-    name: '',
-    ac: '12',
-    hpMax: '10',
-    initiativeMod: '0',
-    conSaveMod: '',
-    cr: '',
-    xp: '',
-    resistances: '',
-    vulnerabilities: '',
-    immunities: '',
-  });
-
+  const [custom, setCustom] = useState(CUSTOM_DEFAULTS);
+  const [discarding, setDiscarding] = useState(false);
+  // Unsaved work: the Custom tab's fields differ from their defaults.
+  const dirty = tab === 'custom' && JSON.stringify(custom) !== JSON.stringify(CUSTOM_DEFAULTS);
+  // Overlay click and Escape ask first when there is unsaved work; Cancel is an explicit discard.
+  const requestClose = () => (dirty ? setDiscarding(true) : onClose());
   useEffect(() => {
+    if (discarding) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (dirty) setDiscarding(true);
+        else onClose();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
+  }, [onClose, dirty, discarding]);
   const entries = useMemo(() => libraryEntries(customMonsters), [customMonsters]);
   const filter = useMonsterFilter(useMemo(() => entries.map((e) => e.monster), [entries]));
   const matches = useMemo(() => {
@@ -151,7 +161,8 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   );
 
   return (
-    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Add combatants">
+    <>
+    <div className={styles.overlay} onClick={requestClose} role="dialog" aria-modal="true" aria-label="Add combatants">
       <div ref={ref} className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.dialogTitle}>Add combatants</h2>
         <div className={styles.tabs} role="tablist" aria-label="What to add">
@@ -317,5 +328,16 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
         </div>
       </div>
     </div>
+    {discarding && (
+      <ConfirmDialog
+        title="Discard changes"
+        message="Discard what you have entered?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        onCancel={() => setDiscarding(false)}
+        onConfirm={onClose}
+      />
+    )}
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import type { MemberStats } from '../../logic/dm-campaign';
+import { isMemberStale, memberAgeDays, PARTY_STALE_DAYS, type MemberStats } from '../../logic/dm-campaign';
 import type { Breakdown } from '../../logic/breakdown';
 import type { DmPartyMember } from '../../types/dm';
 import { Card } from '../shared/Card';
@@ -11,6 +11,8 @@ interface PartyMemberCardProps {
   onUpdate: () => void;
   onEdit: () => void;
   onRemove: () => void;
+  /** Current time (ms), supplied by the page so the card stays pure. */
+  now: number;
 }
 
 function Stat({ label, breakdown, suffix = '' }: { label: string; breakdown: Breakdown; suffix?: string }) {
@@ -32,8 +34,10 @@ function formatWhen(ms: number): string {
 }
 
 /** One party member's table-side numbers. */
-export function PartyMemberCard({ member, stats, onUpdate, onEdit, onRemove }: PartyMemberCardProps) {
+export function PartyMemberCard({ member, stats, onUpdate, onEdit, onRemove, now }: PartyMemberCardProps) {
   const hp = stats.hp;
+  const stale = isMemberStale(member, now);
+  const ageDays = memberAgeDays(member, now);
   return (
     <Card>
       <div className={styles.memberCard} data-testid="party-member-card">
@@ -42,6 +46,18 @@ export function PartyMemberCard({ member, stats, onUpdate, onEdit, onRemove }: P
           <div className={styles.muted}>{stats.identity}</div>
           <div className={styles.muted}>
             {member.source === 'imported' ? 'Shared character' : 'Entered by hand'} · updated {formatWhen(member.updatedAt)}
+            {stale && (
+              <>
+                {' '}
+                <span
+                  className={styles.chipWarn}
+                  data-testid="stale-badge"
+                  title={`Not updated for ${ageDays} days (flagged after ${PARTY_STALE_DAYS}). Numbers may be out of date.`}
+                >
+                  Stale
+                </span>
+              </>
+            )}
           </div>
         </div>
 
