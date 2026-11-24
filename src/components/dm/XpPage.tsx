@@ -6,6 +6,7 @@ import type { DmApi } from './dmApi';
 import { DIFFICULTIES, DIFFICULTY_LABELS, type EncounterDifficulty } from '../../data/xp-tables';
 import { countsForXp } from '../../logic/dm-balance';
 import { addAward, activeCampaign, memberStats } from '../../logic/dm-campaign';
+import { markAfterCombat } from '../../logic/dm-encounter';
 import {
   awardIdFromUuid,
   cleanLabel,
@@ -35,6 +36,8 @@ interface XpPageProps {
   newId?: () => string;
   /** Encounter to choose on the Fight tab when the page opens (handed over from the Encounter page). */
   initialEncounterId?: string;
+  /** Characters sharing the XP, chosen on the Encounter page. */
+  initialSharers?: number;
 }
 
 type Tab = 'fight' | 'milestone' | 'noncombat' | 'level';
@@ -68,7 +71,7 @@ const BLOCKED_TEXT: Record<BlockedOutcome, string> = {
 };
 
 /** Build one award (DMG 2024 "Awarding XP", "Noncombat Challenges", "Milestones") and copy its code. */
-export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId }: XpPageProps) {
+export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId, initialSharers }: XpPageProps) {
   const campaign = activeCampaign(dm.data);
   const party = campaign?.party ?? [];
   const budgetMembers = party.flatMap((m) => {
@@ -79,7 +82,7 @@ export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId 
   const [tab, setTab] = useState<Tab>('fight');
   const [label, setLabel] = useState('');
   const [encounterId, setEncounterId] = useState(initialEncounterId ?? '');
-  const [sharers, setSharers] = useState('');
+  const [sharers, setSharers] = useState(initialSharers !== undefined ? String(initialSharers) : '');
   const [milestone, setMilestone] = useState<'major' | 'minor'>('major');
   const [noncombat, setNoncombat] = useState<EncounterDifficulty | 'typed'>('moderate');
   const [typed, setTyped] = useState('100');
@@ -186,7 +189,14 @@ export function XpPage({ dm, onNotify, newId = defaultNewId, initialEncounterId 
       return;
     }
     setCreateError(null);
-    if (campaign) dm.update((d) => addAward(d, campaign.id, award));
+    if (campaign) {
+      // A fight award made for an encounter ticks that encounter's after-combat checklist.
+      const fightId = award.source === 'fight' ? encounter?.id : undefined;
+      dm.update((d) => {
+        const added = addAward(d, campaign.id, award);
+        return fightId ? markAfterCombat(added, campaign.id, fightId, { awardMade: true }, award.createdAt) : added;
+      });
+    }
     setShown({ code: encoded.code, id: award.id, key, history: false, kind: award.kind, amount: award.amount, label: award.label });
   };
 

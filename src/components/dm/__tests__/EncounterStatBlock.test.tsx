@@ -66,6 +66,15 @@ function seedRunning(opts: { activeId?: string | null; status?: DmEncounter['sta
 const drawer = () => screen.queryByRole('complementary', { name: 'Stat block' });
 const show = (name: string) => fireEvent.click(screen.getByRole('button', { name: `Show stat block for ${name}` }));
 const toggleFollow = () => fireEvent.click(within(drawer()!).getByRole('checkbox', { name: 'Follow the active turn' }));
+/** Open the drawer on one creature and turn follow off, so it stays pinned to that creature. */
+const showPinned = (name: string) => {
+  show(name);
+  const box = within(drawer()!).getByRole('checkbox', { name: 'Follow the active turn' });
+  if ((box as HTMLInputElement).checked) fireEvent.click(box);
+  // Following had moved the drawer to the active creature: pick the wanted one again.
+  const again = screen.queryByRole('button', { name: `Show stat block for ${name}` });
+  if (again) fireEvent.click(again);
+};
 const drawerNext = () => fireEvent.click(within(drawer()!).getByRole('button', { name: 'Next turn' }));
 
 beforeEach(() => localStorage.clear());
@@ -73,7 +82,7 @@ beforeEach(() => localStorage.clear());
 describe('Stat block drawer on the Encounter page', () => {
   it('opens, replaces, and closes with Close and Escape', () => {
     seedRunning();
-    show('Goblin Warrior 2');
+    showPinned('Goblin Warrior 2');
     const d = drawer()!;
     expect(d).toBeInTheDocument();
     expect(within(d).getByRole('article', { name: 'Goblin Warrior stat block' })).toBeInTheDocument();
@@ -174,7 +183,6 @@ describe('Follow the active turn', () => {
   it('switches the shown creature on Next turn from the drawer header', () => {
     seedRunning();
     show('Goblin Warrior 2');
-    toggleFollow();
     // Following: Goblin Warrior 1 is active.
     expect(screen.getByRole('button', { name: 'Hide stat block for Goblin Warrior 1' })).toHaveAttribute('aria-pressed', 'true');
     drawerNext();
@@ -186,7 +194,6 @@ describe('Follow the active turn', () => {
   it('keeps the last creature with a note when a party member or Custom-tab combatant is active', () => {
     seedRunning({ activeId: 'dragon' });
     show('Goblin Warrior 1');
-    toggleFollow();
     expect(within(drawer()!).getByRole('article', { name: 'Adult Red Dragon stat block' })).toBeInTheDocument();
     drawerNext(); // Borin (pc)
     expect(within(drawer()!).getByRole('article', { name: 'Adult Red Dragon stat block' })).toBeInTheDocument();
@@ -199,7 +206,6 @@ describe('Follow the active turn', () => {
   it('stays mounted with "No active turn" when there is no active combatant', () => {
     seedRunning({ activeId: null });
     show('Goblin Warrior 1');
-    toggleFollow();
     expect(drawer()).not.toBeNull();
     expect(within(drawer()!).getByTestId('stat-block-note')).toHaveTextContent('No active turn');
     expect(within(drawer()!).getByRole('checkbox', { name: 'Follow the active turn' })).toBeChecked();
@@ -209,7 +215,6 @@ describe('Follow the active turn', () => {
   it('turning follow off leaves the last shown creature open', () => {
     seedRunning();
     show('Adult Red Dragon');
-    toggleFollow();
     expect(screen.getByRole('button', { name: 'Hide stat block for Goblin Warrior 1' })).toBeInTheDocument();
     toggleFollow();
     expect(screen.getByRole('button', { name: 'Hide stat block for Goblin Warrior 1' })).toHaveAttribute('aria-pressed', 'true');
@@ -221,7 +226,6 @@ describe('Follow the active turn', () => {
   it('leaves a placeholder with the toggle and Close when the last shown creature is removed', () => {
     seedRunning({ activeId: 'pc' });
     show('Goblin Warrior 1');
-    toggleFollow();
     expect(within(drawer()!).getByTestId('stat-block-note')).toHaveTextContent('Active combatant has no stat block');
     const card = screen.getAllByTestId('combatant-card').find((el) => within(el).queryByText('Goblin Warrior 1'))!;
     fireEvent.click(within(card).getByRole('button', { name: /^Show more for/ }));
@@ -232,5 +236,35 @@ describe('Follow the active turn', () => {
     expect(within(d).getByRole('checkbox', { name: 'Follow the active turn' })).toBeChecked();
     fireEvent.click(within(d).getByRole('button', { name: 'Close' }));
     expect(drawer()).toBeNull();
+  });
+});
+
+describe('Stat block drawer: defaults and Hit Points', () => {
+  it('follows the active turn by default in a running fight, not in setup', () => {
+    seedRunning();
+    show('Goblin Warrior 2');
+    expect(within(drawer()!).getByRole('checkbox', { name: 'Follow the active turn' })).toBeChecked();
+    expect(screen.getByRole('button', { name: 'Hide stat block for Goblin Warrior 1' })).toBeInTheDocument();
+  });
+  it('does not follow in setup', () => {
+    seedRunning({ status: 'setup' });
+    show('Goblin Warrior 2');
+    expect(within(drawer()!).getByRole('checkbox', { name: 'Follow the active turn' })).not.toBeChecked();
+  });
+  it('damages and heals the shown creature from the drawer', () => {
+    seedRunning();
+    show('Goblin Warrior 1');
+    const d = drawer()!;
+    fireEvent.change(within(d).getByLabelText('Amount for Goblin Warrior 1 (stat block)'), { target: { value: '4' } });
+    fireEvent.click(within(d).getByRole('button', { name: 'Damage Goblin Warrior 1 (stat block)' }));
+    expect(within(drawer()!).getByText('AC 15, HP 6/10', { exact: false })).toBeInTheDocument();
+    fireEvent.change(within(drawer()!).getByLabelText('Amount for Goblin Warrior 1 (stat block)'), { target: { value: '3' } });
+    fireEvent.click(within(drawer()!).getByRole('button', { name: 'Heal Goblin Warrior 1 (stat block)' }));
+    expect(within(drawer()!).getByText('AC 15, HP 9/10', { exact: false })).toBeInTheDocument();
+  });
+  it('has no Hit Point controls outside a running fight', () => {
+    seedRunning({ status: 'setup' });
+    show('Goblin Warrior 1');
+    expect(within(drawer()!).queryByRole('button', { name: /Damage Goblin Warrior 1/ })).toBeNull();
   });
 });

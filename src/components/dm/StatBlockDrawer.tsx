@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import type { LibraryMonster } from '../../logic/dm-library';
 import { MonsterStatBlock } from './MonsterStatBlock';
@@ -16,6 +17,8 @@ interface StatBlockDrawerProps {
   empty?: string;
   monster?: LibraryMonster;
   follow?: { value: boolean; onChange: (value: boolean) => void };
+  /** Damage and heal the shown combatant, with the same logic as its card (during a fight). */
+  hp?: { onDamage: (amount: number) => void; onHeal: (amount: number) => void };
   /** Next turn, for a running encounter (the toolbar scrolls out of reach on phones). */
   onNextTurn?: () => void;
   onClose: () => void;
@@ -30,9 +33,17 @@ export function StatBlockDrawer({
   empty,
   monster,
   follow,
+  hp,
   onNextTurn,
   onClose,
 }: StatBlockDrawerProps) {
+  const [amount, setAmount] = useState('');
+  const amountNum = Math.max(0, Math.trunc(Number(amount)) || 0);
+  const apply = (fn: (n: number) => void) => {
+    if (amountNum <= 0) return;
+    fn(amountNum);
+    setAmount('');
+  };
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Escape') {
       e.stopPropagation();
@@ -46,6 +57,28 @@ export function StatBlockDrawer({
           <strong>{title}</strong>
           {subtitle && <span className={styles.muted}> ({subtitle})</span>}
           {vitals && <div className={styles.muted}>{vitals}</div>}
+          {hp && (
+            <div className={styles.row}>
+              <input
+                className={`${styles.input} ${enc.amount}`}
+                type="number"
+                min={0}
+                inputMode="numeric"
+                aria-label={`Amount for ${title} (stat block)`}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') apply(hp.onDamage);
+                }}
+              />
+              <button type="button" className={styles.btnPrimary} onClick={() => apply(hp.onDamage)} aria-label={`Damage ${title} (stat block)`}>
+                Damage
+              </button>
+              <button type="button" className={styles.btn} onClick={() => apply(hp.onHeal)} aria-label={`Heal ${title} (stat block)`}>
+                Heal
+              </button>
+            </div>
+          )}
         </div>
         <div className={enc.drawerActions}>
           {follow && (

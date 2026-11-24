@@ -49,6 +49,8 @@ interface TreasurePageProps {
   onOpenJournal: () => void;
   /** CRs of the monsters overcome in an encounter, handed over by the Encounter page's "Roll treasure" button. */
   encounterCrs?: EncounterCrGroup[];
+  /** Called after a treasure roll made for that encounter, so its after-combat checklist can show it. */
+  onRolled?: () => void;
 }
 
 type Tab = 'individual' | 'hoard' | 'quest' | 'magic' | 'items' | 'reference';
@@ -110,7 +112,7 @@ function outcomeText(o: Outcome, rolled: RolledMagicItem[] = []): string {
 }
 
 /** Roll treasure from the DMG tables, take it as coins, gems, art or bars, and save it to the journal. */
-export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: TreasurePageProps) {
+export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs, onRolled }: TreasurePageProps) {
   const campaign = activeCampaign(dm.data);
   const partyLevels = (campaign?.party ?? []).flatMap((m) => {
     const s = memberStats(m);
@@ -154,6 +156,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs }: Trea
     setRolledMagic([]);
     setOutcome({ ...partial, form, formed: formMoney(createDefaultRng(), partial.totalGp, form) });
     setRollSeq((s) => s + 1);
+    onRolled?.();
   };
 
   const rollMagic = (count: number) => {

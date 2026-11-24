@@ -4,12 +4,15 @@ import type { LucideIcon } from 'lucide-react';
 import { DM_PAGE_INFO } from '../../logic/dm-mode';
 import type { DmPage } from '../../logic/dm-mode';
 import type { EncounterCrGroup } from '../../logic/dm-treasure';
+import { activeCampaign } from '../../logic/dm-campaign';
 import { useDmData } from '../../hooks/useDmData';
+import { markAfterCombat } from '../../logic/dm-encounter';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { PageContainer } from '../layout/PageContainer';
 import { Toast } from '../shared/Toast';
 import { AriaLiveAnnouncer } from '../shared/AriaLiveAnnouncer';
 import { UpdateBanner } from '../shared/UpdateBanner';
+import type { OpenJournal } from './dmApi';
 import { DmBackupNudge } from './DmBackupNudge';
 import { getDmLastExportAt } from '../../storage/dm-backup';
 import { CampaignPage } from './CampaignPage';
@@ -70,22 +73,37 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
   const [xpEncounterId, setXpEncounterId] = useState<string | undefined>(undefined);
   // CRs handed to the Treasure page by the Encounter page's button, cleared the same way.
   const [treasureCrs, setTreasureCrs] = useState<EncounterCrGroup[] | undefined>(undefined);
+  // The encounter the Treasure page's CRs came from, so a roll there can tick the encounter's checklist.
+  const [treasureEncounterId, setTreasureEncounterId] = useState<string | undefined>(undefined);
+  // Characters sharing the XP, handed to the Party XP page with the encounter id.
+  const [xpSharers, setXpSharers] = useState<number | undefined>(undefined);
+  // A journal note to open selected, handed over by the page that just created it.
+  const [journalNoteId, setJournalNoteId] = useState<string | undefined>(undefined);
   const go = useCallback(
     (target: DmPage) => {
       setXpEncounterId(undefined);
       setTreasureCrs(undefined);
+      setTreasureEncounterId(undefined);
+      setXpSharers(undefined);
+      setJournalNoteId(undefined);
       onNavigate(target);
     },
     [onNavigate],
   );
-  const openPartyXp = (encounterId: string) => {
+  const openPartyXp = (encounterId: string, sharers?: number) => {
     setXpEncounterId(encounterId);
+    setXpSharers(sharers);
     onNavigate('xp');
   };
 
-  const openTreasure = (groups: EncounterCrGroup[]) => {
+  const openTreasure = (groups: EncounterCrGroup[], encounterId?: string) => {
     setTreasureCrs(groups);
+    setTreasureEncounterId(encounterId);
     onNavigate('treasure');
+  };
+  const openJournal: OpenJournal = (noteId) => {
+    setJournalNoteId(noteId);
+    onNavigate('journal');
   };
   // Number-key shortcuts, ignored while typing in a form field.
   useEffect(() => {
@@ -176,14 +194,14 @@ export function DmShell({ page, onNavigate, onOpenPlayer, onTurnOff, theme, onTh
         {page === 'party' && (
           <PartyPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />
         )}
-        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenPartyXp={openPartyXp} onOpenTreasure={openTreasure} onOpenJournal={() => onNavigate('journal')} />}
+        {page === 'encounter' && <EncounterPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenPartyXp={openPartyXp} onOpenTreasure={openTreasure} onOpenJournal={openJournal} />}
         {page === 'library' && <LibraryPage dm={dm} onNotify={notify} onOpenEncounter={() => onNavigate('encounter')} />}
-        {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} />}
+        {page === 'journal' && <JournalPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} initialNoteId={journalNoteId} />}
         {page === 'generators' && (
-          <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => onNavigate('journal')} />
+          <GeneratorsPage dm={dm} onNotify={notify} onOpenCampaign={() => onNavigate('campaign')} onOpenJournal={() => openJournal()} />
         )}
-        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => onNavigate('journal')} encounterCrs={treasureCrs} />}
-        {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} />}
+        {page === 'treasure' && <TreasurePage dm={dm} onNotify={notify} onOpenJournal={() => openJournal()} encounterCrs={treasureCrs} onRolled={treasureEncounterId ? () => { const eid = treasureEncounterId; const cid = activeCampaign(dm.data)?.id; if (cid) dm.update((d) => markAfterCombat(d, cid, eid, { treasureRolled: true }, Date.now())); } : undefined} />}
+        {page === 'xp' && <XpPage dm={dm} onNotify={notify} initialEncounterId={xpEncounterId} initialSharers={xpSharers} />}
         {page === 'settings' && (
           <DmSettingsPage dm={dm} theme={theme} onThemeToggle={onThemeToggle} onTurnOff={onTurnOff} onNotify={notify} onExported={() => setLastExportAt(getDmLastExportAt())} />
         )}

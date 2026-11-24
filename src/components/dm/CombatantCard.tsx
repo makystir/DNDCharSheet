@@ -124,7 +124,13 @@ export function CombatantCard({
     });
     if (!outcome) return;
     onCommit(outcome.encounter);
+    // The details were for this hit only: clear them so they are not applied to the next one.
     setAmount('');
+    setType('');
+    setResist(false);
+    setVuln(false);
+    setImmune(false);
+    setCrit(false);
   };
 
   const heal = () => {
@@ -145,6 +151,8 @@ export function CombatantCard({
 
   const duplicate = () => onCommit(duplicateCombatant(encounter, c.id, () => crypto.randomUUID()));
 
+  // Damage details ticked for the next hit, shown on the card so they are visible without opening More.
+  const pendingFlags = [type, resist && 'resist', vuln && 'vulnerable', immune && 'immune', crit && 'crit'].filter(Boolean).join(', ');
   const dc = c.concentrationDcs[0];
   const defences = [
     c.resistances && `Resists ${c.resistances}`,
@@ -262,6 +270,14 @@ export function CombatantCard({
                 Concentrating{c.concentration.label ? `: ${c.concentration.label}` : ''}
               </span>
             )}
+          </div>
+        )}
+
+        {pendingFlags !== '' && !ended && !out && (
+          <div className={styles.chips}>
+            <span className={styles.chip} data-testid="pending-damage-flags" title="Applied to the next Damage press, then cleared">
+              Next hit: {pendingFlags}
+            </span>
           </div>
         )}
 
@@ -458,7 +474,7 @@ export function CombatantCard({
               </div>
               <span className={styles.muted}>
                 Resistance halves (round down) before Vulnerability doubles. Tick the boxes for this hit; they apply to the
-                next Damage press.
+                next Damage press and are cleared after it.
               </span>
             </div>
 

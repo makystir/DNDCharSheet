@@ -301,21 +301,125 @@ describe('Encounter page: after combat', () => {
     expect(screen.getByRole('button', { name: 'Roll treasure for this encounter' })).toBeInTheDocument();
   });
 
-  it('adds the combat summary to a new session note, then to the same one again', () => {
+  it('adds the combat summary once, shows where, and opens the journal on that note', () => {
     endFightWithOrc('1/2');
-    const journal = () => JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal as { kind: string; body: string }[];
+    const journal = () => JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal as { id: string; kind: string; body: string }[];
     fireEvent.click(screen.getByRole('button', { name: 'Add combat summary to the session note' }));
     expect(journal()).toHaveLength(1);
     expect(journal()[0].kind).toBe('session');
     expect(journal()[0].body).toContain('Combat: Ambush');
     expect(journal()[0].body).toContain('Combat ends after round');
+    // A second press is not possible, and the button says where the summary went.
+    const added = screen.getByRole('button', { name: /^Added to Session/ });
+    expect(added).toBeDisabled();
+    fireEvent.click(added);
+    expect(journal()[0].body.match(/Combat: Ambush/g)).toHaveLength(1);
+    expect(screen.getByTestId('done-summary')).toBeInTheDocument();
+    // The state survives leaving and coming back.
+    fireEvent.click(screen.getByRole('button', { name: 'Open journal' }));
+    expect(screen.getByText(/Combat: Ambush/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Encounter/ }));
+    expect(screen.getByRole('button', { name: /^Added to Session/ })).toBeDisabled();
+  });
+  it('puts a long combat log in the note as the last lines only', () => {
+    seedCampaign();
+    const lines = Array.from({ length: 40 }, (_, i) => `Line ${i + 1}`);
+    const enc = { id: 'e', name: 'Big fight', status: 'ended', round: 9, activeId: null, combatants: [], log: lines, createdAt: 1, updatedAt: 1 };
+    const d = JSON.parse(localStorage.getItem(DM_DATA_KEY)!);
+    d.campaigns[0].encounters = [enc];
+    d.campaigns[0].activeEncounterId = 'e';
+    localStorage.setItem(DM_DATA_KEY, JSON.stringify(d));
+    render(<Routed initial="encounter" />);
     fireEvent.click(screen.getByRole('button', { name: 'Add combat summary to the session note' }));
-    expect(journal()).toHaveLength(1);
-    expect(journal()[0].body.match(/Combat: Ambush/g)).toHaveLength(2);
-    expect(screen.getByRole('button', { name: 'Open journal' })).toBeInTheDocument();
+    const body = JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].journal[0].body as string;
+    expect(body).toContain('Line 40');
+    expect(body).not.toContain('Line 1\n');
+    expect(body).toContain('last 10 of 40 lines');
+  });
+  it('marks the party update as done and asks before updating the party again', () => {
+    seedCampaign();
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    fireEvent.click(screen.getByRole('button', { name: 'Add whole party' }));
+    fireEvent.change(screen.getByLabelText('Initiative for Borin'), { target: { value: '5' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    fireEvent.click(screen.getByRole('button', { name: 'End combat' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'End combat' })).getByRole('button', { name: 'End combat' }));
+    const saved = () => JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].encounters[0];
+    expect(screen.queryByTestId('done-party')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Update party cards with these Hit Points' }));
+    expect(screen.getByTestId('done-party')).toBeInTheDocument();
+    expect(saved().partyUpdated).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Update party cards again' }));
+    expect(screen.getByRole('dialog', { name: 'Update party cards again' })).toBeInTheDocument();
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+  it('marks treasure as rolled after a roll on the Treasure page, and keeps it after navigating back', () => {
+    endFightWithOrc('1/2');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll treasure for this encounter' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Roll' }));
+    fireEvent.click(screen.getByRole('button', { name: /Encounter/ }));
+    expect(screen.getByTestId('done-treasure')).toBeInTheDocument();
+  });
+  it('carries the number of characters sharing the XP to Party XP', () => {
+    endFightWithOrc('1/2');
+    fireEvent.change(screen.getByLabelText('Characters sharing the XP'), { target: { value: '4' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Open Party XP for this fight' }));
+    expect(screen.getByLabelText('Characters sharing the XP')).toHaveValue(4);
+  });
+  it('shows no toolbar once the fight has ended', () => {
+    endFightWithOrc('1/2');
+    expect(screen.queryByTestId('encounter-toolbar')).toBeNull();
   });
 });
-
+describe('Encounter page: live combat', () => {
+  function runningWith(hp: string) {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    addCustom('Ogre', hp);
+    fireEvent.change(screen.getByLabelText('Initiative for Ogre'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+  }
+  it('shows the balance card in setup and hides it once combat runs', () => {
+    seedCampaign(false);
+    render(<Routed initial="encounter" />);
+    newEncounter();
+    addCustom('Ogre', '30');
+    expect(screen.getByText('Encounter balance')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Initiative for Ogre'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start combat' }));
+    expect(screen.queryByText('Encounter balance')).toBeNull();
+  });
+  it('clears the damage details after a Damage press and shows them on the card until then', () => {
+    runningWith('100');
+    fireEvent.click(screen.getByRole('button', { name: 'Show more for Ogre' }));
+    fireEvent.change(screen.getByLabelText('Damage type for Ogre'), { target: { value: 'Fire' } });
+    fireEvent.click(screen.getByLabelText(/Resistance \(half\)/));
+    fireEvent.click(screen.getByLabelText(/Critical hit/));
+    expect(screen.getByTestId('pending-damage-flags')).toHaveTextContent('Fire, resist, crit');
+    fireEvent.change(screen.getByLabelText('Amount for Ogre'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Damage Ogre' }));
+    expect(screen.queryByTestId('pending-damage-flags')).toBeNull();
+    expect(screen.getByLabelText(/Resistance \(half\)/)).not.toBeChecked();
+    expect(screen.getByLabelText(/Critical hit/)).not.toBeChecked();
+    expect(screen.getByLabelText('Damage type for Ogre')).toHaveValue('');
+    // The next hit is full damage.
+    fireEvent.change(screen.getByLabelText('Amount for Ogre'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Damage Ogre' }));
+    expect(within(cards()[0]).getByText(/85 \/ 100/)).toBeInTheDocument();
+  });
+  it('rolls Initiative for combatants added mid-fight and sorts them in', () => {
+    runningWith('30');
+    expect(screen.queryByRole('button', { name: 'Roll Initiative for new combatants' })).toBeNull();
+    addCustom('Wolf', '11');
+    expect(within(cards()[1]).getByTitle('Initiative')).toHaveTextContent('-');
+    fireEvent.click(screen.getByRole('button', { name: 'Roll Initiative for new combatants' }));
+    cards().forEach((card) => expect(within(card).getByTitle('Initiative')).not.toHaveTextContent('-'));
+    expect(screen.queryByRole('button', { name: 'Roll Initiative for new combatants' })).toBeNull();
+  });
+});
 describe('Encounter page: DM quality of life', () => {
   it('shows whose turn it is next to the round', () => {
     seedCampaign(false);

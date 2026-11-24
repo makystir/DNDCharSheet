@@ -169,6 +169,16 @@ export interface DmEncounter {
    * added so later edits or deletes do not change a fight in progress. Absent in older saves.
    */
   customMonsterSnapshots?: Record<string, DmCustomMonster>;
+  /** After-combat checklist: each step is marked done once it has been carried out. Absent in older saves (all not done). */
+  awardMade?: boolean;
+  treasureRolled?: boolean;
+  summaryAdded?: boolean;
+  partyUpdated?: boolean;
+  /** The journal entry the combat summary went into, to open it and to label the done state. */
+  summaryNoteId?: string;
+  summaryNoteTitle?: string;
+  /** Characters sharing the XP, as chosen on the Encounter page and carried to Party XP. */
+  xpSharers?: number;
   createdAt: number;
   updatedAt: number;
 }

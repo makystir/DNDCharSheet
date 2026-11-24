@@ -32,15 +32,17 @@ interface JournalPageProps {
   dm: DmApi;
   onNotify: (text: string) => void;
   onOpenCampaign: () => void;
+  /** A note to open selected, for example the one a combat summary was just added to. */
+  initialNoteId?: string;
 }
 
 /** Sessions, NPCs, places, quests and notes for the open campaign, with search and links between them. */
-export function JournalPage({ dm, onNotify, onOpenCampaign }: JournalPageProps) {
+export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: JournalPageProps) {
   const campaign = activeCampaign(dm.data);
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<DmNoteKind | ''>('');
   const [status, setStatus] = useState<DmQuestStatus | ''>('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialNoteId ?? null);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState<DmNote | null>(null);
 

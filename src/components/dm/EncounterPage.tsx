@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Swords } from 'lucide-react';
 import type { DmCombatant, DmEncounter } from '../../types/dm';
-import type { DmApi } from './dmApi';
+import type { DmApi, OpenJournal } from './dmApi';
 import { activeCampaign, memberStats } from '../../logic/dm-campaign';
 import { difficultyFit, encounterXp, fitLabel, xpBudget, type BudgetMember } from '../../logic/dm-balance';
 import { DIFFICULTIES } from '../../data/xp-tables';
 import {
   activeEncounter,
+  combatantsMissingInitiative,
+  dealDamage,
+  healCombatant,
+  markAfterCombat,
   addCombatants,
   combatSummaryText,
   applyEncounterHpToParty,
@@ -50,11 +54,15 @@ interface EncounterPageProps {
   onNotify: (text: string) => void;
   onOpenCampaign: () => void;
   /** Open the Party XP page's Fight tab with this encounter already chosen. */
-  onOpenPartyXp: (encounterId: string) => void;
+  onOpenPartyXp: (encounterId: string, sharers?: number) => void;
   /** Open the Treasure page with the CRs of the creatures overcome in this fight. */
-  onOpenTreasure: (groups: EncounterCrGroup[]) => void;
-  onOpenJournal: () => void;
+  onOpenTreasure: (groups: EncounterCrGroup[], encounterId?: string) => void;
+  /** Open the Journal, with the given note selected when there is one. */
+  onOpenJournal: OpenJournal;
 }
+
+/** Combat log lines pasted into the session note with the summary (a long fight's log can run past 100 lines). */
+const SUMMARY_LOG_LINES = 10;
 
 const STATUS_LABEL = { setup: 'Setting up', running: 'In progress', ended: 'Finished' } as const;
 
@@ -66,7 +74,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
   const [deleting, setDeleting] = useState<DmEncounter | null>(null);
   const [newName, setNewName] = useState('');
   const [startError, setStartError] = useState<string | null>(null);
-  const [summarySaved, setSummarySaved] = useState(false);
+  const [confirmParty, setConfirmParty] = useState(false);
   const undoToast = useUndoToast();
   // The stat block drawer. id is the creature last shown (the pinned one when follow is off).
   const [statBlock, setStatBlock] = useState<{ encounterId: string; id: string; follow: boolean } | null>(null);
@@ -325,6 +333,12 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
     });
   };
 
+  const updateParty = () => {
+    const now = clockNow();
+    dm.update((d) => markAfterCombat(applyEncounterHpToParty(d, campaign.id, open, now), campaign.id, open.id, { partyUpdated: true }, now));
+    onNotify('Party cards updated with the end-of-fight Hit Points.');
+  };
+
   const renderCard = (c: DmCombatant) => (
     <CombatantCard
       key={c.id}
@@ -337,7 +351,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
       hasStatBlock={canShowStatBlock(c)}
       statBlockOpen={drawerOpen && c.id === shown?.id}
       onToggleStatBlock={() =>
-        setStatBlock(drawerOpen && c.id === shown?.id ? null : { encounterId: open.id, id: c.id, follow: sb?.follow ?? false })
+        setStatBlock(drawerOpen && c.id === shown?.id ? null : { encounterId: open.id, id: c.id, follow: sb?.follow ?? running })
       }
     />
   );
@@ -356,6 +370,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         </button>
       </div>
 
+      {!ended && (
       <div className={running ? `${enc.toolbar} ${enc.toolbarSticky}` : enc.toolbar} data-testid="encounter-toolbar">
         {running && (
           <>
@@ -423,6 +438,11 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
             <button type="button" className={styles.btn} onClick={() => commit(sortByInitiative(open))}>
               Sort by Initiative
             </button>
+            {combatantsMissingInitiative(open).length > 0 && (
+              <button type="button" className={styles.btn} onClick={() => commit(sortByInitiative(rollInitiatives(open, createDefaultRng())))}>
+                Roll Initiative for new combatants
+              </button>
+            )}
             <span className={enc.spacer} />
             <button type="button" className={styles.btnDanger} onClick={() => setConfirmEnd(true)}>
               End combat
@@ -430,6 +450,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
           </>
         )}
       </div>
+      )}
 
       {startError && (
         <p className={styles.error} role="alert">
@@ -443,7 +464,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
           // The Party XP page awards every party member and rejects a smaller count, so start from the same number.
           defaultSharers={Math.max(1, campaign.party.length)}
           onCommit={commit}
-          onOpenPartyXp={() => onOpenPartyXp(open.id)}
+          onOpenPartyXp={(sharers) => onOpenPartyXp(open.id, sharers)}
         />
       )}
 
@@ -471,26 +492,38 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
                     );
                     return;
                   }
-                  onOpenTreasure(src.groups);
+                  onOpenTreasure(src.groups, open.id);
                 }}
               >
                 Roll treasure for this encounter
               </button>
+              {open.treasureRolled && <span className={styles.chip} data-testid="done-treasure">Done: treasure rolled</span>}
               <button
                 type="button"
                 className={styles.btn}
+                disabled={open.summaryAdded === true}
                 onClick={() => {
+                  if (open.summaryAdded) return;
                   const now = clockNow();
-                  const result = appendToLatestSession(dm.data, campaign.id, combatSummaryText(open), crypto.randomUUID(), now);
-                  dm.replace(result.data);
-                  setSummarySaved(true);
+                  // The session note gets the outcome and the last lines of the log; the full log stays on the encounter.
+                  const result = appendToLatestSession(
+                    dm.data,
+                    campaign.id,
+                    combatSummaryText(open, { maxLogLines: SUMMARY_LOG_LINES }),
+                    crypto.randomUUID(),
+                    now,
+                  );
+                  dm.replace(
+                    markAfterCombat(result.data, campaign.id, open.id, { summaryAdded: true, summaryNoteId: result.noteId, summaryNoteTitle: result.title }, now),
+                  );
                   onNotify(`Combat summary ${result.created ? 'saved in the new' : 'added to'} session note "${result.title}".`);
                 }}
               >
-                Add combat summary to the session note
+                {open.summaryAdded ? `Added to ${open.summaryNoteTitle ?? 'the session note'}` : 'Add combat summary to the session note'}
               </button>
-              {summarySaved && (
-                <button type="button" className={styles.btn} onClick={onOpenJournal}>
+              {open.summaryAdded && <span className={styles.chip} data-testid="done-summary">Done: summary added</span>}
+              {open.summaryAdded && (
+                <button type="button" className={styles.btn} onClick={() => onOpenJournal(open.summaryNoteId)}>
                   Open journal
                 </button>
               )}
@@ -501,14 +534,11 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
                 <button
                   type="button"
                   className={styles.btn}
-                  onClick={() => {
-                    const now = Date.now();
-                    dm.update((d) => applyEncounterHpToParty(d, campaign.id, open, now));
-                    onNotify('Party cards updated with the end-of-fight Hit Points.');
-                  }}
+                  onClick={() => (open.partyUpdated ? setConfirmParty(true) : updateParty())}
                 >
-                  Update party cards with these Hit Points
+                  {open.partyUpdated ? 'Update party cards again' : 'Update party cards with these Hit Points'}
                 </button>
+                {open.partyUpdated && <span className={styles.chip} data-testid="done-party">Done: party cards updated</span>}
                 <span className={styles.muted}>Players keep their own numbers on their sheets.</span>
               </div>
             )}
@@ -516,7 +546,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         </Card>
       )}
 
-      {!ended && <EncounterBalance members={budgetMembers} combatants={open.combatants} />}
+      {!ended && !running && <EncounterBalance members={budgetMembers} combatants={open.combatants} />}
 
       {open.combatants.length === 0 ? (
         <Card>
@@ -541,6 +571,19 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
 
       {drawerOpen && sb && (
         <StatBlockDrawer
+          key={shown?.id ?? 'none'}
+          hp={
+            shown && running && !isOut(shown)
+              ? {
+                  // The same logic as the combatant card's Damage and Heal buttons.
+                  onDamage: (amount) => {
+                    const outcome = dealDamage(open, shown.id, { amount, resistance: false, vulnerability: false, immune: false, crit: false });
+                    if (outcome) commit(outcome.encounter);
+                  },
+                  onHeal: (amount) => commit(healCombatant(open, shown.id, amount)),
+                }
+              : undefined
+          }
           title={shown ? shown.name : 'Stat block'}
           subtitle={shown && resolved && resolved.monster.name !== shown.name ? resolved.monster.name : undefined}
           vitals={shown ? `AC ${shown.ac}, HP ${shown.hp.hp}/${shown.hp.max}` : undefined}
@@ -575,6 +618,19 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
         duration={5000}
         action={undoToast.pending ? { label: 'Undo', onAction: undoToast.undo } : undefined}
       />
+
+      {confirmParty && (
+        <ConfirmDialog
+          title="Update party cards again"
+          message="The party cards were already updated with this fight's Hit Points. Copy them again?"
+          confirmLabel="Update again"
+          onCancel={() => setConfirmParty(false)}
+          onConfirm={() => {
+            updateParty();
+            setConfirmParty(false);
+          }}
+        />
+      )}
 
       {confirmEnd && (
         <ConfirmDialog

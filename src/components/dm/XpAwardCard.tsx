@@ -15,17 +15,24 @@ interface XpAwardCardProps {
   defaultSharers: number;
   onCommit: (next: DmEncounter) => void;
   /** Open the Party XP page's Fight tab for this encounter, where the award code is made. */
-  onOpenPartyXp: () => void;
+  onOpenPartyXp: (sharers: number) => void;
 }
 
 /** Who counts as overcome, and what each character earns (DMG 2024 "Awarding XP"). */
 export function XpAwardCard({ encounter, defaultSharers, onCommit, onOpenPartyXp }: XpAwardCardProps) {
-  const [sharers, setSharers] = useState(String(Math.max(1, defaultSharers)));
+  const [sharers, setSharers] = useState(String(encounter.xpSharers ?? Math.max(1, defaultSharers)));
   const monsters = encounter.combatants.filter((c) => c.kind === 'monster');
   const counts = countsForXp;
   const counted = monsters.filter(counts);
   const size = Math.max(1, Math.trunc(Number(sharers)) || 1);
   const award = xpAward(counted, size);
+  // Party XP rejects a count below the whole party, so say so here instead of failing there.
+  const belowParty = size < defaultSharers;
+  const changeSharers = (value: string) => {
+    setSharers(value);
+    const count = Math.trunc(Number(value));
+    if (value.trim() !== '' && count >= 1 && count !== encounter.xpSharers) onCommit({ ...encounter, xpSharers: Math.min(count, 99) });
+  };
 
   return (
     <Card>
@@ -58,7 +65,7 @@ export function XpAwardCard({ encounter, defaultSharers, onCommit, onOpenPartyXp
         <div className={styles.row}>
           <label className={styles.field} style={{ flex: '0 1 180px' }}>
             <span className={styles.fieldLabel}>Characters sharing the XP</span>
-            <input className={styles.input} type="number" min={1} value={sharers} onChange={(e) => setSharers(e.target.value)} />
+            <input className={styles.input} type="number" min={1} value={sharers} onChange={(e) => changeSharers(e.target.value)} />
           </label>
           <div className={styles.stat}>
             <span className={styles.statLabel}>Total XP</span>
@@ -78,10 +85,18 @@ export function XpAwardCard({ encounter, defaultSharers, onCommit, onOpenPartyXp
           </div>
         </div>
         <div className={styles.row}>
-          <button type="button" className={styles.btnPrimary} onClick={onOpenPartyXp}>
+          <button type="button" className={styles.btnPrimary} onClick={() => onOpenPartyXp(size)}>
             Open Party XP for this fight
           </button>
-          <span className={styles.muted}>Make the award code there. The ticked creatures carry over.</span>
+          <span className={styles.muted}>Make the award code there. The ticked creatures and the number sharing carry over.</span>
+          {encounter.awardMade && <span className={styles.chip} data-testid="done-award">Done: award code made</span>}
+        </div>
+        <div className={styles.row}>
+          {belowParty && (
+            <span className={styles.error} role="alert">
+              Party XP needs at least the {defaultSharers} party members. Enter {defaultSharers} or more before opening it.
+            </span>
+          )}
         </div>
       </div>
     </Card>

@@ -646,7 +646,7 @@ export function previousTurn(enc: DmEncounter): DmEncounter {
  * standing and who was down, then the combat log in order. The log keeps at most
  * `MAX_LOG_LINES` lines, so a long fight's earliest lines may already be gone.
  */
-export function combatSummaryText(enc: DmEncounter): string {
+export function combatSummaryText(enc: DmEncounter, options: { maxLogLines?: number } = {}): string {
   const rounds = Math.max(1, enc.round);
   const standing = enc.combatants.filter((c) => !isOut(c)).map((c) => c.name);
   const down = enc.combatants.filter((c) => isOut(c)).map((c) => c.name);
@@ -655,7 +655,15 @@ export function combatSummaryText(enc: DmEncounter): string {
     `Still standing: ${standing.length === 0 ? 'nobody' : standing.join(', ')}.`,
   ];
   if (down.length > 0) lines.push(`Down for good: ${down.join(', ')}.`);
-  if (enc.log.length > 0) lines.push('', 'Combat log:', ...enc.log.map((l) => `- ${l}`));
+  if (enc.log.length > 0) {
+    const max = options.maxLogLines;
+    if (max !== undefined && enc.log.length > max) {
+      // A long fight's log is not pasted whole: keep the last lines and say how many were left out.
+      lines.push('', `Combat log (last ${max} of ${enc.log.length} lines; the full log stays on the encounter):`, ...enc.log.slice(-max).map((l) => `- ${l}`));
+    } else {
+      lines.push('', 'Combat log:', ...enc.log.map((l) => `- ${l}`));
+    }
+  }
   return lines.join('\n');
 }
 
@@ -1004,6 +1012,17 @@ export function deleteEncounter(data: DmData, campaignId: string, encounterId: s
  * numbers. Imported cards are snapshots of the player's sheet, so the player's
  * own sheet is unaffected and the next share link replaces these numbers.
  */
+export type AfterCombatPatch = Partial<
+  Pick<DmEncounter, 'awardMade' | 'treasureRolled' | 'summaryAdded' | 'partyUpdated' | 'summaryNoteId' | 'summaryNoteTitle' | 'xpSharers'>
+>;
+/** Record an after-combat step (or the sharer count) on a saved encounter. Does nothing when the encounter is not found. */
+export function markAfterCombat(data: DmData, campaignId: string, encounterId: string, patch: AfterCombatPatch, now: number): DmData {
+  return mapEncounters(data, campaignId, (c) =>
+    c.encounters.some((e) => e.id === encounterId)
+      ? { ...c, updatedAt: now, encounters: c.encounters.map((e) => (e.id === encounterId ? { ...e, ...patch, updatedAt: now } : e)) }
+      : c,
+  );
+}
 export function applyEncounterHpToParty(data: DmData, campaignId: string, enc: DmEncounter, now: number): DmData {
   const byMember = new Map(enc.combatants.filter((c) => c.kind === 'pc' && c.memberId).map((c) => [c.memberId as string, c]));
   return mapEncounters(data, campaignId, (campaign) => ({

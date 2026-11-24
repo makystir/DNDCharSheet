@@ -188,6 +188,13 @@ function sanitizeEncounter(raw: unknown): DmEncounter | undefined {
     combatants,
     log: strList(raw.log).slice(-MAX_LOG_LINES),
     ...(snaps.length > 0 ? { customMonsterSnapshots: Object.fromEntries(snaps.map((m) => [m.id, m])) } : {}),
+    ...(raw.awardMade === true ? { awardMade: true } : {}),
+    ...(raw.treasureRolled === true ? { treasureRolled: true } : {}),
+    ...(raw.summaryAdded === true ? { summaryAdded: true } : {}),
+    ...(raw.partyUpdated === true ? { partyUpdated: true } : {}),
+    ...(typeof raw.summaryNoteId === 'string' && raw.summaryNoteId !== '' ? { summaryNoteId: str(raw.summaryNoteId).slice(0, 100) } : {}),
+    ...(typeof raw.summaryNoteTitle === 'string' && raw.summaryNoteTitle !== '' ? { summaryNoteTitle: str(raw.summaryNoteTitle).slice(0, 200) } : {}),
+    ...(typeof raw.xpSharers === 'number' && Number.isInteger(raw.xpSharers) && raw.xpSharers >= 1 ? { xpSharers: Math.min(raw.xpSharers, 99) } : {}),
     createdAt: num(raw.createdAt, 0),
     updatedAt: num(raw.updatedAt, 0),
   };

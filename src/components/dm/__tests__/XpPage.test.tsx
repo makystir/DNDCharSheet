@@ -32,9 +32,9 @@ function seed(members: Array<{ id: string; character: Character }> = [], manualL
   saveDmData(d);
 }
 
-function Page({ onNotify = () => {}, newId = () => UUID, initialEncounterId }: { onNotify?: (t: string) => void; newId?: () => string; initialEncounterId?: string }) {
+function Page({ onNotify = () => {}, newId = () => UUID, initialEncounterId, initialSharers }: { onNotify?: (t: string) => void; newId?: () => string; initialEncounterId?: string; initialSharers?: number }) {
   const dm = useDmData();
-  return <XpPage dm={dm} onNotify={onNotify} newId={newId} initialEncounterId={initialEncounterId} />;
+  return <XpPage dm={dm} onNotify={onNotify} newId={newId} initialEncounterId={initialEncounterId} initialSharers={initialSharers} />;
 }
 
 function typeAmount(value: string) {
@@ -205,6 +205,20 @@ describe('Party XP page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
     const code = await screen.findByLabelText('Award code');
     expect(await decodeAward((code as HTMLTextAreaElement).value)).toMatchObject({ ok: true, award: { kind: 'xp', amount: 100 } });
+  });
+  it('starts with the sharer count chosen on the Encounter page, and marks the encounter award as made', async () => {
+    const mon = { ...customCombatant('orc', { name: 'orc', ac: 10, hpMax: 10, initiativeMod: 0 }), xp: 300, kind: 'monster' as const, xpCounts: true };
+    const enc = { id: 'e1', name: 'e1', status: 'ended' as const, round: 0, activeId: null, combatants: [mon], log: [], createdAt: 1, updatedAt: 1 };
+    let d = createCampaign(emptyDmData(), { id: 'c', name: 'Test', now: 1 });
+    d = addImportedMember(d, 'c', { id: 'Ann', character: { ...sheet(3, 'xp', 0), name: 'Ann' }, now: 1 }).data;
+    d = { ...d, campaigns: d.campaigns.map((c) => ({ ...c, encounters: [enc] })) };
+    saveDmData(d);
+    render(<Page initialEncounterId="e1" initialSharers={3} />);
+    expect(screen.getByLabelText('Characters sharing the XP')).toHaveValue(3);
+    fireEvent.click(screen.getByRole('button', { name: 'Create code' }));
+    const code = await screen.findByLabelText('Award code');
+    expect(await decodeAward((code as HTMLTextAreaElement).value)).toMatchObject({ ok: true, award: { kind: 'xp', amount: 100 } });
+    await waitFor(() => expect(loadDmData().campaigns[0].encounters[0].awardMade).toBe(true));
   });
   it('hides the previous code while a history code is requested, and when that request fails', async () => {
     seed([{ id: 'Ann', character: sheet(3, 'xp', 0) }]);
