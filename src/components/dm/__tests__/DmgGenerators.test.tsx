@@ -207,6 +207,51 @@ describe('Generator results across tabs, saving and the journal', () => {
     expect(journal()).toHaveLength(3);
   });
 
+  const selectedTitle = () => within(screen.getByLabelText('Journal entries')).getByRole('button', { pressed: true }).textContent ?? '';
+
+  it('Open journal selects the saved NPC note', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Generate NPC' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open journal' }));
+    expect(selectedTitle()).toContain(journal()[0].title);
+  });
+
+  it('Open journal selects the place note, not its owner note', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Generate tavern' }));
+    const name = screen.getByTestId('place-name').textContent ?? '';
+    fireEvent.click(screen.getByRole('button', { name: 'Save to journal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open journal' }));
+    expect(selectedTitle()).toContain(name);
+  });
+
+  it('keeps the DMG shop source and the DMG options after a tab switch', () => {
+    seed();
+    render(<Routed initial="generators" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Shop' }));
+    fireEvent.change(screen.getByLabelText('Name source'), { target: { value: 'dmg' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Generate shop' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Tavern' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Shop' }));
+    expect(screen.getByLabelText('Name source')).toHaveValue('dmg');
+    fireEvent.click(screen.getByRole('button', { name: 'New name' }));
+    // A DMG shop is named from its (re-rolled) DMG shop type, shown in the subtitle; the original word lists would not do that.
+    const type = /^An? (.+), owned by/.exec(screen.getByLabelText('Generated shop').querySelector('span')!.textContent ?? '')![1];
+    expect(screen.getByTestId('place-name').textContent!.toLowerCase().endsWith(type)).toBe(true);
+    fireEvent.click(screen.getByRole('tab', { name: 'Adventure seed' }));
+    fireEvent.change(screen.getByLabelText('Party level'), { target: { value: '5-10' } });
+    fireEvent.change(screen.getByLabelText('Kind of hook'), { target: { value: 'supernatural' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Generate adventure seed' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Dungeon' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Adventure seed' }));
+    expect(screen.getByLabelText('Party level')).toHaveValue('5-10');
+    expect(screen.getByLabelText('Kind of hook')).toHaveValue('supernatural');
+  });
+
   it('wraps the tab strip on narrow screens', () => {
     const css = readFileSync(join(__dirname, '..', 'dm.module.css'), 'utf8');
     expect(css).toMatch(/\.tabs\s*\{[^}]*flex-wrap:\s*wrap/);

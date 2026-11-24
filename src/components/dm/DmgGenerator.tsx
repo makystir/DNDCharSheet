@@ -75,9 +75,9 @@ async function copyText(text: string): Promise<boolean> {
 /** A generator that rolls transcribed DMG 2024 tables: options, a Generate button, a result card with per-line "Again". */
 export function DmgGenerator({ id, dm, onNotify, onOpenJournal, result, onResult }: DmgGeneratorProps) {
   const campaign = activeCampaign(dm.data);
-  const [size, setSize] = useState<DmgOptions['size']>('');
-  const [tier, setTier] = useState<AdventureTier>('1-4');
-  const [hook, setHook] = useState<HookKind>('patron');
+  const [size, setSize] = useState<DmgOptions['size']>(result?.rolledWith.size ?? '');
+  const [tier, setTier] = useState<AdventureTier>(result?.rolledWith.tier ?? '1-4');
+  const [hook, setHook] = useState<HookKind>(result?.rolledWith.hook ?? 'patron');
   const parts = result?.parts ?? null;
   const rolledWith = result?.rolledWith ?? {};
   const title = DMG_GENERATOR_TITLES[id];

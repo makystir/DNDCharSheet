@@ -53,6 +53,9 @@ interface PlaceResult {
   place: { name: string; owner: GeneratedNpc; dmgType?: string };
   /** The place's journal note (the owner's note is linked from it). */
   savedId?: string;
+  /** The options in force when it was rolled, restored into the selects after a tab switch. */
+  source: 'original' | 'dmg';
+  trade: string;
 }
 
 type ResultProps<T> = { result: T | null; onResult: (r: T | null) => void };
@@ -279,11 +282,12 @@ function NpcGenerator({ dm, onNotify, onOpenJournal, result: current, onResult }
 /** A tavern or a shop: a name and an owner, saved to the journal as two linked entries. */
 function PlaceGenerator({ kind, dm, onNotify, onOpenJournal, result: current, onResult }: { kind: 'tavern' | 'shop' } & Omit<GeneratorsPageProps, 'onOpenCampaign'> & ResultProps<PlaceResult>) {
   const campaign = activeCampaign(dm.data);
-  const [trade, setTrade] = useState(SHOP_TYPES[0].id);
+  const [trade, setTrade] = useState(current?.trade ?? SHOP_TYPES[0].id);
   // 'original' uses this app's word lists; 'dmg' uses the DMG 2024 p.94 tables.
-  const [source, setSource] = useState<'original' | 'dmg'>('original');
+  const [source, setSource] = useState<'original' | 'dmg'>(current?.source ?? 'original');
   const place = current?.place ?? null;
   const dmg = source === 'dmg';
+  const withOpts = (r: Omit<PlaceResult, 'source' | 'trade'>): PlaceResult => ({ ...r, source, trade });
 
   const rollOwner = (role: string) => generateNpc(createDefaultRng(), { role: role.toLowerCase() });
   const ownerRole = (tradeLabel: string) => (kind === 'tavern' ? 'innkeeper' : tradeLabel);
@@ -298,19 +302,19 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal, result: current, on
 
   const roll = () => {
     const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
-    onResult({ place: build(rollOwner(ownerRole(dmgType ?? shopTypeById(trade).label)), dmgType) });
+    onResult(withOpts({ place: build(rollOwner(ownerRole(dmgType ?? shopTypeById(trade).label)), dmgType) }));
   };
 
   const newName = () => {
     if (!place) return;
     const dmgType = kind === 'shop' && dmg ? rollDmgShopType(createDefaultRng()) : undefined;
-    onResult({ place: build(place.owner, dmgType) });
+    onResult(withOpts({ place: build(place.owner, dmgType) }));
   };
 
   const newOwner = () => {
     const owner = rollOwner(ownerRole(place?.dmgType ?? shopTypeById(trade).label));
     if (!place) return;
-    onResult({ place: kind === 'tavern' ? { ...place, owner } : build(owner, place.dmgType) });
+    onResult(withOpts({ place: kind === 'tavern' ? { ...place, owner } : build(owner, place.dmgType) }));
   };
 
   const save = () => {
@@ -326,7 +330,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal, result: current, on
       now,
     );
     dm.replace(result.data);
-    onResult({ place, savedId: placeId });
+    onResult({ place, savedId: placeId, source: current?.source ?? source, trade: current?.trade ?? trade });
     onNotify(`${result.placeTitle} and its owner ${result.ownerTitle} saved to the journal.`);
   };
 
@@ -385,7 +389,7 @@ function PlaceGenerator({ kind, dm, onNotify, onOpenJournal, result: current, on
           </span>
           <NpcCard
             npc={place.owner}
-            onReroll={(part) => onResult({ place: { ...place, owner: rerollNpcPart(createDefaultRng(), place.owner, part) } })}
+            onReroll={(part) => onResult(withOpts({ place: { ...place, owner: rerollNpcPart(createDefaultRng(), place.owner, part) } }))}
           />
         </div>
       )}
