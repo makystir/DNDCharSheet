@@ -91,7 +91,10 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
 
   // On a narrow screen the stat block sits below the list, so bring it into view when a creature is picked.
   useEffect(() => {
-    if (selectedKey && isNarrow) statRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+    if (selectedKey && isNarrow) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      statRef.current?.scrollIntoView?.({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+    }
     // Only a new selection scrolls, not a change of screen width.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey]);

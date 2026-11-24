@@ -5,7 +5,7 @@ import { SWUpdateProvider } from '../../../hooks/useSWUpdate';
 import { DmShell } from '../DmShell';
 import { DM_DATA_KEY } from '../../../storage/dm-store';
 import type { DmPage } from '../../../logic/dm-mode';
-import { createCampaign, emptyDmData } from '../../../logic/dm-campaign';
+import { createCampaign, addManualMember, DEFAULT_MANUAL_STATS, emptyDmData } from '../../../logic/dm-campaign';
 import { createEncounter, saveEncounter, openEncounter } from '../../../logic/dm-encounter';
 import {
   MAX_RECENT_CREATURES,
@@ -62,6 +62,7 @@ describe('Library cluster E', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add to Ambush' }));
     expect(screen.getByTestId('library-encounter-summary')).toHaveTextContent('Ambush: 1 combatant ·');
     expect(screen.getByTestId('library-encounter-summary')).toHaveTextContent(/\d+ XP/);
+    expect(screen.getByTestId('library-encounter-summary')).toHaveTextContent('No party to compare with');
   });
 
   it('opens the target encounter from the summary line', () => {
@@ -88,6 +89,28 @@ describe('Library cluster E', () => {
     expect(screen.getByRole('article', { name: 'Bandit Captain stat block' })).toBeInTheDocument();
   });
 
+  it('shows a budget fit label once the campaign has a party', () => {
+    seed();
+    const d = JSON.parse(localStorage.getItem(DM_DATA_KEY)!);
+    localStorage.setItem(DM_DATA_KEY, JSON.stringify(addManualMember(d, 'c', { id: 'm1', name: 'Borin', stats: { ...DEFAULT_MANUAL_STATS, ac: 18, hpMax: 30, hpCurrent: 30 }, now: 1 })));
+    render(<Routed initial="library" />);
+    pick('Bandit Captain');
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Ambush' }));
+    expect(screen.getByTestId('library-encounter-summary')).toHaveTextContent(/Fits the \w+ budget|Over the High budget/);
+  });
+  it('records creatures added from the Add combatants dialog in the recent row', () => {
+    seed();
+    const enc = render(<Routed initial="encounter" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add combatants' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Creature library' }));
+    fireEvent.change(screen.getByLabelText('Search creatures'), { target: { value: 'Aboleth' } });
+    fireEvent.click(within(screen.getByRole('list', { name: 'Creatures' })).getAllByRole('radio')[0]);
+    fireEvent.click(screen.getByRole('button', { name: 'Add and keep browsing' }));
+    expect(loadRecentCreatures()).toHaveLength(1);
+    enc.unmount();
+    render(<Routed initial="library" />);
+    expect(within(screen.getByRole('group', { name: 'Recently added to an encounter' })).getByRole('button', { name: /Aboleth/ })).toBeInTheDocument();
+  });
   it('scrolls the stat block into view on a narrow screen only', () => {
     const scroll = vi.fn();
     Element.prototype.scrollIntoView = scroll;
