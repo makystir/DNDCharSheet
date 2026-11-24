@@ -69,7 +69,7 @@ const PENDING_STEP: Record<PendingItem['kind'] | FeaturePickItem['kind'], Review
   spellbook: 'spells',
   prepared: 'spells',
   expertise: 'features',
-  languages: 'species',
+  languages: 'features',
 };
 
 const PENDING_LABEL: Record<PendingItem['kind'] | FeaturePickItem['kind'], string> = {

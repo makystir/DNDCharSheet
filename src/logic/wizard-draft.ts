@@ -17,6 +17,9 @@ export interface WizardDraft {
   savedAt: number;
   step: number;
   furthest: number;
+  /** Step ids at save time (optional: older drafts stored only numeric indexes into the old step order). */
+  stepId?: string;
+  furthestId?: string;
   name: string;
   classId: string;
   backgroundId: string;
@@ -85,6 +88,8 @@ export function isWizardDraft(value: unknown): value is WizardDraft {
     isInt(d.savedAt, 0) &&
     isInt(d.step, 0) &&
     isInt(d.furthest, 0) &&
+    (d.stepId === undefined || typeof d.stepId === 'string') &&
+    (d.furthestId === undefined || typeof d.furthestId === 'string') &&
     typeof d.name === 'string' &&
     isNumRecord(d.allocation) &&
     isStrRecord(d.speciesChoices) &&
@@ -109,6 +114,41 @@ export function isWizardDraft(value: unknown): value is WizardDraft {
     (d.trinketRoll === null || (isInt(d.trinketRoll, 1) && (d.trinketRoll as number) <= 100)) &&
     isFeatures(d.features)
   );
+}
+
+/**
+ * The wizard's step order before Ability Scores and Equipment moved ahead of
+ * Class Features. A draft saved then has only numeric `step` / `furthest`
+ * indexes into this list (minus any conditional step the class lacks).
+ */
+const LEGACY_STEP_ORDER = [
+  'class',
+  'background',
+  'species',
+  'skills',
+  'features',
+  'abilities',
+  'spells',
+  'details',
+  'equipment',
+  'review',
+];
+
+/**
+ * Where a saved draft resumes in the current step list (`stepIds`, already
+ * filtered for the class). Uses the saved step ids; a legacy draft without ids
+ * is translated from its old numeric index. A step the class no longer has
+ * clamps to a valid index.
+ */
+export function resolveDraftStep(draft: WizardDraft, stepIds: string[]): { step: number; furthest: number } {
+  const last = Math.max(stepIds.length - 1, 0);
+  const legacy = LEGACY_STEP_ORDER.filter((id) => stepIds.includes(id));
+  const locate = (id: string | undefined, legacyIndex: number): number => {
+    const target = id ?? legacy[Math.min(legacyIndex, legacy.length - 1)];
+    const at = stepIds.indexOf(target);
+    return at >= 0 ? at : Math.min(legacyIndex, last);
+  };
+  return { step: locate(draft.stepId, draft.step), furthest: locate(draft.furthestId, draft.furthest) };
 }
 
 /** Whether a draft holds anything worth resuming (a class or a name). */

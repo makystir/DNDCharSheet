@@ -63,8 +63,7 @@ describe('Wizard flow: names, blockers and focus', () => {
     expect(nextBtn()).toBeDisabled();
     expect(screen.getByTestId('wizard-missing')).toHaveTextContent('To finish: give your character a name');
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    // Back on Details (Equipment is between Details and Review).
+    // Back on Details (Review follows it directly; Equipment now comes earlier).
     expect(screen.getByRole('heading', { name: /Alignment & Details/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Generate name' }));
     expect((screen.getByLabelText('Name') as HTMLInputElement).value.length).toBeGreaterThan(0);

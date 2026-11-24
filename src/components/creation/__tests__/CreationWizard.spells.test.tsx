@@ -49,7 +49,8 @@ function toAfterAbilities(skills: number) {
       target: { value: String(i) },
     });
   });
-  next();
+  next(); // Ability Scores -> Equipment (the default package is enough)
+  next(); // Equipment -> (Class Features, stepped over) -> Spells or Details
 }
 
 /** Clicks up to limit enabled, unchecked checkboxes in the group (the cap stops it sooner). */
@@ -90,8 +91,8 @@ describe('CreationWizard Spells step', () => {
     );
     toSkills(classId);
     toAfterAbilities(0);
-    // Step 6, or 7 when the class has a Class Features step before it.
-    expect(screen.getByRole('heading', { name: /Step [67]: Spells/ })).toBeInTheDocument();
+    // Step 7, or 8 when the class has a Class Features step before it.
+    expect(screen.getByRole('heading', { name: /Step [78]: Spells/ })).toBeInTheDocument();
     expect(screen.getByText(/Casters prepare a list of spells\./)).toBeInTheDocument();
     expect(screen.getByText(/You can change your prepared spells after a Long Rest/)).toBeInTheDocument();
     expect(screen.queryByText(/memoriz/i)).toBeNull();
@@ -126,7 +127,6 @@ describe('CreationWizard Spells step', () => {
     );
 
     next(); // Details
-    next(); // Equipment
     next(); // Review
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const stored = (onComplete.mock.calls[0][0] as Character).spellcasting?.byClass?.[classId as ClassId];
@@ -167,12 +167,12 @@ describe('CreationWizard Spells step', () => {
     expect(within(g).getAllByRole('button', { name: /Details for/ }).length).toBeGreaterThan(0);
   });
 
-  it('goes Back from Spells to Ability Scores', () => {
+  it('goes Back from Spells to Equipment', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     toSkills('wizard');
     toAfterAbilities(0);
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByRole('heading', { name: /Ability Scores/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Equipment/ })).toBeInTheDocument();
   });
 });
 
@@ -188,8 +188,8 @@ describe('CreationWizard Review step', () => {
         if (g) pickAll(g);
       }
     }
-    // Spells (if any) -> Details -> Equipment -> Review.
-    const total = pickSpells || classId === 'wizard' ? 3 : 2;
+    // Spells (if any) -> Details -> Review.
+    const total = pickSpells || classId === 'wizard' ? 2 : 1;
     for (let i = 0; i < total; i++) next();
     return onComplete;
   }
@@ -224,7 +224,7 @@ describe('CreationWizard Review step', () => {
     expect(screen.getByRole('group', { name: /cantrips: choose/ })).toBeInTheDocument();
   });
 
-  it('maps the Expertise Fix button to Class Features and the languages Fix button to Species & Languages', () => {
+  it('maps the Expertise Fix button to Class Features and the languages Fix button to Class Features', () => {
     toReview('rogue', 0, false);
     const backToReview = () => {
       for (let i = 0; i < 8; i++) {
@@ -237,7 +237,8 @@ describe('CreationWizard Review step', () => {
     expect(screen.getByRole('heading', { name: /Class Features/ })).toBeInTheDocument();
     backToReview();
     fireEvent.click(within(screen.getByTestId('review-open')).getByRole('button', { name: 'Fix feature languages' }));
-    expect(screen.getByRole('heading', { name: /Species & Languages/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Class Features/ })).toBeInTheDocument();
+    expect(screen.getByTestId('features-languages')).toBeInTheDocument();
   });
 
   it('shows the chosen spells and "Everything is set." when nothing is open, and Finish works', () => {

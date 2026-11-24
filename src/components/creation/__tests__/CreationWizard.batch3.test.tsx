@@ -17,6 +17,12 @@ function goTo(heading: RegExp) {
   for (let i = 0; i < 10 && !screen.queryByRole('heading', { name: heading }); i++) next();
   expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
 }
+/** Assign the standard array on the Ability Scores step. */
+function assignScores() {
+  ABILITIES.forEach((a, i) => {
+    fireEvent.change(screen.getByLabelText(`${NAMES[a]} score assignment`), { target: { value: String(i) } });
+  });
+}
 function throughSpecies(classId = 'fighter') {
   fireEvent.change(screen.getByLabelText('Class'), { target: { value: classId } });
   fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Tess' } });
@@ -122,6 +128,8 @@ describe('Class Features step', () => {
     const onComplete = vi.fn();
     render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
     throughSpecies('fighter');
+    goTo(/Ability Scores/);
+    assignScores();
     goTo(/Class Features/);
     const style = within(screen.getByTestId('features-fighting-style'));
     // The feature and every option are described before anything is picked.
@@ -131,10 +139,6 @@ describe('Class Features step', () => {
     // Weapon Mastery: the suggested starting weapons can be added in one tap.
     const mastery = within(screen.getByTestId('features-weapon-mastery'));
     for (const btn of mastery.queryAllByRole('button', { name: /^Add [A-Z]/ }).slice(0, 3)) fireEvent.click(btn);
-    goTo(/Ability Scores/);
-    ABILITIES.forEach((a, i) => {
-      fireEvent.change(screen.getByLabelText(`${NAMES[a]} score assignment`), { target: { value: String(i) } });
-    });
     goTo(/Review/);
     expect(screen.getByTestId('review-class-features')).toHaveTextContent('Fighting Style: Archery');
     next();
@@ -145,6 +149,8 @@ describe('Class Features step', () => {
   it('asks a Cleric for a Divine Order', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     throughSpecies('cleric');
+    goTo(/Ability Scores/);
+    assignScores();
     goTo(/Class Features/);
     const order = within(screen.getByTestId('features-cleric.divineOrder'));
     fireEvent.click(order.getAllByRole('radio')[0]);

@@ -108,6 +108,7 @@ import {
   clearWizardDraft,
   draftHasProgress,
   loadWizardDraft,
+  resolveDraftStep,
   saveWizardDraft,
   type WizardDraft,
 } from '../../logic/wizard-draft';
@@ -153,14 +154,17 @@ const ALL_STEPS: { id: StepId; label: string }[] = [
   { id: 'background', label: 'Background' },
   { id: 'species', label: 'Species' },
   { id: 'skills', label: 'Skills' },
-  // Only for classes whose level 1 features ask for a pick (Fighting Style,
-  // Divine / Primal Order, Invocations, Expertise, Weapon Mastery).
-  { id: 'features', label: 'Class Features' },
   { id: 'abilities', label: 'Ability Scores' },
+  // Equipment comes before Class Features so Weapon Mastery is picked from the
+  // gear the player actually chose, and after Ability Scores because its
+  // Strength / heavy-armour warnings read the final scores.
+  { id: 'equipment', label: 'Equipment' },
+  // Only for classes whose level 1 features ask for a pick (Fighting Style,
+  // Divine / Primal Order, Invocations, Expertise, Weapon Mastery, feature languages).
+  { id: 'features', label: 'Class Features' },
   // Only for classes with level 1 spellcasting (startingChoicesFor(...).spells).
   { id: 'spells', label: 'Spells' },
   { id: 'details', label: 'Details' },
-  { id: 'equipment', label: 'Equipment' },
   { id: 'review', label: 'Review' },
 ];
 
@@ -190,8 +194,9 @@ const STANDARD_ARRAY = standardArray();
  * Mirrors the WFRP CharacterWizard, re-themed to D&D: a five-step flow driven by
  * StepIndicator in PHB order — Class, Origin (Background + ability allocation,
  * Species + sub-choices, Languages), Ability Scores (Standard Array / Point Buy
- * with a live 27-point budget / Roll 4d6), Alignment & Details (with per-field
- * flavor generators), and Equipment (package A vs 50 GP B). On completion it
+ * with a live 27-point budget / Roll 4d6), Equipment (package A vs 50 GP B),
+ * Class Features (so Weapon Mastery sees the chosen gear), and Alignment & Details
+ * (with per-field flavor generators). On completion it
  * assembles a valid Character through the audited A6b `applyBackground` path
  * (base abilities never mutated) plus the chosen ability-score method.
  *
@@ -855,8 +860,15 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
     setCart(d.cart);
     setTrinketRoll(d.trinketRoll);
     setFeatures((d.features ?? {}) as WizardFeatures);
-    setFurthest(d.furthest);
-    setStep(d.step);
+    // The step list depends on the resumed class, so resolve the saved step ids against it.
+    const resumedSteps = ALL_STEPS.filter(
+      (s) =>
+        (s.id !== 'spells' || (d.classId !== '' && startingChoicesFor(d.classId as ClassId)?.spells != null)) &&
+        (s.id !== 'features' || hasCreationFeatures(d.classId)),
+    ).map((s) => s.id);
+    const resumed = resolveDraftStep(d, resumedSteps);
+    setFurthest(resumed.furthest);
+    setStep(resumed.step);
     setSavedDraft(null);
   };
   const discardDraft = () => {
@@ -873,6 +885,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       savedAt: Date.now(),
       step,
       furthest,
+      stepId: steps[Math.min(step, steps.length - 1)].id,
+      furthestId: steps[Math.min(furthest, steps.length - 1)].id,
       name,
       classId,
       backgroundId,
@@ -900,7 +914,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       features: features as WizardDraft['features'],
     });
   }, [
-    savedDraft, step, furthest, name, classId, backgroundId, allocation, speciesId, speciesChoices,
+    savedDraft, steps, step, furthest, name, classId, backgroundId, allocation, speciesId, speciesChoices,
     chosenLanguages, grantedLanguages, toolProficiency, skillChoices, spellPicks, abilityMethod,
     arrayAssignment, pointBuyScores, rolledPool, rolledAssignment, gender, alignment, details,
     equipmentChoice, classOption, classPicks, cart, trinketRoll, features,
@@ -1283,51 +1297,6 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
           })}
         </div>
       </fieldset>
-
-      {/* Base-class feature languages (PHB 2024): Rogue L1 "Thieves' Cant"
-          auto-grants Thieves' Cant + 1 choice; Ranger L2 "Deft Explorer" grants
-          2 choices. Surfaced once a class is chosen. The fixed auto-grant is
-          read-only; the "choose N" picks write into languages.granted. */}
-      {classId !== '' && (featureGrant.fixed.length > 0 || featureGrant.chooseCount > 0) && (
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.fieldLabel}>
-            {CLASS_LIST.find((c) => c.id === classId)?.name ?? 'Class'} feature languages
-            {featureGrant.chooseCount > 0 && <> — choose {featureGrant.chooseCount}</>}
-          </legend>
-          {featureGrant.fixed.length > 0 && (
-            <p className={styles.hint}>
-              Known automatically: {featureGrant.fixed.map(formatLanguage).join(', ')}
-            </p>
-          )}
-          {featureGrant.chooseCount > 0 && (
-            <>
-              <p className={styles.hint}>
-                {grantedLanguages.length} of {featureGrant.chooseCount} chosen
-              </p>
-              <div className={styles.langGrid}>
-                {LANGUAGES.filter(
-                  (lang) => !featureGrant.fixed.includes(lang),
-                ).map((lang) => {
-                  const selected = grantedLanguages.includes(lang);
-                  const atCap = grantedLanguages.length >= featureGrant.chooseCount;
-                  return (
-                    <label key={lang} className={styles.checkRow}>
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        disabled={!selected && atCap}
-                        aria-label={`${formatLanguage(lang)} (feature)`}
-                        onChange={() => toggleGrantedLanguage(lang)}
-                      />
-                      {formatLanguage(lang)}
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </fieldset>
-      )}
     </div>
   );
 
@@ -1891,6 +1860,9 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
         classId={classId}
         preview={buildCharacter()}
         onChange={(next) => setFeatures(extractWizardFeatures(next, classId))}
+        languageGrant={featureGrant}
+        grantedLanguages={grantedLanguages}
+        onToggleGrantedLanguage={toggleGrantedLanguage}
       />
     </div>
   );

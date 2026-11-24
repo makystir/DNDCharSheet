@@ -38,10 +38,13 @@ function toEquipment(classId: string) {
       target: { value: String(i) },
     });
   });
-  next(); // (Spells for casters) / Details
-  while (!screen.queryByRole('region', { name: 'Class equipment' })) {
-    next();
-  }
+  next(); // Equipment
+  expect(screen.getByRole('region', { name: 'Class equipment' })).toBeInTheDocument();
+}
+/** Equipment -> (Class Features, stepped over) -> Details -> Review. */
+function toReview() {
+  next();
+  next();
 }
 
 describe('CreationWizard equipment step', () => {
@@ -93,7 +96,7 @@ describe('CreationWizard equipment step', () => {
     toEquipment('fighter');
     fireEvent.click(screen.getByRole('tab', { name: '155 GP' }));
     fireEvent.click(screen.getByRole('button', { name: 'Buy one Dagger' }));
-    next(); // Review
+    toReview();
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const character = onComplete.mock.calls[0][0];
     // Gold only (no class package): 155 + 8 (Acolyte package) - 2 (Dagger) = 161 GP.
@@ -107,7 +110,7 @@ describe('CreationWizard equipment step', () => {
     const onComplete = vi.fn();
     render(<CreationWizard onComplete={onComplete} onCancel={vi.fn()} />);
     toEquipment('fighter');
-    next();
+    toReview();
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const character = onComplete.mock.calls[0][0];
     const chain = character.inventory.find((i: { catalogId?: string }) => i.catalogId === 'chain-mail');
@@ -123,7 +126,7 @@ describe('CreationWizard equipment step', () => {
     fireEvent.change(screen.getByLabelText("Choose Artisan's Tools or Musical Instrument"), {
       target: { value: 'Lute' },
     });
-    next();
+    toReview();
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const character = onComplete.mock.calls[0][0];
     expect(character.inventory.some((i: { catalogId?: string }) => i.catalogId === 'instrument-lute')).toBe(true);
@@ -137,7 +140,7 @@ describe('CreationWizard equipment step', () => {
     expect(screen.getByText(/metal urn containing the ashes of a hero/, { selector: 'p' })).toBeInTheDocument();
     // A rolled trinket can't be re-rolled (roll once); a choice can be cleared first.
     expect(screen.getByRole('button', { name: /Roll for a trinket/ })).toBeDisabled();
-    next();
+    toReview();
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
     const character = onComplete.mock.calls[0][0];
     expect(

@@ -14,6 +14,8 @@ import { creationFeatureNeeds } from '../../logic/creation-features';
 import { resolveClassFeatureTooltip, resolveFeatTooltip } from '../../logic/tooltip-content';
 import { ContentTooltip, MaybeContentTooltip } from '../shared/ContentTooltip';
 import { WeaponMasteryChooser } from '../combat/WeaponMasteryChooser';
+import { formatLanguage } from '../pages/sheet-helpers';
+import { LANGUAGES } from '../../logic/languages';
 import styles from './ClassFeaturesStep.module.css';
 
 export interface ClassFeaturesStepProps {
@@ -22,6 +24,10 @@ export interface ClassFeaturesStepProps {
   preview: Character;
   /** The edited preview; the wizard reads the picks back from it. */
   onChange: (next: Character) => void;
+  /** Level 1 feature languages (Rogue's Thieves' Cant): fixed grants and how many to choose. */
+  languageGrant?: { fixed: string[]; chooseCount: number };
+  grantedLanguages?: string[];
+  onToggleGrantedLanguage?: (lang: string) => void;
 }
 
 /** The class feature (from the class data) that grants a pick, for its description and tooltip. */
@@ -52,10 +58,17 @@ const CHOICE_FEATURE: Partial<Record<ClassChoiceKey, string>> = {
  * section opens with the feature's own description (class data), lists every
  * option with its description before anything is picked, and offers a
  * suggestion where the class data gives one (skills that use the class's main
- * ability; weapons in the starting gear). Nothing blocks: unfinished picks
+ * ability; weapons in the equipment chosen on the Equipment step). Nothing blocks: unfinished picks
  * still show on the sheet afterwards.
  */
-export function ClassFeaturesStep({ classId, preview, onChange }: ClassFeaturesStepProps) {
+export function ClassFeaturesStep({
+  classId,
+  preview,
+  onChange,
+  languageGrant,
+  grantedLanguages = [],
+  onToggleGrantedLanguage,
+}: ClassFeaturesStepProps) {
   const needs = creationFeatureNeeds(classId);
   const className = getClass(classId)?.name ?? classId;
 
@@ -73,7 +86,7 @@ export function ClassFeaturesStep({ classId, preview, onChange }: ClassFeaturesS
   const proficient = SKILLS.filter((s) => effectiveSkillTraining(preview, s.id).proficient);
   const suggestedExpertise = new Set(skillsUsingPrimaryAbility(classId, proficient.map((s) => s.id)));
 
-  // ── Weapon Mastery suggestions: weapons in the starting gear ──────────────
+  // ── Weapon Mastery suggestions: weapons in the chosen equipment ───────────
   const mastery = masteryChoices(preview);
   const gearWeapons = [
     ...new Set(
@@ -211,12 +224,55 @@ export function ClassFeaturesStep({ classId, preview, onChange }: ClassFeaturesS
         </section>
       )}
 
+      {languageGrant && (languageGrant.fixed.length > 0 || languageGrant.chooseCount > 0) && (
+        // Base-class feature languages (PHB 2024): Rogue L1 "Thieves' Cant"
+        // auto-grants Thieves' Cant + 1 choice; Ranger L2 "Deft Explorer" grants
+        // 2 choices (not at creation). The fixed auto-grant is read-only; the
+        // "choose N" picks write into languages.granted.
+        <section className={styles.section} aria-label="Feature languages" data-testid="features-languages">
+          <h3 className={styles.sectionTitle}>
+            {className} feature languages
+            {languageGrant.chooseCount > 0 && <> — choose {languageGrant.chooseCount}</>}
+          </h3>
+          {languageGrant.fixed.length > 0 && (
+            <p className={styles.hint}>Known automatically: {languageGrant.fixed.map(formatLanguage).join(', ')}</p>
+          )}
+          {languageGrant.chooseCount > 0 && (
+            <>
+              <p className={styles.count}>
+                {grantedLanguages.length} of {languageGrant.chooseCount} chosen
+              </p>
+              <ul className={styles.options}>
+                {LANGUAGES.filter((lang) => !languageGrant.fixed.includes(lang)).map((lang) => {
+                  const selected = grantedLanguages.includes(lang);
+                  const atCap = grantedLanguages.length >= languageGrant.chooseCount;
+                  return (
+                    <li key={lang} className={selected ? `${styles.option} ${styles.optionChosen}` : styles.option}>
+                      <label className={styles.optionLabel}>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          disabled={!selected && atCap}
+                          aria-label={`${formatLanguage(lang)} (feature)`}
+                          onChange={() => onToggleGrantedLanguage?.(lang)}
+                        />
+                        <span className={styles.optionName}>{formatLanguage(lang)}</span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
+
       {needs.weaponMastery > 0 && (
         <section className={styles.section} aria-label="Weapon Mastery" data-testid="features-weapon-mastery">
           <FeatureIntro classId={classId} featureName="Weapon Mastery" />
           {gearWeapons.length > 0 && mastery.slotsLeft > 0 && (
             <div className={styles.suggest}>
-              <span>Suggested: weapons in your starting gear.</span>
+              <span>Suggested: weapons in the equipment you chose.</span>
               {gearWeapons.map((id) => (
                 <button
                   key={id}

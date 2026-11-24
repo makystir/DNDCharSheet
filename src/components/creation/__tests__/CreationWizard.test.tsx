@@ -13,6 +13,12 @@ function next() {
   }
 }
 
+/** From Equipment, press Next once to land on the Class Features step (which 
+ext() steps over). */
+function toClassFeatures() {
+  fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  expect(screen.getByRole('heading', { name: /Class Features/ })).toBeInTheDocument();
+}
 /** Fill step 1 (name + class) and advance. */
 function completeStep1() {
   fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'fighter' } });
@@ -111,9 +117,9 @@ describe('CreationWizard', () => {
     completeStep1();
     completeStep2();
     completeStep3StandardArray();
-    next(); // -> step 4 (Details)
-    next(); // -> step 5 (Equipment)
-    next(); // -> step 6 (Review)
+    next(); // -> Equipment
+    next(); // -> Details (Fighter's Class Features step is stepped over)
+    next(); // -> Review
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
 
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -143,7 +149,7 @@ describe('CreationWizard', () => {
     expect(within(modTrigger).queryByText).not.toBeNull();
   });
 
-  it('shows a Rogue a 1-language feature picker and Thieves\u2019 Cant as a read-only known language', () => {
+  it('shows a Rogue a 1-language feature picker on Class Features, with Thieves\u2019 Cant as a read-only known language', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     fireEvent.change(screen.getByLabelText('Class'), { target: { value: 'rogue' } });
     fireEvent.change(screen.getByLabelText('Character Name'), { target: { value: 'Shadow' } });
@@ -151,8 +157,17 @@ describe('CreationWizard', () => {
     fireEvent.change(screen.getByLabelText('Background'), { target: { value: 'acolyte' } });
     fireEvent.change(screen.getByLabelText('Intelligence background increase'), { target: { value: '2' } });
     fireEvent.change(screen.getByLabelText('Wisdom background increase'), { target: { value: '1' } });
-    next(); // Background -> Species (the languages live here)
-    // The feature fieldset announces "choose 1" and the auto-granted Thieves' Cant.
+    next(); // Background -> Species
+    // The feature languages are not on the Species step any more.
+    expect(screen.queryByText(/Rogue feature languages/)).toBeNull();
+    expect(screen.queryByLabelText('Goblin (feature)')).toBeNull();
+    fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
+    next(); // -> Skills
+    next(); // -> Ability Scores
+    completeStep3StandardArray();
+    next(); // -> Equipment
+    toClassFeatures();
+    // The feature section announces "choose 1" and the auto-granted Thieves' Cant.
     expect(screen.getByText(/Rogue feature languages/)).toBeInTheDocument();
     expect(screen.getByText(/choose 1/)).toBeInTheDocument();
     expect(screen.getByText(/Known automatically: .*Thieves/)).toBeInTheDocument();
@@ -265,12 +280,13 @@ describe('CreationWizard', () => {
     });
     next(); // Background -> Species
     fireEvent.change(screen.getByLabelText('Species'), { target: { value: 'human' } });
-    fireEvent.click(screen.getByLabelText('Goblin (feature)'));
     next(); // -> Skills
     next(); // -> Ability Scores
     completeStep3StandardArray();
-    next(); // -> step 4
-    next(); // -> step 5
+    next(); // -> Equipment
+    toClassFeatures();
+    fireEvent.click(screen.getByLabelText('Goblin (feature)'));
+    next(); // -> Details
     next(); // -> Review
     fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
 
@@ -285,7 +301,7 @@ describe('CreationWizard Skills step', () => {
   it('lists Skills between Species and Ability Scores in the step indicator', () => {
     render(<CreationWizard onComplete={vi.fn()} onCancel={vi.fn()} />);
     const group = screen.getByRole('group', { name: 'Step progress' });
-    expect(group.textContent).toMatch(/Class.*Background.*Species.*Skills.*Ability Scores.*Details.*Equipment.*Review/);
+    expect(group.textContent).toMatch(/Class.*Background.*Species.*Skills.*Ability Scores.*Equipment.*Details.*Review/);
   });
 
   it('shows the class saves and origin grants as granted automatically', () => {

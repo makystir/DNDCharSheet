@@ -5,6 +5,8 @@ import { generateRandomCharacter } from '../personal-details-generation';
 import { createSeededRng } from '../random';
 import { masteryChoices } from '../weapon-mastery';
 import { characterFeats } from '../feats';
+import { featureLanguageGrants } from '../languages';
+import type { Character } from '../../types/character';
 import {
   applyWizardFeatures,
   autoPickFeatures,
@@ -52,5 +54,14 @@ describe('level 1 class feature picks (Class Features step)', () => {
     const built = applyWizardFeatures(bare, 'fighter', picks, 1);
     expect(characterFeats(built).find((f) => f.grantedBy === 'fighter')?.featId).toBe(picks.fightingStyle);
     expect(extractWizardFeatures(built, 'fighter')).toEqual(picks);
+  });
+});
+
+describe('feature languages need a Class Features step', () => {
+  it('every class with a level 1 feature-language grant has a Class Features step to show it on', () => {
+    for (const c of CLASS_LIST) {
+      const grant = featureLanguageGrants({ classes: [{ id: c.id, level: 1 }] } as Character);
+      if (grant.fixed.length > 0 || grant.chooseCount > 0) expect(hasCreationFeatures(c.id), c.id).toBe(true);
+    }
   });
 });
