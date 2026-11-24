@@ -56,3 +56,49 @@ export function setPactExpended(character: Character, expended: number): Charact
   const clamped = Math.max(0, Math.min(max, Math.trunc(expended)));
   return { ...character, spellcasting: { ...(character.spellcasting ?? {}), pactSlotsExpended: clamped } };
 }
+
+export type CastPlan =
+  | { kind: 'cantrip' }
+  | { kind: 'slot'; source: 'spellcasting' | 'pact'; level: number }
+  | { kind: 'none'; reason: string };
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+}
+
+/**
+ * Which slot a Combat "Cast" spends for a spell of `spellLevel`.
+ * PHB 2024 "Spell Slots" (Docs/PlayersHandbook.md L10709): "you expend a slot of
+ * that spell's level or higher"; "Casting Without Slots" (L10717): a cantrip is
+ * cast without a spell slot. So the spell's own level comes first and a higher
+ * slot is used only when every lower valid one is spent. Pact Magic slots may
+ * cast prepared spells (L2169); when a Spellcasting slot and the Pact slot are
+ * the same level, the Spellcasting slot is used first (the PHB does not rank them).
+ */
+export function planCast(character: Character, spellLevel: number): CastPlan {
+  if (spellLevel <= 0) return { kind: 'cantrip' };
+  const candidates: { source: 'spellcasting' | 'pact'; level: number }[] = [];
+  for (const s of slotLevels(character)) {
+    if (s.level >= spellLevel && s.max - s.expended > 0) candidates.push({ source: 'spellcasting', level: s.level });
+  }
+  const pact = pactSlots(character);
+  if (pact && pact.slotLevel >= spellLevel && pact.max - pact.expended > 0) {
+    candidates.push({ source: 'pact', level: pact.slotLevel });
+  }
+  if (candidates.length === 0) {
+    return { kind: 'none', reason: `No ${ordinal(spellLevel)}-level+ slots remaining` };
+  }
+  // Array.sort is stable, so a Spellcasting slot stays ahead of a same-level Pact slot.
+  candidates.sort((a, b) => a.level - b.level);
+  return { kind: 'slot', ...candidates[0]! };
+}
+
+/** Apply a plan with the same setters the slot pips use (one more slot expended). */
+export function spendForCast(character: Character, plan: CastPlan): Character {
+  if (plan.kind !== 'slot') return character;
+  if (plan.source === 'pact') return setPactExpended(character, (pactSlots(character)?.expended ?? 0) + 1);
+  const current = slotLevels(character).find((s) => s.level === plan.level)?.expended ?? 0;
+  return setSlotsExpended(character, plan.level, current + 1);
+}

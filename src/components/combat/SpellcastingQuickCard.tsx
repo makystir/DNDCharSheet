@@ -9,7 +9,7 @@ import {
 } from '../../logic/spellcasting';
 import { setConcentrating } from '../../logic/concentration';
 import { knownSpellsByClass } from '../../logic/known-spells';
-import { pactSlots, setPactExpended, setSlotsExpended, slotLevels } from '../../logic/spell-slot-spend';
+import { pactSlots, planCast, setPactExpended, setSlotsExpended, slotLevels, spendForCast } from '../../logic/spell-slot-spend';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
@@ -82,10 +82,28 @@ export function SpellcastingQuickCard({ character, onChange, onNotify }: Spellca
     onNotify?.(out.message);
   };
 
+  // Cast: spends the lowest valid slot via the same setters as the pips (PHB 2024 "Spell Slots"), then the shared Concentration logic.
+  const cast = (id: string) => {
+    const spell = getSpell(id);
+    if (!spell) return;
+    const plan = planCast(character, spell.level);
+    if (plan.kind === 'none') return;
+    let next = spendForCast(character, plan);
+    let message = plan.kind === 'slot' ? `Cast ${spell.name} with a level ${plan.level} slot.` : `Cast ${spell.name}.`;
+    if (spell.concentration) {
+      const out = setConcentrating(next, id as SpellId, true);
+      next = out.character;
+      message = `${message} ${out.message}`;
+    }
+    onChange(next);
+    onNotify?.(message);
+  };
   const spellRow = (id: string) => {
     const spell = getSpell(id);
     if (!spell) return null;
     const concentratingHere = character.concentration?.spellId === id;
+    const plan = planCast(character, spell.level);
+    const blocked = plan.kind === 'none' ? plan.reason : undefined;
     return (
       <li key={id} className={styles.spell}>
         <span className={styles.spellName}>
@@ -95,6 +113,20 @@ export function SpellcastingQuickCard({ character, onChange, onNotify }: Spellca
           {spell.castingTime.split(',')[0]}
           {spell.concentration && <span className={styles.tag}>Conc.</span>}
           {spell.ritual && <span className={styles.tag}>Ritual</span>}
+          <button
+            type="button"
+            className={styles.concBtn}
+            aria-label={`Cast ${spell.name}`}
+            disabled={blocked !== undefined}
+            onClick={() => cast(id)}
+          >
+            Cast
+          </button>
+          {blocked && (
+            <span className={styles.note} role="note">
+              {blocked}
+            </span>
+          )}
           {spell.concentration && (
             <button
               type="button"
