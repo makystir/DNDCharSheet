@@ -4,6 +4,7 @@ import { MAGIC_ITEMS } from '../../data/magic-items';
 import { DMG_MAGIC_ITEMS } from '../../data/dmg-magic-items';
 import { resolveMagicItem } from '../magic-item-resolve';
 import { characterArmorClassBreakdown } from '../armor-class';
+import { equippedWeapons, weaponAttackProfile, weaponProficiency } from '../attacks';
 import { encodeSharePayload } from '../share-codec';
 import { encodeAward } from '../dm-awards';
 import type { InventoryItem } from '../../types/character';
@@ -90,6 +91,20 @@ describe('dm item codes', () => {
     expect(acOf(viaCode)).toBe(acOf(manual));
   });
 
+  it('redeemed weapon behaves like a manually added custom weapon for attack', async () => {
+    const base = createCharacter('T');
+    const manual: InventoryItem = { id: 'm', kind: 'weapon', name: 'Custom', quantity: 1 };
+    const viaCode = inventoryItemFromCode(await payloadOf(srdWeapon.name), 'c');
+    const view = (item: InventoryItem) => {
+      const ch = { ...base, inventory: [item], equipped: { weaponItemIds: [item.id] } };
+      return {
+        profile: weaponAttackProfile(ch, item),
+        proficiency: weaponProficiency(ch, item).source,
+        equipped: equippedWeapons(ch).length,
+      };
+    };
+    expect(view(viaCode)).toEqual(view(manual));
+  });
   it('rejects bad input with a clear error', async () => {
     const cases: [string, string][] = [
       ['', 'empty'],
