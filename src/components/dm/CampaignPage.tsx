@@ -60,7 +60,8 @@ export function CampaignPage({ dm, onNotify, onOpenParty }: CampaignPageProps) {
               />
             </label>
             <label className={styles.field}>
-              <span className={styles.fieldLabel}>Notes</span>
+              <span className={styles.fieldLabel}>Campaign summary</span>
+              <span className={styles.muted}>A short overview of the campaign. Session logs, NPCs and places go in the Journal.</span>
               <textarea
                 key={`notes-${campaign.id}`}
                 className={styles.textarea}

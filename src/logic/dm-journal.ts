@@ -85,6 +85,7 @@ export interface SearchFilter {
 }
 
 function snippet(body: string, q: string): string {
+  if (q === '') return '';
   const at = body.toLowerCase().indexOf(q);
   if (at < 0) return '';
   const start = Math.max(0, at - 30);
@@ -106,22 +107,23 @@ export function sortNotes(notes: DmNote[], kind?: DmNoteKind): DmNote[] {
   return list.sort((a, b) => b.updatedAt - a.updatedAt || a.title.localeCompare(b.title));
 }
 
-/** Filter and search. Title matches come before body matches. */
+/** Filter and search. Every word of the query must appear in the title or text. Title matches come before body matches. */
 export function searchJournal(journal: DmNote[], f: SearchFilter): JournalHit[] {
-  const q = (f.query ?? '').trim().toLowerCase();
+  const tokens = (f.query ?? '').toLowerCase().split(/\s+/).filter((t) => t !== '');
   const pool = sortNotes(
     journal.filter((n) => (!f.kind || n.kind === f.kind) && (!f.status || (n.kind === 'quest' && n.status === f.status))),
     f.kind,
   );
-  if (q === '') return pool.map((note) => ({ note, snippet: '' }));
-  const inTitle = pool.filter((n) => n.title.toLowerCase().includes(q));
-  const inBody = pool.filter((n) => !n.title.toLowerCase().includes(q) && n.body.toLowerCase().includes(q));
-  return [
-    ...inTitle.map((note) => ({ note, snippet: snippet(note.body, q) })),
-    ...inBody.map((note) => ({ note, snippet: snippet(note.body, q) })),
-  ];
+  if (tokens.length === 0) return pool.map((note) => ({ note, snippet: '' }));
+  const found = pool.flatMap((note) => {
+    const title = note.title.toLowerCase();
+    const body = note.body.toLowerCase();
+    if (!tokens.every((t) => title.includes(t) || body.includes(t))) return [];
+    const inTitle = tokens.every((t) => title.includes(t));
+    return [{ note, inTitle, snippet: snippet(note.body, tokens.find((t) => body.includes(t)) ?? '') }];
+  });
+  return [...found.filter((h) => h.inTitle), ...found.filter((h) => !h.inTitle)].map(({ note, snippet: s }) => ({ note, snippet: s }));
 }
-
 // ------------------------------------------------------------------- edits
 
 function cleanTitle(title: string): string {
@@ -267,6 +269,14 @@ export function patchNote(data: DmData, campaignId: string, noteId: string, patc
 
 export function deleteNote(data: DmData, campaignId: string, noteId: string, now: number): DmData {
   return mapCampaign(data, campaignId, (c) => ({ ...c, updatedAt: now, journal: c.journal.filter((n) => n.id !== noteId) }));
+}
+
+/** Remove an entry that is still exactly as `newNote` made it and that nothing links to. Used when a new entry is abandoned. */
+export function discardUntouched(data: DmData, campaignId: string, original: Pick<DmNote, 'id' | 'title' | 'body'>, now: number): DmData {
+  const c = data.campaigns.find((x) => x.id === campaignId);
+  const n = c?.journal.find((x) => x.id === original.id);
+  if (!c || !n || n.title !== original.title || n.body !== original.body || backlinks(c.journal, n).length > 0) return data;
+  return deleteNote(data, campaignId, n.id, now);
 }
 
 export function noteById(journal: DmNote[], id: string | null): DmNote | undefined {

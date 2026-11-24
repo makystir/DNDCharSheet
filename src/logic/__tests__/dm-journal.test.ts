@@ -94,6 +94,13 @@ describe('search and order', () => {
     expect(searchJournal(all, { query: 'zzz' })).toEqual([]);
   });
 
+  it('matches every word of the query in any order, across title and text', () => {
+    const g = note({ title: 'Ambush', body: 'Attacked by goblins on the road.' });
+    const h = note({ title: 'Docks', body: 'Quiet.' });
+    expect(searchJournal([g, h], { query: 'goblin ambush' }).map((x) => x.note.title)).toEqual(['Ambush']);
+    expect(searchJournal([g, h], { query: '  ROAD   goblins ' })).toHaveLength(1);
+    expect(searchJournal([g, h], { query: 'goblin docks' })).toEqual([]);
+  });
   it('filters by kind and by quest status', () => {
     expect(searchJournal(all, { kind: 'npc' }).map((h) => h.note.title)).toEqual(['Mira']);
     expect(searchJournal(all, { kind: 'quest', status: 'open' }).map((h) => h.note.title)).toEqual(['Burn the mill']);

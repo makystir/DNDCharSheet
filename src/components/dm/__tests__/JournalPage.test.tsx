@@ -61,6 +61,22 @@ describe('Journal page', () => {
     expect(screen.getByRole('group', { name: 'Editing Session 2' })).toBeInTheDocument();
   });
 
+  it('drops a new entry that is left untouched, and keeps one that was edited', () => {
+    seed();
+    render(<Routed initial="journal" />);
+    fireEvent.click(screen.getByRole('button', { name: 'New npc' }));
+    expect(saved()).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(saved()).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: 'New npc' }));
+    fireEvent.change(screen.getByLabelText('Text'), { target: { value: 'Runs the inn.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(saved()).toHaveLength(1);
+    // Starting another entry while one is untouched also drops the first.
+    fireEvent.click(screen.getByRole('button', { name: 'New location' }));
+    fireEvent.click(screen.getByRole('button', { name: 'New quest' }));
+    expect(saved().map((n) => n.kind).sort()).toEqual(['npc', 'quest']);
+  });
   it('shows links as buttons, opens the target, and offers to create a missing one', () => {
     seed(mk('a', 'Session 1', 'Met [[Mira]] near [[The Docks]].', { kind: 'session', sessionNumber: 1 }), mk('m', 'Mira', '', { kind: 'npc' }));
     render(<Routed initial="journal" />);

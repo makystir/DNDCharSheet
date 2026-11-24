@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { NotebookPen } from 'lucide-react';
 import type { DmNote, DmNoteKind, DmQuestStatus } from '../../types/dm';
 import type { DmApi } from './dmApi';
@@ -11,6 +11,7 @@ import {
   STATUS_LABELS,
   backlinks,
   deleteNote,
+  discardUntouched,
   newNote,
   noteById,
   patchNote,
@@ -46,6 +47,8 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState<DmNote | null>(null);
 
+  // A new entry is saved so it can be edited, but dropped again if it is left exactly as created.
+  const fresh = useRef<Pick<DmNote, 'id' | 'title' | 'body'> | null>(null);
   const journal = useMemo(() => campaign?.journal ?? [], [campaign]);
   const hits = useMemo(
     () => searchJournal(journal, { query, kind: kind || undefined, status: kind === 'quest' && status ? status : undefined }),
@@ -73,7 +76,13 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
   const selected = noteById(journal, selectedId);
   const campaignId = campaign.id;
 
+  const dropFresh = () => {
+    const f = fresh.current;
+    fresh.current = null;
+    if (f) dm.update((d) => discardUntouched(d, campaignId, f, clockNow()));
+  };
   const create = (k: DmNoteKind, title?: string) => {
+    dropFresh();
     if (journal.length >= MAX_NOTES) {
       onNotify(`A campaign journal holds up to ${MAX_NOTES} entries.`);
       return;
@@ -81,6 +90,7 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
     const now = clockNow();
     const note = newNote(journal, { id: crypto.randomUUID(), kind: k, now, title });
     dm.update((d) => saveNote(d, campaignId, note, now));
+    if (title === undefined) fresh.current = { id: note.id, title: note.title, body: note.body };
     setSelectedId(note.id);
     setEditing(true);
     // Make sure the new entry shows in the list.
@@ -166,6 +176,7 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
                 className={note.id === selectedId ? jr.itemActive : jr.item}
                 aria-pressed={note.id === selectedId}
                 onClick={() => {
+                  dropFresh();
                   setSelectedId(note.id);
                   setEditing(false);
                 }}
@@ -198,7 +209,10 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
                 dm.update((d) => retitleNote(d, campaignId, selected.id, title, now));
               }}
               onPatch={(p) => patch(selected.id, p)}
-              onDone={() => setEditing(false)}
+              onDone={() => {
+                dropFresh();
+                setEditing(false);
+              }}
             />
           ) : (
             <NoteView
@@ -226,6 +240,7 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
           onConfirm={() => {
             const id = deleting.id;
             const now = clockNow();
+            if (fresh.current?.id === id) fresh.current = null;
             dm.update((d) => deleteNote(d, campaignId, id, now));
             setSelectedId(null);
             setDeleting(null);
