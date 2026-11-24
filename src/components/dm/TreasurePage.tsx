@@ -38,6 +38,7 @@ import {
 } from '../../logic/dm-treasure';
 import { createDefaultRng } from '../../logic/random';
 import { Card } from '../shared/Card';
+import { ItemCodeShare } from './ItemCodeShare';
 import { SectionHeader } from '../shared/SectionHeader';
 import { CalculatedValue } from '../shared/CalculatedValue';
 import styles from './dm.module.css';
@@ -250,6 +251,7 @@ export function TreasurePage({ dm, onNotify, onOpenJournal, encounterCrs, onRoll
                   <>
                     <p>{r.item.description}</p>
                     <div className={styles.muted}>Source: {r.item.source}</div>
+                    <ItemCodeShare item={r.item} onNotify={onNotify} />
                   </>
                 ) : (
                   <p role="note" className={styles.muted}>

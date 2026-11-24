@@ -39,6 +39,8 @@ import { ContentTooltip } from '../shared/ContentTooltip';
 import { ConsumablesPanel } from '../shared/ConsumablesPanel';
 import { CurrencyInput } from '../shared/CurrencyInput';
 import { CoinWeightValue } from '../shared/CoinWeightValue';
+import { ItemRedeemCard } from './ItemRedeemCard';
+import { addItemFromCode } from '../../logic/dm-item-codes';
 import styles from './InventoryPage.module.css';
 
 export interface InventoryPageProps {
@@ -613,6 +615,8 @@ export function InventoryPage({ character, onChange }: InventoryPageProps) {
           direct <ConsumablesPanel/> usage), so it is rendered directly here —
           NOT nested inside a second Card (finding #5: no card-in-card). */}
       <ConsumablesPanel character={character} onChange={onChange} />
+
+      <ItemRedeemCard onAdd={(p, id) => onChange(addItemFromCode(character, p, id))} />
 
       {/* ── Coin Purse + Encumbrance breakdown (two-column) ── */}
       <Card>
