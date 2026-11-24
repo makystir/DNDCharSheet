@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { NotebookPen } from 'lucide-react';
 import type { DmNote, DmNoteKind, DmQuestStatus } from '../../types/dm';
 import type { DmApi } from './dmApi';
@@ -48,7 +48,20 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
   const [deleting, setDeleting] = useState<DmNote | null>(null);
 
   // A new entry is saved so it can be edited, but dropped again if it is left exactly as created.
-  const fresh = useRef<Pick<DmNote, 'id' | 'title' | 'body'> | null>(null);
+  const fresh = useRef<(Pick<DmNote, 'id' | 'title' | 'body'> & { campaignId: string }) | null>(null);
+  const updateRef = useRef(dm.update);
+  useEffect(() => {
+    updateRef.current = dm.update;
+  });
+  // Leaving the Journal tab (the page unmounts) also drops an untouched new entry.
+  useEffect(
+    () => () => {
+      const f = fresh.current;
+      fresh.current = null;
+      if (f) updateRef.current((d) => discardUntouched(d, f.campaignId, f, clockNow()));
+    },
+    [],
+  );
   const journal = useMemo(() => campaign?.journal ?? [], [campaign]);
   const hits = useMemo(
     () => searchJournal(journal, { query, kind: kind || undefined, status: kind === 'quest' && status ? status : undefined }),
@@ -76,21 +89,26 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
   const selected = noteById(journal, selectedId);
   const campaignId = campaign.id;
 
-  const dropFresh = () => {
+  /** Drops an untouched new entry and returns the journal as it stands afterwards. */
+  const dropFresh = (): DmNote[] => {
     const f = fresh.current;
     fresh.current = null;
-    if (f) dm.update((d) => discardUntouched(d, campaignId, f, clockNow()));
+    if (!f) return journal;
+    const now = clockNow();
+    dm.update((d) => discardUntouched(d, f.campaignId, f, now));
+    const after = discardUntouched(dm.data, f.campaignId, f, now);
+    return after.campaigns.find((c) => c.id === campaignId)?.journal ?? journal;
   };
   const create = (k: DmNoteKind, title?: string) => {
-    dropFresh();
-    if (journal.length >= MAX_NOTES) {
+    const current = dropFresh();
+    if (current.length >= MAX_NOTES) {
       onNotify(`A campaign journal holds up to ${MAX_NOTES} entries.`);
       return;
     }
     const now = clockNow();
-    const note = newNote(journal, { id: crypto.randomUUID(), kind: k, now, title });
+    const note = newNote(current, { id: crypto.randomUUID(), kind: k, now, title });
     dm.update((d) => saveNote(d, campaignId, note, now));
-    if (title === undefined) fresh.current = { id: note.id, title: note.title, body: note.body };
+    if (title === undefined) fresh.current = { campaignId, id: note.id, title: note.title, body: note.body };
     setSelectedId(note.id);
     setEditing(true);
     // Make sure the new entry shows in the list.
@@ -251,4 +269,5 @@ export function JournalPage({ dm, onNotify, onOpenCampaign, initialNoteId }: Jou
     </div>
   );
 }
+
 

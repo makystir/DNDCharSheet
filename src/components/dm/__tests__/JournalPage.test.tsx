@@ -6,7 +6,7 @@ import { DmShell } from '../DmShell';
 import { DM_DATA_KEY } from '../../../storage/dm-store';
 import type { DmPage } from '../../../logic/dm-mode';
 import { createCampaign, emptyDmData } from '../../../logic/dm-campaign';
-import { saveNote } from '../../../logic/dm-journal';
+import { saveNote, discardUntouched, MAX_NOTES, SESSION_TEMPLATE } from '../../../logic/dm-journal';
 import type { DmNote } from '../../../types/dm';
 
 function Routed({ initial }: { initial: DmPage }) {
@@ -41,6 +41,69 @@ const list = () => within(screen.getByRole('list', { name: 'Journal entries' }))
 
 beforeEach(() => localStorage.clear());
 
+describe('discardUntouched', () => {
+  const orig = { id: 'a', title: 'Untitled', body: '' };
+  const withNotes = (...notes: DmNote[]) => {
+    let d = createCampaign(emptyDmData(), { id: 'c', name: 'Test', now: 1 });
+    for (const n of notes) d = saveNote(d, 'c', n, 1);
+    return d;
+  };
+  const ids = (d: ReturnType<typeof withNotes>) => d.campaigns[0].journal.map((n) => n.id);
+  it('removes an unlinked note that is unchanged', () => {
+    expect(ids(discardUntouched(withNotes(mk('a', 'Untitled')), 'c', orig, 2))).toEqual([]);
+  });
+  it('keeps an edited note, a linked note, and ignores an unknown id', () => {
+    expect(ids(discardUntouched(withNotes(mk('a', 'Untitled', 'text')), 'c', orig, 2))).toEqual(['a']);
+    expect(ids(discardUntouched(withNotes(mk('a', 'Untitled'), mk('l', 'Linker', 'see [[Untitled]]')), 'c', orig, 2))).toContain('a');
+    const d = withNotes(mk('a', 'Untitled'));
+    expect(discardUntouched(d, 'c', { ...orig, id: 'zz' }, 2)).toBe(d);
+  });
+});
+describe('Journal page: untouched new entries', () => {
+  it('drops an untouched new entry when the Journal tab is left', () => {
+    seed();
+    render(<Routed initial="journal" />);
+    fireEvent.click(screen.getByRole('button', { name: 'New npc' }));
+    expect(saved()).toHaveLength(1);
+    fireEvent.click(screen.getAllByRole('button', { name: /Campaign/ })[0]);
+    expect(saved()).toHaveLength(0);
+  });
+  it('drops an untouched session outline and the next session reuses its number', () => {
+    seed();
+    render(<Routed initial="journal" />);
+    fireEvent.click(screen.getByRole('button', { name: 'New session' }));
+    expect((screen.getByLabelText('Text') as HTMLTextAreaElement).value).toBe(SESSION_TEMPLATE);
+    fireEvent.click(screen.getByRole('button', { name: 'New session' }));
+    expect(screen.getByRole('group', { name: 'Editing Session 1' })).toBeInTheDocument();
+    expect(saved()).toHaveLength(1);
+  });
+  it('still allows New at the entry limit when an untouched new entry frees a slot', () => {
+    seed(...Array.from({ length: MAX_NOTES - 1 }, (_, i) => mk('n' + i, 'Note ' + i, 'x')));
+    render(<Routed initial="journal" />);
+    fireEvent.click(screen.getByRole('button', { name: 'New npc' }));
+    expect(saved()).toHaveLength(MAX_NOTES);
+    fireEvent.click(screen.getByRole('button', { name: 'New location' }));
+    expect(saved()).toHaveLength(MAX_NOTES);
+    expect(saved().some((n) => n.kind === 'location')).toBe(true);
+    expect(saved().some((n) => n.kind === 'npc')).toBe(false);
+  });
+  it('keeps the selection of another note after discarding a new entry', () => {
+    seed(mk('k', 'Keeper', 'body'));
+    render(<Routed initial="journal" />);
+    fireEvent.click(screen.getByRole('button', { name: 'New npc' }));
+    fireEvent.click(list().getByRole('button', { name: /Keeper/ }));
+    expect(saved().map((n) => n.id)).toEqual(['k']);
+    expect(list().getByRole('button', { name: /Keeper/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+describe('Campaign page notes', () => {
+  it('labels the field as a summary and points to the Journal', () => {
+    seed();
+    render(<Routed initial="campaign" />);
+    expect(screen.getByText('Campaign summary')).toBeInTheDocument();
+    expect(screen.getByText(/go in the Journal/)).toBeInTheDocument();
+  });
+});
 describe('Journal page', () => {
   it('asks for a campaign first', () => {
     render(<Routed initial="journal" />);
@@ -182,3 +245,4 @@ describe('Journal page', () => {
     expect(screen.getByText('No entries yet. Start with a session, an NPC or a place.')).toBeInTheDocument();
   });
 });
+
