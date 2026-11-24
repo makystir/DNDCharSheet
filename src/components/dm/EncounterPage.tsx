@@ -3,8 +3,8 @@ import { Swords } from 'lucide-react';
 import type { DmCombatant, DmEncounter } from '../../types/dm';
 import type { DmApi, OpenJournal } from './dmApi';
 import { activeCampaign, memberStats } from '../../logic/dm-campaign';
-import { difficultyFit, encounterXp, fitLabel, xpBudget, type BudgetMember } from '../../logic/dm-balance';
-import { DIFFICULTIES } from '../../data/xp-tables';
+import type { BudgetMember } from '../../logic/dm-balance';
+import { encounterSummary } from '../../logic/dm-encounter-summary';
 import {
   activeEncounter,
   combatantsMissingInitiative,
@@ -99,26 +99,7 @@ export function EncounterPage({ dm, onNotify, onOpenCampaign, onOpenPartyXp, onO
 
   const open = activeEncounter(campaign);
 
-  // Budget for the characters in a fight, or the whole party until some are added.
-  const budgetMembersFor = (combatants: DmCombatant[]): BudgetMember[] => {
-    const inFight: BudgetMember[] = combatants.flatMap((c) => {
-      const m = c.kind === 'pc' && c.memberId ? campaign.party.find((p) => p.id === c.memberId) : undefined;
-      const s = m ? memberStats(m) : undefined;
-      return s ? [{ name: c.name, level: s.level }] : [];
-    });
-    if (inFight.length > 0) return inFight;
-    return campaign.party.flatMap((m) => {
-      const s = memberStats(m);
-      return s ? [{ name: m.name, level: s.level }] : [];
-    });
-  };
-  /** Encounter XP and where it sits against the DMG 2024 budgets (same math as the balance card). */
-  const summaryOf = (e: DmEncounter) => {
-    const xpBreakdown = encounterXp(e.combatants).total;
-    const xp = xpBreakdown.total;
-    const [low, moderate, high] = DIFFICULTIES.map((d) => xpBudget(budgetMembersFor(e.combatants), d).total);
-    return { xp, xpBreakdown, fit: fitLabel(difficultyFit(xp, { low, moderate, high })) };
-  };
+  const summaryOf = (e: DmEncounter) => encounterSummary(campaign, e);
 
   const commit = (next: DmEncounter) => {
     const now = clockNow();

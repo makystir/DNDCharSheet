@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import type { DmCustomMonster } from '../../types/dm';
 import type { DmApi } from './dmApi';
@@ -15,14 +15,18 @@ import {
   type LibraryMonster,
   type LibraryOrigin,
 } from '../../logic/dm-library';
-import { addCombatants, createEncounter, parseCopyCount, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { encounterSummary } from '../../logic/dm-encounter-summary';
+import { loadRecentCreatures, recordRecentCreature } from '../../logic/dm-recent-creatures';
+import { addCombatants, createEncounter, openEncounter, parseCopyCount, saveEncounter, MAX_COMBATANTS } from '../../logic/dm-encounter';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { clockNow } from '../../logic/dm-mode';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
+import { CalculatedValue } from '../shared/CalculatedValue';
 import { MonsterStatBlock } from './MonsterStatBlock';
 import { MonsterEditorDialog } from './MonsterEditorDialog';
-import { MonsterFilterBar, useMonsterFilter } from './MonsterFilterBar';
+import { MonsterFilterBar, RecentCreatures, useMonsterFilter } from './MonsterFilterBar';
 import styles from './dm.module.css';
 import lib from './library.module.css';
 
@@ -39,6 +43,32 @@ const ORIGIN_LABEL: Record<LibraryOrigin, string> = {
   custom: 'My monsters',
 };
 
+/** One line on the target encounter: combatant count, XP (with its breakdown), difficulty fit, and a link to open it. */
+function EncounterSummaryLine({
+  summary,
+  name,
+  combatants,
+  onOpen,
+}: {
+  summary: ReturnType<typeof encounterSummary>;
+  name: string;
+  combatants: number;
+  onOpen: () => void;
+}) {
+  return (
+    <p className={styles.muted} style={{ marginTop: 8 }} data-testid="library-encounter-summary">
+      {name}: {combatants} {combatants === 1 ? 'combatant' : 'combatants'} ·{' '}
+      <CalculatedValue label="Encounter XP" breakdown={summary.xpBreakdown}>
+        {summary.xp.toLocaleString()} XP
+      </CalculatedValue>{' '}
+      · {summary.fit}{' '}
+      <button type="button" className={styles.btn} onClick={onOpen}>
+        Open encounter
+      </button>
+    </p>
+  );
+}
+
 /** Search the creatures, read a stat block, copy one into your own monsters, or send it into an encounter. */
 export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps) {
   const campaign = activeCampaign(dm.data);
@@ -49,11 +79,22 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
   const [encounterId, setEncounterId] = useState('');
   const [qty, setQty] = useState('1');
   const [group, setGroup] = useState(true);
+  const [recentKeys, setRecentKeys] = useState<string[]>(loadRecentCreatures);
+  const statRef = useRef<HTMLDivElement>(null);
+  const isNarrow = useMediaQuery('(max-width: 767px)');
 
   const all = useMemo(() => libraryMonsters(dm.data), [dm.data]);
   const filter = useMonsterFilter(all, origin || undefined);
   const shown = filter.matches;
   const selected = all.find((m) => m.key === selectedKey) ?? null;
+  const recent = recentKeys.flatMap((k) => all.find((m) => m.key === k) ?? []);
+
+  // On a narrow screen the stat block sits below the list, so bring it into view when a creature is picked.
+  useEffect(() => {
+    if (selectedKey && isNarrow) statRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+    // Only a new selection scrolls, not a change of screen width.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedKey]);
 
   const openEncounters = (campaign?.encounters ?? []).filter((e) => e.status !== 'ended');
   const chosenEncounter =
@@ -79,6 +120,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
       onNotify(notAddableMessage(m.name));
       return;
     }
+    setRecentKeys(recordRecentCreature(m.key));
     const next = addCombatants(chosenEncounter, list, dm.data.customMonsters);
     const now = clockNow();
     dm.update((d) => saveEncounter(d, campaign.id, next, now));
@@ -93,6 +135,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
       onNotify(notAddableMessage(m.name));
       return;
     }
+    setRecentKeys(recordRecentCreature(m.key));
     const now = clockNow();
     const created = createEncounter(crypto.randomUUID(), `${m.name} encounter`, now);
     const next = addCombatants(created, list, dm.data.customMonsters);
@@ -136,6 +179,8 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
         </div>
       </Card>
 
+      <RecentCreatures monsters={recent} selectedKey={selectedKey} onSelect={setSelectedKey} />
+
       <div className={lib.layout}>
         <ul className={lib.results} aria-label="Creatures">
           {shown.length === 0 && <li className={styles.muted} style={{ padding: 12 }}>No creature matches those filters.</li>}
@@ -157,7 +202,7 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
           ))}
         </ul>
 
-        <div className={styles.stack}>
+        <div className={styles.stack} ref={statRef}>
           {!selected ? (
             <Card>
               <SectionHeader icon={BookOpen} title="Stat block" />
@@ -226,6 +271,17 @@ export function LibraryPage({ dm, onNotify, onOpenEncounter }: LibraryPageProps)
                     </>
                   )}
                 </div>
+                {selected.addable && campaign && chosenEncounter && (
+                  <EncounterSummaryLine
+                    summary={encounterSummary(campaign, chosenEncounter)}
+                    name={chosenEncounter.name}
+                    combatants={chosenEncounter.combatants.length}
+                    onOpen={() => {
+                      dm.update((d) => openEncounter(d, campaign.id, chosenEncounter.id));
+                      onOpenEncounter();
+                    }}
+                  />
+                )}
                 {selected.addable && !chosenEncounter && (
                   <p className={styles.muted} style={{ marginTop: 8 }}>
                     {campaign

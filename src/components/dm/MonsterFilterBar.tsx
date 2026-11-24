@@ -79,3 +79,34 @@ export function MonsterFilterBar({
     </>
   );
 }
+
+/** A row of the creatures most recently added to an encounter; renders nothing when there are none. */
+export function RecentCreatures({
+  monsters,
+  selectedKey,
+  onSelect,
+}: {
+  monsters: LibraryMonster[];
+  selectedKey: string | null;
+  onSelect: (key: string) => void;
+}) {
+  if (monsters.length === 0) return null;
+  return (
+    <div className={styles.stack} role="group" aria-label="Recently added to an encounter">
+      <span className={styles.fieldLabel}>Recently added to an encounter</span>
+      <div className={styles.row} style={{ flexWrap: 'wrap' }}>
+        {monsters.map((m) => (
+          <button
+            key={m.key}
+            type="button"
+            className={m.key === selectedKey ? styles.btnPrimary : styles.btn}
+            aria-pressed={m.key === selectedKey}
+            onClick={() => onSelect(m.key)}
+          >
+            {m.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

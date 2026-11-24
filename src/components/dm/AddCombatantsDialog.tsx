@@ -6,6 +6,7 @@ import { libraryCombatants, libraryMonsters, notAddableMessage, type LibraryMons
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { recordRecentCreature } from '../../logic/dm-recent-creatures';
 import { MonsterFilterBar, useMonsterFilter } from './MonsterFilterBar';
 import styles from './dm.module.css';
 import enc from './encounter.module.css';
@@ -116,6 +117,7 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
       if (!entry) return setError('Pick a creature from the list.');
       const made = libraryCombatants(entry.monster, count, group, newId);
       if (!made) return setError(notAddableMessage(entry.name));
+      recordRecentCreature(entry.key);
       onAdd(made, keepOpen);
       if (keepOpen) setAdded(`Added ${count > 1 ? `${count} x ` : ''}${entry.name}.`);
       return;
