@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useState } from 'react';
 import { render, screen, fireEvent, within, waitFor, cleanup } from '@testing-library/react';
 import { SWUpdateProvider } from '../../../hooks/useSWUpdate';
@@ -11,7 +11,8 @@ import { generateRandomCharacter } from '../../../logic/personal-details-generat
 import { createSeededRng } from '../../../logic/random';
 import { exportToJSON } from '../../../storage/export-import';
 import { encodeSharePayload } from '../../../logic/share-codec';
-import { PARTY_STALE_DAYS } from '../../../logic/dm-campaign';
+import { PARTY_STALE_DAYS, isMemberStale, memberAgeDays } from '../../../logic/dm-campaign';
+import type { DmPartyMember } from '../../../types/dm';
 
 function Routed({ initial }: { initial: DmPage }) {
   const [page, setPage] = useState<DmPage>(initial);
@@ -84,23 +85,42 @@ describe('Mismatched share link (cluster B)', () => {
     await waitFor(() => expect(JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].party[0].name).toBe(b.name.trim()));
   });
 
-  it('refreshes without asking when the names match (ignoring case)', async () => {
-    const a = generateRandomCharacter(createSeededRng(11), {});
-    const code = await encodeSharePayload(exportToJSON(a));
+  async function seedAndOpenUpdate(a: ReturnType<typeof generateRandomCharacter>, pasted: ReturnType<typeof generateRandomCharacter>) {
+    const codeA = await encodeSharePayload(exportToJSON(a));
+    const codeP = await encodeSharePayload(exportToJSON(pasted));
     render(<Routed initial="campaign" />);
     openParty();
     fireEvent.click(screen.getByRole('button', { name: /Add member/ }));
-    fireEvent.change(screen.getByLabelText(/Share link, code/), { target: { value: `https://example.com/#view/${code}` } });
+    fireEvent.change(screen.getByLabelText(/Share link, code/), { target: { value: `https://example.com/#view/${codeA}` } });
     fireEvent.click(screen.getByRole('button', { name: 'Add to party' }));
     await waitFor(() => expect(screen.getByTestId('party-member-card')).toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Update from link' }));
-    fireEvent.change(screen.getByLabelText(/Share link, code/), { target: { value: `https://example.com/#view/${code}` } });
+    fireEvent.change(screen.getByLabelText(/Share link, code/), { target: { value: `https://example.com/#view/${codeP}` } });
     fireEvent.click(screen.getByRole('button', { name: 'Update member' }));
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Update ' + a.name.trim() + ' from a share link' })).toBeNull());
+  }
+  const storedName = () => JSON.parse(localStorage.getItem(DM_DATA_KEY)!).campaigns[0].party[0].name;
+
+  it('refreshes without asking when the names differ only by case', async () => {
+    const a = generateRandomCharacter(createSeededRng(11), {});
+    const upper = { ...a, name: a.name.trim().toUpperCase() };
+    expect(upper.name).not.toBe(a.name.trim());
+    await seedAndOpenUpdate(a, upper);
+    await waitFor(() => expect(storedName()).toBe(upper.name));
     expect(screen.queryByRole('dialog', { name: 'Replace party member' })).toBeNull();
   });
-});
 
+  it('keeps the card unchanged and the import dialog open when the confirm is cancelled', async () => {
+    const a = generateRandomCharacter(createSeededRng(11), {});
+    let b = generateRandomCharacter(createSeededRng(12), {});
+    for (let s = 13; b.name.trim().toLowerCase() === a.name.trim().toLowerCase(); s++) b = generateRandomCharacter(createSeededRng(s), {});
+    await seedAndOpenUpdate(a, b);
+    const confirm = await screen.findByRole('dialog', { name: 'Replace party member' });
+    fireEvent.click(within(confirm).getByRole('button', { name: `Keep ${a.name.trim()}` }));
+    expect(screen.queryByRole('dialog', { name: 'Replace party member' })).toBeNull();
+    expect(storedName()).toBe(a.name.trim());
+    expect(screen.getByRole('dialog', { name: `Update ${a.name.trim()} from a share link` })).toBeInTheDocument();
+  });
+});
 describe('Add combatants dialog dirty check (cluster B)', () => {
   const props = { party: [], customMonsters: [], presentMemberIds: [] as string[] };
   it('closes at once when nothing was typed', () => {
@@ -124,6 +144,18 @@ describe('Add combatants dialog dirty check (cluster B)', () => {
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Discard changes' })).getByRole('button', { name: 'Discard' }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+
+  it('still asks after switching away from the Custom tab', () => {
+    const onClose = vi.fn();
+    render(<AddCombatantsDialog {...props} onAdd={vi.fn()} onClose={onClose} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom' }));
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Gribbly' } });
+    fireEvent.click(screen.getByRole('tab', { name: 'Creature library' }));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Discard changes' })).toBeInTheDocument();
   });
 });
 
@@ -158,5 +190,19 @@ describe('Stale party card flag (cluster B)', () => {
     seedMember(Date.now() - 2 * DAY);
     render(<Routed initial="party" />);
     expect(screen.queryByTestId('stale-badge')).toBeNull();
+  });
+});
+
+describe('isMemberStale (cluster B)', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = 100 * DAY;
+  const m = (updatedAt: number) => ({ updatedAt }) as DmPartyMember;
+  it('is stale at exactly the threshold and not one day before', () => {
+    expect(isMemberStale(m(now - PARTY_STALE_DAYS * DAY), now)).toBe(true);
+    expect(isMemberStale(m(now - (PARTY_STALE_DAYS - 1) * DAY), now)).toBe(false);
+  });
+  it('is not stale and has no age when the update date is unknown (0)', () => {
+    expect(memberAgeDays(m(0), now)).toBeNull();
+    expect(isMemberStale(m(0), now)).toBe(false);
   });
 });

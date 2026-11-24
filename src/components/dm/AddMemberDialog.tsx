@@ -158,7 +158,10 @@ export function AddMemberDialog({
     lockedTo === 'import'
       ? memberName
         ? `Update ${memberName} from a share link`
-        : 'Update from a share link' : editing ? 'Edit party member' : 'Add a party member';
+        : 'Update from a share link'
+      : editing
+        ? 'Edit party member'
+        : 'Add a party member';
 
   return (
     <>
@@ -249,11 +252,15 @@ export function AddMemberDialog({
             <div className={styles.formGrid}>
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Name</span>
-                <input className={styles.input} value={draft.name} onChange={(e) => {
+                <input
+                  className={styles.input}
+                  value={draft.name}
+                  onChange={(e) => {
                     setField('name', e.target.value);
                     setError(null);
                   }}
-                  autoFocus />
+                  autoFocus
+                />
               </label>
               <label className={styles.field}>
                 <span className={styles.fieldLabel}>Class (for example Rogue 4)</span>

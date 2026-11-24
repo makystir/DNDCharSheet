@@ -49,12 +49,17 @@ export function PartyMemberCard({ member, stats, onUpdate, onEdit, onRemove, now
             {stale && (
               <>
                 {' '}
-                <span
-                  className={styles.chipWarn}
-                  data-testid="stale-badge"
-                  title={`Not updated for ${ageDays} days (flagged after ${PARTY_STALE_DAYS}). Numbers may be out of date.`}
-                >
-                  Stale
+                <span className={styles.chipWarn} data-testid="stale-badge">
+                  <CalculatedValue
+                    label="Stale card"
+                    breakdown={{
+                      total: ageDays ?? 0,
+                      components: [{ label: 'Days since last update', value: ageDays ?? 0 }],
+                      note: `Flagged after ${PARTY_STALE_DAYS} days. Numbers may be out of date.`,
+                    }}
+                  >
+                    Stale
+                  </CalculatedValue>
                 </span>
               </>
             )}

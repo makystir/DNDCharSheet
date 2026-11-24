@@ -73,8 +73,8 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
   const [error, setError] = useState<string | null>(null);
   const [custom, setCustom] = useState(CUSTOM_DEFAULTS);
   const [discarding, setDiscarding] = useState(false);
-  // Unsaved work: the Custom tab's fields differ from their defaults.
-  const dirty = tab === 'custom' && JSON.stringify(custom) !== JSON.stringify(CUSTOM_DEFAULTS);
+  // Unsaved work: the Custom fields differ from their defaults.
+  const dirty = JSON.stringify(custom) !== JSON.stringify(CUSTOM_DEFAULTS);
   // Overlay click and Escape ask first when there is unsaved work; Cancel is an explicit discard.
   const requestClose = () => (dirty ? setDiscarding(true) : onClose());
   useEffect(() => {
@@ -162,182 +162,182 @@ export function AddCombatantsDialog({ party, customMonsters, presentMemberIds, o
 
   return (
     <>
-    <div className={styles.overlay} onClick={requestClose} role="dialog" aria-modal="true" aria-label="Add combatants">
-      <div ref={ref} className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <h2 className={styles.dialogTitle}>Add combatants</h2>
-        <div className={styles.tabs} role="tablist" aria-label="What to add">
-          {(['party', 'library', 'custom'] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              className={tab === t ? styles.tabActive : styles.tab}
-              onClick={() => {
-                setTab(t);
-                setError(null);
-              }}
-            >
-              {t === 'party' ? 'Party' : t === 'library' ? 'Creature library' : 'Custom'}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'party' && (
-          <div className={styles.stack}>
-            {party.length === 0 ? (
-              <p className={styles.muted}>This campaign has no party members yet. Add them on the Party page.</p>
-            ) : (
-              <>
-                <div className={styles.row}>
-                  <button
-                    type="button"
-                    className={styles.btn}
-                    onClick={() => setPicked(new Set(party.filter((m) => !presentMemberIds.includes(m.id)).map((m) => m.id)))}
-                  >
-                    Select everyone
-                  </button>
-                  <button type="button" className={styles.btn} onClick={() => setPicked(new Set())}>
-                    Clear
-                  </button>
-                </div>
-                <ul className={enc.pickList}>
-                  {party.map((m) => {
-                    const present = presentMemberIds.includes(m.id);
-                    return (
-                      <li key={m.id}>
-                        <label className={enc.pickItem}>
-                          <input
-                            type="checkbox"
-                            checked={picked.has(m.id)}
-                            disabled={present}
-                            onChange={() => togglePicked(m.id)}
-                          />
-                          <span>
-                            {m.name}
-                            {present && <span className={styles.muted}> (already in this encounter)</span>}
-                          </span>
-                        </label>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </>
-            )}
+      <div className={styles.overlay} onClick={requestClose} role="dialog" aria-modal="true" aria-label="Add combatants">
+        <div ref={ref} className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+          <h2 className={styles.dialogTitle}>Add combatants</h2>
+          <div className={styles.tabs} role="tablist" aria-label="What to add">
+            {(['party', 'library', 'custom'] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={tab === t}
+                className={tab === t ? styles.tabActive : styles.tab}
+                onClick={() => {
+                  setTab(t);
+                  setError(null);
+                }}
+              >
+                {t === 'party' ? 'Party' : t === 'library' ? 'Creature library' : 'Custom'}
+              </button>
+            ))}
           </div>
-        )}
 
-        {tab === 'library' && (
-          <div className={styles.stack}>
-            <div className={styles.row}>
-              <MonsterFilterBar filter={filter} searchLabel="Search creatures" />
+          {tab === 'party' && (
+            <div className={styles.stack}>
+              {party.length === 0 ? (
+                <p className={styles.muted}>This campaign has no party members yet. Add them on the Party page.</p>
+              ) : (
+                <>
+                  <div className={styles.row}>
+                    <button
+                      type="button"
+                      className={styles.btn}
+                      onClick={() => setPicked(new Set(party.filter((m) => !presentMemberIds.includes(m.id)).map((m) => m.id)))}
+                    >
+                      Select everyone
+                    </button>
+                    <button type="button" className={styles.btn} onClick={() => setPicked(new Set())}>
+                      Clear
+                    </button>
+                  </div>
+                  <ul className={enc.pickList}>
+                    {party.map((m) => {
+                      const present = presentMemberIds.includes(m.id);
+                      return (
+                        <li key={m.id}>
+                          <label className={enc.pickItem}>
+                            <input
+                              type="checkbox"
+                              checked={picked.has(m.id)}
+                              disabled={present}
+                              onChange={() => togglePicked(m.id)}
+                            />
+                            <span>
+                              {m.name}
+                              {present && <span className={styles.muted}> (already in this encounter)</span>}
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
             </div>
-            <ul className={enc.pickList} aria-label="Creatures">
-              {shown.length === 0 && <li className={styles.muted}>No creature matches those filters.</li>}
-              {shown.map((e) => (
-                <li key={e.key}>
-                  <label className={enc.pickItem}>
-                    <input type="radio" name="library-creature" checked={chosen === e.key} onChange={() => setChosen(e.key)} />
-                    <span>
-                      {e.name}
-                      <span className={styles.muted}> · {e.detail}</span>
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-            {matches.length > shown.length && (
-              <p className={styles.muted}>
-                Showing the first {shown.length} of {matches.length} matches. Narrow the search or filters to see the rest.
-              </p>
-            )}
-            {copiesControls}
-            {added && (
-              <p className={styles.muted} role="status">
-                {added}
-              </p>
-            )}
-          </div>
-        )}
-
-        {tab === 'custom' && (
-          <div className={styles.stack}>
-            <div className={styles.formGrid}>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Name</span>
-                <input className={styles.input} value={custom.name} onChange={(e) => setC('name', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Armor Class</span>
-                <input className={styles.input} type="number" value={custom.ac} onChange={(e) => setC('ac', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Hit Points</span>
-                <input className={styles.input} type="number" value={custom.hpMax} onChange={(e) => setC('hpMax', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Initiative modifier</span>
-                <input className={styles.input} type="number" value={custom.initiativeMod} onChange={(e) => setC('initiativeMod', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Constitution save modifier (optional)</span>
-                <input className={styles.input} type="number" value={custom.conSaveMod} onChange={(e) => setC('conSaveMod', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Challenge Rating (optional)</span>
-                <input className={styles.input} value={custom.cr} onChange={(e) => setC('cr', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>XP value (optional; filled in from the CR if left empty)</span>
-                <input className={styles.input} type="number" value={custom.xp} onChange={(e) => setC('xp', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Resistances (for example Fire; Cold)</span>
-                <input className={styles.input} value={custom.resistances} onChange={(e) => setC('resistances', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Vulnerabilities</span>
-                <input className={styles.input} value={custom.vulnerabilities} onChange={(e) => setC('vulnerabilities', e.target.value)} />
-              </label>
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>Immunities</span>
-                <input className={styles.input} value={custom.immunities} onChange={(e) => setC('immunities', e.target.value)} />
-              </label>
-            </div>
-            {copiesControls}
-          </div>
-        )}
-
-        {error && (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        )}
-        <div className={styles.dialogActions}>
-          <button type="button" className={styles.btn} onClick={onClose}>
-            Cancel
-          </button>
-          {tab === 'library' && (
-            <button type="button" className={styles.btn} onClick={() => submit(true)}>
-              Add and keep browsing
-            </button>
           )}
-          <button type="button" className={styles.btnPrimary} onClick={() => submit()}>
-            Add to encounter
-          </button>
+
+          {tab === 'library' && (
+            <div className={styles.stack}>
+              <div className={styles.row}>
+                <MonsterFilterBar filter={filter} searchLabel="Search creatures" />
+              </div>
+              <ul className={enc.pickList} aria-label="Creatures">
+                {shown.length === 0 && <li className={styles.muted}>No creature matches those filters.</li>}
+                {shown.map((e) => (
+                  <li key={e.key}>
+                    <label className={enc.pickItem}>
+                      <input type="radio" name="library-creature" checked={chosen === e.key} onChange={() => setChosen(e.key)} />
+                      <span>
+                        {e.name}
+                        <span className={styles.muted}> · {e.detail}</span>
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              {matches.length > shown.length && (
+                <p className={styles.muted}>
+                  Showing the first {shown.length} of {matches.length} matches. Narrow the search or filters to see the rest.
+                </p>
+              )}
+              {copiesControls}
+              {added && (
+                <p className={styles.muted} role="status">
+                  {added}
+                </p>
+              )}
+            </div>
+          )}
+
+          {tab === 'custom' && (
+            <div className={styles.stack}>
+              <div className={styles.formGrid}>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Name</span>
+                  <input className={styles.input} value={custom.name} onChange={(e) => setC('name', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Armor Class</span>
+                  <input className={styles.input} type="number" value={custom.ac} onChange={(e) => setC('ac', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Hit Points</span>
+                  <input className={styles.input} type="number" value={custom.hpMax} onChange={(e) => setC('hpMax', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Initiative modifier</span>
+                  <input className={styles.input} type="number" value={custom.initiativeMod} onChange={(e) => setC('initiativeMod', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Constitution save modifier (optional)</span>
+                  <input className={styles.input} type="number" value={custom.conSaveMod} onChange={(e) => setC('conSaveMod', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Challenge Rating (optional)</span>
+                  <input className={styles.input} value={custom.cr} onChange={(e) => setC('cr', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>XP value (optional; filled in from the CR if left empty)</span>
+                  <input className={styles.input} type="number" value={custom.xp} onChange={(e) => setC('xp', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Resistances (for example Fire; Cold)</span>
+                  <input className={styles.input} value={custom.resistances} onChange={(e) => setC('resistances', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Vulnerabilities</span>
+                  <input className={styles.input} value={custom.vulnerabilities} onChange={(e) => setC('vulnerabilities', e.target.value)} />
+                </label>
+                <label className={styles.field}>
+                  <span className={styles.fieldLabel}>Immunities</span>
+                  <input className={styles.input} value={custom.immunities} onChange={(e) => setC('immunities', e.target.value)} />
+                </label>
+              </div>
+              {copiesControls}
+            </div>
+          )}
+
+          {error && (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          )}
+          <div className={styles.dialogActions}>
+            <button type="button" className={styles.btn} onClick={onClose}>
+              Cancel
+            </button>
+            {tab === 'library' && (
+              <button type="button" className={styles.btn} onClick={() => submit(true)}>
+                Add and keep browsing
+              </button>
+            )}
+            <button type="button" className={styles.btnPrimary} onClick={() => submit()}>
+              Add to encounter
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    {discarding && (
-      <ConfirmDialog
-        title="Discard changes"
-        message="Discard what you have entered?"
-        confirmLabel="Discard"
-        cancelLabel="Keep editing"
-        onCancel={() => setDiscarding(false)}
-        onConfirm={onClose}
-      />
-    )}
+      {discarding && (
+        <ConfirmDialog
+          title="Discard changes"
+          message="Discard what you have entered?"
+          confirmLabel="Discard"
+          cancelLabel="Keep editing"
+          onCancel={() => setDiscarding(false)}
+          onConfirm={onClose}
+        />
+      )}
     </>
   );
 }
