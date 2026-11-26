@@ -1736,7 +1736,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                   ))}
                 </select>
               </div>
-            )}            {rolledPool ? (
+            )}
+            {rolledPool ? (
               <>
                 <p className={styles.hint}>
                   Rolled: {rolledPool.join(', ')}. Assign each to an ability.
@@ -1756,7 +1757,8 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                       />
                       {' '}(minimum {MIN_TOTAL_70}; {rollInfo.attempts} {rollInfo.attempts === 1 ? 'set' : 'sets'} rolled).
                     </>
-                  )}                </p>
+                  )}
+                </p>
                 {classId !== '' && (
                   <div className={styles.methodBody}>
                     <button type="button" className={styles.recommendBtn} onClick={placeRolledByClass}>
