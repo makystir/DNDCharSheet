@@ -1,4 +1,4 @@
-/* CreationWizard — guided D&D 5.5e (2024) character creation flow. */
+﻿/* CreationWizard â€” guided D&D 5.5e (2024) character creation flow. */
 
 .wizard {
   display: flex;
@@ -194,7 +194,7 @@
   color: var(--text-primary);
 }
 
-/* ─── Class guidance (read-only advisor) ─────────────────────────────────── */
+/* â”€â”€â”€ Class guidance (read-only advisor) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .guidancePanel {
   border: 1px solid var(--border);
@@ -775,4 +775,26 @@
 .select,
 .selectSmall {
   max-width: 100%;
+}
+
+.rollGrid {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.rollGridCell,
+.rollGridCellSelected {
+  text-align: center;
+  padding: 0.3rem 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.rollGridCellSelected {
+  border-color: var(--accent-gold);
+  font-weight: 700;
+  outline: 2px solid var(--accent-gold);
 }

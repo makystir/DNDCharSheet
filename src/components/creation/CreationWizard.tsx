@@ -70,6 +70,22 @@ import { allDeityOptions } from '../../logic/deity-recommendations';
 import { DeitySuggestions } from './DeitySuggestions';
 import type { NameGender } from '../../data/name-tables';
 import { createDefaultRng } from '../../logic/random';
+import { useRollingHouseRules } from '../../hooks/useRollingHouseRules';
+import {
+  ROLLING_HOUSE_RULES,
+  gridLines,
+  gridLineScores,
+  rollFiveDropTwoScore,
+  rollGrid,
+  rollHeroicScore,
+  rollMinTotalSet,
+  rollRerollOnesScore,
+  rollSix,
+  rollTwelveKeepSix,
+  GRID_SIZE,
+  MIN_TOTAL_70,
+} from '../../logic/house-rule-rolling';
+import type { GridDice, RollingHouseRuleId } from '../../logic/house-rule-rolling';
 import { formatSigned, type Breakdown } from '../../logic/breakdown';
 import {
   classGuidance,
@@ -170,6 +186,30 @@ const ALL_STEPS: { id: StepId; label: string }[] = [
 
 type AbilityMethod = 'standard-array' | 'point-buy' | 'roll';
 type EquipmentChoice = 'A' | 'B';
+/**
+ * Which dice procedure the 'roll' method uses. 'standard' is the PHB 2024
+ * 4d6-drop-lowest; every other value is an opt-in house rule (see
+ * src/logic/house-rule-rolling.ts) offered only when enabled in Settings. The
+ * 6x6 Grid offers both dice choices the table allows (3d6 or 4d6 drop lowest).
+ */
+type RollVariant = 'standard' | Exclude<RollingHouseRuleId, 'grid-6x6'> | 'grid-3d6' | 'grid-4d6';
+const GRID_DICE: Record<'grid-3d6' | 'grid-4d6', GridDice> = { 'grid-3d6': '3d6', 'grid-4d6': '4d6-drop-lowest' };
+const ROLL_VARIANT_LABEL: Record<RollVariant, string> = {
+  standard: 'Standard: 4d6, drop lowest (PHB)',
+  '2d6-plus-6': ROLLING_HOUSE_RULES['2d6-plus-6'].name,
+  '4d6-reroll-ones': ROLLING_HOUSE_RULES['4d6-reroll-ones'].name,
+  '5d6-drop-two': ROLLING_HOUSE_RULES['5d6-drop-two'].name,
+  'grid-3d6': `${ROLLING_HOUSE_RULES['grid-6x6'].name} (3d6)`,
+  'grid-4d6': `${ROLLING_HOUSE_RULES['grid-6x6'].name} (4d6, drop lowest)`,
+  'min-total-70': ROLLING_HOUSE_RULES['min-total-70'].name,
+  '3d6-twelve-keep-six': ROLLING_HOUSE_RULES['3d6-twelve-keep-six'].name,
+};
+/** The house rule that gates a roll variant, or null for the PHB method. */
+function variantRule(v: RollVariant): RollingHouseRuleId | null {
+  if (v === 'standard') return null;
+  return v === 'grid-3d6' || v === 'grid-4d6' ? 'grid-6x6' : v;
+}
+const GRID_LINES = gridLines();
 
 const GENDERS: { value: NameGender; label: string }[] = [
   { value: 'male', label: 'Male' },
@@ -240,6 +280,25 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   const [pointBuyScores, setPointBuyScores] = useState<Record<Ability, number>>({ ...EMPTY_SCORES });
   const [rolledPool, setRolledPool] = useState<number[] | null>(null);
   const [rolledAssignment, setRolledAssignment] = useState<Partial<Record<Ability, number>>>({});
+  // House-rule rolling (opt-in via Settings). Not persisted in the draft: the
+  // rolled pool is, so a resumed draft keeps its scores but the variant resets.
+  const { enabled: rollingRules } = useRollingHouseRules();
+  const [rollVariantChoice, setRollVariantChoice] = useState<RollVariant>('standard');
+  const [gridCells, setGridCells] = useState<number[] | null>(null);
+  const [gridLineId, setGridLineId] = useState<string | null>(null);
+  const [rollInfo, setRollInfo] = useState<
+    { kind: 'twelve'; rolls: number[] } | { kind: 'min-total'; attempts: number } | null
+  >(null);
+  const rollVariantOptions = useMemo<RollVariant[]>(
+    () =>
+      (Object.keys(ROLL_VARIANT_LABEL) as RollVariant[]).filter((v) => {
+        const rule = variantRule(v);
+        return rule === null || rollingRules.includes(rule);
+      }),
+    [rollingRules],
+  );
+  // A variant whose house rule was switched off falls back to the PHB method.
+  const rollVariant: RollVariant = rollVariantOptions.includes(rollVariantChoice) ? rollVariantChoice : 'standard';
 
   // Step 4: Alignment & details.
   const [gender, setGender] = useState<NameGender>('neutral');
@@ -385,7 +444,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
       case 'abilities':
         if (!abilityStepValid()) {
           if (abilityMethod === 'point-buy') missing.push('keep every score between 8 and 15 within the 27 points');
-          else if (abilityMethod === 'roll' && rolledPool === null) missing.push('roll your scores');
+          else if (abilityMethod === 'roll' && rolledPool === null) missing.push(gridCells ? 'pick a row, column or diagonal of the grid' : 'roll your scores');
           else missing.push('give each ability one of the scores');
         }
         break;
@@ -583,8 +642,48 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
   };
 
   const rollScores = () => {
-    const pool = rollAbilityScoreSet(createDefaultRng());
-    setRolledPool(pool);
+    const roller = createDefaultRng();
+    setRolledAssignment({});
+    setGridCells(null);
+    setGridLineId(null);
+    setRollInfo(null);
+    switch (rollVariant) {
+      case 'grid-3d6':
+      case 'grid-4d6':
+        // The six scores are chosen from the grid afterwards (pickGridLine).
+        setGridCells(rollGrid(roller, GRID_DICE[rollVariant]));
+        setRolledPool(null);
+        return;
+      case '2d6-plus-6':
+        setRolledPool(rollSix(roller, rollHeroicScore));
+        return;
+      case '4d6-reroll-ones':
+        setRolledPool(rollSix(roller, rollRerollOnesScore));
+        return;
+      case '5d6-drop-two':
+        setRolledPool(rollSix(roller, rollFiveDropTwoScore));
+        return;
+      case 'min-total-70': {
+        const result = rollMinTotalSet(roller);
+        setRolledPool(result.scores);
+        setRollInfo({ kind: 'min-total', attempts: result.attempts });
+        return;
+      }
+      case '3d6-twelve-keep-six': {
+        const result = rollTwelveKeepSix(roller);
+        setRolledPool(result.kept);
+        setRollInfo({ kind: 'twelve', rolls: result.rolls });
+        return;
+      }
+      default:
+        setRolledPool(rollAbilityScoreSet(roller));
+    }
+  };
+
+  const pickGridLine = (lineId: string) => {
+    if (!gridCells) return;
+    setGridLineId(lineId);
+    setRolledPool(gridLineScores(gridCells, lineId));
     setRolledAssignment({});
   };
 
@@ -1561,14 +1660,103 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
 
         {abilityMethod === 'roll' && (
           <div className={styles.methodBody}>
+            {rollVariantOptions.length > 1 && (
+              <select
+                className={styles.select}
+                aria-label="Rolling method"
+                value={rollVariant}
+                onChange={(e) => {
+                  setRollVariantChoice(e.target.value as RollVariant);
+                  setRolledPool(null);
+                  setRolledAssignment({});
+                  setGridCells(null);
+                  setGridLineId(null);
+                  setRollInfo(null);
+                }}
+              >
+                {rollVariantOptions.map((v) => (
+                  <option key={v} value={v}>
+                    {ROLL_VARIANT_LABEL[v]}
+                  </option>
+                ))}
+              </select>
+            )}
+            {rollVariant !== 'standard' && (
+              <p className={styles.hint} data-testid="roll-variant-info">
+                House rule (not in the 2024 PHB): {ROLLING_HOUSE_RULES[variantRule(rollVariant) ?? '2d6-plus-6'].description}
+              </p>
+            )}
             <button type="button" className={styles.rollBtn} onClick={rollScores}>
-              🎲 Roll 4d6 (drop lowest) × 6
+              {rollVariant === 'standard' ? (
+                <>
+🎲 Roll 4d6 (drop lowest) × 6
+</>
+              ) : (
+                <>Roll: {ROLL_VARIANT_LABEL[rollVariant]}</>
+              )}
             </button>
-            {rolledPool ? (
+            {gridCells && (
+              <div data-testid="roll-grid">
+                <p className={styles.hint}>
+                  Pick one row, column or diagonal as your six scores.
+                </p>
+                <div
+                  className={styles.rollGrid}
+                  style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)` }}
+                  role="group"
+                  aria-label="6x6 score grid"
+                >
+                  {gridCells.map((score, i) => {
+                    const selected = GRID_LINES.find((l) => l.id === gridLineId)?.cells.includes(i) ?? false;
+                    return (
+                      <span
+                        key={i}
+                        className={selected ? styles.rollGridCellSelected : styles.rollGridCell}
+                        data-testid={`grid-cell-${i}`}
+                        data-selected={selected}
+                      >
+                        {score}
+                      </span>
+                    );
+                  })}
+                </div>
+                <select
+                  className={styles.select}
+                  aria-label="Grid line"
+                  value={gridLineId ?? ''}
+                  onChange={(e) => pickGridLine(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Choose a row, column or diagonal
+                  </option>
+                  {GRID_LINES.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}            {rolledPool ? (
               <>
                 <p className={styles.hint}>
                   Rolled: {rolledPool.join(', ')}. Assign each to an ability.
-                </p>
+                  {rollInfo?.kind === 'twelve' && (
+                    <> Twelve 3d6 rolls: {rollInfo.rolls.join(', ')}. The six highest are kept.</>
+                  )}
+                  {rollInfo?.kind === 'min-total' && (
+                    <>
+                      {' '}Total{' '}
+                      <CalculatedValue
+                        label="Total of six scores"
+                        breakdown={{
+                          total: rolledPool.reduce((s, n) => s + n, 0),
+                          components: rolledPool.map((v, i) => ({ label: `Score ${i + 1}`, value: v })),
+                          note: `Must be at least ${MIN_TOTAL_70}; ${rollInfo.attempts} ${rollInfo.attempts === 1 ? 'set' : 'sets'} rolled.`,
+                        }}
+                      />
+                      {' '}(minimum {MIN_TOTAL_70}; {rollInfo.attempts} {rollInfo.attempts === 1 ? 'set' : 'sets'} rolled).
+                    </>
+                  )}                </p>
                 {classId !== '' && (
                   <div className={styles.methodBody}>
                     <button type="button" className={styles.recommendBtn} onClick={placeRolledByClass}>
@@ -1583,7 +1771,7 @@ export function CreationWizard({ onComplete, onCancel }: CreationWizardProps) {
                 {renderAbilityAssignRows(rolledPool, true)}
               </>
             ) : (
-              <p className={styles.hint}>Roll to generate six scores.</p>
+              <p className={styles.hint}>{gridCells ? 'Choose a line of the grid above.' : 'Roll to generate six scores.'}</p>
             )}
           </div>
         )}

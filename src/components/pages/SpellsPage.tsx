@@ -414,16 +414,11 @@ export function SpellsPage({
   // ignored here so they cannot silently eat the cap; the notice above offers to
   // remove them.
   const illegalSelections = useMemo(() => illegalSpellSelections(character), [character]);
-  const illegalKeys = useMemo(
-    () => new Set(illegalSelections.filter((i) => i.classId === primaryId).map((i) => `${i.kind}:${i.id}`)),
-    [illegalSelections, primaryId],
+  const illegalKeys = new Set(
+    illegalSelections.filter((i) => i.classId === primaryId).map((i) => `${i.kind}:${i.id}`),
   );
-  const chosenPrepared = useMemo(
-    () =>
-      (perClass.prepared ?? []).filter(
-        (id) => !alwaysPrepared.includes(id) && !illegalKeys.has(`prepared:${id}`),
-      ),
-    [perClass.prepared, alwaysPrepared, illegalKeys],
+  const chosenPrepared = (perClass.prepared ?? []).filter(
+    (id) => !alwaysPrepared.includes(id) && !illegalKeys.has(`prepared:${id}`),
   );
 
   // Cantrips the character must know and cannot replace (Arcane Trickster's
@@ -431,11 +426,9 @@ export function SpellsPage({
   // the picker (cannot be unchecked) and counted against the cantrip cap, even
   // before the user makes any selection — without forcing a write on mount.
   const required = useMemo(() => requiredCantrips(character), [character]);
-  const chosenCantrips = useMemo(() => {
-    const stored = (perClass.cantrips ?? []).filter((id) => !illegalKeys.has(`cantrip:${id}`));
-    const missing = required.filter((id) => !stored.includes(id));
-    return missing.length > 0 ? [...missing, ...stored] : stored;
-  }, [perClass.cantrips, required, illegalKeys]);
+  const storedCantrips = (perClass.cantrips ?? []).filter((id) => !illegalKeys.has(`cantrip:${id}`));
+  const missingCantrips = required.filter((id) => !storedCantrips.includes(id));
+  const chosenCantrips = missingCantrips.length > 0 ? [...missingCantrips, ...storedCantrips] : storedCantrips;
 
   // The leveled spell list(s) the character prepares/browses from: the Wizard
   // list for EK/AT, and the Bard/Cleric/Druid/Wizard union for a level-10+ Bard

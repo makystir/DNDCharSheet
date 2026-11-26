@@ -1,6 +1,8 @@
 import { Crown, Dices, Download, Printer, Settings as SettingsIcon, SlidersHorizontal } from 'lucide-react';
 import type { Character } from '../../types/character';
 import { useDiceEntryMode } from '../../hooks/useDiceEntryMode';
+import { useRollingHouseRules } from '../../hooks/useRollingHouseRules';
+import { ROLLING_HOUSE_RULES, ROLLING_HOUSE_RULE_IDS } from '../../logic/house-rule-rolling';
 import { useInstallPrompt } from '../../hooks/useInstallPrompt';
 import { Card } from '../shared/Card';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -56,6 +58,8 @@ export function SettingsPage({
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   // App-wide dice-entry preference (localStorage), not a character house rule.
   const { mode: diceMode, setMode: setDiceMode } = useDiceEntryMode();
+  // App-wide optional ability-score rolling methods (offered in the creation wizard).
+  const { enabled: rollingRules, setEnabled: setRollingRule } = useRollingHouseRules();
 
   // PWA install affordance: only surface the "Install" card when the browser
   // signals the app is installable (and not already installed), so Settings
@@ -154,6 +158,33 @@ export function SettingsPage({
         </div>
       </Card>
 
+      <Card>
+        <SectionHeader icon={Dices} title="Ability Score Rolling (House Rules)" />
+        {ROLLING_HOUSE_RULE_IDS.map((id) => {
+          const rule = ROLLING_HOUSE_RULES[id];
+          const on = rollingRules.includes(id);
+          return (
+            <div key={id} className={styles.settingRow}>
+              <span className={styles.settingLabel}>
+                <span className={styles.settingName}>{rule.name}</span>
+                <span className={styles.settingHint}>
+                  {rule.description} {rule.range} NOT a 2024 rule: an opt-in house rule for this device, off by
+                  default. When on, it is offered as a rolling method in the character creation wizard.
+                </span>
+              </span>
+              <label className={styles.toggleControl}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  aria-label={`Enable ${rule.name} (house rule)`}
+                  onChange={(e) => setRollingRule(id, e.target.checked)}
+                />
+                <span>{on ? 'On' : 'Off'}</span>
+              </label>
+            </div>
+          );
+        })}
+      </Card>
       <Card>
         <SectionHeader icon={SlidersHorizontal} title="House Rules" />
         <div className={styles.settingRow}>
