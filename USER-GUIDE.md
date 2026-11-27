@@ -1,4 +1,4 @@
-# D&D Character Sheet: Beginner's User Guide
+﻿# D&D Character Sheet: Beginner's User Guide
 
 A digital character sheet for Dungeons & Dragons (2024 rules). It runs in your browser, saves everything on your own device, and can be installed like an app.
 
@@ -90,7 +90,7 @@ You can also tap a step's name in the progress bar to jump straight to it, back 
 
 The wizard saves as you go. If you close the page or it reloads, the next time you open the wizard it offers to **Resume** your unfinished character, or **Start over**.
 
-The wizard has these steps. The **Spells** step only appears for classes that cast spells at level 1.
+The wizard has these steps, in this order: Class, Background, Species, Skills, Ability Scores, Equipment, Class Features, Spells, Details and Review. **Class Features** only appears for classes that make a pick at level 1, and **Spells** only for classes that cast spells at level 1. The step numbers shown in the wizard count only the steps you actually get, so they can differ from the headings below.
 
 ### Step 1: Class
 
@@ -140,19 +140,6 @@ Skills that use your class's main ability are tagged **Suggested**, because you'
 
 Not sure? You can move on and finish later. The Overview page will remind you.
 
-### Class Features (some classes only)
-
-Some classes make a few extra picks at level 1, and this step appears only for them. It asks for:
-
-- **Fighting Style:** Fighters choose one Fighting Style feat.
-- **Divine Order:** Clerics choose Protector or Thaumaturge.
-- **Primal Order:** Druids choose Magician or Warden.
-- **Eldritch Invocation:** Warlocks choose one.
-- **Expertise:** Rogues choose two of their skills.
-- **Weapon Mastery:** Barbarians, Fighters, Paladins, Rangers and Rogues choose the weapons whose mastery they can use.
-
-Each section starts with what the feature does and shows every option's description before you pick. Expertise marks the skills that use your class's main ability as **Suggested**. Weapon Mastery offers to add the weapons from your starting gear in one tap. If you choose Thaumaturge or Magician, the Spells step lets you pick the extra cantrip it gives you. Making these picks here means your character starts with nothing left to choose. You can still change them later on the Advancement page or on Class & Features.
-
 ### Step 5: Ability Scores
 
 The scores on this step already include the +2 and +1 from your background, so what you see is what you'll have. Hover over a score to see the base score and the increase.
@@ -161,25 +148,25 @@ Your six ability scores come from one of three methods:
 
 - **Standard Array:** you get a fixed set of numbers (15, 14, 13, 12, 10, 8) and assign each to an ability. **This is the simplest option for new players.**
 - **Point Buy:** you have a budget of points to spend, with higher scores costing more.
-- **Rolling:** you roll dice for each score. **Place my rolls for my class** then puts your highest roll where your class needs it most, following the PHB's suggested order; you can still move any of them.
+- **Rolling:** you roll 4d6 for each score and drop the lowest die, six times (the 2024 Player's Handbook method). **Place my rolls for my class** then puts your highest roll where your class needs it most, following the PHB's suggested order; you can still move any of them.
 
 The wizard explains the method you pick, and you can tap an ability's name to see what it does.
 
+#### Optional rolling methods (house rules)
+Your table can agree to other ways of rolling scores. None of them is in the 2024 Player's Handbook, so all six are **off by default**. Turn each one on under **Settings > Ability Score Rolling (House Rules)**. The switches are stored on this device and apply to every character you create. Once at least one is on, the **Rolling** option shows a **Rolling method** menu. It lists the Player's Handbook method (**Standard: 4d6, drop lowest (PHB)**) and each method you switched on. A line under the menu reminds you the method is a house rule and says how it works. Changing the method clears the scores you have rolled so far. If you later switch a method off in Settings, the wizard goes back to the Player's Handbook method.
+
+- **2d6 + 6 (Heroic):** roll two d6 and add 6, six times. Each score is 8 to 18, averaging 13.
+- **4d6, Drop Lowest, Reroll 1s:** roll four d6, reroll any 1 until none show, then drop the lowest die. Six times. Each score is 6 to 18.
+- **5d6, Drop Lowest Two:** roll five d6 and keep the highest three. Six times. Each score is 3 to 18.
+- **The 6x6 Grid:** the menu offers two versions, **(3d6)** and **(4d6, drop lowest)**. The roll fills a grid of 36 scores. Choose one **row, column or diagonal** (six rows, six columns and the two diagonals) from the **Grid line** menu. The chosen cells are highlighted and become your six scores. **Next** stays unavailable until you have picked a line.
+- **70+ Minimum Total:** roll 4d6 and drop the lowest, six times. If the six scores add up to less than 70, the whole set is thrown away and rolled again until it reaches 70. The result shows the total (hover over it to see the six scores) and how many sets it took.
+- **3d6 Twelve Times, Keep Six:** a method from the AD&D Dungeon Master's Guide. Roll 3d6 twelve times and keep the six highest totals. The result lists all twelve rolls and keeps the top six.
+
+After you roll (and pick a grid line, if the method has one), assign each score to an ability as usual. **Place my rolls for my class** works with every method. The rolled scores are saved with your unfinished character, but the chosen method is not, so a resumed character shows the Player's Handbook method again.
+
 Put your highest numbers in the abilities your class cares about. The class guide from Step 1 tells you which. Your background's bonuses from Step 2 are added on top.
 
-### Step 6: Spells (spellcasters only)
-
-If your class casts spells at level 1, you pick your starting **cantrips** (spells you can cast as often as you like) and your starting leveled spells. The list only shows spells your class can actually learn. If you picked a spell that isn't legal for your class, the app tells you and lets you remove it.
-
-### Step 7: Alignment and Details
-
-Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and a character description. Each has a 🎲 button that rolls one for you (name, age and appearance suit your species), and you can type over anything it rolls. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
-
-The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. Below the appearance fields are five more: a **Character description**, an **Ideal**, a **Flaw**, a **Short-term goal** and a **Long-term goal**. Each has its own 🎲, and **Roll all five** fills them at once. They are written for your class, species and alignment (choose those first for the best fit), and your species' lineage or ancestry too, such as a Wood Elf, a red-dragon Dragonborn or an Infernal Tiefling. The description weaves in two traits from the Player's Handbook's alignment table, along with a class-flavoured opening, a line about your people and heritage, something from your past, a habit and a mannerism. There are so many pieces that two characters, even of the same class and alignment, come out different. Roll as often as you like and edit what you keep. Stuck? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
-
-**Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
-
-### Step 8: Equipment
+### Step 6: Equipment
 
 In the 2024 rules, both your **class** and your **background** give you starting equipment, and any coins you get can be spent on gear right away. This step has four parts:
 
@@ -194,9 +181,35 @@ A gold-only choice gives you the biggest budget. A package gives you a ready-mad
 **Warnings about gear you may not use well.** If you buy something your class probably can't use properly, the app tells you. For example, a Wizard buying armor gets a warning that they aren't trained with it, and that wearing armor without training gives Disadvantage on Strength and Dexterity tests and stops spellcasting. A Rogue buying a Greatsword is told they won't add their Proficiency Bonus to its attacks. You'll also see a note for Heavy weapons or armor your Strength can't handle. These are only warnings. You can still buy the item, because a feat, a species trait or your DM's ruling might make it work.
 
 Armor and a shield you are trained in are worn automatically when you finish. You can change what you're wearing on the Inventory page.
-### Step 9: Review
+### Class Features (some classes only)
 
-Your character as it will be created, like a first look at the sheet. It leads with the numbers you use first in play: Hit Points, Armor Class, Speed, Initiative, Passive Perception and Proficiency Bonus (hover over any of them to see how it's worked out). Below come your ability scores, proficiencies, origin feat, species traits, languages, spells, equipment and coins, and details. Each section has an **Edit** link that takes you back to the step it came from. Anything still unfinished is listed at the bottom. When you're happy, press **Finish** and the wizard creates your character and takes you to the sheet.
+Some classes make a few extra picks at level 1, and this step appears only for them. It asks for:
+
+- **Fighting Style:** Fighters choose one Fighting Style feat.
+- **Divine Order:** Clerics choose Protector or Thaumaturge.
+- **Primal Order:** Druids choose Magician or Warden.
+- **Eldritch Invocation:** Warlocks choose one.
+- **Expertise:** Rogues choose two of their skills.
+- **Weapon Mastery:** Barbarians, Fighters, Paladins, Rangers and Rogues choose the weapons whose mastery they can use.
+- **Languages:** Rogues learn Thieves' Cant and choose one more language. The fixed language is shown and can't be changed.
+
+Each section starts with what the feature does and shows every option's description before you pick. Expertise marks the skills that use your class's main ability as **Suggested**. This step comes after Equipment, so Weapon Mastery offers to add the weapons from the gear you chose in one tap. If you choose Thaumaturge or Magician, the Spells step lets you pick the extra cantrip it gives you. Making these picks here means your character starts with nothing left to choose. You can still change them later on the Advancement page or on Class & Features.
+
+### Spells (spellcasters only)
+
+If your class casts spells at level 1, you pick your starting **cantrips** (spells you can cast as often as you like) and your starting leveled spells. The list only shows spells your class can actually learn. If you picked a spell that isn't legal for your class, the app tells you and lets you remove it.
+
+### Alignment and Details
+
+Choose an **alignment** (a rough description of your character's moral outlook) and fill in personal details such as age, height, appearance and a character description. Each has a 🎲 button that rolls one for you (name, age and appearance suit your species), and you can type over anything it rolls. None of this affects the math. It is there to help you play the character, and you can leave it blank for now.
+
+The wizard describes the alignment you pick, and **What do the alignments mean?** explains all of them. Evil alignments come with a reminder to check with your DM first. Below the appearance fields are five more: a **Character description**, an **Ideal**, a **Flaw**, a **Short-term goal** and a **Long-term goal**. Each has its own 🎲, and **Roll all five** fills them at once. They are written for your class, species and alignment (choose those first for the best fit), and your species' lineage or ancestry too, such as a Wood Elf, a red-dragon Dragonborn or an Infernal Tiefling. The description weaves in two traits from the Player's Handbook's alignment table, along with a class-flavoured opening, a line about your people and heritage, something from your past, a habit and a mannerism. There are so many pieces that two characters, even of the same class and alignment, come out different. Roll as often as you like and edit what you keep. Stuck? **Questions to imagine your past** offers prompts from the Player's Handbook, like "Who raised you?".
+
+**Faith / Deity (optional).** Type a god's name or pick from the list. The list covers the Greyhawk gods from the 2024 Dungeon Master's Guide plus the Forgotten Realms, the racial and dragon gods (like Moradin and Bahamut), and Dragonlance. Below the field, **Suggested deities** recommends gods that fit your class, species and alignment, and says why (for example, Lawful Good matches your alignment). Gods usually belong to one setting, so use the **Setting** menu to match your DM's world. Evil gods only appear for evil characters. These are only suggestions. Press **Choose** to fill in the Faith field, or name any god, including your own. Hover over a god's name for its symbol, alignment and a short description.
+
+### Review
+
+Your character as it will be created, like a first look at the sheet. It leads with the numbers you use first in play: Hit Points, Armor Class, Speed, Initiative, Passive Perception and Proficiency Bonus (hover over any of them to see how it's worked out). Below come your ability scores, proficiencies, origin feat, species traits, languages, spells, equipment and coins, and details. Each section has an **Edit** link that takes you back to the step it came from. Anything still unfinished is listed at the bottom under **Still open**, and each item has a **Fix** button that takes you to the step where you can finish it. When you're happy, press **Finish** and the wizard creates your character and takes you to the sheet.
 
 ---
 
@@ -251,7 +264,7 @@ The Character page has two sub-tabs: **Overview** and **Class & Features**.
 
 Your at-a-glance page, and the one you'll use most during play. From top to bottom you'll find:
 
-- **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them. An empty field has a 🎲 that rolls a suggestion; once the field has something in it, the 🎲 goes away. Clear the field to get it back.
+- **Personal details:** name, species, size, class, level, background, alignment, faith, and appearance. This is where you edit them. Use the card's header to collapse it once it is filled in; the app remembers that for each character, and your portrait stays visible. An empty field has a 🎲 that rolls a suggestion; once the field has something in it, the 🎲 goes away. Clear the field to get it back.
 - **Finish setting up:** a checklist of choices you haven't made yet, such as skills or spells. It disappears when everything is done.
 - **Vitals:** hit points, armor class, speed, initiative, passive Perception, proficiency bonus, Hit Dice and more. **Adjust** (closed at first) holds an Armor Class override and an initiative bonus, for anything the app doesn't know about.
 - **Rest:** your Hit Dice (type how many you've spent) and the **Short Rest** and **Long Rest** buttons. Rolling initiative interrupts a rest, so resting lives here rather than on the Combat page. The Short Rest dialog helps you spend Hit Dice to heal; the Long Rest dialog lists exactly what resets. If companions travel with you, the Long Rest dialog offers to rest them too (ticked, and you can untick it); anyone at 0 HP is named and left out.
@@ -317,7 +330,7 @@ A weapon that uses ammunition, like a bow, shows how much you have left right on
 
 ### Spells and turn options
 
-- **Spellcasting** (spellcasters only): your spell save DC and spell attack bonus, your spell slots as circles you tap to spend or get back, and the cantrips and prepared spells ready to cast, with their casting time and Concentration or Ritual tags. Tap a spell's name for the full description.
+- **Spellcasting** (spellcasters only): your spell save DC and spell attack bonus, your spell slots as circles you tap to spend or get back, and the cantrips and prepared spells ready to cast, with their casting time and Concentration or Ritual tags. Tap a spell's name for the full description. Each spell has a **Cast** button. For a leveled spell it spends a slot for you: the lowest slot that can cast it, which means a slot of the spell's own level first and a higher one only when the lower ones are spent. Pact Magic slots count too (if a Spellcasting slot and a Pact slot are the same level, the Spellcasting slot is used first). A cantrip costs no slot. A Concentration spell starts Concentration, the same as the concentration button beside the spell. When no slot is left, **Cast** is turned off and a note says so. To spend a particular slot instead, tap its circle yourself.
 - **On your turn:** the standard actions anyone can take (Attack, Dash, Disengage, Dodge, Help, Hide, Influence, Magic, Ready, Search, Study, Utilize), your Bonus Action spells, and the Reactions you have, such as Opportunity Attack or Shield, with a note when one isn't available right now. Tap a name for what it does. It also lists your own class and subclass features by how you use them: under Actions the ones that take an action (such as Channel Divinity: Turn Undead), and under Bonus Actions the ones that take a Bonus Action (such as Second Wind, Cunning Action or Flurry of Blows). Only features you have reached are shown, and a subclass feature appears once you choose that subclass.
 
 ### Resources
@@ -353,6 +366,7 @@ Your gear, split into:
 - **Weapons:** add weapons from the catalog. Each shows its damage, properties and mastery.
 - **Armor & Shields:** add what you own and choose what you're **wearing**. Your Armor Class updates automatically. The tooltip on AC shows the full breakdown.
 - **Other Gear:** everything else, with quantities and weights.
+- **DM item code:** if your DM gives you a magic item as a code (it starts with `ITEM-`), paste it into this card and press **Check**. The card shows the item's name, type, rarity, attunement requirement, description and source. Press **Add to inventory** to add it, or **Cancel**. A code that can't be read shows an error and adds nothing. The app doesn't track attunement, so the requirement is shown in the item's notes only.
 - **Coin Purse:** platinum, gold, electrum, silver and copper.
 - **Encumbrance:** how much you carry compared with your capacity, plus **Weight by Category**.
 
@@ -449,6 +463,9 @@ Switch between **dark** and **light** themes. Your choice is remembered on this 
 
 By default the app rolls virtual dice for you. Turn on **Enter dice results manually** to roll real dice at the table and type the result in instead.
 
+### Ability Score Rolling (House Rules)
+Six optional ways to roll ability scores in the character creation wizard: **2d6 + 6 (Heroic)**, **4d6, Drop Lowest, Reroll 1s**, **5d6, Drop Lowest Two**, **The 6x6 Grid**, **70+ Minimum Total** and **3d6 Twelve Times, Keep Six**. Each has its own switch, and each is **off** until you turn it on. They are not 2024 rules. The switches are saved on this device and apply to all characters, not to one. When at least one is on, the wizard's Rolling option offers a **Rolling method** menu with that method added. [Step 5](#step-5-ability-scores) describes how each one works.
+
 ### House Rules
 
 House rules are **optional** changes that your table agrees to. They are **off by default**, so the app follows the official rules until you switch one on:
@@ -486,10 +503,10 @@ The DM workspace has nine pages:
 - **Campaign.** Name your campaign, keep notes, and switch between campaigns. Deleting a campaign asks first.
 - **Party.** One card per player, with the numbers you check most: Armor Class, Hit Points, Speed, passive Perception, Insight and Investigation, spell save DC, Darkvision, languages and conditions. Hover over or tap a number to see how it was worked out. A summary at the top shows the party's average level (rounded down), who has no Darkvision, and which languages everyone, or anyone, knows.
 - **Encounter.** Run a fight. Create an encounter, then **Add combatants**: your party, a creature from the library (the Monster Manual NPC blocks and the Player's Handbook creatures with fixed numbers), or a custom creature. Adding several copies numbers them and lets them share one Initiative roll. Players roll their own Initiative, so type it in. **Roll Initiative for monsters** rolls for everyone you control, with Disadvantage for anyone marked Surprised. **Start combat** puts everyone in order, highest first. Ties are yours to break: move a combatant up or down. Each card shows Armor Class and Hit Points. Type an amount and press **Damage** or **Heal**. Under **More**, pick a damage type and tick Resistance, Vulnerability or Immunity (Resistance halves, rounded down, before Vulnerability doubles). The same panel gives Temp HP, timed conditions, notes and a Concentration toggle. When a concentrating creature takes damage, the card shows the Constitution save and its DC, with the arithmetic on hover. A monster dies the moment it drops to 0 Hit Points, unless you tick the option to give it Death Saving Throws, and a player character at 0 Hit Points gets a Death Saving Throw tracker. **Next turn** moves on and starts a new round after the last combatant. Timed conditions lose one round when a new round starts, and the book sets no standard condition length, so treat the count as a reminder. **End combat** can copy the end-of-fight Hit Points back to your party cards. A creature with legendary actions (one you wrote yourself) shows a counter with **Use one** and **Refill**. The Monster Manual says a legendary action cannot be taken while Incapacitated, and that every use returns at the start of that creature's own turn, so the app refills them for you. Lair effects are not tracked. **Encounter balance** sits above the combatants: it adds up the creatures' XP and sets it against the Dungeon Master's Guide XP budget for your party's levels (Low, Moderate and High), with what is left to spend for each. The 2024 rules add the XP with no multiplier. It says which budget the encounter fits, notes the book's warnings (many creatures, a creature whose Challenge Rating is above the party's level, 0 XP creatures, too many stat blocks), and shows how every total was worked out. A creature with no XP value is listed and not counted: set it under **More**. When combat ends, **XP for this fight** lets you tick the creatures the party overcame and divides their XP evenly among the characters, rounded down.
-- **Library.** Every creature the app knows, with a search box and filters for Challenge Rating, creature type and source. Pick one to read its stat block (hover over a modifier to see how it was worked out). **Add to** puts one or several copies into an open encounter. **Make an editable copy** turns any creature into one of **your monsters**, which you can edit, delete, and use in every campaign. **New custom monster** starts from a blank sheet, including traits, actions, reactions and legendary actions. Only creatures with a fixed Armor Class and Hit Points can go straight into an encounter.
-- **Journal.** Your campaign's notebook: sessions, NPCs, locations, quests and plain notes, with a search box that looks at titles and text. A new session starts from a short outline and gets the next number. Quests have a status (Open, Done or Dropped) you can filter on. Link entries together by typing the other entry's title in double square brackets, such as [[Mira the Innkeeper]], or by choosing it from **Insert a link to**. A link shows as a button that opens that entry, a link to an entry that does not exist yet offers to create it, and each entry lists the entries that link to it. If you rename an entry, the links to it are updated. Text is saved as you type, and every campaign keeps its own journal.
-- **Generators.** Tools for improvising at the table. **Quick NPC** builds a person from the same name, appearance and character-description generators the character wizard uses. Choose any of species, gender, alignment, a class flavor (it changes how the description reads and gives no class features) and a role in your own words, such as "blacksmith", and leave the rest random. Press **Again** beside any part (name, age and looks, description, ideal, flaw, goals) to roll just that part. **Tavern** and **Shop** make a name and an owner. The owner is a quick NPC. **Save to journal** adds the NPC, or the place and its owner as two entries that link to each other. The tavern and shop names come from word lists written for this app, not from a rulebook, and an NPC made here is a description only, with no stat block.
-- **Treasure.** Rolls from the Dungeon Master's Guide treasure tables. **Individual** treasure comes from a monster's Challenge Rating, and for a group you roll once and multiply by the number of creatures. **Hoard** uses the CR of the monster, or of the leader of a group, and gives money plus a number of magic items. Tick **Fond of treasure** to roll twice, as the book suggests for a dragon. **Quest reward** rolls on the hoard table using the characters' level as the CR, and starts from your party's average level. Each roll can use the printed average instead of dice, and every total shows how it was worked out. **Take the money as** shows the value as coins, trade bars, gemstones or art objects of one value (largest first, with the change in coins). The book lets monetary treasure take any of those forms, but how you split it is your call. A **Treasure theme** only suggests a form. **Gems and art** rolls a number of named stones or art objects, and **Reference** lists the tables. When a roll gives magic items, choose the rarity and press **Roll** to pick them from the Random Magic Items tables (with no treasure theme, each item rolls 1d4 for Arcana, Armaments, Implements or Relics). Each item shows its description, and an entry that could not be matched to a source book is flagged for you to check. Two figures were read from a poor scan (the CR 11-16 hoard money and the CR 5-10 magic item count), so please check them against your book.
+- **Library.** Every creature the app knows, with a search box and filters for Challenge Rating, creature type and source. A line above the list sums up the encounter you are adding to (how many combatants, its XP with the working, and how hard it is for your party) with a link to open it, and a **Recently added to an encounter** row brings back the last creatures you added. On a narrow screen, picking a creature scrolls its stat block into view. Pick one to read its stat block (hover over a modifier to see how it was worked out). **Add to** puts one or several copies into an open encounter. **Make an editable copy** turns any creature into one of **your monsters**, which you can edit, delete, and use in every campaign. **New custom monster** starts from a blank sheet, including traits, actions, reactions and legendary actions. Only creatures with a fixed Armor Class and Hit Points can go straight into an encounter.
+- **Journal.** Your campaign's notebook: sessions, NPCs, locations, quests and plain notes, with a search box that looks at titles and text. A search with several words finds entries that contain every word, in any order. A new entry you leave untouched is dropped when you move away, so empty notes don't pile up. A new session starts from a short outline and gets the next number. Quests have a status (Open, Done or Dropped) you can filter on. Link entries together by typing the other entry's title in double square brackets, such as [[Mira the Innkeeper]], or by choosing it from **Insert a link to**. A link shows as a button that opens that entry, a link to an entry that does not exist yet offers to create it, and each entry lists the entries that link to it. If you rename an entry, the links to it are updated. Text is saved as you type, and every campaign keeps its own journal.
+- **Generators.** Tools for improvising at the table. **Quick NPC** builds a person from the same name, appearance and character-description generators the character wizard uses. Choose any of species, gender, alignment, a class flavor (it changes how the description reads and gives no class features) and a role in your own words, such as "blacksmith", and leave the rest random. Press **Again** beside any part (name, age and looks, description, ideal, flaw, goals) to roll just that part. **Tavern** and **Shop** make a name and an owner. The owner is a quick NPC. A **Name source** menu on both lets you use the app's own word lists (the default) or the Dungeon Master's Guide 2024 tables on page 94 (Tavern Names, Random Shops). Six more tabs roll on Dungeon Master's Guide 2024 tables: **Settlement** (optionally for a size you choose), **Adventure seed** (for a party tier and a kind of hook), **Dungeon**, **NPC details** (an appearance feature and a secret, to use beside Quick NPC), **Weather** and **Monster behavior**. Each has a roll button and an **Again** button beside each rolled line. Results stay put when you switch tabs. **Save to journal** adds the NPC, or the place and its owner as two entries that link to each other. Once saved, the button reads **Saved** until you roll something new, and **Open journal** jumps to that entry. A roll from one of the Dungeon Master's Guide tabs saves as a single journal entry. The tavern and shop names come from word lists written for this app, not from a rulebook, and an NPC made here is a description only, with no stat block.
+- **Treasure.** Rolls from the Dungeon Master's Guide treasure tables. **Individual** treasure comes from a monster's Challenge Rating, and for a group you roll once and multiply by the number of creatures. **Hoard** uses the CR of the monster, or of the leader of a group, and gives money plus a number of magic items. Tick **Fond of treasure** to roll twice, as the book suggests for a dragon. **Quest reward** rolls on the hoard table using the characters' level as the CR, and starts from your party's average level. Each roll can use the printed average instead of dice, and every total shows how it was worked out. **Take the money as** shows the value as coins, trade bars, gemstones or art objects of one value (largest first, with the change in coins). The book lets monetary treasure take any of those forms, but how you split it is your call. A **Treasure theme** only suggests a form. **Gems and art** rolls a number of named stones or art objects, and **Reference** lists the tables. When a roll gives magic items, choose the rarity and press **Roll** to pick them from the Random Magic Items tables (with no treasure theme, each item rolls 1d4 for Arcana, Armaments, Implements or Relics). Each item shows its description, and an entry that could not be matched to a source book is flagged for you to check. Under each item that could be matched, **Create item code** makes a code starting with `ITEM-`. Press **Copy code** and send it to the player, who pastes it into the **DM item code** card on their Inventory page. A flagged item has no code. Two figures were read from a poor scan (the CR 11-16 hoard money and the CR 5-10 magic item count), so please check them against your book.
 - **Party XP.** Build an XP award (from a fight, a milestone, a noncombat achievement, or a level) and see what each party member would gain. Each award becomes a code you send to the players, who paste it on their Advancement page.
 - **Settings.** Switch the theme, turn DM mode off, and **Export DM data** to a file or **Import DM data** from one. Campaigns are stored in this browser only, so export a copy now and then.
 
