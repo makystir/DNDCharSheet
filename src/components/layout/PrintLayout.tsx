@@ -67,9 +67,9 @@ export function PrintLayout({ character }: PrintLayoutProps) {
               {(data.identity.subclasses || data.identity.xp) && (
                 <tr>
                   <td className={styles.hdrCell}>Subclass</td>
-                  <td className={styles.valCell}>{data.identity.subclasses || '—'}</td>
+                  <td className={styles.valCell}>{data.identity.subclasses || 'â€”'}</td>
                   <td className={styles.hdrCell}>XP</td>
-                  <td className={styles.valCell}>{data.identity.xp || '—'}</td>
+                  <td className={styles.valCell}>{data.identity.xp || 'â€”'}</td>
                 </tr>
               )}
               <tr>
@@ -107,13 +107,13 @@ export function PrintLayout({ character }: PrintLayoutProps) {
         <section className={styles.sectionBox} aria-label="Proficiencies">
           <div className={styles.sectionTitle}>Proficiencies</div>
           <div className={styles.textBlock}>
-            <span className={styles.hdrInline}>Armor:</span> {data.proficiencies.armor || '—'}
+            <span className={styles.hdrInline}>Armor:</span> {data.proficiencies.armor || 'â€”'}
           </div>
           <div className={styles.textBlock}>
-            <span className={styles.hdrInline}>Weapons:</span> {data.proficiencies.weapons || '—'}
+            <span className={styles.hdrInline}>Weapons:</span> {data.proficiencies.weapons || 'â€”'}
           </div>
           <div className={styles.textBlock}>
-            <span className={styles.hdrInline}>Tools:</span> {data.proficiencies.tools || '—'}
+            <span className={styles.hdrInline}>Tools:</span> {data.proficiencies.tools || 'â€”'}
           </div>
         </section>
 

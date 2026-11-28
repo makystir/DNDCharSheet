@@ -152,3 +152,11 @@ describe('PrintLayout — essential character information', () => {
     expect(screen.getByText('6500')).toBeInTheDocument();
   });
 });
+describe('PrintLayout - empty placeholders', () => {
+  it('prints an em dash (not a replacement character) for empty proficiency and Subclass/XP cells', () => {
+    const { container } = render(<PrintLayout character={makeWizard()} />);
+    // A Wizard has no armor proficiency; no subclass is set and XP mode is off.
+    expect(screen.getByLabelText('Proficiencies')).toHaveTextContent('Armor: \u2014');
+    expect(container.textContent).not.toContain('\uFFFD');
+  });
+});
