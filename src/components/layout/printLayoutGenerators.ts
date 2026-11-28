@@ -29,10 +29,10 @@ import { getEquipment } from '../../data/equipment';
 import { getFeat } from '../../data/feats';
 import { getBackground } from '../../data/backgrounds';
 import { getSpell } from '../../data/spells';
-import { characterHitPointMaxBreakdown, effectiveHp } from '../../logic/hit-points-state';
+import { characterHitPointMaxBreakdown, effectiveHp, effectiveTempHp } from '../../logic/hit-points-state';
 import { initiativeBreakdown } from '../../logic/initiative';
 import { passivePerceptionBreakdown } from '../../logic/passive-checks';
-import { speedBreakdown, resolveSpecies, speciesTraits } from '../../logic/species';
+import { speedBreakdown, resolveSpecies, speciesTraits, darkvisionBreakdown } from '../../logic/species';
 import { allSavingThrowBreakdowns, savingThrowProficiency } from '../../logic/saving-throws';
 import { allSkillBreakdowns, effectiveSkillTraining } from '../../logic/skills';
 import {
@@ -55,7 +55,12 @@ import {
   resolveClass,
   resolveClasses,
   entrySubclass,
+  classProficiencies,
+  hitDiceByDieType,
 } from '../../logic/classes';
+import { hitDiceAvailable } from '../../logic/rests';
+import { masteryChoices } from '../../logic/weapon-mastery';
+import { characterXp, levelingMode } from '../../logic/advancement';
 import { knownLanguages } from '../../logic/languages';
 import { activeConditionIds, exhaustionLevelOf, withExhaustion } from '../../logic/conditions';
 import { equippedWeapons, weaponAttackProfile, unarmedStrike } from '../../logic/attacks';
@@ -90,6 +95,22 @@ export interface IdentitySection {
   background: string;
   alignment: string;
   languages: string;
+  /** Chosen subclass names, one per class that has one (empty when none). */
+  subclasses: string;
+  /** XP total; present only when the character levels by XP. */
+  xp: string;
+}
+
+/** A labelled line of text (Proficiencies, Hit Dice, Personal Details...). */
+export interface LabelledLine {
+  label: string;
+  value: string;
+}
+
+export interface ProficienciesSection {
+  armor: string;
+  weapons: string;
+  tools: string;
 }
 
 export interface AbilityRow {
@@ -166,6 +187,8 @@ export interface SpellsSection {
 export interface InventoryRow {
   name: string;
   quantity: number;
+  /** True when the item is worn/wielded (armor, shield or equipped weapon). */
+  equipped: boolean;
 }
 
 export interface CurrencyRow {
@@ -192,6 +215,11 @@ export interface PrintSheetData {
   coreStats: CoreStat[];
   /** Heroic Inspiration (PHB 2024): read-only on the sheet; set on the Overview. */
   heroicInspiration: boolean;
+  /** Hit Dice, Temp HP, Darkvision, Weapon Mastery: lines shown under Core Statistics. */
+  extras: LabelledLine[];
+  proficiencies: ProficienciesSection;
+  /** Filled-in Personal Details fields only (empty array when none). */
+  personalDetails: LabelledLine[];
   skills: SkillRow[];
   saves: SaveRow[];
   attacks: AttackRow[];
@@ -233,6 +261,13 @@ export function buildIdentity(character: Character): IdentitySection {
     background,
     alignment: character.alignment ?? '',
     languages: knownLanguages(character).join(', '),
+    subclasses: resolved
+      .flatMap(({ entry }) => {
+        const sub = entrySubclass(entry);
+        return sub ? [sub.name] : [];
+      })
+      .join(', '),
+    xp: levelingMode(character) === 'xp' ? `${characterXp(character)}` : '',
   };
 }
 
@@ -272,6 +307,65 @@ export function buildCoreStats(character: Character): CoreStat[] {
     { label: 'Initiative', value: signed(initiative.total) },
     { label: 'Passive Perception', value: `${passivePerception.total}` },
   ];
+}
+
+/**
+ * Lines shown under Core Statistics: Hit Dice (pooled by die type, with how many
+ * are unspent), Temp HP and Darkvision when above 0, and the Weapon Mastery
+ * choices that are currently usable. Every value is read from existing logic.
+ */
+export function buildExtras(character: Character): LabelledLine[] {
+  const lines: LabelledLine[] = [];
+  const pool = hitDiceByDieType(character);
+  const dice = Object.entries(pool)
+    .sort(([a], [b]) => Number(b) - Number(a))
+    .map(([die, count]) => `${count}d${die}`)
+    .join(' + ');
+  if (dice) {
+    lines.push({
+      label: 'Hit Dice',
+      value: `${dice} (${hitDiceAvailable(character)} unspent)`,
+    });
+  }
+  const tempHp = effectiveTempHp(character);
+  if (tempHp > 0) lines.push({ label: 'Temp HP', value: `${tempHp}` });
+  const darkvision = darkvisionBreakdown(character).total;
+  if (darkvision > 0) lines.push({ label: 'Darkvision', value: `${darkvision} ft` });
+  const masteries = masteryChoices(character)
+    .usable.flatMap((id) => {
+      const name = getWeapon(id)?.name;
+      return name ? [name] : [];
+    })
+    .join(', ');
+  if (masteries) lines.push({ label: 'Weapon Mastery', value: masteries });
+  return lines;
+}
+
+/** Armor, weapon and tool proficiencies (class-granted plus class-feature choices). */
+export function buildProficiencies(character: Character): ProficienciesSection {
+  const p = classProficiencies(character);
+  return { armor: p.armor.join(', '), weapons: p.weapons.join(', '), tools: p.tools.join(', ') };
+}
+
+/** Personal Details that are filled in, in sheet order. Free text, no mechanics. */
+export function buildPersonalDetails(character: Character): LabelledLine[] {
+  const fields: Array<[string, string | undefined]> = [
+    ['Faith', character.faith],
+    ['Age', character.age],
+    ['Height', character.height],
+    ['Weight', character.weight],
+    ['Eyes', character.eyes],
+    ['Hair', character.hair],
+    ['Skin', character.skin],
+    ['Description', character.personality],
+    ['Ideal', character.ideal],
+    ['Flaw', character.flaw],
+    ['Short-term goal', character.shortTermGoal],
+    ['Long-term goal', character.longTermGoal],
+  ];
+  return fields.flatMap(([label, value]) =>
+    value && value.trim() !== '' ? [{ label, value: value.trim() }] : [],
+  );
 }
 
 /** All skills with their modifier total + proficiency / expertise markers. */
@@ -441,9 +535,16 @@ export function buildSpells(character: Character): SpellsSection | undefined {
 
 /** Inventory + encumbrance + currency: item list, carried vs capacity, coin purse. */
 export function buildInventory(character: Character): InventorySection {
+  const eq = character.equipped;
+  const equippedIds = new Set<string>([
+    ...(eq?.armorItemId ? [eq.armorItemId] : []),
+    ...(eq?.shieldItemId ? [eq.shieldItemId] : []),
+    ...(eq?.weaponItemIds ?? []),
+  ]);
   const items = (character.inventory ?? []).map((item) => ({
     name: inventoryItemName(item),
     quantity: item.quantity,
+    equipped: equippedIds.has(item.id),
   }));
   const carried = carriedWeightBreakdown(character).total;
   const capacity = carryingCapacityBreakdown(character).total;
@@ -532,6 +633,9 @@ export function buildPrintSheetData(character: Character): PrintSheetData {
     abilities: buildAbilities(character),
     coreStats: buildCoreStats(character),
     heroicInspiration: character.heroicInspiration === true,
+    extras: buildExtras(character),
+    proficiencies: buildProficiencies(character),
+    personalDetails: buildPersonalDetails(character),
     skills: buildSkills(character),
     saves: buildSaves(character),
     attacks: buildAttacks(character),

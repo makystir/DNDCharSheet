@@ -492,7 +492,7 @@ Your characters are stored **only in this browser, on this device**. Nothing is 
 
 ### Print
 
-**Print character sheet** produces a paper copy, for when you want a physical sheet at the table.
+**Print character sheet** produces a paper copy, for when you want a physical sheet at the table. The printout shows plain numbers (no tooltips) and runs onto more than one page when the character has a lot to list. It carries your identity (species, class and level, subclass, background, alignment, languages, and XP if you level by XP), proficiency bonus, Armor Class, Hit Points (and Temporary Hit Points when you have any), Speed, Initiative, passive Perception, Hit Dice, Darkvision, Weapon Mastery choices, armor, weapon and tool proficiencies, ability scores, saving throws, skills, attacks, spells (for spellcasters), inventory (with worn and wielded items marked) and coins, features, traits and feats, active conditions, and any Personal Details you filled in. Things that change during play, such as death saves, spell slots spent and feature uses spent, are not printed.
 
 ### Dungeon Master mode
 

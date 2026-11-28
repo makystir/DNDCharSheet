@@ -64,6 +64,14 @@ export function PrintLayout({ character }: PrintLayoutProps) {
                 <td className={styles.hdrCell}>Alignment</td>
                 <td className={styles.valCell}>{data.identity.alignment || 'â€”'}</td>
               </tr>
+              {(data.identity.subclasses || data.identity.xp) && (
+                <tr>
+                  <td className={styles.hdrCell}>Subclass</td>
+                  <td className={styles.valCell}>{data.identity.subclasses || '—'}</td>
+                  <td className={styles.hdrCell}>XP</td>
+                  <td className={styles.valCell}>{data.identity.xp || '—'}</td>
+                </tr>
+              )}
               <tr>
                 <td className={styles.hdrCell}>Languages</td>
                 <td className={styles.valCell} colSpan={3}>
@@ -87,6 +95,25 @@ export function PrintLayout({ character }: PrintLayoutProps) {
           </div>
           <div className={styles.inspirationLine}>
             Heroic Inspiration: {data.heroicInspiration ? 'Yes' : 'No'}
+          </div>
+          {data.extras.map((line) => (
+            <div key={line.label} className={styles.textBlock}>
+              <span className={styles.hdrInline}>{line.label}:</span> {line.value}
+            </div>
+          ))}
+        </section>
+
+        {/* Proficiencies */}
+        <section className={styles.sectionBox} aria-label="Proficiencies">
+          <div className={styles.sectionTitle}>Proficiencies</div>
+          <div className={styles.textBlock}>
+            <span className={styles.hdrInline}>Armor:</span> {data.proficiencies.armor || '—'}
+          </div>
+          <div className={styles.textBlock}>
+            <span className={styles.hdrInline}>Weapons:</span> {data.proficiencies.weapons || '—'}
+          </div>
+          <div className={styles.textBlock}>
+            <span className={styles.hdrInline}>Tools:</span> {data.proficiencies.tools || '—'}
           </div>
         </section>
 
@@ -294,7 +321,10 @@ export function PrintLayout({ character }: PrintLayoutProps) {
               ) : (
                 data.inventory.items.map((item, i) => (
                   <tr key={`${item.name}-${i}`}>
-                    <td className={styles.cell}>{item.name}</td>
+                    <td className={styles.cell}>
+                      {item.name}
+                      {item.equipped ? ' (equipped)' : ''}
+                    </td>
                     <td className={styles.valCell}>{item.quantity}</td>
                   </tr>
                 ))
@@ -341,6 +371,22 @@ export function PrintLayout({ character }: PrintLayoutProps) {
             </tbody>
           </table>
         </section>
+
+        {/* Personal details (only the filled-in fields) */}
+        {data.personalDetails.length > 0 && (
+          <section
+            className={styles.sectionBox}
+            aria-label="Personal details"
+            data-section="personal-details"
+          >
+            <div className={styles.sectionTitle}>Personal Details</div>
+            {data.personalDetails.map((line) => (
+              <div key={line.label} className={styles.textBlock}>
+                <span className={styles.hdrInline}>{line.label}:</span> {line.value}
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* Conditions (only when any are active) */}
         {data.conditions.length > 0 && (

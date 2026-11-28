@@ -111,3 +111,44 @@ describe('PrintLayout — blank character', () => {
     expect(screen.getByText('Unnamed Character')).toBeInTheDocument();
   });
 });
+
+describe('PrintLayout — essential character information', () => {
+  it('prints proficiencies, hit dice, and equipped markers', () => {
+    render(<PrintLayout character={makeFighter()} />);
+    expect(screen.getByLabelText('Proficiencies')).toHaveTextContent('Armor:');
+    expect(screen.getByLabelText('Proficiencies')).toHaveTextContent('Martial');
+    expect(screen.getByLabelText('Core statistics')).toHaveTextContent('Hit Dice: 5d10 (5 unspent)');
+    expect(screen.getByLabelText('Inventory')).toHaveTextContent('(equipped)');
+  });
+  it('prints temp HP and spent hit dice', () => {
+    render(<PrintLayout character={makeFighter({ tempHp: 4, hitDiceSpent: 2 })} />);
+    const core = screen.getByLabelText('Core statistics');
+    expect(core).toHaveTextContent('Temp HP: 4');
+    expect(core).toHaveTextContent('Hit Dice: 5d10 (3 unspent)');
+  });
+  it('prints only the filled-in personal details', () => {
+    const { container } = render(
+      <PrintLayout character={makeFighter({ faith: 'Tyr', age: '34', ideal: 'Justice' })} />,
+    );
+    const section = container.querySelector('[data-section="personal-details"]');
+    expect(section).toHaveTextContent('Faith: Tyr');
+    expect(section).toHaveTextContent('Age: 34');
+    expect(section).toHaveTextContent('Ideal: Justice');
+    expect(section).not.toHaveTextContent('Height');
+  });
+  it('omits Personal Details when nothing is filled in', () => {
+    const { container } = render(<PrintLayout character={makeFighter()} />);
+    expect(container.querySelector('[data-section="personal-details"]')).toBeNull();
+  });
+  it('shows XP only when leveling by XP', () => {
+    const { rerender } = render(<PrintLayout character={makeFighter()} />);
+    expect(screen.queryByText('XP')).not.toBeInTheDocument();
+    rerender(
+      <PrintLayout
+        character={makeFighter({ advancement: { leveling: { mode: 'xp', xp: 6500 } } })}
+      />,
+    );
+    expect(screen.getByText('XP')).toBeInTheDocument();
+    expect(screen.getByText('6500')).toBeInTheDocument();
+  });
+});
