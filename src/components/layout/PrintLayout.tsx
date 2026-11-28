@@ -34,6 +34,10 @@ function PageFooter({ name }: { name: string }) {
   );
 }
 
+// TODO(follow-up): the print output does not yet include class-feature choices
+// (Metamagic, Eldritch Invocations, Battle Master Maneuvers, etc.) or spell levels
+// beside spell names. Deliberately left out for now; see
+// .agents/tasks/print-essentials/report.md ("Gaps deliberately left").
 export function PrintLayout({ character }: PrintLayoutProps) {
   const data = buildPrintSheetData(character);
 
